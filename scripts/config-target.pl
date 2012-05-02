@@ -16,10 +16,13 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 use strict;
+use File::Copy;
 require 'getcwd.pl';
 
 ### Compute TOP_BUILD_DIR ###
 our $progroot = $0;
+our $orig_progroot = "";
+
 my $cwd;
 if ($progroot !~ /^\//) {
   $cwd = getcwd();
@@ -41,6 +44,18 @@ while ($progroot =~ /\/[^\/]*?\/\.\.\//) {
 }
 # And finally remove the trailing slash
 $progroot =~ s/\/$//;
+# In the bitbake world the progroot is the directory above the bitbake_build
+if ($ENV{'BUILDDIR'} ne "") {
+  $orig_progroot = $progroot;
+  $progroot = "$ENV{'BUILDDIR'}/.." if ($ENV{'BUILDDIR'} ne "");
+}
+
+# Set base path depending on qemu location
+our $BPATH = "$progroot/host-cross/bin";
+if (-x "$progroot/host-cross/usr/bin/qemu") {
+  $BPATH = "$progroot/host-cross/usr/bin";
+}
+
 $ENV{'TOP_BUILD_DIR'} = $progroot;
 my $debug = 0;
 print "Program root: $progroot\n" if $debug;
@@ -58,14 +73,49 @@ our %tgt_vars;
 our $use_taskset = 1;
 
 sub setup_makefile_vars {
-  open(VAR, "$progroot/Makefile");
+  my $toparse = "$progroot/Makefile";
+  # For bitbake search for local.conf
+  my $bbconf = "$progroot/bitbake_build/conf/local.conf";
+  if (-e $bbconf) {
+    $toparse = $config_file if (-e $bbconf);
+    $tgt_vars{'TOP_PRODUCT_DIR'} = "$progroot/..";
+  } 
+
+  if (!(-e $config_file) && (-e $bbconf)) {
+    my $mach = "";
+    my $fstype = "";
+    open(VAR, $bbconf) || die "Could not open: $bbconf";
+    while($_ = <VAR>) {
+      chop();
+      if ($_ =~ /^\s*MACHINE\s*=\s*(\S+)/) {
+	$mach = $1;
+	$mach =~ s/\"//g;
+      }
+      if ($_ =~ /^\s*DEFAULT_IMAGE\s*=\s*(\S+)/) {
+	$fstype = $1;
+	$fstype =~ s/\"//g;
+      }
+    }
+    close(VAR);
+    my $bbfile = "$progroot/bitbake_build/tmp/deploy/images/config-vars-$fstype-$mach";
+    if (-e $bbfile) {
+      copy($bbfile, $config_file);
+    } else {
+      print "ERROR: could not find: $bbfile\n";
+      print "       Perhaps you need to build the root filesystem?\n";
+      exit 1;
+    }
+  }
+
+  open(VAR, "$toparse");
   while (<VAR>) {
     if (($_ =~ /^(PACKAGE_.*?) = (.*)/) ||
 	($_ =~ /^(TOP_.*?) = (.*)/) ||
 	($_ =~ /^(TARGET_KERNEL.*?) = (.*)/) ||
 	($_ =~ /^(LAYER_DIRS_.*?) = (.*)/) ||
 	($_ =~ /^(TARGET_ROOTFS.*?) = (.*)/) ||
-	($_ =~ /^(TARGET_BOARD.*?) = (.*)/)) {
+	($_ =~ /^(TARGET_BOARD.*?) = (.*)/) ||
+	($_ =~ /^(TARGET_BOARD)=\"(.*?)\"/)) {
       my $a = $1;
       my $b = $2;
       $b =~ s/^\"//;
@@ -370,7 +420,7 @@ while ($ARGV[0]) {
 }
 
 # Print a reasonable error message if QEMU is not present
-if (!(-x "$progroot/host-cross/bin/qemu")) {
+if (!(-x "$BPATH/qemu")) {
   open(LAYERS, "<$progroot/layers") ||
       die "ERROR: QEMU is unavailable!\n";
 
@@ -691,7 +741,7 @@ sub do_nfs_stop {
   system("$progroot/scripts/user-nfs.sh stop");
   # Stop faked as well if fakeroot_kill is not set
   if (!($ENV{'FAKEROOT_KILL'} eq "0" || $ENV{'FAKEROOT_KILL'} eq "no")) {
-    system("$progroot/host-cross/bin/pseudo -P $progroot/host-cross -S");
+    system("$BPATH/pseudo -P $progroot/host-cross -S");
   }
 }
 
@@ -834,7 +884,7 @@ sub tuntap_start {
   set_arp();
   my ($tgtip,$tapdev,$gw,$netmask) = computeTap();
   # The tunctl command
-  my $tuncmd = "$progroot/host-cross/bin/tunctl";
+  my $tuncmd = "$BPATH/tunctl";
   if ($tgt_vars{'TARGET_TAP_UID'} eq "default") {
     if ($< == 0) {
       my @st = stat("$progroot/host-cross");
@@ -912,7 +962,7 @@ sub tuntap_stop {
   print F<<EOF;
 #!/bin/sh
 $arp -i $tgt_vars{'TARGET_TAP_HOST_DEV'} -d $tgtip pub
-$progroot/host-cross/bin/tunctl -d $tapdev
+$BPATH/tunctl -d $tapdev
 EOF
   close(F);
   chown_file_cleanup($tuntapScript);
@@ -932,8 +982,8 @@ EOF
 }
 
 sub vde_start {
-  my $cmdsw = "$progroot/host-cross/bin/vde_switch";
-  my $cmdsv = "$progroot/host-cross/bin/slirpvde";
+  my $cmdsw = "$BPATH/vde_switch";
+  my $cmdsv = "$BPATH/slirpvde";
 
   if (!($tgt_vars{'TARGET_VIRT_ENET_TYPE'} eq "slirpvde")) {
     return;
@@ -1170,6 +1220,13 @@ sub qemu_start {
       $qopts .= " -kernel $tgt_vars{'TARGET_QEMU_KERNEL'}";
     } else {
       my $findfile = "$progroot/export/$tgt_vars{'TARGET_BOARD'}-$tgt_vars{'TARGET_QEMU_KERNEL'}-WR$tgt_vars{'PACKAGE_VERSION'}$tgt_vars{'PACKAGE_EXTRAVERSION'}";
+      if (!(-f $findfile)) {
+	# try without the -WR
+	my $ff = "$progroot/bitbake_build/tmp/deploy/images/$tgt_vars{'TARGET_QEMU_KERNEL'}-$tgt_vars{'TARGET_BOARD'}.bin";
+	if ($findfile) {
+	  $findfile = $ff;
+	}
+      }
       if ($tgt_vars{'TARGET_KERNEL'} ne "") {
 	$findfile .= "_$tgt_vars{'TARGET_KERNEL'}";
       }
@@ -1196,15 +1253,18 @@ sub qemu_start {
       }
     }
     $qopts .= " -net user -net nic,macaddr=$mac";
-    $qopts .= ",model=$tgt_vars{'TARGET_QEMU_ENET_MODEL'}" if $tgt_vars{'TARGET_QEMU_ENET_MODEL'} ne "auto";
+    $qopts .= ",model=$tgt_vars{'TARGET_QEMU_ENET_MODEL'}" if $tgt_vars{'TARGET_QEMU_ENET_MODEL'} ne "auto" &&
+	$tgt_vars{'TARGET_QEMU_ENET_MODEL'} ne "";
   } elsif ($tgt_vars{'TARGET_VIRT_ENET_TYPE'} eq "slirpvde") {
     $qopts .= " -net nic,macaddr=$mac";
-    $qopts .= ",model=$tgt_vars{'TARGET_QEMU_ENET_MODEL'}" if $tgt_vars{'TARGET_QEMU_ENET_MODEL'} ne "auto";
+    $qopts .= ",model=$tgt_vars{'TARGET_QEMU_ENET_MODEL'}" if $tgt_vars{'TARGET_QEMU_ENET_MODEL'} ne "auto" &&
+	$tgt_vars{'TARGET_QEMU_ENET_MODEL'} ne "";
     $qopts .= " -net vde,sock=$vdeDir";
   } elsif ($tgt_vars{'TARGET_VIRT_ENET_TYPE'} eq "tuntap") {
     $qopts .= " -net tap,ifname=$tapdev,script=/bin/true -net nic,macaddr=$mac";
-    $qopts .= ",model=$tgt_vars{'TARGET_QEMU_ENET_MODEL'}" if $tgt_vars{'TARGET_QEMU_ENET_MODEL'} ne "auto";
-  } elsif ($tgt_vars{'TARGET_QEMU_ENET_MODEL'} ne "auto") {
+    $qopts .= ",model=$tgt_vars{'TARGET_QEMU_ENET_MODEL'}" if $tgt_vars{'TARGET_QEMU_ENET_MODEL'} ne "auto" &&
+	$tgt_vars{'TARGET_QEMU_ENET_MODEL'} ne "";
+  } elsif ($tgt_vars{'TARGET_QEMU_ENET_MODEL'} ne "auto" && $tgt_vars{'TARGET_QEMU_ENET_MODEL'} ne "") {
     $qopts .= " -net nic,model=$tgt_vars{'TARGET_QEMU_ENET_MODEL'}";
   }
   # Hard Disk
@@ -1288,7 +1348,7 @@ sub qemu_start {
   ## Run QEMU
   my $qbin = $tgt_vars{'TARGET_QEMU_BIN'};
   if (! -f $qbin) {
-    $qbin = "$progroot/host-cross/bin/$tgt_vars{'TARGET_QEMU_BIN'}";
+    $qbin = "$BPATH/$tgt_vars{'TARGET_QEMU_BIN'}";
   }
   if (! -f $qbin) {
     $qbin = `which $tgt_vars{'TARGET_QEMU_BIN'} 2> /dev/null`;
@@ -1316,7 +1376,7 @@ sub qemu_start {
     }
   }
   # SMP options
-  if ($tgt_vars{'TARGET_QEMU_SMP'} ne "0") {
+  if ($tgt_vars{'TARGET_QEMU_SMP'} ne "0" && $tgt_vars{'TARGET_QEMU_SMP'} ne "") {
     $qopts .= " -smp $tgt_vars{'TARGET_QEMU_SMP'}";
   }
   # debug wait
@@ -1326,7 +1386,7 @@ sub qemu_start {
 
   my $cmd = "$qbin $qopts $kopts -pidfile $qPid";
   if ($tgt_vars{'TARGET_VIRT_ENET_TYPE'} eq "slirpvde") {
-    $cmd = "$progroot/host-cross/bin/vdeq $cmd"
+    $cmd = "$BPATH/vdeq $cmd"
   }
   if ($tgt_vars{'TARGET_VIRT_CPU_MASK'} ne "" &&
       $tgt_vars{'TARGET_VIRT_CPU_MASK'} ne "none") {
@@ -1423,7 +1483,7 @@ sub agent_proxy_start {
       int($tgt_vars{"TARGET_QEMU_PROXY_PORT"}) > 0 &&
       $tgt_vars{'TARGET_QEMU_USE_STDIO'} ne "yes") {
     my $pid;
-    my $cmd = "$progroot/host-cross/bin/agent-proxy 0+$tgt_vars{'TARGET_QEMU_PROXY_PORT'} 0.0.0.0 tcplisten:$tgt_vars{'TARGET_QEMU_PROXY_LISTEN_PORT'} -D -f $apPid\n";
+    my $cmd = "$BPATH/agent-proxy 0+$tgt_vars{'TARGET_QEMU_PROXY_PORT'} 0.0.0.0 tcplisten:$tgt_vars{'TARGET_QEMU_PROXY_LISTEN_PORT'} -D -f $apPid\n";
 
     if (!check_pid_start($apPid, "agent-proxy")) {
       return;
@@ -1493,7 +1553,7 @@ sub read_config {
   my @var;
   my @var1;
   my @var2;
-  
+
   if (-e $extra_brd_config) {
     open(VAR, $extra_brd_config);
     @var1 = <VAR>;
@@ -1815,8 +1875,16 @@ sub find_simics_dir {
       if (-e "$_/wrll-simics/config-target-simics.pl") {
 	return "$_/wrll-simics";
       }
+      if (-e "$_/wr-simics/config-target-simics.pl") {
+	return "$_/wr-simics";
+      }
     }
     close(F);
+  }
+
+  if ($orig_progroot ne "" && (-e "$orig_progroot/../wr-simics")) {
+      # Special case for bitbake looking for wr-simics 
+      return "$orig_progroot/../wr-simics";
   }
 
   if (-e "$tgt_vars{'TOP_PRODUCT_DIR'}/../layers/wrll-simics/config-target-simics.pl") {

@@ -1,0 +1,37 @@
+#!/bin/bash
+# This is a simple script to emulate "make start-target" it is perfectly fine
+# to just invoke config-target.pl directly
+
+args=""
+cmd=""
+env=""
+while [ $# -gt 0 ]; do
+    # Check for other args that can take a file
+    case $1 in
+	nfs-start) cmd=nfs-start ; shift ; continue ;;
+	nfs-stop) cmd=nfs-stop ; shift ; continue ;;
+	net-start) cmd=net-start ; shift ; continue ;;
+	net-stop) cmd=net-stop ; shift ; continue ;;
+
+	start-target) cmd=start ; shift ; continue ;;
+	stop-target) cmd=stop ; shift ; continue ;;
+	config-target) cmd=config ; shift ; continue ;;
+
+	start-qemu) env="$env TARGET_VIRT_TYPE=qemu" ; cmd=start ; shift ; continue ;;
+	stop-qemu) env="$env TARGET_VIRT_TYPE=qemu" ; cmd=stop ; shift ; continue ;;
+	config-target-qemu) env="$env TARGET_VIRT_TYPE=qemu" ; cmd=config ; shift ; continue ;;
+
+	start-simics) env="$env TARGET_VIRT_TYPE=simics" ; cmd=start ; shift ; continue ;;
+	stop-simics) env="$env TARGET_VIRT_TYPE=simics" ; cmd=stop ; shift ; continue ;;
+	config-target-simics) env="$env TARGET_VIRT_TYPE=simics" ; cmd=config ; shift ; continue ;;
+	start-simics-vmp) env="$env TARGET_VIRT_TYPE=simics" ; cmd=start-vmp ; shift ; continue ;;
+
+	TOPTS=*) args="$args ${1#TOPTS=}" ; shift ; continue ;;
+	*=*) env="$env ${1%%=*}=\"${1#*=}\"" ; shift ; continue ;;
+    esac
+    args="$args $1"
+    shift
+done
+DIR=`dirname $0`
+
+eval $env exec perl $DIR/config-target.pl $cmd $args
