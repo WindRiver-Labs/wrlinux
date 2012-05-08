@@ -13,7 +13,7 @@ require wrlinux-image-glibc-std.bb
 #
 PR = "r0"
 
-# sato (x11)
+# sato & more! (x11)
 #
-IMAGE_FEATURES += "${ENHANCED_IMAGE_FEATURES} x11-sato"
+IMAGE_FEATURES += "${ENHANCED_IMAGE_FEATURES} core-lsb-more core-lsb-graphics-plus x11-sato"
 
