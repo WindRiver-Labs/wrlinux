@@ -1,0 +1,34 @@
+---
+ term-utils/script.c |   12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+--- a/term-utils/script.c
++++ b/term-utils/script.c
+@@ -482,9 +482,11 @@ handle_fifo_fd(char *ibuf)
+ 			}
+ 			rcons[rcons_in_use] = sock;
+ 			FD_SET(rcons[rcons_in_use], &master_rds);
+-			con_focus = rcons_in_use;
++			if (!getenv("NO_SCRIPT_SWITCH_CONNECT")) {
++				con_focus = rcons_in_use;
++				printf("Switching focus to console: %i\r\n", con_focus + 1);
++			}
+ 			rcons_in_use++;
+-			printf("Switching focus to console: %i\r\n", rcons_in_use);
+ 			refresh_nsockhandle();
+ 		}
+ fifo_out:
+@@ -519,9 +521,11 @@ handle_listen_sock(void)
+ 			fprintf(stderr, "error on socket accept()\n");
+ 		} else {
+ 			FD_SET(rcons[rcons_in_use], &master_rds);
+-			con_focus = rcons_in_use;
++			if (!getenv("NO_SCRIPT_SWITCH_CONNECT")) {
++				con_focus = rcons_in_use;
++				printf("Switching focus to console: %i\r\n", con_focus + 1);
++			}
+ 			rcons_in_use++;
+-			printf("Switching focus to console: %i\r\n", rcons_in_use);
+ 			refresh_nsockhandle();
+ 		}
+ 	}

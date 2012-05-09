@@ -1,0 +1,29 @@
+No longer send SIGTERM to the entire process group in an error condition
+
+This fixes a long standing problem where a SIGTERM is sent to the
+process group and it can kill the parent process.
+
+Earlier patches have already modified the script utility such that a
+parent will correctly get the exit code of the child.  It just a
+matter of setting the childstatus correctly and calling done(), vs
+sending a SIGTERM to the entire process group, which can also kill the
+parent of what ever started script if it did not create a new process
+group before calling fork() and exec().
+
+---
+ term-utils/script.c |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+--- a/term-utils/script.c
++++ b/term-utils/script.c
+@@ -843,7 +843,9 @@ fail(void) {
+ 	if (console_fifo)
+ 		unlink(console_fifo);
+ 
+-	kill(0, SIGTERM);
++	childstatus = SIGTERM;
++	if (subchild == 0 && child > 0)
++		kill(0, SIGTERM);
+ 	done();
+ }
+ 
