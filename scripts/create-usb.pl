@@ -18,9 +18,16 @@
 use strict;
 require 'getcwd.pl';
 my $progroot = $0;
+my $orig_progroot = $0;
 compute_top_build_dir();
-$ENV{'PATH'} = "$progroot/host-cross/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+$ENV{'PATH'} = "$progroot/host-cross/bin:$progroot/host-cross/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+my $pseudo_dist = "$progroot/export/pseudo.dist";
+# bitbake sets BUILDDIR
+if ($ENV{'BUILDDIR'} ne "") {
+    $ENV{'ALT_PSEUDO_LOCALSTATEDIR'} = "$pseudo_dist";
+}
 
+chdir($progroot) || die "Could not change directory $progroot";
 # Question answer globals
 my $use_img = -1; # -1 = ask, 0 = write usb, 1 = write image
 my $size_of_fat16 = 64;  # Default fat 16 size
@@ -53,7 +60,11 @@ my $iso_cfg_file = "syslinux-usb-initrd.cfg";
 my $iso_initrd_file = "busybox-initrd-static";
 my $iso_cfg_dir = "";
 my $readonly = 1;
-my $mbr_file = "$progroot/host-cross/share/syslinux/mbr.bin";
+my $syslinux_usr_dir = "$progroot/host-cross/share/syslinux";
+if (-e "$progroot/host-cross/usr/share/syslinux/mbr.bin") {
+    $syslinux_usr_dir = "$progroot/host-cross/usr/share/syslinux";
+}
+my $mbr_file = "$syslinux_usr_dir/mbr.bin";
 my $do_system = 1;  # Internal debug variable for execing commands
 my @mounts; # List of what devices are mounted locally
 my @execARG = @ARGV;
@@ -115,8 +126,8 @@ while (@ARGV) {
     shift @ARGV;
 }
 
+$SIG{INT} = \&shutdown_clean;
 if ($useloop) {
-    $SIG{INT} = \&shutdown_loopdev;
     if (system("/sbin/losetup -h 2>&1 |grep sizelimit > /dev/null") != 0) {
 	$USE_LOOP_SIZELIMIT = 0;
     }
@@ -134,8 +145,8 @@ if (!$use_img) {
         print "The program writes to raw devices.\n";
 	print "Please become root and run the program\n";
 	print "Attempting to run: sudo $0 @execARG\n";
-	exec "sudo $0 @execARG --usbimg";
-	exit -1;
+	exec "sudo BUILDDIR=\"$ENV{'BUILDDIR'}\" $0 @execARG --usbimg";
+	exit_error();
     }
 
     print "================================================================\n";
@@ -163,7 +174,7 @@ if (!$use_img) {
 if ($use_img) {
     if (! (-e "$progroot/export/dist/.")) {
 	print "ERROR: No export/dist directory exists, stopping\n";
-	exit -1;
+	exit_error();
     }
     $size_of_fat16 = ask_general("Size of FAT16 boot <#MEGS>", $size_of_fat16) if $ask_fat16;
     ask_ext2_size();
@@ -211,24 +222,30 @@ while(<F>) {
 	chop($iso_cfg_dir);
 	last;
     }
+    if (-e "$dirspec$_/data/syslinux/$iso_cfg_file") {
+	$iso_cfg_dir = `readlink -f $dirspec$_/data/syslinux`;
+	chop($iso_cfg_dir);
+	last;
+    }
 }
 close(F);
 if ($iso_cfg_dir eq "") {
     print "ERROR: Could not locate the $iso_cfg_file\n";
-    exit -1;
+    exit_error();
 }
 if (!(-e $iso_initrd_file)) {
     $iso_initrd_file = "$iso_cfg_dir/$iso_initrd_file";
 } 
 if (!(-e $iso_initrd_file)) {
     print "ERROR: Could not locate the $iso_cfg_dir/busybox-initrd-static\n";
-    exit -1;
+    exit_error();
 }
 
 print "\n#############  Begin scripted Execution ##################\n";
 
 if ($use_img) {
     create_img();
+    restore_pseudo_dir();
     exit 0;
 }
 
@@ -237,6 +254,7 @@ if ($use_img) {
 # Start with formatting the device
 format_usb_and_copy();
 
+restore_pseudo_dir();
 exit 0;
 
 #-------------------------------------------------------------------#
@@ -363,9 +381,10 @@ EOF
     print "# Modify rootfs\n";
     make_fs_template("export/dist");
     chdir($progroot) || die "Could not change dir to $progroot";
-    if (scriptcmd("./scripts/fakestart.sh ./host-cross/bin/genext2fs -z -b $prtsz[1][2] -d export/dist $tmpinst.2") != 0) {
+    move_pseudo_dir();
+    if (scriptcmd("./scripts/fakestart.sh genext2fs -z -b $prtsz[1][2] -d export/dist $tmpinst.2") != 0) {
 	print "ERROR: File system creation failed!\n";
-	exit -1;
+	exit_error();
     }
     scriptcmd("e2label $tmpinst.2 wr_usb_boot");
 
@@ -478,7 +497,7 @@ sub format_usb_and_copy {
 	scriptcmd("mke2fs -L wr_usb_boot $instdev" . "2");
 	$ret = mount_and_copy($instdev . "2");
     }
-    exit 1 if ($ret);
+    exit_error() if ($ret);
 }
 
 sub dos_copy {
@@ -502,7 +521,7 @@ sub dos_copy {
 	system("perl -p -i -e 's/(append.* )ro /\$1rw /' $progroot/syslinux.cfg");
     }
     scriptcmd("mcopy -o $iso_cfg_dir/devices.txt $iso_cfg_dir/help.txt $iso_cfg_dir/splash.lss $iso_cfg_dir/splash.txt m:");
-    scriptcmd("mcopy -o $progroot/host-cross/share/syslinux/isolinux.bin $progroot/host-cross/share/syslinux/vesamenu.c32 $progroot/host-cross/share/syslinux/menu.c32 $progroot/syslinux.cfg m:");
+    scriptcmd("mcopy -o $syslinux_usr_dir/isolinux.bin $syslinux_usr_dir/vesamenu.c32 $syslinux_usr_dir/menu.c32 $progroot/syslinux.cfg m:");
     scriptcmd("mcopy -o $bzImage_file m:vmlinuz");
     scriptcmd("mcopy -o $iso_initrd_file m:initrd");
     unlink($MTOOLSRC);
@@ -530,6 +549,7 @@ sub mount_and_copy {
 	    print "ERROR: No export/dist directory exists, stopping\n";
 	    return -1;
 	}
+	move_pseudo_dir();
 	print "./scripts/fakestart.sh tar -C export/dist -cSpf - . | (cd $MNTPOINT && tar -xSvf -)\n";
 	open(F, "./scripts/fakestart.sh tar -C export/dist -cSpf - . | (cd $MNTPOINT && tar -xSvf -) |");
     }
@@ -706,10 +726,14 @@ sub make_fs_template {
     }
     while(<F>) {
 	chop();
-	if (-e "$dirspec$_/templates/feature/readonly_root/fs_final.sh") {
-	    $fs_final_loc = `readlink -f $dirspec$_/templates/feature/readonly_root/fs_final.sh`;
+	my $dir = "$dirspec$_/templates/feature/readonly_root";
+	if (-e "$dirspec$_/data/syslinux/readonly_root") {
+	    $dir = "$dirspec$_/data/syslinux/readonly_root";
+	}
+	if (-e "$dir/fs_final.sh") {
+	    $fs_final_loc = `readlink -f $dir/fs_final.sh`;
 	    chop($fs_final_loc);
-	    $fs_dir = `readlink -f $dirspec$_/templates/feature/readonly_root/fs`;
+	    $fs_dir = `readlink -f $dir/fs`;
 	    chop($fs_dir);
 	    last;
 	}
@@ -719,6 +743,7 @@ sub make_fs_template {
 	die "ERROR: Could not locate the readonly rootfs fs_final.sh script";
     }
 
+    move_pseudo_dir();
     if ($readonly) {
 	scriptcmd("mkdir -p $dir/etc/initial_setup");
 	scriptcmd("cp -f $fs_dir/etc/initial_setup/00read_only_root.sh $dir/etc/initial_setup");
@@ -792,21 +817,25 @@ sub ask_usb_device {
 	}
     } else {
 	if (!check_dev_good($instdev)) {
-	    exit -1;
+	    exit_error();
 	}
     }
 }
 sub mbr_check {
     if (!(-e $mbr_file)) {
 	print "ERROR: Could not locate the mbr.bin file for syslinux\n";
-	exit -1;
+	exit_error();
     }
 }
 
 sub compute_top_build_dir {
     ### Compute TOP_BUILD_DIR ###
     my $cwd;
-    if ($progroot !~ /^\//) {
+    # In the bitbake world the progroot is the directory above the bitbake_build
+    if ($ENV{'BUILDDIR'} ne "") {
+	$orig_progroot = $progroot;
+	$progroot = "$ENV{'BUILDDIR'}/.." if ($ENV{'BUILDDIR'} ne "");
+    } elsif ($progroot !~ /^\//) {
 	$cwd = getcwd();
 	$progroot = "$cwd/./$progroot";
     }
@@ -829,7 +858,27 @@ sub compute_top_build_dir {
     $ENV{'TOP_BUILD_DIR'} = $progroot;
 }
 
-sub shutdown_loopdev {
+sub move_pseudo_dir {
+    if (-d "export/dist/var/pseudo") {
+	scriptcmd("PSEUDO_PREFIX=$progroot/host-cross/usr PSEUDO_LOCALSTATEDIR=$progroot/export/dist/var/pseudo $progroot/host-cross/usr/bin/pseudo -S");
+	scriptcmd("rm -rf $pseudo_dist");
+	scriptcmd("mv export/dist/var/pseudo $pseudo_dist");
+    }
+}
+
+sub restore_pseudo_dir {
+    if (-d $pseudo_dist) {
+	scriptcmd("PSEUDO_PREFIX=$progroot/host-cross/usr PSEUDO_LOCALSTATEDIR=$pseudo_dist $progroot/host-cross/usr/bin/pseudo -S");
+	scriptcmd("mv $pseudo_dist export/dist/var/pseudo");
+    }
+}
+
+sub exit_error {
+    restore_pseudo_dir();
+    exit 1;
+}
+
+sub shutdown_clean {
     if ($LOOP_DEV ne "") {
 	print "ERROR: $0 interrupted\n";
 	print "   Force shuting down $LOOP_DEV\n";

@@ -1,2 +1,2 @@
-EXTRA_IMAGEDEPENDS += "unfs-server-native"
+EXTRA_IMAGEDEPENDS += "unfs-server-native syslinux-native"
 
