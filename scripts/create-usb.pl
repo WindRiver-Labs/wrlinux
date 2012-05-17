@@ -20,7 +20,7 @@ require 'getcwd.pl';
 my $progroot = $0;
 my $orig_progroot = $0;
 compute_top_build_dir();
-$ENV{'PATH'} = "$progroot/host-cross/bin:$progroot/host-cross/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+$ENV{'PATH'} = "$progroot/host-cross/bin:$progroot/host-cross/usr/bin:$progroot/host-cross/usr/sbin:/usr/bin:/bin:/usr/sbin:/sbin";
 my $pseudo_dist = "$progroot/export/pseudo.dist";
 # bitbake sets BUILDDIR
 if ($ENV{'BUILDDIR'} ne "") {
@@ -314,7 +314,7 @@ sub create_img {
     $cyl = int($cyl + 1) if ($cyl != int($cyl));
     if (!$useloop) {
 	unlink($tmpinst0);
-	my $create_disk = sprintf("./host-cross/bin/qemu-img create -f raw $tmpinst0 %iM", $size_of_fat16 + $size_of_ext2 + 1);	
+	my $create_disk = sprintf("qemu-img create -f raw $tmpinst0 %iM", $size_of_fat16 + $size_of_ext2 + 1);	
 	scriptcmd($create_disk);
     }
     scriptcmd($ddcmd) if (!$useloop);
@@ -520,7 +520,7 @@ sub dos_copy {
     } else {
 	system("perl -p -i -e 's/(append.* )ro /\$1rw /' $progroot/syslinux.cfg");
     }
-    scriptcmd("mcopy -o $iso_cfg_dir/devices.txt $iso_cfg_dir/help.txt $iso_cfg_dir/splash.lss $iso_cfg_dir/splash.txt m:");
+    scriptcmd("mcopy -o $iso_cfg_dir/help.txt $iso_cfg_dir/splash.lss $iso_cfg_dir/splash.txt m:");
     scriptcmd("mcopy -o $syslinux_usr_dir/isolinux.bin $syslinux_usr_dir/vesamenu.c32 $syslinux_usr_dir/menu.c32 $progroot/syslinux.cfg m:");
     scriptcmd("mcopy -o $bzImage_file m:vmlinuz");
     scriptcmd("mcopy -o $iso_initrd_file m:initrd");
