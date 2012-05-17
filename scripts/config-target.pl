@@ -1814,7 +1814,7 @@ sub simTypeAvailable {
     } elsif ($_ =~ /^TARGET_SIMICS_BIN/) {
       $fallback = "simics" if $fallback eq "";
       $got_simics = 1;
-    } elsif ($_ =~ /^TARGET_QEMU_BIN/) {
+    } elsif ($_ =~ /^TARGET_QEMU_BIN/ && $_ !~ /\"\"/) {
       $fallback = "qemu";
       $got_qemu = 1;
     } elsif ($_ =~ /^TARGET_UML_KERNEL/) {
