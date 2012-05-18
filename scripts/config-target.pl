@@ -77,7 +77,6 @@ sub setup_makefile_vars {
   # For bitbake search for local.conf
   my $bbconf = "$progroot/bitbake_build/conf/local.conf";
   if (-e $bbconf) {
-    $toparse = $config_file if (-e $bbconf);
     $tgt_vars{'TOP_PRODUCT_DIR'} = "$progroot/..";
   } 
 
@@ -1228,7 +1227,9 @@ sub qemu_start {
 	}
       }
       if ($tgt_vars{'TARGET_KERNEL'} ne "") {
-	$findfile .= "_$tgt_vars{'TARGET_KERNEL'}";
+	my $ff = $findfile;
+	$ff .= "_$tgt_vars{'TARGET_KERNEL'}";
+	$findfile = $ff if (-e $ff);
       }
       if (-f $findfile) {
 	$qopts .= " -kernel $findfile";
