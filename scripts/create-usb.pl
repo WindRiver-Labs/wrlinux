@@ -445,7 +445,7 @@ sub format_usb_and_copy {
 
     mbr_check();
     if ($useloop) {
-	my $cmd = sprintf("./host-cross/bin/qemu-img create -f raw ./export/usb.img %iM", $size_of_fat16 + $size_of_ext2 + 1);
+	my $cmd = sprintf("qemu-img create -f raw ./export/usb.img %iM", $size_of_fat16 + $size_of_ext2 + 1);
 	scriptcmd($cmd);
 	scriptcmd(sprintf("chown %i ./export/usb.img", $l_uid));
 	$instdev = `/sbin/losetup -f 2> /dev/null`;
