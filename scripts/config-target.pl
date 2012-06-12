@@ -420,7 +420,11 @@ while ($ARGV[0]) {
 
 # Print a reasonable error message if QEMU is not present
 if (!(-x "$BPATH/qemu")) {
-  open(LAYERS, "<$progroot/layers") ||
+  my $layers = "$progroot/layers";
+  if (-f "$progroot/layer_paths") {
+    $layers = "$progroot/layer_paths"
+  }
+  open(LAYERS, "<$layers") ||
       die "ERROR: QEMU is unavailable!\n";
 
   my $found_qemu = "no";
@@ -1867,10 +1871,14 @@ sub tgt_confs_instance {
 sub find_simics_dir {
   if (-e "$progroot/scripts/config-target-simics.pl") {
     return "$progroot/scripts";
-  } 
+  }
 
-  if (-e "$progroot/layers") {
-    open(F, "$progroot/layers");
+  my $layers = "$progroot/layers";
+  if (-f "$progroot/layer_paths") {
+    $layers = "$progroot/layer_paths"
+  }
+  if (-e "$layers") {
+    open(F, "$layers");
     while (<F>) {
       chop();
       if (-e "$_/wrll-simics/config-target-simics.pl") {

@@ -209,11 +209,19 @@ if ($readonly_ask ne "") {
 
 # Search for the installer/dist/syslinux/syslinux.cfg file
 my $dirspec = "";
-if (-f "$progroot/layers") {
-  open(F, "$progroot/layers");
-} else {
-  $dirspec = "export/";
-  open(F, "export/layers");
+my $f = "";
+my $layers = "";
+foreach $f ("layer_paths", "layers") {
+    if (-f "$progroot/$f") {
+	open(F, "$progroot/$f");
+	$layers = $f;
+	last;
+    } elsif (-f "export/$f") {
+	$dirspec = "export/";
+	$layers = $f;
+	open(F, "export/$f");
+	last;
+    }
 }
 while(<F>) {
     chop();
@@ -717,13 +725,7 @@ sub make_fs_template {
     my $fs_final_loc = "";
     my $fs_dir = "";
     # Find the readonly_root feature template
-    my $dirspec;
-    if (-f "$progroot/layers") {
-      open(F, "$progroot/layers");
-    } else {
-      $dirspec = "export/";
-      open(F, "export/layers");
-    }
+    open(F, "$dirspec$layers");
     while(<F>) {
 	chop();
 	my $dir = "$dirspec$_/templates/feature/readonly_root";
