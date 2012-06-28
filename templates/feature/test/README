@@ -1,0 +1,11 @@
+This template adds test-related packages.
+
+To use, add
+
+--with-template=feature/test
+
+as a configure option, or
+
+--enable-test=yes
+
+See the template configuration file for the list of packages included with this feature.
