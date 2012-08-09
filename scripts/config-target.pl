@@ -55,6 +55,15 @@ our $BPATH = "$progroot/host-cross/bin";
 if (-x "$progroot/host-cross/usr/bin/qemu") {
   $BPATH = "$progroot/host-cross/usr/bin";
 }
+if ($ENV{'BUILD_BIN_DIR'} ne "") {
+  $BPATH = $ENV{'BUILD_BIN_DIR'}
+}
+
+our $CROSSPATH = "$progroot/host-cross";
+if ($ENV{'HOST_CROSS_SYSROOT_DIR'} ne "") {
+  $CROSSPATH = $ENV{'HOST_CROSS_SYSROOT_DIR'}
+}
+
 
 $ENV{'TOP_BUILD_DIR'} = $progroot;
 my $debug = 0;
@@ -668,7 +677,7 @@ exit 0;
 #############################################
 sub chown_file_cleanup {
   my ($file) = @_;
-  my @st = stat("$progroot/host-cross");
+  my @st = stat("$CROSSPATH");
   chown($st[4], -1, $file);
 }
 
@@ -744,7 +753,7 @@ sub do_nfs_stop {
   system("$progroot/scripts/user-nfs.sh stop");
   # Stop faked as well if fakeroot_kill is not set
   if (!($ENV{'FAKEROOT_KILL'} eq "0" || $ENV{'FAKEROOT_KILL'} eq "no")) {
-    system("$BPATH/pseudo -P $progroot/host-cross -S");
+    system("$BPATH/pseudo -P $CROSSPATH -S");
   }
 }
 
@@ -890,7 +899,7 @@ sub tuntap_start {
   my $tuncmd = "$BPATH/tunctl";
   if ($tgt_vars{'TARGET_TAP_UID'} eq "default") {
     if ($< == 0) {
-      my @st = stat("$progroot/host-cross");
+      my @st = stat("$CROSSPATH");
       $tuncmd .= " -u $st[4]";
     } else {
       $tuncmd .= " -u $<";
