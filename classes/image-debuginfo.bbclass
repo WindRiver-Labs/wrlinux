@@ -63,13 +63,17 @@ rpm_collect_debuginfo_files() {
 	# Capture the new solution w/ the debug files...
         ${RPM} -D "_dbpath ${INSTALL_ROOTFS_RPM}/install" -qa --qf "%{packageorigin}\n" \
                 -D "__dbi_txn create nofsync private" | sort \
-                > ${INSTALL_ROOTFS_RPM}/install/dbg-total-solution.manifest
+                > ${INSTALL_ROOTFS_RPM}/install/dbg-total-solution.manifest || :
 
-	grep -Fv -f ${INSTALL_ROOTFS_RPM}/install/dbg-already_installed.manifest ${INSTALL_ROOTFS_RPM}/install/dbg-total-solution.manifest > \
-		${INSTALL_ROOTFS_RPM}/install/dbg-solution.manifest
+	if [ -s ${INSTALL_ROOTFS_RPM}/install/dbg-total-solution.manifest ]; then
+	   grep -Fv -f ${INSTALL_ROOTFS_RPM}/install/dbg-already_installed.manifest ${INSTALL_ROOTFS_RPM}/install/dbg-total-solution.manifest > \
+		${INSTALL_ROOTFS_RPM}/install/dbg-solution.manifest || :
+	fi
 
-	echo "  Installing debug specific packages"
-	rpm_update_pkg ${INSTALL_ROOTFS_RPM}/install/dbg-solution.manifest 1>>`dirname ${BB_LOGFILE}`/log.do_rootfs.install-dbg.${PID} 2>&1 || true
+	if [ -s ${INSTALL_ROOTFS_RPM}/install/dbg-solution.manifest ]; then
+	   echo "  Installing debug specific packages (ignoring errors)"
+	   rpm_update_pkg ${INSTALL_ROOTFS_RPM}/install/dbg-solution.manifest 1>>`dirname ${BB_LOGFILE}`/log.do_rootfs.install-dbg.${PID} 2>&1 || true
+	fi
 
 	# Cleanup the various temp files
 	cp -a ${INSTALL_ROOTFS_RPM}/install/dbg-* ${WORKDIR}/temp/.
