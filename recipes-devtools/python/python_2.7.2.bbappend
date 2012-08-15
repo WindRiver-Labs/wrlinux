@@ -1,0 +1,2 @@
+# Disable BBCLASSEXTEND nativesdk
+BBCLASSEXTEND = ""

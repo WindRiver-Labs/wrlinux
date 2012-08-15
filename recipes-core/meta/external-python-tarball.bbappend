@@ -1,0 +1,3 @@
+# Python-nativesdk-sqlite3 is not being built...
+
+TOOLCHAIN_HOST_TASK := "${@oe_filter_out('python-nativesdk-sqlite3', '${TOOLCHAIN_HOST_TASK}', d)}"
