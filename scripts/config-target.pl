@@ -1,6 +1,5 @@
 #!/usr/bin/perl
-
-#  Copyright (c) 2005-2008,2010-2011 Wind River Systems, Inc.
+#  Copyright (c) 2005-2008,2010-2012 Wind River Systems, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
@@ -1891,22 +1890,22 @@ sub find_simics_dir {
     while (<F>) {
       chop();
       if (-e "$_/wrll-simics/config-target-simics.pl") {
+	close(F);
 	return "$_/wrll-simics";
       }
       if (-e "$_/wr-simics/config-target-simics.pl") {
+	close(F);
 	return "$_/wr-simics";
       }
     }
     close(F);
   }
 
-  if ($orig_progroot ne "" && (-e "$orig_progroot/../wr-simics")) {
-      # Special case for bitbake looking for wr-simics 
-      return "$orig_progroot/../wr-simics";
-  }
-
   if (-e "$tgt_vars{'TOP_PRODUCT_DIR'}/../layers/wrll-simics/config-target-simics.pl") {
     return "$tgt_vars{'TOP_PRODUCT_DIR'}/../layers/wrll-simics";
+  }
+  if (-e "$tgt_vars{'TOP_PRODUCT_DIR'}/../layers/wr-simics/config-target-simics.pl") {
+    return "$tgt_vars{'TOP_PRODUCT_DIR'}/../layers/wr-simics";
   }
   return "";
 }
