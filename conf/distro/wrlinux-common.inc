@@ -1,5 +1,13 @@
 # information common to all wrlinux distros
 #
+
+# Wind River assumes that we want 32-bit pseudo wrappers, so enable
+# them by default, but allow a knowledgable user to override the setting
+#
+# OE-Core default is set in the pseudo recipe and defaults to '1'.
+#
+NO32LIBS ?= "0"
+
 MAINTAINER = "Wind River <info@windriver.com>"
 
 TARGET_VENDOR = "-wrs"
