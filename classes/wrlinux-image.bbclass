@@ -4,7 +4,7 @@
 # base on poky-image.bbclass Copyright (C) 2007 OpenedHand LTD
 
 # IMAGE_FEATURES control content of images built with Poky.
-# 
+#
 # By default we install task-wrlinux-boot and task-base packages - this gives us
 # working (console only) rootfs.
 #
@@ -71,7 +71,7 @@ WRLINUX_BASE_INSTALL = '\
     ${@base_contains("IMAGE_FEATURES", ["tools-testapps", "dbg-pkgs"], "task-poky-tools-testapps-dbg", "",d)} \
     ${@base_contains("IMAGE_FEATURES", ["tools-testapps", "dev-pkgs"], "task-poky-tools-testapps-dev", "",d)} \
     \
-    ${@base_contains("IMAGE_FEATURES", "tools-sdk", "task-poky-sdk task-poky-standalone-sdk-target", "",d)} \    
+    ${@base_contains("IMAGE_FEATURES", "tools-sdk", "task-poky-sdk task-poky-standalone-sdk-target", "",d)} \
     ${@base_contains("IMAGE_FEATURES", ["tools-sdk", "dbg-pkgs"], "task-poky-sdk-dbg", "",d)} \
     ${@base_contains("IMAGE_FEATURES", ["tools-sdk", "dev-pkgs"], "task-poky-sdk-dev", "",d)} \
     \
