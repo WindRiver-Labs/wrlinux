@@ -8,8 +8,7 @@ distribution specific integration and bug fixes, and other wrlinux components.
 Dependencies
 ------------
 This layer depends on the oe-core version supplied with Wind River Linux.
-It is also suggested tht it be used with the wrlcompat and wrlinux layers.
-
+It is also suggested that it be used with the wrlcompat layer.
 
 Maintenance
 -----------
@@ -22,6 +21,16 @@ Building the wrlinux layer
 -----------------------------------
 This layer should be added to the bblayers.conf file.  This is done
 automatically when using the Wind River configure wrapper.
+
+If you are not using the configure wrapper, you will need to set the
+following in your local.conf file to use Wind River Linux distribution
+configuration:
+DISTRO=wrlinux
+
+A configuration sample has been included under the templates
+directory.  Each of the samples can be added to your configuration by
+adding an include into your local.conf file, or by using the Wind River
+configure program and --with-template=...
 
 
 License
