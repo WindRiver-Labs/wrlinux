@@ -25,7 +25,9 @@ automatically when using the Wind River configure wrapper.
 If you are not using the configure wrapper, you will need to set the
 following in your local.conf file to use Wind River Linux distribution
 configuration:
-DISTRO=wrlinux
+
+DISTRO = "wrlinux"
+SDKMACHINE = "native"
 
 A configuration sample has been included under the templates
 directory.  Each of the samples can be added to your configuration by
