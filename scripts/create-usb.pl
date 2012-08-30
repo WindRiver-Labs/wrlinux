@@ -21,11 +21,6 @@ my $progroot = $0;
 my $orig_progroot = $0;
 compute_top_build_dir();
 $ENV{'PATH'} = "$progroot/host-cross/bin:$progroot/host-cross/usr/bin:$progroot/host-cross/usr/sbin:/usr/bin:/bin:/usr/sbin:/sbin";
-my $pseudo_dist = "$progroot/export/pseudo.dist";
-# bitbake sets BUILDDIR
-if ($ENV{'BUILDDIR'} ne "") {
-    $ENV{'ALT_PSEUDO_LOCALSTATEDIR'} = "$pseudo_dist";
-}
 
 chdir($progroot) || die "Could not change directory $progroot";
 # Question answer globals
@@ -253,7 +248,6 @@ print "\n#############  Begin scripted Execution ##################\n";
 
 if ($use_img) {
     create_img();
-    restore_pseudo_dir();
     exit 0;
 }
 
@@ -262,7 +256,6 @@ if ($use_img) {
 # Start with formatting the device
 format_usb_and_copy();
 
-restore_pseudo_dir();
 exit 0;
 
 #-------------------------------------------------------------------#
@@ -389,7 +382,6 @@ EOF
     print "# Modify rootfs\n";
     make_fs_template("export/dist");
     chdir($progroot) || die "Could not change dir to $progroot";
-    move_pseudo_dir();
     if (scriptcmd("./scripts/fakestart.sh genext2fs -z -b $prtsz[1][2] -d export/dist $tmpinst.2") != 0) {
 	print "ERROR: File system creation failed!\n";
 	exit_error();
@@ -557,7 +549,6 @@ sub mount_and_copy {
 	    print "ERROR: No export/dist directory exists, stopping\n";
 	    return -1;
 	}
-	move_pseudo_dir();
 	print "./scripts/fakestart.sh tar -C export/dist -cSpf - . | (cd $MNTPOINT && tar -xSvf -)\n";
 	open(F, "./scripts/fakestart.sh tar -C export/dist -cSpf - . | (cd $MNTPOINT && tar -xSvf -) |");
     }
@@ -745,7 +736,6 @@ sub make_fs_template {
 	die "ERROR: Could not locate the readonly rootfs fs_final.sh script";
     }
 
-    move_pseudo_dir();
     if ($readonly) {
 	scriptcmd("mkdir -p $dir/etc/initial_setup");
 	scriptcmd("cp -f $fs_dir/etc/initial_setup/00read_only_root.sh $dir/etc/initial_setup");
@@ -860,23 +850,7 @@ sub compute_top_build_dir {
     $ENV{'TOP_BUILD_DIR'} = $progroot;
 }
 
-sub move_pseudo_dir {
-    if (-d "export/dist/var/pseudo") {
-	scriptcmd("PSEUDO_PREFIX=$progroot/host-cross/usr PSEUDO_LOCALSTATEDIR=$progroot/export/dist/var/pseudo $progroot/host-cross/usr/bin/pseudo -S");
-	scriptcmd("rm -rf $pseudo_dist");
-	scriptcmd("mv export/dist/var/pseudo $pseudo_dist");
-    }
-}
-
-sub restore_pseudo_dir {
-    if (-d $pseudo_dist) {
-	scriptcmd("PSEUDO_PREFIX=$progroot/host-cross/usr PSEUDO_LOCALSTATEDIR=$pseudo_dist $progroot/host-cross/usr/bin/pseudo -S");
-	scriptcmd("mv $pseudo_dist export/dist/var/pseudo");
-    }
-}
-
 sub exit_error {
-    restore_pseudo_dir();
     exit 1;
 }
 
