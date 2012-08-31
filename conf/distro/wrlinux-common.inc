@@ -71,6 +71,9 @@ BB_SIGNATURE_HANDLER ?= 'OEBasicHash'
 # Add our license to the acceptable restricted license list
 LICENSE_FLAGS_WHITELIST += "commercial_windriver"
 
+# Don't include a /etc/hostname file in our rootfs
+hostname_pn-base-files ?= "none"
+
 # Extra host tool packages
 require conf/distro/include/wr-host-tools.inc
 
