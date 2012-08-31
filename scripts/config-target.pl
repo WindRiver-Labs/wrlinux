@@ -1267,7 +1267,8 @@ sub qemu_start {
 	}
       }
     }
-    $qopts .= " -net user -net nic,macaddr=$mac";
+    my $ex_user = ",hostname=\"$tgtname\"" if $tgtname ne "";
+    $qopts .= " -net user$ex_user -net nic,macaddr=$mac";
     $qopts .= ",model=$tgt_vars{'TARGET_QEMU_ENET_MODEL'}" if $tgt_vars{'TARGET_QEMU_ENET_MODEL'} ne "auto" &&
 	$tgt_vars{'TARGET_QEMU_ENET_MODEL'} ne "";
   } elsif ($tgt_vars{'TARGET_VIRT_ENET_TYPE'} eq "slirpvde") {
