@@ -74,6 +74,10 @@ LICENSE_FLAGS_WHITELIST += "commercial_windriver"
 # Don't include a /etc/hostname file in our rootfs
 hostname_pn-base-files ?= ""
 
+# Change base package dependency in -dbg packages from recommends to suggests
+RRECOMMENDS_${PN}-dbg = ""
+RSUGGESTS_${PN}-dbg = "${PN} (= ${EXTENDPKGV})"
+
 # Extra host tool packages
 require conf/distro/include/wr-host-tools.inc
 
