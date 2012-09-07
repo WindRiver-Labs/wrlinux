@@ -26,57 +26,14 @@ rpm_collect_debuginfo_files() {
 	echo "#! /bin/bash" > ${WORKDIR}/scriptlet_wrapper
 	chmod +x ${WORKDIR}/scriptlet_wrapper
 
-	mkdir -p ${INSTALL_ROOTFS_RPM}/install
-	# Gather the existing set of installed packages...
-        ${RPM} -D "_dbpath ${INSTALL_ROOTFS_RPM}/install" -qa --qf "%{packageorigin}\n" \
-                -D "__dbi_txn create nofsync private" | sort \
-                > ${INSTALL_ROOTFS_RPM}/install/dbg-already_installed.manifest
-
-	echo "  Compute solution for: ${PACKAGE_GROUP_dbg-pkgs}"
-	for pkg in ${PACKAGE_GROUP_dbg-pkgs} ; do
-		echo "  Processing $pkg..."
-                archvar=base_archs
-                ml_prefix=`echo ${pkg} | cut -d'-' -f1`
-                ml_pkg=$pkg
-                for i in ${MULTILIB_PREFIX_LIST} ; do
-                        if [ ${ml_prefix} = ${i} ]; then
-                                ml_pkg=$(echo ${pkg} | sed "s,^${ml_prefix}-\(.*\),\1,")
-                                archvar=ml_archs
-                                break
-                        fi
-                done
-
-                pkg_name=$(resolve_package_rpm ${INSTALL_CONFBASE_RPM}-${archvar}.conf ${ml_pkg})
-                if [ -z "$pkg_name" ]; then
-                        echo "Note: Unable to find package $pkg ($ml_pkg)"
-                        continue
-                fi
-                echo "   Attempting $pkg_name... ignoring errors"
-                ${RPM} --predefine "_rpmds_sysinfo_path ${INSTALL_ROOTFS_RPM}/etc/rpm/sysinfo" \
-                        --predefine "_rpmrc_platform_path ${INSTALL_ROOTFS_RPM}/etc/rpm/platform" \
-                        -D "_dbpath ${INSTALL_ROOTFS_RPM}/install" -D "`cat ${INSTALL_CONFBASE_RPM}.macro`" \
-                        -D "__dbi_txn create nofsync private" \
-                        -U --justdb --noscripts --notriggers --noparentdirs --nolinktos --ignoresize \
-                $pkg_name 1>>`dirname ${BB_LOGFILE}`/log.do_rootfs.install-dbg.${PID} 2>&1 || true
-        done
-
-	# Capture the new solution w/ the debug files...
-        ${RPM} -D "_dbpath ${INSTALL_ROOTFS_RPM}/install" -qa --qf "%{packageorigin}\n" \
-                -D "__dbi_txn create nofsync private" | sort \
-                > ${INSTALL_ROOTFS_RPM}/install/dbg-total-solution.manifest || :
-
-	if [ -s ${INSTALL_ROOTFS_RPM}/install/dbg-total-solution.manifest ]; then
-	   grep -Fv -f ${INSTALL_ROOTFS_RPM}/install/dbg-already_installed.manifest ${INSTALL_ROOTFS_RPM}/install/dbg-total-solution.manifest > \
-		${INSTALL_ROOTFS_RPM}/install/dbg-solution.manifest || :
-	fi
-
-	if [ -s ${INSTALL_ROOTFS_RPM}/install/dbg-solution.manifest ]; then
-	   echo "  Installing debug specific packages (ignoring errors)"
-	   rpm_update_pkg ${INSTALL_ROOTFS_RPM}/install/dbg-solution.manifest 1>>`dirname ${BB_LOGFILE}`/log.do_rootfs.install-dbg.${PID} 2>&1 || true
-	fi
+	rootfs_install_complementary '*-dbg'
 
 	# Cleanup the various temp files
-	cp -a ${INSTALL_ROOTFS_RPM}/install/dbg-* ${WORKDIR}/temp/.
+	for file in ${INSTALL_ROOTFS_RPM}/install/*.manifest
+	do
+	   base=`basename $file`
+	   cp $file ${T}/dbg-$base || true
+	done
 	rm -rf ${INSTALL_ROOTFS_RPM}/install
 
 	# Restore the helper
@@ -106,9 +63,7 @@ ipk_collect_debuginfo_files() {
 	INSTALL_ROOTFS_IPK_BAK=${INSTALL_ROOTFS_IPK}
 	export INSTALL_ROOTFS_IPK=${INSTALL_ROOTFS_IPK}-dbg
 
-	echo "  Installing debug specific packages"
-	ipkg_args="-f ${INSTALL_CONF_IPK} -o ${INSTALL_ROOTFS_IPK} --force_overwrite"
-        opkg-cl ${ipkg_args} install ${PACKAGE_GROUP_dbg-pkgs} 1>`dirname ${BB_LOGFILE}`/log.do_rootfs.install-dbg.${PID} 2>&1 || true
+	rootfs_install_complementary '*-dbg'
 
 	# Restore the variable for any other users...
 	export INSTALL_ROOTFS_IPK=${INSTALL_ROOTFS_IPK_BAK}
@@ -136,11 +91,7 @@ deb_collect_debuginfo_files() {
 	sed -i "s,${INSTALL_ROOTFS_DEB_BAK},${INSTALL_ROOTFS_DEB},g" \
 		${APT_CONFIG}
 
-	echo "  Installing debug specific packages"
-	for i in ${PACKAGE_GROUP_dbg-pkgs}; do
-		echo INSTALL_ROOTFS_DEB: ${INSTALL_ROOTFS_DEB}
-		apt-get install $i --force-yes --allow-unauthenticated 1>>`dirname ${BB_LOGFILE}`/log.do_rootfs.install-dbg.${PID} 2>&1 || true
-	done
+	rootfs_install_complementary '*-dbg'
 
 	# Restore the variable for any other users...
 	export APT_CONFIG=${APT_CONFIG_BAK}
