@@ -1308,7 +1308,7 @@ sub qemu_start {
   if ($tgt_vars{'TARGET_QEMU_PROXY_PORT'} ne "" &&
       $tgt_vars{'TARGET_QEMU_PROXY_PORT'} ne "0" &&
       $tgt_vars{'TARGET_QEMU_USE_STDIO'} ne "yes") {
-    $qopts .= " -serial mon:tcp::$tgt_vars{'TARGET_QEMU_PROXY_LISTEN_PORT'} -monitor null";
+    $qopts .= " -serial mon:tcp:localhost:$tgt_vars{'TARGET_QEMU_PROXY_LISTEN_PORT'} -monitor null";
   }
 
   # Memory options
