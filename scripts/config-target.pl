@@ -38,16 +38,16 @@ $progroot =~ s/^\/\.\.\//\//;
 $progroot =~ s/^(.*)\/.*/$1/;
 # Compute the top name which is roughly ..
 $progroot .= "/../";
+# In the bitbake world the progroot is the directory above the bitbake_build
+if ($ENV{'BUILDDIR'} ne "") {
+  $orig_progroot = $progroot;
+  $progroot = "$ENV{'BUILDDIR'}/../" if ($ENV{'BUILDDIR'} ne "");
+}
 while ($progroot =~ /\/[^\/]*?\/\.\.\//) {
   $progroot =~ s/(\/[^\/]*?\/\.\.\/)/\//;
 }
 # And finally remove the trailing slash
 $progroot =~ s/\/$//;
-# In the bitbake world the progroot is the directory above the bitbake_build
-if ($ENV{'BUILDDIR'} ne "") {
-  $orig_progroot = $progroot;
-  $progroot = "$ENV{'BUILDDIR'}/.." if ($ENV{'BUILDDIR'} ne "");
-}
 
 # Set base path depending on qemu location
 our $BPATH = "$progroot/host-cross/bin";
@@ -204,7 +204,8 @@ if ($virt_type eq "qemu") {
 [ "TARGET_QEMU_PROXY_LISTEN_PORT", "Console proxy port qemu backend", "4446", "Long", "", ""],
 [ "TARGET_QEMU_DEBUG_PORT" , "QEMU ICE style debug port", "1234", "Long", "", ""],
 [ "TARGET_QEMU_AGENT_RPORT" , "usermode-agent port", "udp:4444::17185", "String", "", ""],
-[ "TARGET_QEMU_TCF_RPORT" , "tcf-agent port", "tcp:4447::1534", "String", "", ""],
+[ "TARGET_QEMU_TCF_RPORT" , "tcf-agent tcp port", "tcp:4447::1534", "String", "", ""],
+[ "TARGET_QEMU_UTCF_RPORT" , "tcf-agent udp port", "udp:4447::1534", "String", "", ""],
 [ "TARGET_QEMU_HTTP_RPORT" , "HTTP web port", "tcp:4448::80", "String", "", ""],
 [ "TARGET_QEMU_KGDB_RPORT" , "KGDB port", "udp:4445::6443", "String", "", ""],
 [ "TARGET_QEMU_TELNET_RPORT" , "Telnet port", "tcp:4441::23", "String", "", ""],
