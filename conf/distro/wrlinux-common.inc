@@ -84,8 +84,8 @@ require conf/distro/include/wr-host-tools.inc
 # Blacklist recipes we explicitly disallow in wrlinux
 require conf/distro/blacklist.conf
 
-# Make sure DISTRO_FEATURES backfill has pulseaudio (this is a hack untill
-# pulseaudio is fixed
+# Make sure DISTRO_FEATURES backfill has pulseaudio 
+# this is a temporary fix until pulseaudio is fixed
 
 DISTRO_FEATURES_BACKFILL_CONSIDERED = "pulseaudio"
 
