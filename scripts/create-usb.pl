@@ -48,6 +48,7 @@ my $format_ask = "y";  # Format the usb stick?
 my @prtsz;  # Paritition map and byte offsets
 my $ask_fat16 = 1;
 my $ask_ext2 = 1;
+my $convert_ext = 0;
 my $ask_rootfs = 1;
 my $ask_bzImage = 1;
 my $use_tarfiles = 0;
@@ -80,6 +81,8 @@ while (@ARGV) {
 	$bzImage_file = $1;
     } elsif ($ARGV[0] =~  /--extra-mb=(.*)/) {
 	$extra_mb = $1;
+    } elsif ($ARGV[0] =~  /--convert-extX=(.*)/) {
+	$convert_ext = $1;
     } elsif ($ARGV[0] =~  /--ext2-mb=(.*)/) {
 	$size_of_ext2 = $1;
 	$ask_ext2 = 0;
@@ -173,6 +176,7 @@ if ($use_img) {
     }
     $size_of_fat16 = ask_general("Size of FAT16 boot <#MEGS>", $size_of_fat16) if $ask_fat16;
     ask_ext2_size();
+    ask_convert();
 } else {
     # Ask about formatting the device
     if ($format == -1) {
@@ -191,6 +195,7 @@ if ($use_img) {
 		$size_of_ext2 = "+" . $size_of_ext2 . "M";
 	    }
 	}
+	ask_convert();
     }
 }
 if (!$use_img) {
@@ -248,6 +253,7 @@ print "\n#############  Begin scripted Execution ##################\n";
 
 if ($use_img) {
     create_img();
+    write_helper_mount();
     exit 0;
 }
 
@@ -259,6 +265,12 @@ format_usb_and_copy();
 exit 0;
 
 #-------------------------------------------------------------------#
+
+sub ask_convert {
+    if ($convert_ext == 0) {
+	$convert_ext = ask_general("Use ext 2,3,4", 2);
+    }
+}
 
 sub ask_ext2_size {
     my $sz = `du -sk --apparent-size $progroot/export/dist/.`;
@@ -386,6 +398,19 @@ EOF
 	print "ERROR: File system creation failed!\n";
 	exit_error();
     }
+    if ($convert_ext == 3) {
+	if (scriptcmd("./scripts/fakestart.sh tune2fs -j $tmpinst.2") != 0) {
+	    print "ERROR: tunefs for ext3!\n";
+	    exit_error();
+	}
+    }
+    if ($convert_ext == 4) {
+	if (scriptcmd("./scripts/fakestart.sh tune2fs -O extents,uninit_bg,dir_index,has_journal $tmpinst.2") != 0) {
+	    print "ERROR: tunefs for ext4 failed!\n";
+	    exit_error();
+	}
+	scriptcmd("./scripts/fakestart.sh e2fsck -yfDC0 $tmpinst.2")
+    }
     scriptcmd("e2label $tmpinst.2 wr_usb_boot");
 
     print "#======Create final image======\n";
@@ -424,8 +449,11 @@ sub write_helper_mount {
     $szstring = "" if (!$USE_LOOP_SIZELIMIT);
     my $cmd = "sudo mount -o loop,offset=$prtsz[0][0]$szstring usb.img /tmp/mnt1";
     $szstring = ",sizelimit=$prtsz[1][3]";
+    my $lo_cmd = "# sudo /sbin/losetup -o $prtsz[0][0] --sizelimit $prtsz[0][3] -f --show ./export/usb.img";
+
     $szstring = "" if (!$USE_LOOP_SIZELIMIT);
     my $cmd2 = "sudo mount -o loop,offset=$prtsz[1][0]$szstring usb.img /tmp/mnt2";
+    my $lo_cmd2 = "# sudo /sbin/losetup -o $prtsz[1][0] --sizelimit $prtsz[1][3] -f --show ./export/usb.img";
     print HELPER_OUT<<EOF;
 # Example to mount first and second partition from usb image
 # First partition - (fat)
@@ -434,6 +462,10 @@ $cmd
 # Second partition - (ext2)
 mkdir -p /tmp/mnt2
 $cmd2
+
+# Alternate use of setting up a device
+$lo_cmd
+$lo_cmd2
 EOF
     close(HELPER_OUT);
     system("chown -R $l_uid $file");
@@ -484,7 +516,7 @@ sub format_usb_and_copy {
 	# Ext2 partition build for loopback partition 2
 	lo_mount(1);
 	my $sz = int($prtsz[1][3]/1024);
-	if (scriptcmd("mke2fs -L wr_usb_boot $instdev $sz") != 0) {
+	if (scriptcmd("mke2fs -t ext$convert_ext -L wr_usb_boot $instdev $sz") != 0) {
 	    lo_umount();
 	}
 	scriptcmd("sync");
@@ -494,7 +526,7 @@ sub format_usb_and_copy {
 	scriptcmd("mkdosfs $instdev" . "1");
 	scriptcmd("syslinux $instdev" . "1");
 	dos_copy($instdev . "1");
-	scriptcmd("mke2fs -L wr_usb_boot $instdev" . "2");
+	scriptcmd("mke2fs -t ext$convert_ext -L wr_usb_boot $instdev" . "2");
 	$ret = mount_and_copy($instdev . "2");
     }
     exit_error() if ($ret);
@@ -878,6 +910,7 @@ Usage: $0
   --ext2-mb=<#MB>  Fixed size of ext2 partition
   --extra-mb=<#MB> Extra megabytes for the file system creation
                    --ext2-mb overrides this
+  --convert-extX=# Specify using ext2, ext3 or ext4 where # = 2, 3, or 4
   --format=<y/n>   Format the device Yes or No
   --rw             Mount target file system Read/Write after boot
   --ro             Mount target file system Read-only after boot
