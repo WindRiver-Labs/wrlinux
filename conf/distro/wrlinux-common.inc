@@ -50,8 +50,8 @@ TCLIBCAPPEND = ""
 #default locale / local language processing settings
 IMAGE_LINGUAS ?= ""
 
-QEMU_TARGETS ?= "arm i386 mips mipsel ppc x86_64"
-# Other QEMU_TARGETS "mips64 mips64el sh4"
+QEMU_TARGETS ?= "arm i386 mips mipsel mips64 mips64el ppc x86_64"
+# Other QEMU_TARGETS "sh4"
 
 MIRRORS =+ "\
 ftp://.*/.*      http://downloads.yoctoproject.org/mirror/sources/ \n \
