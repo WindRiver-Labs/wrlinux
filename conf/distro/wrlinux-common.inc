@@ -1,3 +1,6 @@
+#
+# Copyright (C) 2012 Wind River Systems, Inc.
+#
 # information common to all wrlinux distros
 #
 

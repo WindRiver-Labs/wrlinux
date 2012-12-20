@@ -1,3 +1,6 @@
+#
+# Copyright (C) 2012 Wind River Systems, Inc.
+#
 do_rootfs[depends] += "prelink-native:do_populate_sysroot"
 
 IMAGE_PREPROCESS_COMMAND += "output_image_vars; "

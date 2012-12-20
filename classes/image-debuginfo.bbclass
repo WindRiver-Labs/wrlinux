@@ -1,3 +1,6 @@
+#
+# Copyright (C) 2012 Wind River Systems, Inc.
+#
 # Implement a routine that adds the referenced debuginfo (-dbg) files to a
 # parallel filesystem tarball to aid in remote debugging.
 #

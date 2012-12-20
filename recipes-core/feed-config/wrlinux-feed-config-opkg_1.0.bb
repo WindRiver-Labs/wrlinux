@@ -1,3 +1,6 @@
+#
+# Copyright (C) 2012 Wind River Systems, Inc.
+#
 # Based on the poky-feed-config-opkg example recipe
 
 DESCRIPTION = "WR Linux example feed configuration"

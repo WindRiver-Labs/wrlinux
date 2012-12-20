@@ -1,3 +1,6 @@
+#
+# Copyright (C) 2012 Wind River Systems, Inc.
+#
 # Implement routines to help make late (post rootfs) changes to the
 # constructed filesystem image.
 #
