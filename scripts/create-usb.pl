@@ -16,7 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 use strict;
-require 'getcwd.pl';
+use Cwd;
 my $progroot = $0;
 my $orig_progroot = $0;
 compute_top_build_dir();
