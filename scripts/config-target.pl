@@ -16,7 +16,7 @@
 
 use strict;
 use File::Copy;
-require 'getcwd.pl';
+use Cwd;
 
 ### Compute TOP_BUILD_DIR ###
 our $progroot = $0;
