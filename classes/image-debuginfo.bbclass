@@ -19,9 +19,13 @@ rpm_collect_debuginfo_files() {
 	cp -a ${INSTALL_ROOTFS_RPM}/etc/rpm ${INSTALL_ROOTFS_RPM}-dbg/etc/.
 	mkdir -p ${INSTALL_ROOTFS_RPM}-dbg/var/lib/
 	cp -a ${INSTALL_ROOTFS_RPM}/var/lib/rpm ${INSTALL_ROOTFS_RPM}-dbg/var/lib/.
+	cp -a ${INSTALL_ROOTFS_RPM}/var/lib/smart ${INSTALL_ROOTFS_RPM}-dbg/var/lib/.
 
 	INSTALL_ROOTFS_RPM_BAK=${INSTALL_ROOTFS_RPM}
 	export INSTALL_ROOTFS_RPM=${INSTALL_ROOTFS_RPM}-dbg
+
+	# Update the local smart configuration to the new rootfs
+	smart --data-dir=$INSTALL_ROOTFS_RPM/var/lib/smart config --set rpm-root=$INSTALL_ROOTFS_RPM
 
 	# Move of the scriptlet helper out of the way, we don't want it...
 	mv ${WORKDIR}/scriptlet_wrapper ${WORKDIR}/scriptlet_wrapper.bak
@@ -31,12 +35,6 @@ rpm_collect_debuginfo_files() {
 
 	rootfs_install_complementary '*-dbg'
 
-	# Cleanup the various temp files
-	for file in ${INSTALL_ROOTFS_RPM}/install/*.manifest
-	do
-	   base=`basename $file`
-	   cp $file ${T}/dbg-$base || true
-	done
 	rm -rf ${INSTALL_ROOTFS_RPM}/install
 
 	# Restore the helper
@@ -47,7 +45,7 @@ rpm_collect_debuginfo_files() {
    fi
 }
 
-RPM_POSTPROCESS_COMMANDS_append += "rpm_collect_debuginfo_files ;"
+RPM_POSTPROCESS_COMMANDS_prepend = "rpm_collect_debuginfo_files ; "
 
 ipk_collect_debuginfo_files() {
    if [ "${IMAGE_GEN_DEBUGFS}" = "1" ]; then
