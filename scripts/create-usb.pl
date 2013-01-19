@@ -238,6 +238,13 @@ while(<F>) {
 }
 close(F);
 if ($iso_cfg_dir eq "") {
+    # check if this is an SDK
+    if (-e "export/wr-layer/data/syslinux/$iso_cfg_file") {
+        $iso_cfg_dir = `readlink -f export/wr-layer/data/syslinux`;
+        chop($iso_cfg_dir);
+    }
+}
+if ($iso_cfg_dir eq "") {
     print "ERROR: Could not locate the $iso_cfg_file\n";
     exit_error();
 }
@@ -764,6 +771,15 @@ sub make_fs_template {
 	}
     }
     close(F);
+    if ($fs_final_loc eq "") {
+        # check to see if this is an SDK
+        if (-e "export/wr-layer/data/syslinux/readonly_root") {
+            $fs_final_loc = `readlink -f export/wr-layer/data/syslinux/readonly_root/fs_final.sh`;
+            chop($fs_final_loc);
+            $fs_dir = `readlink -f export/wr-layer/data/syslinux/readonly_root/fs`;
+            chop($fs_dir);
+        }
+    }
     if ($fs_final_loc eq "") {
 	die "ERROR: Could not locate the readonly rootfs fs_final.sh script";
     }
