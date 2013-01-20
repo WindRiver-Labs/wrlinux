@@ -1069,14 +1069,27 @@ sub external_console {
     $cpid = fork();
   }
   if ($cpid == 0) {
+    my $use_sh = 0;
     if ($tgt_vars{'TARGET_VIRT_EXT_CON_CMD'} ne "") {
+      if ($tgt_vars{'TARGET_VIRT_EXT_CON_CMD'} =~ /^xterm/) {
+	# check for xterm and fall back to gnome-terminal if xterm is
+	# not available
+	if (system("which xterm") != 0) {
+	  $use_sh = 1;
+	  $tgt_vars{'TARGET_VIRT_EXT_CON_CMD'} = "gnome-terminal -e"
+	}
+      }
       if ($tgt_vars{'TARGET_VIRT_CONSOLE_SLEEP'} ne "") {
 	$cmd .= "; echo emulation ended ; set -x ; sleep $tgt_vars{'TARGET_VIRT_CONSOLE_SLEEP'}";
       }
       $cmd =~ s/\"/\\\"/g;
       my $precmd = $tgt_vars{'TARGET_VIRT_EXT_CON_CMD'};
       $precmd =~ s/Virtual-WRLinux/Virtual-WRLinux$instance/;
-      $cmd = "$precmd \"$cmd\"";
+      if ($use_sh) {
+	$cmd = "$precmd 'sh -c \"$cmd\"'";
+      } else {
+	$cmd = "$precmd \"$cmd\"";
+      }
       print "FINAL CMD: $cmd\n" if $debug;
       if ($nofork) {
 	return system($cmd);
