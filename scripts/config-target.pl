@@ -1221,8 +1221,6 @@ sub qemu_start {
   # Graphics suppport
   if ($tgt_vars{"TARGET_QEMU_GRAPHICS"} ne "yes") {
     $qopts .= " -nographic";
-  } else {
-    $qopts .= " -show-cursor -usb -usbdevice wacom-tablet -vga vmware -enable-gl";
   }
   # Keyboard type
   if ($tgt_vars{"TARGET_QEMU_KEYBOARD"} ne "") {
