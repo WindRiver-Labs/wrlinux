@@ -1074,7 +1074,7 @@ sub external_console {
       if ($tgt_vars{'TARGET_VIRT_EXT_CON_CMD'} =~ /^xterm/) {
 	# check for xterm and fall back to gnome-terminal if xterm is
 	# not available
-	if (system("which xterm") != 0) {
+	if (system("which xterm > /dev/null 2> /dev/null") != 0) {
 	  $use_sh = 1;
 	  $tgt_vars{'TARGET_VIRT_EXT_CON_CMD'} = "gnome-terminal -e"
 	}
