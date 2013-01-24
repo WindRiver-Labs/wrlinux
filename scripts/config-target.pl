@@ -921,6 +921,10 @@ $tuncmd
 echo 1 > /proc/sys/net/ipv4/ip_forward
 /sbin/route add -host $tgtip dev $tapdev
 echo 1 > /proc/sys/net/ipv4/conf/$tapdev/proxy_arp
+/sbin/iptables -C INPUT -i tap+ -j ACCEPT
+if [ "$?" != "0" ]; then
+	/sbin/iptables -I INPUT -i tap+ -j ACCEPT
+fi
 $arp -Ds $tgtip $tgt_vars{'TARGET_TAP_HOST_DEV'} pub
 for e in 1 2 3 4 5 6 7 8 9 10; do
   if [ ! -e /dev/net/tun ] ; then
@@ -973,6 +977,7 @@ sub tuntap_stop {
   open(F,">$tuntapScript") || die "Could not write: $tuntapScript";
   print F<<EOF;
 #!/bin/sh
+/sbin/iptables -D INPUT -i tap+ -j ACCEPT
 $arp -i $tgt_vars{'TARGET_TAP_HOST_DEV'} -d $tgtip pub
 $BPATH/tunctl -d $tapdev
 EOF
