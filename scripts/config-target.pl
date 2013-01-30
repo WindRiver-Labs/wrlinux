@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-#  Copyright (c) 2005-2008,2010-2012 Wind River Systems, Inc.
+#  Copyright (c) 2005-2008,2010-2013 Wind River Systems, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
@@ -738,9 +738,9 @@ sub do_nfs_start {
   my $var = system("$kill_opt $progroot/scripts/user-nfs.sh restart");
   if ($var != 0) {
     print "NFS ERROR cannot continue.\n";
-    print "   Please stop the existing QEMU process(s). Try running the\n";
+    print "   Please stop the existing NFS process(s). Try running the\n";
     print "   following command:\n";
-    print "	   pkill rpc\n";
+    print "	   pkill unfsd\n";
     print "   and retry your previous command.\n";
     print " Or re-run your last command with TOPTS=\"-in 1\" appended\n";
     print " Some diagnostic messages may be available in \n";
@@ -1505,7 +1505,7 @@ sub getUserNFS {
     } elsif ($tgt_vars{"TARGET_VIRT_BOOT_TYPE"} =~ /^usernfs(.+)/) {
       $nfs_args = $1;
     }
-    return " root=/dev/nfs nfsroot=$gw:$ex,nfsvers=2,port=$ENV{'NFS_PORT'},mountprog=$tgt_vars{'NFS_MOUNTPROG'},nfsprog=$tgt_vars{'NFS_NFSPROG'},$nfs_args,mountport=$tgt_vars{'MOUNT_PORT'} $tgt_vars{'TARGET_VIRT_ROOT_MOUNT'}";
+    return " root=/dev/nfs nfsroot=$gw:$ex,nfsvers=3,port=$ENV{'NFS_PORT'},mountprog=$tgt_vars{'NFS_MOUNTPROG'},nfsprog=$tgt_vars{'NFS_NFSPROG'},$nfs_args,mountport=$tgt_vars{'MOUNT_PORT'} $tgt_vars{'TARGET_VIRT_ROOT_MOUNT'}";
   }
   return "";
 }
