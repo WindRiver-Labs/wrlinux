@@ -1249,7 +1249,7 @@ sub qemu_start {
     if (-f "$tgt_vars{'TARGET_QEMU_KERNEL'}") {
       $qopts .= " -kernel $tgt_vars{'TARGET_QEMU_KERNEL'}";
     } else {
-      my $findfile = "$progroot/export/$tgt_vars{'TARGET_BOARD'}-$tgt_vars{'TARGET_QEMU_KERNEL'}-WR$tgt_vars{'PACKAGE_VERSION'}$tgt_vars{'PACKAGE_EXTRAVERSION'}";
+      my $findfile = "$progroot/export/$tgt_vars{'TARGET_BOARD'}-$tgt_vars{'TARGET_QEMU_KERNEL'}-WR$tgt_vars{'PACKAGE_VERSION'}$tgt_vars{'PACKAGE_EXTRAVERSION'}_$tgt_vars{'TARGET_KERNEL'}";
       if (!(-f $findfile)) {
 	# try without the -WR
 	my $ff = "$progroot/bitbake_build/tmp/deploy/images/$tgt_vars{'TARGET_QEMU_KERNEL'}-$tgt_vars{'TARGET_BOARD'}.bin";
