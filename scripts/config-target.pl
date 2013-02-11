@@ -55,7 +55,7 @@ if ($ENV{'NO_CONFIG_TARGET_ENV_READ'} ne "1") {
   open(MFILE, "$progroot/Makefile");
   while (<MFILE>) {
     if ($_ =~ /^get_env:/) {
-      open(ENVREAD, "make -f $progroot/Makefile|");
+      open(ENVREAD, "make -f $progroot/Makefile get_env|");
       while (<ENVREAD>) {
 	chop;
 	my ($a, $b) = split(/=/, $_, 2);
