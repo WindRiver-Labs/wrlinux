@@ -49,6 +49,25 @@ while ($progroot =~ /\/[^\/]*?\/\.\.\//) {
 # And finally remove the trailing slash
 $progroot =~ s/\/$//;
 
+# In an SDK, there is a get_env in the top Makefile to setup
+# all the environment settings go set that first
+if ($ENV{'NO_CONFIG_TARGET_ENV_READ'} ne "1") {
+  open(MFILE, "$progroot/Makefile");
+  while (<MFILE>) {
+    if ($_ =~ /^get_env:/) {
+      open(ENVREAD, "make -f $progroot/Makefile|");
+      while (<ENVREAD>) {
+	chop;
+	my ($a, $b) = split(/=/, $_, 2);
+	$ENV{$a} = $b;
+      }
+      close(ENVREAD);
+      last;
+    }
+  }
+  close(MFILE);
+}
+
 # Set base path depending on qemu location
 our $BPATH = "$progroot/host-cross/bin";
 if (-x "$progroot/host-cross/usr/bin/qemu") {
