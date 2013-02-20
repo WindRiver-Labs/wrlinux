@@ -21,31 +21,6 @@ WRL_FS_FINAL_PATH   ?= "${TOPDIR}/conf"
 
 wrl_fs_final_run() {
 	logpath=`dirname ${BB_LOGFILE}`
-
-	if [ -n "${WRL_CHANGELIST_PATH}" ]; then
-	  count=0
-	  for wrl_path in ${WRL_CHANGELIST_PATH}; do
-	    echo "Checking for ${wrl_path}/changelist.xml"
-	    if  [ -s ${wrl_path}/changelist.xml ]; then
-		# Store symlink for later debugging if necessary
-		targetcount=`printf '%.4d' $count`
-		count=`expr $count + 1`
-		ln -s ${wrl_path}/changelist.xml ${logpath}/changelist-${targetcount}.xml.${PID}
-
-		echo "Running filesystem change script (${targetcount}) ${wrl_path}/changelist.xml"
-
-		export TOP_BUILD_DIR="${wrl_path}"
-		export EXPORT_DIST_DIR="${IMAGE_ROOTFS}"
-		changelist=`which fs_changelist.lua 2>/dev/null`
-		if [ -e "${changelist}" ]; then
-			rpm --eval "%{lua: dofile(\"${changelist}\")} "
-		else
-			echo "ERROR: Unable to find fs_changelist.lua"
-		fi
-	    fi
-	  done
-	fi
-
 	if [ -n "${WRL_FS_FINAL_PATH}" ]; then
 	  count=0
 	  for wrl_path in ${WRL_FS_FINAL_PATH}; do
@@ -68,6 +43,31 @@ wrl_fs_final_run() {
 			(cd $IMAGE_ROOTFS ; sh $i)
 	      fi
 	    done
+	  done
+	fi
+
+	# Handle changelist.xml after fs_final.sh to acquire changes/appends to etc files 
+	if [ -n "${WRL_CHANGELIST_PATH}" ]; then
+	  count=0
+	  for wrl_path in ${WRL_CHANGELIST_PATH}; do
+	    echo "Checking for ${wrl_path}/changelist.xml"
+	    if  [ -s ${wrl_path}/changelist.xml ]; then
+		# Store symlink for later debugging if necessary
+		targetcount=`printf '%.4d' $count`
+		count=`expr $count + 1`
+		ln -s ${wrl_path}/changelist.xml ${logpath}/changelist-${targetcount}.xml.${PID}
+
+		echo "Running filesystem change script (${targetcount}) ${wrl_path}/changelist.xml"
+
+		export TOP_BUILD_DIR="${wrl_path}"
+		export EXPORT_DIST_DIR="${IMAGE_ROOTFS}"
+		changelist=`which fs_changelist.lua 2>/dev/null`
+		if [ -e "${changelist}" ]; then
+			rpm --eval "%{lua: dofile(\"${changelist}\")} "
+		else
+			echo "ERROR: Unable to find fs_changelist.lua"
+		fi
+	    fi
 	  done
 	fi
 }
