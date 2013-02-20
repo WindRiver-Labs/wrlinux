@@ -6,7 +6,7 @@ do_rootfs[depends] += "prelink-native:do_populate_sysroot"
 IMAGE_PREPROCESS_COMMAND += "output_image_vars; "
 
 output_image_vars () {
-	cat <<EOF > ${DEPLOY_DIR_IMAGE}/config-vars-${IMAGE_BASENAME}-${MACHINE}
+	cat <<EOF > ${DEPLOY_DIR_IMAGE}/config-vars-${DEFAULT_IMAGE}-${MACHINE}
 TARGET_BOARD="${MACHINE}"
 TARGET_QEMU_BIN="${TARGET_QEMU_BIN}"
 TARGET_QEMU_BOOT_CONSOLE="${TARGET_QEMU_BOOT_CONSOLE}"
