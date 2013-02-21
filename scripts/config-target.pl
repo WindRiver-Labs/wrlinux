@@ -1352,8 +1352,39 @@ sub qemu_start {
     $qopts .= " -m $tgt_vars{'TARGET_QEMU_MEM'}";
   }
 
+  ## Run QEMU
+  my $qbin = $tgt_vars{'TARGET_QEMU_BIN'};
+  if (! -f $qbin) {
+    $qbin = "$BPATH/$tgt_vars{'TARGET_QEMU_BIN'}";
+  }
+  if (! -f $qbin) {
+    $qbin = `which $tgt_vars{'TARGET_QEMU_BIN'} 2> /dev/null`;
+    chop($qbin);
+  }
+  if (! -f $qbin) {
+    print "ERROR Could not locate a qemu binary: $tgt_vars{'TARGET_QEMU_BIN'}\n";
+    exit -1;
+  }
+
+  # Invoke qemu to see what version of qemu/kvm we are running
+  my $qbin_uses_dash_s = 1;
+  my $qbin_uses_gl = 0;
+
+  open(IN, "$qbin -h|");
+  while (<IN>) {
+    chop();
+    if ($_ =~ /^-s.*-gdb tcp/) {
+      $qbin_uses_dash_s = 0;
+    }
+    if ($_ =~ /^-enable-gl/) {
+      $qbin_uses_gl = 1;
+    }
+  }
+
   if ($tgt_vars{"TARGET_QEMU_OPTS"} ne "") {
-    $qopts .= " $tgt_vars{'TARGET_QEMU_OPTS'}";
+    my $tmp = $tgt_vars{'TARGET_QEMU_OPTS'};
+    $tmp =~ s/-enable-gl// if (!$qbin_uses_gl);
+    $qopts .= " $tmp";
   }
 
   ## Construct the kernel boot line
@@ -1397,28 +1428,6 @@ sub qemu_start {
     $kopts = "";
   }
   kill_stop($qPid, "qemu") if (!$doOutputStart);
-  ## Run QEMU
-  my $qbin = $tgt_vars{'TARGET_QEMU_BIN'};
-  if (! -f $qbin) {
-    $qbin = "$BPATH/$tgt_vars{'TARGET_QEMU_BIN'}";
-  }
-  if (! -f $qbin) {
-    $qbin = `which $tgt_vars{'TARGET_QEMU_BIN'} 2> /dev/null`;
-    chop($qbin);
-  }
-  if (! -f $qbin) {
-    print "ERROR Could not locate a qemu binary: $tgt_vars{'TARGET_QEMU_BIN'}\n";
-    exit -1;
-  }
-  # Invoke qemu to see what version of qemu/kvm we are running
-  my $qbin_uses_dash_s = 1;
-  open(IN, "$qbin -h|");
-  while (<IN>) {
-    chop();
-    if ($_ =~ /^-s.*-gdb tcp/) {
-      $qbin_uses_dash_s = 0;
-    }
-  }
   # debug port
   if ($tgt_vars{'TARGET_QEMU_DEBUG_PORT'} ne "0") {
     if ($qbin_uses_dash_s) {
