@@ -759,10 +759,15 @@ sub do_nfs_start {
     print "NFS ERROR cannot continue.\n";
     print "   Please stop the existing NFS process(s). Try running the\n";
     print "   following command:\n";
-    print "	   pkill unfsd\n";
-    print "   and retry your previous command.\n";
-    print " Or re-run your last command with TOPTS=\"-in 1\" appended\n";
-    print " Some diagnostic messages may be available in \n";
+    print "        pkill unfsd\n";
+    print "   and retry your previous command.\n\n";
+    print "   Of course if you tried the one above and you are seeing\n";
+    print "   \"Address already in use\" messages above you might need:\n";
+    print "        pkill -9 unfsd\n";
+    print "        NOTE: You could also track down the port numbers that\n";
+    print "              are reported using lsof and kill those processes\n";
+    print " OR perhaps use other ports by appending to your last command: TOPTS=\"-in 1\"\n";
+    print " Sometimes addional diagnostic messages may be available in \n";
     print "      /var/log/messages\n";
     exit 1;
   }
