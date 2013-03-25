@@ -70,7 +70,8 @@ if ($ENV{'NO_CONFIG_TARGET_ENV_READ'} ne "1") {
 
 # Set base path depending on qemu location
 our $BPATH = "$progroot/host-cross/bin";
-if (-x "$progroot/host-cross/usr/bin/qemu") {
+if ((-x "$progroot/host-cross/usr/bin/qemu") ||
+    (-x "$progroot/host-cross/usr/bin/qemu-system-x86_64")) {
   $BPATH = "$progroot/host-cross/usr/bin";
 }
 if ($ENV{'BUILD_BIN_DIR'} ne "") {
@@ -447,7 +448,7 @@ while ($ARGV[0]) {
 }
 
 # Print a reasonable error message if QEMU is not present
-if (!(-x "$BPATH/qemu")) {
+if (!((-x "$BPATH/qemu") || (-x "$BPATH/qemu-system-x86_64"))) {
   my $layers = "$progroot/layers";
   if (-f "$progroot/layer_paths") {
     $layers = "$progroot/layer_paths"
