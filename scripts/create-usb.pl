@@ -83,6 +83,7 @@ while (@ARGV) {
 	$convert_ext = 1;
 	$readonly_ask = "";
 	$readonly = 1;
+	$size_of_ext2 = 0;
     } elsif ($ARGV[0] eq "--force") {
 	$ask_force = 0;
     } elsif ($ARGV[0] =~  /--rootfs=(.*)/) {
