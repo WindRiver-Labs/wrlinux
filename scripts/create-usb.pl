@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-#  Copyright (c) 2011 Wind River Systems, Inc.
+#  Copyright (c) 2011-2013 Wind River Systems, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
@@ -33,6 +33,7 @@ my $useloop = 0;
 my $format = -1;
 my $ask_force = 1;
 my $instdev = "";
+my $outfile = "$progroot/export/usb.img";
 my $rootfs_file = `ls -tr $progroot/export/*-dist.tar.bz2 2> /dev/null |head`; 
 my $bzImage_file = `ls -tr $progroot/export/*bzImage* 2> /dev/null |head -1`;
 chop($rootfs_file);
@@ -55,6 +56,7 @@ my $use_tarfiles = 0;
 my $iso_cfg_file = "syslinux-usb-initrd.cfg";
 my $iso_initrd_file = "busybox-initrd-static";
 my $iso_cfg_dir = "";
+my $use_iso = 0;
 my $readonly = 1;
 my $syslinux_usr_dir = "$progroot/host-cross/share/syslinux";
 if (-e "$progroot/host-cross/usr/share/syslinux/mbr.bin") {
@@ -71,6 +73,16 @@ while (@ARGV) {
 	$use_img = 0;
     } elsif ($ARGV[0] eq "--fileimg") {
 	$use_img = 1;
+    } elsif ($ARGV[0] eq "--isoimg") {
+	$use_img = 1;
+	$use_iso = 1;
+	$iso_cfg_file = "isolinux.cfg";
+	$outfile = "$progroot/export/bootimage.iso";
+	$ask_fat16 = 0;
+	$ask_ext2 = 0;
+	$convert_ext = 1;
+	$readonly_ask = "";
+	$readonly = 1;
     } elsif ($ARGV[0] eq "--force") {
 	$ask_force = 0;
     } elsif ($ARGV[0] =~  /--rootfs=(.*)/) {
@@ -163,10 +175,7 @@ if (!$use_img) {
     ask_usb_device();
 } else {
     # set output file unless already set
-    if ($instdev eq "") {
-	$instdev = "$progroot/export/usb.img";
-    }
-    $instdev = ask_general("Location to write image file", $instdev);
+    $outfile = ask_general("Location to write image file", $outfile);
 }
 
 if ($use_img) {
@@ -257,6 +266,17 @@ if (!(-e $iso_initrd_file)) {
 }
 
 print "\n#############  Begin scripted Execution ##################\n";
+if (! (-e "$progroot/isolinux.cfg")) {
+    system("cp $iso_cfg_dir/$iso_cfg_file $progroot/isolinux.cfg");
+    chown($l_uid, -1, "$progroot/isolinux.cfg");
+}
+
+########### Build only an ISO ################
+
+if ($use_iso) {
+    create_iso();
+    exit 0;
+}
 
 if ($use_img) {
     create_img();
@@ -272,6 +292,23 @@ format_usb_and_copy();
 exit 0;
 
 #-------------------------------------------------------------------#
+
+sub create_iso {
+    my $ldir = "export/dist/boot/isolinux";
+    scriptcmd("./scripts/fakestart.sh mkdir -p $ldir");
+    scriptcmd("./scripts/fakestart.sh cp $progroot/isolinux.cfg $ldir/isolinux.cfg");
+    scriptcmd("./scripts/fakestart.sh cp $syslinux_usr_dir/isolinux.bin $syslinux_usr_dir/vesamenu.c32 $syslinux_usr_dir/menu.c32 $iso_cfg_dir/help.txt $iso_cfg_dir/splash.lss $iso_cfg_dir/splash.txt $ldir");
+    scriptcmd("./scripts/fakestart.sh cp $bzImage_file $ldir/vmlinuz");
+    scriptcmd("./scripts/fakestart.sh cp $iso_initrd_file $ldir/initrd");
+    make_fs_template("export/dist");
+
+    if (scriptcmd("./scripts/fakestart.sh mkisofs -o $outfile -R -D -A \"oe_iso_boot\" -V \"oe_iso_boot\" -b boot/isolinux/isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table export/dist") != 0) {
+	print "ERROR: Failed to correctly generate ISO\n";
+	exit 1;
+    }
+    scriptcmd("isohybrid export/bootimage.iso");
+    print "# IMAGE COMPLETE: $outfile\n";
+}
 
 sub ask_convert {
     if ($convert_ext == 0) {
@@ -309,8 +346,8 @@ sub ask_ext2_size {
 }
 
 sub create_img {
-    my $tmpinst = $instdev;
-    $tmpinst = `dirname $instdev`;
+    my $tmpinst = $outfile;
+    $tmpinst = `dirname $outfile`;
     chop($tmpinst);
     $tmpinst .= "/img_tmp";
     my $tmpinst0 = "$tmpinst.0";
@@ -421,8 +458,8 @@ EOF
     scriptcmd("e2label $tmpinst.2 wr_usb_boot");
 
     print "#======Create final image======\n";
-    scriptcmd("cat $tmpinst0 $tmpinst.1 $tmpinst.2 > $instdev\n");
-    print "# Image created: $instdev\n";
+    scriptcmd("cat $tmpinst0 $tmpinst.1 $tmpinst.2 > $outfile\n");
+    print "# Image created: $outfile\n";
     unlink("$tmpinst0") if $do_unlink;
     unlink("$tmpinst.1") if $do_unlink;
     unlink("$tmpinst.2") if $do_unlink;
@@ -432,7 +469,7 @@ sub lo_mount {
     my ($partition) = @_;
     my $sz_txt = "--sizelimit $prtsz[$partition][3]";
     $sz_txt = "" if (!$USE_LOOP_SIZELIMIT);
-    my $cmd = "/sbin/losetup -o $prtsz[$partition][0] $sz_txt $instdev ./export/usb.img";
+    my $cmd = "/sbin/losetup -o $prtsz[$partition][0] $sz_txt $instdev $outfile";
     if (scriptcmd($cmd) != 0) {
 	die "ERROR: losetup failed to run";
     }
@@ -454,13 +491,13 @@ sub write_helper_mount {
 	die "could not write ./export/mount_help.usb.img.txt";
     my $szstring = ",sizelimit=$prtsz[0][3]";
     $szstring = "" if (!$USE_LOOP_SIZELIMIT);
-    my $cmd = "sudo mount -o loop,offset=$prtsz[0][0]$szstring usb.img /tmp/mnt1";
+    my $cmd = "sudo mount -o loop,offset=$prtsz[0][0]$szstring $outfile /tmp/mnt1";
     $szstring = ",sizelimit=$prtsz[1][3]";
-    my $lo_cmd = "# sudo /sbin/losetup -o $prtsz[0][0] --sizelimit $prtsz[0][3] -f --show ./export/usb.img";
+    my $lo_cmd = "# sudo /sbin/losetup -o $prtsz[0][0] --sizelimit $prtsz[0][3] -f --show $outfile";
 
     $szstring = "" if (!$USE_LOOP_SIZELIMIT);
-    my $cmd2 = "sudo mount -o loop,offset=$prtsz[1][0]$szstring usb.img /tmp/mnt2";
-    my $lo_cmd2 = "# sudo /sbin/losetup -o $prtsz[1][0] --sizelimit $prtsz[1][3] -f --show ./export/usb.img";
+    my $cmd2 = "sudo mount -o loop,offset=$prtsz[1][0]$szstring $outfile /tmp/mnt2";
+    my $lo_cmd2 = "# sudo /sbin/losetup -o $prtsz[1][0] --sizelimit $prtsz[1][3] -f --show $outfile";
     print HELPER_OUT<<EOF;
 # Example to mount first and second partition from usb image
 # First partition - (fat)
@@ -484,9 +521,9 @@ sub format_usb_and_copy {
 
     mbr_check();
     if ($useloop) {
-	my $cmd = sprintf("qemu-img create -f raw ./export/usb.img %iM", $size_of_fat16 + $size_of_ext2 + 1);
+	my $cmd = sprintf("qemu-img create -f raw $outfile %iM", $size_of_fat16 + $size_of_ext2 + 1);
 	scriptcmd($cmd);
-	scriptcmd(sprintf("chown %i ./export/usb.img", $l_uid));
+	scriptcmd(sprintf("chown %i $outfile", $l_uid));
 	$instdev = `/sbin/losetup -f 2> /dev/null`;
 	if ($? != 0) {
 	    # Having no "losetup -f" means your host OS is OLD!
@@ -503,7 +540,7 @@ sub format_usb_and_copy {
 	}
 	$LOOP_DEV = $instdev;
 	chop($instdev);
-	scriptcmd("/sbin/losetup $instdev ./export/usb.img");
+	scriptcmd("/sbin/losetup $instdev $outfile");
     }
     format_partitions();
     scriptcmd("partprobe");
@@ -790,8 +827,14 @@ sub make_fs_template {
 	scriptcmd("cp -f $fs_dir/initial_setup.sh $dir");
 	scriptcmd("chmod 755 $dir/etc/initial_setup/00read_only_root.sh $dir/initial_setup.sh");
 	scriptcmd("cd $dir && $progroot/scripts/fakestart.sh sh $fs_final_loc");
+	if (-f "export/dist/etc/init.d/checkroot.sh") {
+	    system("perl -p -i -e 's/rootremount=yes/rootremount=no/; s/rootcheck=yes/rootcheck=no/' export/dist/etc/init.d/checkroot.sh");
+	}
     } else {
 	scriptcmd("cd $dir && ENV_FORCE_RW_USB=force $progroot/scripts/fakestart.sh sh $fs_final_loc");
+	if (-f "export/dist/etc/init.d/checkroot.sh") {
+	    system("perl -p -i -e 's/rootremount=no/rootremount=yes/' export/dist/etc/init.d/checkroot.sh");
+	}
     }
 }
 
@@ -919,6 +962,7 @@ sub usage {
 Usage: $0
   --usbimg         Write a usb image
   --fileimg        Write a file image to later copy to usb
+  --isoimg         Write a iso/usb hybrid image
   --instdev=<DEV>  Location to write the syslinux and rootfs
   --rootfs=<bz2>   Absolute path to *tar.bz2 to use for root file system
   --bzImage=<img>  Kernel boot image to include in fat16 fs
