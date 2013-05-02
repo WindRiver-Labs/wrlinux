@@ -461,6 +461,9 @@ if (!(-x "$BPATH/qemu")) {
     chomp;
     s/\s*#.*//; # Delete comments
     next if (/^$/ ); # Skip blank lines
+    if ($_ !~ /^\//) {
+      $_ = "$progroot/$_";
+    }
     if (!(-d $_)) {
       $missing_layer = "yes";
     } elsif (-f "$_/tools/qemu/Makefile") {
@@ -1942,6 +1945,11 @@ sub find_simics_dir {
     open(F, "$layers");
     while (<F>) {
       chop();
+      s/\s*#.*//; # Delete comments
+      next if (/^$/ ); # Skip blank lines
+      if ($_ !~ /^\//) {
+	$_ = "$progroot/$_";
+      }
       if (-e "$_/wrll-simics/config-target-simics.pl") {
 	close(F);
 	return "$_/wrll-simics";
