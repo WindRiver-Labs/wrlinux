@@ -235,6 +235,11 @@ foreach $f ("layer_paths", "layers") {
 }
 while(<F>) {
     chop();
+    s/\s*#.*//; # Delete comments
+    next if (/^$/ ); # Skip blank lines
+    if ($_ !~ /^\//) {
+	$_ = "$progroot/$_";
+    }
     if (-e "$dirspec$_/dist/syslinux/$iso_cfg_file") {
 	$iso_cfg_dir = `readlink -f $dirspec$_/dist/syslinux`;
 	chop($iso_cfg_dir);
