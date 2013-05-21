@@ -32,7 +32,7 @@ INHERIT += "image-debuginfo"
 BB_HASHBASE_WHITELIST_append += "IMAGE_GEN_DEBUGFS"
 
 # Override these in wrlinux based distros to modify DISTRO_EXTRA_R*
-WRLINUX_DEFAULT_EXTRA_RDEPENDS = "task-core-boot"
+WRLINUX_DEFAULT_EXTRA_RDEPENDS = "packagegroup-core-boot"
 WRLINUX_DEFAULT_EXTRA_RRECOMMENDS = "kernel-module-af-packet"
 
 DISTRO_EXTRA_RDEPENDS += " ${WRLINUX_DEFAULT_EXTRA_RDEPENDS}"
@@ -77,6 +77,10 @@ LICENSE_FLAGS_WHITELIST += "commercial_windriver"
 # Don't include a /etc/hostname file in our rootfs
 hostname_pn-base-files ?= ""
 
+# Enable QA warnings related to split of / and /usr
+# See oe-core commit 2fb58da56e8e7044de21fd10fe9164d204587236
+WARN_QA ?= "ldflags useless-rpaths rpaths unsafe-references-in-binaries unsafe-references-in-scripts staticdev libdir xorg-driver-abi textrel"
+
 # Change base package dependency in -dbg packages from recommends to suggests
 RRECOMMENDS_${PN}-dbg = ""
 RSUGGESTS_${PN}-dbg = "${PN} (= ${EXTENDPKGV})"
@@ -91,6 +95,9 @@ require conf/distro/blacklist.conf
 # this is a temporary fix until pulseaudio is fixed
 
 DISTRO_FEATURES_BACKFILL_CONSIDERED = "pulseaudio"
+
+# Enable gcc 4.8
+GCCVERSION = "4.8%"
 
 # Multilib configuration
 MULTILIBS ?= ""
