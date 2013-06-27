@@ -35,6 +35,9 @@ rpm_collect_debuginfo_files() {
 
 	rootfs_install_complementary '*-dbg'
 
+	# Remove lock files
+	rm -f ${INSTALL_ROOTFS_RPM}/var/lib/rpm/__db.*
+
 	rm -rf ${INSTALL_ROOTFS_RPM}/install
 
 	# Restore the helper
