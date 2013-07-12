@@ -100,6 +100,7 @@ DISTRO_FEATURES_BACKFILL_CONSIDERED = "pulseaudio"
 # - unless we're using e500 or e500v2
 #   -- see https://bugzilla.yoctoproject.org/show_bug.cgi?id=4495
 GCCVERSION = "${@['4.8%', '4.7%'][d.getVar("DEFAULTTUNE", True) in ['ppce500', 'ppce500v2']]}"
+EGLIBCVERSION = "${@['2.18%', '2.17%'][d.getVar("DEFAULTTUNE", True) in ['ppce500', 'ppce500v2']]}"
 
 # Multilib configuration
 MULTILIBS ?= ""
