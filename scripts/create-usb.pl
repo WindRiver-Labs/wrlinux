@@ -243,12 +243,10 @@ while(<F>) {
     if (-e "$dirspec$_/dist/syslinux/$iso_cfg_file") {
 	$iso_cfg_dir = `readlink -f $dirspec$_/dist/syslinux`;
 	chop($iso_cfg_dir);
-	last;
     }
     if (-e "$dirspec$_/data/syslinux/$iso_cfg_file") {
 	$iso_cfg_dir = `readlink -f $dirspec$_/data/syslinux`;
 	chop($iso_cfg_dir);
-	last;
     }
 }
 close(F);
