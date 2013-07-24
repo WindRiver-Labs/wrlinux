@@ -46,6 +46,28 @@ wrl_fs_final_run() {
 	  done
 	fi
 
+	# remove /etc/rpm and /var/lib/rpm if /usr/bin/rpm does not exist
+	if [ -e "${IMAGE_ROOTFS}/usr/bin/rpm" ]; then
+		echo "/usr/bin/rpm exists!"
+	else
+		echo "/usr/bin/rpm does not exist!"
+		if [ -d ${IMAGE_ROOTFS}/var/lib/rpm ]; then
+			t="${T}/saved_rpmlib/var/lib/rpm"
+			rm -fr $t
+			mkdir -p $t
+			mv ${IMAGE_ROOTFS}/var/lib/rpm $t
+			rm -rf ${IMAGE_ROOTFS}/var/lib/rpm
+		fi
+
+		if [ -d ${IMAGE_ROOTFS}/etc/rpm ]; then
+			t="${T}/saved_rpmlib/etc/rpm"
+			rm -fr $t
+			mkdir -p $t
+			mv ${IMAGE_ROOTFS}/etc/rpm $t
+			rm -rf ${IMAGE_ROOTFS}/etc/rpm
+		fi
+	fi 
+
 	# Handle changelist.xml after fs_final.sh to acquire changes/appends to etc files 
 	if [ -n "${WRL_CHANGELIST_PATH}" ]; then
 	  count=0
