@@ -51,14 +51,6 @@ wrl_fs_final_run() {
 		echo "/usr/bin/rpm exists!"
 	else
 		echo "/usr/bin/rpm does not exist!"
-		if [ -d ${IMAGE_ROOTFS}/var/lib/rpm ]; then
-			t="${T}/saved_rpmlib/var/lib/rpm"
-			rm -fr $t
-			mkdir -p $t
-			mv ${IMAGE_ROOTFS}/var/lib/rpm $t
-			rm -rf ${IMAGE_ROOTFS}/var/lib/rpm
-		fi
-
 		if [ -d ${IMAGE_ROOTFS}/etc/rpm ]; then
 			t="${T}/saved_rpmlib/etc/rpm"
 			rm -fr $t
