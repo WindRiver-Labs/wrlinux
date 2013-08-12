@@ -1986,7 +1986,7 @@ sub do_usage {
   -d     Extra script debug output
   -w     Wait until debugger attaches to QEMU
   -x     Use an external console defined by
-         TARGET_VIRT_EXTERNAL_CONSOLE
+         TARGET_VIRT_EXT_CON_CMD
          and go into the background
   -o     Output the target start command which you
          could use to start a debugger with
