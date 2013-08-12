@@ -1115,11 +1115,15 @@ sub external_console {
       if ($tgt_vars{'TARGET_VIRT_CONSOLE_SLEEP'} ne "") {
 	$cmd .= "; echo emulation ended ; set -x ; sleep $tgt_vars{'TARGET_VIRT_CONSOLE_SLEEP'}";
       }
-      $cmd =~ s/\"/\\\"/g;
       my $precmd = $tgt_vars{'TARGET_VIRT_EXT_CON_CMD'};
+      unless ($precmd =~ /^screen/) {
+        $cmd =~ s/\"/\\\"/g;
+      }
       $precmd =~ s/Virtual-WRLinux/Virtual-WRLinux$instance/;
       if ($use_sh) {
 	$cmd = "$precmd 'sh -c \"$cmd\"'";
+      } elsif ($precmd =~ /^screen/) {
+	$cmd = "$precmd -t Virtual-WRLinux$instance sh -c '$cmd'";
       } else {
 	$cmd = "$precmd \"$cmd\"";
       }
