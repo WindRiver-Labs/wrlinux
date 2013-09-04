@@ -94,7 +94,7 @@ require conf/distro/blacklist.conf
 # Make sure DISTRO_FEATURES backfill has pulseaudio 
 # this is a temporary fix until pulseaudio is fixed
 
-DISTRO_FEATURES_BACKFILL_CONSIDERED = "pulseaudio"
+DISTRO_FEATURES_BACKFILL_CONSIDERED += " pulseaudio"
 
 # Enable gcc 4.8
 # - unless we're using e500 or e500v2
