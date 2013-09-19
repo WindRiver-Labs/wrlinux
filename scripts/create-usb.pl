@@ -33,6 +33,7 @@ my $useloop = 0;
 my $format = -1;
 my $ask_force = 1;
 my $instdev = "";
+my $bytes_per_inode = 1900;
 my $outfile = "$progroot/export/usb.img";
 my $rootfs_file = `ls -tr $progroot/export/*-dist.tar.bz2 2> /dev/null |head`; 
 my $bzImage_file = `ls -tr $progroot/export/*bzImage* 2> /dev/null |head -1`;
@@ -99,6 +100,8 @@ while (@ARGV) {
     } elsif ($ARGV[0] =~  /--ext2-mb=(.*)/) {
 	$size_of_ext2 = $1;
 	$ask_ext2 = 0;
+    } elsif ($ARGV[0] =~ /--inode-bytes=(.*)/) {
+	$bytes_per_inode = $1;
     } elsif ($ARGV[0] =~  /--fat16-mb=(.*)/) {
 	$size_of_fat16 = $1;
 	$ask_fat16 = 0;
@@ -243,12 +246,10 @@ while(<F>) {
     if (-e "$dirspec$_/dist/syslinux/$iso_cfg_file") {
 	$iso_cfg_dir = `readlink -f $dirspec$_/dist/syslinux`;
 	chop($iso_cfg_dir);
-	last;
     }
     if (-e "$dirspec$_/data/syslinux/$iso_cfg_file") {
 	$iso_cfg_dir = `readlink -f $dirspec$_/data/syslinux`;
 	chop($iso_cfg_dir);
-	last;
     }
 }
 close(F);
@@ -444,7 +445,8 @@ EOF
     print "# Modify rootfs\n";
     make_fs_template("export/dist");
     chdir($progroot) || die "Could not change dir to $progroot";
-    if (scriptcmd("./scripts/fakestart.sh genext2fs -z -b $prtsz[1][2] -d export/dist $tmpinst.2") != 0) {
+
+    if (scriptcmd("./scripts/fakestart.sh genext2fs -i $bytes_per_inode -z -b $prtsz[1][2] -d export/dist $tmpinst.2") != 0) {
 	print "ERROR: File system creation failed!\n";
 	exit_error();
     }
@@ -983,6 +985,7 @@ Usage: $0
   --no-rm          Do not remove temporary files
   --force          Answer y to the warning about possibility to destroy data
   --loop	   Use the loopback device (requires sudo) to write the usb image
+  --inode-bytes    Set the bytes per inode ratio for genext2fs
   --tarfiles       Use tar files for the root files system [default is contents of export/dist]
                    *** Only works with --usbimg or --loop
 EOF
