@@ -124,7 +124,7 @@ sub setup_makefile_vars {
       }
     }
     close(VAR);
-    my $bbfile = "$progroot/bitbake_build/tmp/deploy/images/config-vars-$fstype-$mach";
+    my $bbfile = "$progroot/bitbake_build/tmp/deploy/images/$mach/config-vars-$fstype-$mach";
     if (-e $bbfile) {
       copy($bbfile, $config_file);
     } else {
@@ -1284,7 +1284,7 @@ sub qemu_start {
       my $findfile = "$progroot/export/$tgt_vars{'TARGET_BOARD'}-$tgt_vars{'TARGET_QEMU_KERNEL'}-WR$tgt_vars{'PACKAGE_VERSION'}$tgt_vars{'PACKAGE_EXTRAVERSION'}_$tgt_vars{'TARGET_KERNEL'}";
       if (!(-f $findfile)) {
 	# try without the -WR
-	my $ff = "$progroot/bitbake_build/tmp/deploy/images/$tgt_vars{'TARGET_QEMU_KERNEL'}-$tgt_vars{'TARGET_BOARD'}.bin";
+	my $ff = "$progroot/bitbake_build/tmp/deploy/images/$tgt_vars{'TARGET_BOARD'}/$tgt_vars{'TARGET_QEMU_KERNEL'}-$tgt_vars{'TARGET_BOARD'}.bin";
 	if ($findfile) {
 	  $findfile = $ff;
 	}
