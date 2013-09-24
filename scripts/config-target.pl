@@ -124,7 +124,7 @@ sub setup_makefile_vars {
       }
     }
     close(VAR);
-    my $bbfile = "$progroot/bitbake_build/tmp/deploy/images/$mach/config-vars-$fstype-$mach";
+    my $bbfile = "$progroot/bitbake_build/tmp/deploy/images/config-vars-$fstype-$mach";
     if (-e $bbfile) {
       copy($bbfile, $config_file);
     } else {
