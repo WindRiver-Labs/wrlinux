@@ -1,14 +1,14 @@
 wrlinux
 =======
 
-This layer provides the Wind River Linux distribution definitions, as well as
-distribution specific integration and bug fixes, and other wrlinux components.
+This layer provides the Wind River Linux distribution definitions, 
+distribution-specific integration and bug fixes, and other wrlinux components.
 
 
 Dependencies
 ------------
 This layer depends on the oe-core version supplied with Wind River Linux.
-It is also suggested that it be used with the wrlcompat layer.
+It is also recommended that it be used with the wrlcompat layer.
 
 Maintenance
 -----------
@@ -37,7 +37,7 @@ configure program and --with-template=...
 
 License
 -------
-Copyright (C) 2012 Wind River Systems, Inc.
+Copyright (C) 2012-2013 Wind River Systems, Inc.
 
 The right to copy, distribute or otherwise make use of this software may
 be licensed only pursuant to the terms of an applicable Wind River license
@@ -45,5 +45,5 @@ agreement.  No license to Wind River intellectual properly rights is granted
 herein.  All rights not licensed by Wind River are reserved by Wind River.
 
 Source code included in tree for individual recipes is under the LICENSE
-stated in each recipe (.bb file) unless other stated.
+stated in each recipe (.bb file) unless otherwise stated.
 
