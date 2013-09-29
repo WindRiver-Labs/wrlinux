@@ -21,8 +21,6 @@ SDK_NAME = "${DISTRO}-${TCLIBC}-${SDK_ARCH}-${TARGET_ARCH}"
 SDKPATH = "/opt/windriver/${DISTRO}/${SDK_VERSION}"
 TOOLCHAIN_OUTPUTNAME = "${DISTRO}-${DISTRO_VERSION}-${TCLIBC}-${SDK_ARCH}-${MACHINE_ARCH}-${PN}-sdk"
 
-EXTRAOPKGCONFIG = "wrlinux-feed-config-opkg"
-
 # Add changelist.xml and fs_final*.sh processing
 INHERIT += "image-fs_finalize"
 
