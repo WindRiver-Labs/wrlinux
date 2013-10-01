@@ -223,31 +223,31 @@ function pr_restart
 
 function pr_import
 {
-	local pr_was_running=0
-	if pr_status ; then
-		echo "A PR Server appears to be running already (pid: ${pr_pid}.  Attempting to stop it before proceeding."
-		pr_stop
-		pr_was_running=1
-	fi
-	${build_top}/bitbake/bin/bitbake-prserv-tool import ${pr_xdb}
-	if [ $pr_was_running -eq 1 ]; then
-		echo "The PR server was running prior to import, attempting to restart."
+	local pr_was_running=1
+	if ! pr_status ; then
+		echo "A PR Server does not appear be running already.  Attempting to start it before proceeding."
 		pr_start
+		pr_was_running=0
+	fi
+	bitbake-prserv-tool import ${pr_xdb}
+	if [ $pr_was_running -eq 0 ]; then
+		echo "The PR server was not running prior to export, attempting to stop."
+		pr_stop
 	fi
 }
 
 function pr_export
 {
-	local pr_was_running=0
-	if pr_status ; then
-		echo "A PR Server appears to be running already (pid: ${pr_pid}.  Attempting to stop it before proceeding."
-		pr_stop
-		pr_was_running=1
-	fi
-	${build_top}/bitbake/bin/bitbake-prserv-tool export ${pr_xdb}
-	if [ $pr_was_running -eq 1 ]; then
-		echo "The PR server was running prior to export, attempting to restart."
+	local pr_was_running=1
+	if ! pr_status ; then
+		echo "A PR Server does not appear be running already.  Attempting to start it before proceeding."
 		pr_start
+		pr_was_running=0
+	fi
+	bitbake-prserv-tool export ${pr_xdb}
+	if [ $pr_was_running -eq 0 ]; then
+		echo "The PR server was not running prior to export, attempting to stop."
+		pr_stop
 	fi
 }
 
