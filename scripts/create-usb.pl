@@ -30,6 +30,7 @@ my $size_of_ext2 = "all"; # Use rest of usb stick for ext2
 my $readonly_ask = "y"; # Should mounted root file system be readonly?
 my $extra_mb = -1; # Default of 100 extra megabytes to the image
 my $useloop = 0;
+my $pristine = 0;
 my $format = -1;
 my $ask_force = 1;
 my $instdev = "";
@@ -87,6 +88,10 @@ while (@ARGV) {
 	$size_of_ext2 = 0;
     } elsif ($ARGV[0] eq "--force") {
 	$ask_force = 0;
+    } elsif ($ARGV[0] =~ /--pristine/) {
+	$pristine = 1;
+    } elsif ($ARGV[0] =~ /--initrd=(.*)/) {
+	$iso_initrd_file = $1;
     } elsif ($ARGV[0] =~  /--rootfs=(.*)/) {
 	$rootfs_file = $1;
 	$ask_rootfs = 0;
@@ -816,6 +821,12 @@ sub make_fs_template {
 	}
     }
     close(F);
+
+    if ($pristine) {
+	return;
+    }
+
+    # Anything below here is for the READ_ONLY or READ_WRITE rootfs
     if ($fs_final_loc eq "") {
         # check to see if this is an SDK
         if (-e "export/wr-layer/data/syslinux/readonly_root") {
@@ -988,6 +999,9 @@ Usage: $0
   --inode-bytes    Set the bytes per inode ratio for genext2fs
   --tarfiles       Use tar files for the root files system [default is contents of export/dist]
                    *** Only works with --usbimg or --loop
+ Advanced:
+ --initrd=<initrd> Use an alternate initrd image
+ --pristine        Do not modify anything in export/dist
 EOF
 exit 0;
 }
