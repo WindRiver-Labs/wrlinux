@@ -10,5 +10,5 @@ SRC_URI += "file://rpm2cpio_segfault.patch \
 # so we use this handy script version, instead.
 #
 do_install_append_virtclass-native() {
-        cp scripts/rpm2cpio ${D}/${bindir}
+        cp ${S}/scripts/rpm2cpio ${D}/${bindir}
 }
