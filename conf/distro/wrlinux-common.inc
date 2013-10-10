@@ -103,3 +103,5 @@ EGLIBCVERSION = "${@['2.18%', '2.17%'][d.getVar("DEFAULTTUNE", True) in ['ppce50
 # Multilib configuration
 MULTILIBS ?= ""
 require conf/multilib.conf
+
+PACKAGECONFIG_pn-sysstat = "lm-sensors"
