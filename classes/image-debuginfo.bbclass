@@ -11,21 +11,19 @@ rpm_collect_debuginfo_files() {
    if [ "${IMAGE_GEN_DEBUGFS}" = "1" ]; then
 	echo "Generating a companion debug filesystem..."
 
-	echo "  Creating a backup of the image into image-dbg"
-	rm -rf ${INSTALL_ROOTFS_RPM}-dbg
-	mkdir -p ${INSTALL_ROOTFS_RPM}-dbg
-	cp -a ${INSTALL_ROOTFS_RPM}/install ${INSTALL_ROOTFS_RPM}-dbg/.
-	mkdir -p ${INSTALL_ROOTFS_RPM}-dbg/etc/
-	cp -a ${INSTALL_ROOTFS_RPM}/etc/rpm ${INSTALL_ROOTFS_RPM}-dbg/etc/.
-	mkdir -p ${INSTALL_ROOTFS_RPM}-dbg/var/lib/
-	cp -a ${INSTALL_ROOTFS_RPM}/var/lib/rpm ${INSTALL_ROOTFS_RPM}-dbg/var/lib/.
-	cp -a ${INSTALL_ROOTFS_RPM}/var/lib/smart ${INSTALL_ROOTFS_RPM}-dbg/var/lib/.
+	# We have to do this because paths get hardcoded into the BerkleyDB
+	echo "  Renaming the original image..."
+	rm -rf ${INSTALL_ROOTFS_RPM}-bak
+	mv ${INSTALL_ROOTFS_RPM} ${INSTALL_ROOTFS_RPM}-bak
 
-	INSTALL_ROOTFS_RPM_BAK=${INSTALL_ROOTFS_RPM}
-	export INSTALL_ROOTFS_RPM=${INSTALL_ROOTFS_RPM}-dbg
-
-	# Update the local smart configuration to the new rootfs
-	smart --data-dir=$INSTALL_ROOTFS_RPM/var/lib/smart config --set rpm-root=$INSTALL_ROOTFS_RPM
+	echo "  Setting up for the dbg image..."
+	mkdir -p ${INSTALL_ROOTFS_RPM}
+	cp -a ${INSTALL_ROOTFS_RPM}-bak/install ${INSTALL_ROOTFS_RPM}/.
+	mkdir -p ${INSTALL_ROOTFS_RPM}/etc/
+	cp -a ${INSTALL_ROOTFS_RPM}-bak/etc/rpm ${INSTALL_ROOTFS_RPM}/etc/.
+	mkdir -p ${INSTALL_ROOTFS_RPM}/var/lib/
+	cp -a ${INSTALL_ROOTFS_RPM}-bak/var/lib/rpm ${INSTALL_ROOTFS_RPM}/var/lib/.
+	cp -a ${INSTALL_ROOTFS_RPM}-bak/var/lib/smart ${INSTALL_ROOTFS_RPM}/var/lib/.
 
 	# Move of the scriptlet helper out of the way, we don't want it...
 	mv ${WORKDIR}/scriptlet_wrapper ${WORKDIR}/scriptlet_wrapper.bak
@@ -35,16 +33,23 @@ rpm_collect_debuginfo_files() {
 
 	rootfs_install_complementary '*-dbg'
 
-	# Remove lock files
-	rm -f ${INSTALL_ROOTFS_RPM}/var/lib/rpm/__db.*
+	echo "  Cleaning up RPM information from -dbg image"
+	# Remove package manager files
+	rm -rf ${INSTALL_ROOTFS_RPM}/var/lib/rpm/
+	rm -rf ${INSTALL_ROOTFS_RPM}/var/lib/smart/
 
 	rm -rf ${INSTALL_ROOTFS_RPM}/install
 
+	echo "  Restoring original image..."
 	# Restore the helper
 	mv ${WORKDIR}/scriptlet_wrapper.bak ${WORKDIR}/scriptlet_wrapper
 
-	# Restore the variable for any other users...
-	export INSTALL_ROOTFS_RPM=${INSTALL_ROOTFS_RPM_BAK}
+	# Move the debug filesystem to the final location
+	rm -rf ${INSTALL_ROOTFS_RPM}-dbg
+	mv ${INSTALL_ROOTFS_RPM} ${INSTALL_ROOTFS_RPM}-dbg
+
+	# Restore the backup to the original location
+	mv ${INSTALL_ROOTFS_RPM}-bak ${INSTALL_ROOTFS_RPM}
    fi
 }
 
