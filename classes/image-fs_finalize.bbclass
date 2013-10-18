@@ -19,6 +19,11 @@
 WRL_CHANGELIST_PATH ?= "${TOPDIR}/conf"
 WRL_FS_FINAL_PATH   ?= "${TOPDIR}/conf"
 
+wrl_fs_local_pkg() {
+	smart --data-dir=${IMAGE_ROOTFS}/var/lib/smart config --set rpm-force=1
+	smart --data-dir=${IMAGE_ROOTFS}/var/lib/smart reinstall -y fs-local-pkg
+}
+
 wrl_fs_final_run() {
 	logpath=`dirname ${BB_LOGFILE}`
 	if [ -n "${WRL_FS_FINAL_PATH}" ]; then
@@ -86,6 +91,8 @@ wrl_fs_final_run() {
 	fi
 }
 
+ROOTFS_POSTINSTALL_COMMAND += "${@base_contains('IMAGE_INSTALL', 'fs-local-pkg', 'wrl_fs_local_pkg ;', '', d)}"
 ROOTFS_POSTPROCESS_COMMAND += "wrl_fs_final_run ;"
 
+EXPORT_FUNCTIONS wrl_fs_local_pkg
 EXPORT_FUNCTIONS wrl_fs_final_run
