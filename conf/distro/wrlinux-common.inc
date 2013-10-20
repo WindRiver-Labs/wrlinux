@@ -75,9 +75,16 @@ LICENSE_FLAGS_WHITELIST += "commercial_windriver"
 # Don't include a /etc/hostname file in our rootfs
 hostname_pn-base-files ?= ""
 
+# QA check settings - a little stricter than the OE-Core defaults
 # Enable QA warnings related to split of / and /usr
-# See oe-core commit 2fb58da56e8e7044de21fd10fe9164d204587236
-WARN_QA ?= "ldflags useless-rpaths rpaths unsafe-references-in-binaries unsafe-references-in-scripts staticdev libdir xorg-driver-abi textrel"
+WARN_QA ?= "textrel files-invalid incompatible-license xorg-driver-abi \
+            libdir unsafe-references-in-binaries unsafe-references-in-scripts \
+            ldflags"
+ERROR_QA ?= "dev-so debug-deps dev-deps debug-files arch pkgconfig la perms \
+            useless-rpaths rpaths staticdev pkgvarcheck already-stripped \
+            compile-host-path dep-cmp installed-vs-shipped install-host-path \
+            packages-list perm-config perm-line perm-link pkgv-undefined \
+            pn-overrides split-strip var-undefined version-going-backwards"
 
 # Change base package dependency in -dbg packages from recommends to suggests
 RRECOMMENDS_${PN}-dbg = ""
