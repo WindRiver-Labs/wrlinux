@@ -1,0 +1,140 @@
+INTEL MASTER SOURCE LICENSE AGREEMENT
+OEM/DERIVED PRODUCTS
+
+The source code components as listed in Exhibit A-1 are licensed under the Intel Master License Agreement as previously signed by you, a copy of which is set out below.
+
+This is a Master Source License Agreement (“Agreement”) under which Intel may grant  license  to Licensee only (and not to any parent, sister, affiliate or subsidiary companies, unless specifically approved in writing by Intel) certain source code and related materials including updates and/or new versions thereto and all copies thereof (collectively known as “Source Code”) subject to the terms of this Agreement. Execution of this Agreement by Intel and Licensee indicates their agreement to the terms and conditions governing Licensee’s receipt and use of any Source Code provided hereunder, but does not guarantee Licensee will receive any Source Code from Intel.  No Source Code will be provided unless and until Intel agrees to provide such Source Code to Licensee under the terms of a duly signed Exhibit to this Agreement. 
+
+Therefore, for Source Code provided to Licensee, Intel and Licensee agree as follows:
+
+Intel Corporation (“Intel”) grants to Licensee, but not to any parent, subsidiary, or affiliate of Licensee, and Licensee accepts a limited license as specified in Section 2 below to use the Source Code identified in the Exhibit A-1 to this Agreement, only under the following terms and conditions:
+
+1.0    DEFINITIONS           
+
+1.1    “Derivative Source Program” means Licensee’s source code program that incorporates all or any portion of the Source Code, operates only in conjunction with an Intel Platform, and at a minimum performs all the operations necessary to initialize the platform in preparation for booting an operating system or target application. 
+
+1.2    “End User” means a purchaser and/or recipient or user of Licensee’s computer products who does not resell Licensee’s products in the normal course of the End User’s business.
+
+1.3    “Exhibit” means a duly signed exhibit to this Agreement which describes any Source Code licensed by Intel to Licensee for use in the development of the Licensed Programs.
+
+1.4    “Intel Platform” means the Intel embedded, mobile, desktop and/or server platform which is identified in an Exhibit. 
+1.5    “Licensed Programs” means the software programs, in object code form only, derived from the Derivative Source Program that operate only in conjunction with an Intel Platform.
+
+1.6    “Source Code” means the source code and other materials identified in an Exhibit to this Agreement which are delivered by Intel to Licensee pursuant to such Exhibit. 
+
+2.0    EXHIBITS 
+An Exhibit, duly signed by an authorized representative of each party, must be added to this Agreement for any Source Code which is licensed hereunder by Intel to Licensee.  Such Exhibit shall describe the Source Code to be licensed by Intel and the Intel Platform for which such Source Code is being licensed.  The Source Code licensed in an Exhibit is licensed for use only with the Intel Platform identified in such Exhibit.  Intel may include additional terms and conditions as necessary in any Exhibit.  Exhibit A-1 attached hereto is the first Exhibit to this Agreement. Any additional Exhibits to be added by the Parties shall follow a substantially similar form and be numbered sequentially for example, Exhibit A-2 and Exhibit A-3.
+
+3.0    LICENSE RIGHTS AND CONDITIONS
+
+3.1    LIMITED COPYRIGHT LICENSE: Subject to Licensee’s compliance with the terms of this Agreement, including any Exhibit hereto, Intel grants to Licensee a limited, non-exclusive, non-transferable license under Intel’s copyrights to:  
+
+a.    Copy and modify Source Code and merge portions of the Source Code into Licensee's program material to create Derivative Source Programs solely (1) for Licensee’s own internal use, to design, develop, modify and/or debug Derivative Source Programs and/or Licensed Programs that operate in or in conjunction only with Licensee’s computer products that operate only in conjunction with an Intel Platform, and (2) to enable Licensee to distribute Licensed Programs externally in accordance with Section 3.1(c) below;  
+
+b.    Reproduce and distribute Licensed Programs internally, solely (1) for Licensee’s own use in developing and maintaining products which utilize an Intel Platform and (2) to enable Licensee to distribute Licensed Programs externally in accordance with Section 3.1(c) below; and,
+
+c.    Distribute Licensed Programs externally to Licensee’s End Users, either directly or through Licensee’s usual distribution channels and methods, but only for use with Licensee’s computer products that operate only in conjunction with an Intel Platform; and only under the terms of a written license agreement with terms consistent with such terms that Licensee uses to license its own similar code to its End Users; is not less restrictive than the terms set forth in Exhibit B; and that specifies that the End User may not reverse engineer, decompile, or disassemble the Software.  
+
+
+3.2    ADDITIONAL CONDITIONS: Licensee shall only use the Source Code and Derivative Source Programs at the location(s) authorized in the applicable exhibit of the Master Source License Agreement previously signed by you.  For details please refer to that Master Source License Agreement. Licensee will make reasonable efforts to discontinue distribution of the Licensed Programs that Licensee is licensed hereunder to distribute upon Intel’s release of an update, upgrade or new version of the Source Code, and to make reasonable efforts to make available Licensed Programs containing such updates, upgrades or new versions to Licensee’s End Users who have received the Licensed Programs, provided that Intel shall notify Licensee. External distribution of the Licensed Programs is also subject to the following limitations:  
+
+a.    Licensee is solely responsible to its End Users for any update or support obligation or other liability which may arise from the distribution of the Licensed Programs;  
+
+b.    Licensee shall not make any statement that the Licensed Programs are "certified," or that performance is guaranteed, by Intel;
+
+c.    Licensee shall not use Intel's name or trademarks without prior written permission;
+
+d.    Except for claims or lawsuits directly resulting out of the Source Code provided by Intel, Licensee shall indemnify, hold harmless, and defend Intel and its suppliers from and against any claims or lawsuits, including attorney's fees that arise or result from Licensee’s use, unauthorized modification or distribution of Licensed Programs.
+
+3.3    Except as specifically permitted in Sections 3.1 and 3.2, above, Licensee is not licensed to use the Source Code in any other manner, including for Licensee’s other internal or business use or for use in association with any other products, including any other Intel product(s) which is not identified in an Exhibit. Licensee shall not license Source Code or Derivative Source Programs to any third party, including but not limited to the parent, subsidiaries or affiliates of Licensee. Licensee shall include all copyright notices in all full and partial copies of the Source Code, including all Derivative Source Programs, and shall not deface, obscure or alter any such copyright notices. 
+
+3.4    Intel reserves the right not more than once a year to conduct an audit of Licensee’s activities, by an independent certified public accountant, upon not less than five (5) business days prior written notice and during Licensee’s normal business hours to verify Licensee’s compliance with the terms and conditions of this Agreement. If any such audit discloses material errors or omissions such party, such party shall reimburse Intel for the costs of such audit. 
+
+3.5    Licensee is not obligated to provide Intel with comments or suggestions regarding Derivative Source Programs or the Source Code received under this Agreement.  However, should Licensee provide Intel with designs, comments or suggestions for the modification, correction, improvement or enhancement of the Source Code or Intel products which may embody the Source Code (collectively, “Feedback”), then Licensee hereby grants to Intel a nonexclusive, irrevocable, worldwide, royalty-free license, including the right to sublicense Intel licensees and customers, under Licensee’s intellectual property rights in the Feedback, and the rights to use and disclose such Feedback in any manner Intel chooses and to display, perform, copy, have copied, make, have made, use, sell, offer to sell, and otherwise dispose of Intel’s and its sublicenses’ products embodying such Feedback in any manner and via any media Intel chooses, but without reference to the source of such Feedback.  
+
+4.0    DISCLAIMER OF WARRANTY
+NEITHER INTEL NOR ITS SUPPLIERS MAKE ANY REPRESENTATION OR WARRANTY OR CONDITION OF ANY KIND WHETHER EXPRESS OR IMPLIED (EITHER IN FACT OR BY OPERATION OF LAW) WITH RESPECT TO THE SOURCE CODE.  INTEL AND ITS SUPPLIERS EXPRESSLY DISCLAIM ALL WARRANTIES OR CONDITIONS OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.  INTEL AND ITS SUPPLIERS DO NOT WARRANT THAT THE SOURCE CODE IS ERROR-FREE OR THAT OPERATION OF THE SOURCE CODE WILL BE SECURE OR UNINTERRUPTED AND HEREBY DISCLAIM ANY AND ALL LIABILITY ON ACCOUNT THEREOF. THERE IS ALSO NO IMPLIED WARRANTY OF NON-INFRINGEMENT. SOURCE CODE IS LICENSED ON AN "AS IS" BASIS AND NEITHER INTEL NOR ITS SUPPLIERS WILL PROVIDE ANY SUPPORT, ASSISTANCE, INSTALLATION, TRAINING OR OTHER SERVICES.  INTEL AND ITS SUPPLIERS MAY PROVIDE ANY UPDATES, ENHANCEMENTS OR EXTENSIONS AT THEIR SOLE DISCRETION.
+
+5.0    LIMITATION OF LIABILITY
+IN NO EVENT WILL INTEL OR ITS SUPPLIERS BE LIABLE FOR: (a) ANY REPRESENTATION OR WARRANTY MADE TO ANY THIRD PARTY BY LICENSEE, ANY AGENT OF LICENSEE OR DISTRIBUTOR; (b) FAILURE OF THE SOURCE CODE TO PERFORM AS EXPECTED; (c) FAILURE OF THE SOURCE CODE TO PROVIDE SECURITY; OR (d) ANY USE OF THE SOURCE CODE OR THE RESULTS OR INFORMATION OBTAINED OR DECISIONS MADE BY LICENSEE’S USE OF THE SOURCE CODE.
+
+INTEL AND ITS SUPPLIERS SHALL NOT BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES OF ANY KIND, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+6.0    PROTECTION AND SECURITY
+Licensee acknowledges that Intel considers the Source Code a trade secret as protected by the provisions of the RSNDA between the parties.
+
+7.0    ASSIGNMENT, SALE OR TRANSFER
+Licensee shall not assign, sublicense, or otherwise transfer this Agreement or any right or obligation hereunder without Intel's prior written consent, which consent shall not be unreasonably withheld in the event Licensee is acquired by an entity that is not a competitor of Intel. Any attempt to do so shall be null and void.
+
+8.0    TERMINATION
+
+8.1    Licensee may terminate this Agreement and the licenses granted herein at any time upon Intel’s receipt of written notice.  
+
+8.2    Intel may terminate this Agreement, any Exhibit and any licenses granted herein at any time if Licensee fails to cure any breach of this Agreement or any Exhibit within thirty (30) days after notice of such breach.  Such termination shall not prejudice Intel's right to damages or any other remedy available at law or in equity.
+
+8.3    Upon termination of the Agreement, any Exhibit or any license granted hereunder for any reason whatsoever, Licensee will completely remove the Source Code from all Derivative Source Programs; provided, however, that the foregoing shall not apply to fully-paid up licenses granted by Licensee to its End User(s) pursuant to Section 3.1(c) of this Agreement for so long as such licenses are not in breach of this Agreement. In the event of any such termination, Licensee will, at Intel's option, either return to Intel or destroy the original and all full or partial copies of the Source Code, including those portions in Derivative Source Programs, and certify to Intel that they have been destroyed.
+
+8.4    Upon termination of this Agreement, then at Intel’s discretion, Licensee may retain one (1) copy of the Source Code for Licensee’s own internal support requirements relating to its products incorporating an Intel Platform but for no other purpose.
+
+8.5    Sections 3.5 (feedback license), 4 (Disclaimer of Warranty), 5 (Limitation of Liability), 6 (Protection and Security), 9 (Ownership), and 11 (General) shall survive termination of this Agreement.
+
+9.0    OWNERSHIP
+            
+9.1    Source Code and all copies, and any updates provided by Intel, in whole or in part, are and shall remain the property of Intel or its suppliers.  Licensee understands and agree that no license under any Intel patent, copyright (except as expressly described in Sections 3.1, above), trade secret or other intellectual property right is granted or conferred upon Licensee in this Agreement or by the providing of the Source Code by Intel to Licensee hereunder, either expressly, by implication, inducement, estoppel or otherwise, and that any further license under such intellectual property rights must be express and in writing. 
+
+9.2    Title in and to the Derivative Source Program shall be held by Licensee or Licensee’s suppliers as appropriate, subject to Intel’s underlying ownership of the Source Code.
+
+10.0    EXPORT CONTROL
+
+Neither party shall export, either directly or indirectly, any product, service or technical data or system incorporating the software without first obtaining any required license or other approval from the U. S. Department of Commerce or any other agency or department of the United States Government.  In the event any product or software is exported from the United States or re-exported from a foreign destination by either Party, that Party shall ensure that the distribution and export/re-export or import of the product or software is in compliance with all laws, regulations, orders, or other restrictions of the U.S. Export Administration Regulations and the appropriate foreign government.  Both parties agree that neither it nor any of its subsidiaries will export/re-export any software, technical data, process, product, or service, directly or indirectly, to any country for which the United States government or any agency thereof or the foreign government from where it is shipping requires an export license, or other governmental approval, without first obtaining such license or approval.
+
+11.0    GENERAL
+
+11.1    Any claim arising under or relating to this Agreement shall be governed by the internal substantive laws of the State of Delaware or federal courts located in Delaware, without regard to principles of conflict of laws.  Each party hereby agrees to jurisdiction and venue in the courts of the State of Delaware for all disputes and litigation arising under or relating to this Agreement.
+
+11.2    This is the complete and exclusive Agreement between the parties relating to this subject matter. No amendment shall be effective unless in writing signed by authorized representatives of both parties.
+
+11.3    The terms and conditions stated herein are declared to be severable. If any paragraph, provision, or clause in this Agreement shall be found or be held to be invalid or unenforceable in any jurisdiction in which this Agreement is being performed, the remainder of this Agreement shall be valid and enforceable and the parties shall use good faith to negotiate a substitute, valid and enforceable provision which most nearly effects the parties' intent in entering into this Agreement.
+
+
+EXHIBIT A-1 to the 
+Intel Master Source Code License Agreement 
+
+
+Source Code licensed hereunder:  Clanton Reference Code
+
+Intel Platform(s) licensed hereunder:  Kips Bay, Cross Hill
+
+Intel Silicon Components(s) licensed hereunder :  Clanton
+
+Materials to be supplied by Intel (media, documentation, etc.) under this Exhibit A-1: 
+
+Source Code Name:  Clanton UEFI Reference Code
+
+Source Code Description:  
+UEFI bootloader reference code for EDK II codebase
+
+
+EXHIBIT B
+MINIMUM  END-USER LICENSING TERMS
+
+Licensee shall ensure that terms at least as restrictive and protective of Intel’s interests as the following minimum terms, as described below, are included in all End User Licenses. These minimum terms apply to distribution of Licensed Programs (object code) only.  The minimum terms required for Licensee’s distribution of Derivative Source Programs (based on the Intel Source Code) are those set forth in Section 3.1(c) of the Agreement to which this Exhibit B is attached.
+
+An End User may:
+
+Copy the Licensed Programs and accompanying materials (“Software”) onto the End User’s computers for End User’s internal use solely for development and maintenance of the End User’s products that include an Intel Platform.
+
+An End User may not:
+1. Sublicense or further distribute the Software, or permit simultaneous use of the Software by more than one user.
+2. Reverse engineer, decompile, or disassemble the Software.
+3. Use, copy, modify, sell or transfer the Software except as provided in this Exhibit B.
+4. Remove any copyright notices from the Software or any copies thereof.
+5. Export or import Software in violation of any law, regulation, order or other restriction of the United States government and its agencies, or any foreign government.
+
+An End User shall also be made aware of and agree that:
+1. Title to the Software and all copies thereof remain with Licensee or its suppliers, as applicable, and the Software is copyrighted and protected by United States and international copyright laws.
+2. Except as expressly provided in this Exhibit B, End User is not granted any express or implied right under Intel patents, copyrights, trademarks or trade secret information.
+3. The Software is provided “AS IS” without any express or implied warranty of any kind, including warranties of merchantability, noninfringement of third-party intellectual property of fitness for any particular purpose.
+4. Liability to End User is completely disclaimed to the extent allowed by law, including without limitation all indirect, special, incidental, and consequential damages of any kind.
+5. The Software is provided with RESTRICTED RIGHTS, as that term is understood in government procurement.
+6. The End User license may be terminated at any time if the End User is in breach of any of its terms and conditions.  Upon termination, the End User must immediately destroy the Software or return all copies.
