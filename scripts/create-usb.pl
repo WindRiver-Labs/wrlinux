@@ -304,7 +304,7 @@ sub create_iso {
     my $ldir = "export/dist/boot/isolinux";
     scriptcmd("./scripts/fakestart.sh mkdir -p $ldir");
     scriptcmd("./scripts/fakestart.sh cp $progroot/isolinux.cfg $ldir/isolinux.cfg");
-    scriptcmd("./scripts/fakestart.sh cp $syslinux_usr_dir/isolinux.bin $syslinux_usr_dir/vesamenu.c32 $syslinux_usr_dir/menu.c32 $iso_cfg_dir/help.txt $iso_cfg_dir/splash.lss $iso_cfg_dir/splash.txt $ldir");
+    scriptcmd("./scripts/fakestart.sh cp $syslinux_usr_dir/isolinux.bin $syslinux_usr_dir/vesamenu.c32 $syslinux_usr_dir/libcom32.c32 $syslinux_usr_dir/libutil.c32 $syslinux_usr_dir/ldlinux.c32 $syslinux_usr_dir/menu.c32 $iso_cfg_dir/help.txt $iso_cfg_dir/splash.lss $iso_cfg_dir/splash.txt $ldir");
     scriptcmd("./scripts/fakestart.sh cp $bzImage_file $ldir/vmlinuz");
     scriptcmd("./scripts/fakestart.sh cp $iso_initrd_file $ldir/initrd");
     make_fs_template("export/dist");
@@ -605,7 +605,7 @@ sub dos_copy {
 	system("perl -p -i -e 's/(append.* )ro /\$1rw /' $progroot/syslinux.cfg");
     }
     scriptcmd("mcopy -o $iso_cfg_dir/help.txt $iso_cfg_dir/splash.lss $iso_cfg_dir/splash.txt m:");
-    scriptcmd("mcopy -o $syslinux_usr_dir/isolinux.bin $syslinux_usr_dir/vesamenu.c32 $syslinux_usr_dir/menu.c32 $progroot/syslinux.cfg m:");
+    scriptcmd("mcopy -o $syslinux_usr_dir/isolinux.bin $syslinux_usr_dir/vesamenu.c32 $syslinux_usr_dir/libcom32.c32 $syslinux_usr_dir/libutil.c32 $syslinux_usr_dir/menu.c32 $progroot/syslinux.cfg m:");
     scriptcmd("mcopy -o $bzImage_file m:vmlinuz");
     scriptcmd("mcopy -o $iso_initrd_file m:initrd");
     unlink($MTOOLSRC);
@@ -625,16 +625,16 @@ sub mount_and_copy {
 	}
     }
     if ($use_tarfiles) {
-	print "(cd $MNTPOINT && tar -xSjvf $rootfs_file)\n";
-	open(F, "cd $MNTPOINT && tar -xSjvf $rootfs_file|");
+	print "(cd $MNTPOINT && tar --numeric-owner -xSjvf $rootfs_file)\n";
+	open(F, "cd $MNTPOINT && tar --numeric-owner -xSjvf $rootfs_file|");
     } else {
 	if (! (-e "$progroot/export/dist/.")) {
 	    scriptcmd("umount $MNTPOINT");
 	    print "ERROR: No export/dist directory exists, stopping\n";
 	    return -1;
 	}
-	print "./scripts/fakestart.sh tar -C export/dist -cSpf - . | (cd $MNTPOINT && tar -xSvf -)\n";
-	open(F, "./scripts/fakestart.sh tar -C export/dist -cSpf - . | (cd $MNTPOINT && tar -xSvf -) |");
+	print "./scripts/fakestart.sh tar -C export/dist --numeric-owner -cSpf - . | (cd $MNTPOINT && tar --numeric-owner -xSvf -)\n";
+	open(F, "./scripts/fakestart.sh tar -C export/dist --numeric-owner -cSpf - . | (cd $MNTPOINT && tar --numeric-owner -xSvf -) |");
     }
     print "#==Copying files to media, each . == 1000 files copied, this may take a while==\n";
     print "#";
@@ -662,7 +662,12 @@ sub mount_and_copy {
     scriptcmd("sync");
     print "\n# Copy complete\n";
     scriptcmd("rmdir $MNTPOINT");
-    scriptcmd("chown -R $l_uid host-cross/var/pseudo");
+    if (-d "host-cross/var/pseudo") {
+	scriptcmd("chown -R $l_uid host-cross/var/pseudo");
+    }
+    if (-d "export/dist.pseudo_state") {
+	scriptcmd("chown -R $l_uid export/dist.pseudo_state");
+    }
     return 0;
 }
 
