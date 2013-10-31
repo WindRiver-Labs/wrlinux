@@ -42,6 +42,13 @@ chop($bzImage_file);
 my $do_unlink = 1;
 my $LOOP_DEV = "";  # If someone bails with control-c, reset the loopdevice
 my $USE_LOOP_SIZELIMIT = 1;
+my $use_efi = 0;
+
+my $efi_loader = `ls $progroot/bitbake_build/tmp/deploy/images/*/*.efi 2> /dev/null |tail -1`;
+chop($efi_loader);
+if ($efi_loader ne "") {
+    $use_efi = 1;
+}
 
 # Ask defaults
 my $format_ask = "y";  # Format the usb stick?
@@ -274,7 +281,7 @@ if (!(-e $iso_initrd_file)) {
 
 print "\n#############  Begin scripted Execution ##################\n";
 if (! (-e "$progroot/isolinux.cfg")) {
-    system("cp $iso_cfg_dir/$iso_cfg_file $progroot/isolinux.cfg");
+    system("cp $iso_cfg_dir/isolinux.cfg $progroot/isolinux.cfg");
     chown($l_uid, -1, "$progroot/isolinux.cfg");
 }
 
@@ -300,6 +307,22 @@ exit 0;
 
 #-------------------------------------------------------------------#
 
+sub create_startup_nsh {
+    if (!(-f "$progroot/startup.nsh")) {
+	open(NSH, ">$progroot/startup.nsh");
+	my $loader = $efi_loader;
+	$loader =~ s/.*\///;
+	print NSH "$loader\n";
+	close(NSH);
+	chown($l_uid, -1, "$progroot/startup.nsh");
+    }
+    my $gcfg = "$progroot/grub.cfg";
+    if (!(-f $gcfg)) {
+	system("cp $iso_cfg_dir/grub.cfg $gcfg");
+	chown($l_uid, -1, $gcfg);
+    }
+}
+
 sub create_iso {
     my $ldir = "export/dist/boot/isolinux";
     scriptcmd("./scripts/fakestart.sh mkdir -p $ldir");
@@ -309,11 +332,50 @@ sub create_iso {
     scriptcmd("./scripts/fakestart.sh cp $iso_initrd_file $ldir/initrd");
     make_fs_template("export/dist");
 
-    if (scriptcmd("./scripts/fakestart.sh mkisofs -o $outfile -R -D -A \"oe_iso_boot\" -V \"oe_iso_boot\" -b boot/isolinux/isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table export/dist") != 0) {
+    my $iso_efi_args = "";
+    if ($use_efi) {
+	my $iso_efi_partition = "$ldir/efi.img";
+	create_startup_nsh();
+	my $e = "efi_partition";
+	scriptcmd("rm -rf $e");
+	scriptcmd("mkdir -p $e/EFI/BOOT");
+	scriptcmd("cp $efi_loader $e/EFI/BOOT");
+	scriptcmd("./scripts/fakestart.sh mkdir -p export/dist/EFI/BOOT");
+	scriptcmd("./scripts/fakestart.sh cp grub.cfg export/dist/EFI/BOOT/grub.cfg");
+	if ($use_iso) {
+	    scriptcmd("perl -p -i -e 's/wr_usb_boot/oe_iso_boot/; s# /vmlinuz# /boot/isolinux/vmlinuz#; s# /initrd# /boot/isolinux/initrd#' export/dist/EFI/BOOT/grub.cfg");
+	}
+	scriptcmd("cp $progroot/startup.nsh $e");
+	my $sz = `du -sk --apparent-size $e`;
+	chop($sz);
+	($sz) = split(/\s+/,$sz);
+	$sz = int($sz) + 512;
+	unlink("iso_efi_partiton");
+	scriptcmd("dd if=/dev/zero of=$iso_efi_partition bs=$sz count=1024");
+	scriptcmd("mkdosfs $iso_efi_partition");
+	my $MTOOLSRC = "$progroot/mtools.conf";
+	$ENV{'MTOOLSRC'} = $MTOOLSRC;
+	unlink($MTOOLSRC);
+	open(F, ">$MTOOLSRC");
+	print F "drive m: file=\"$iso_efi_partition\"\n";
+	print F "mtools_skip_check=1\n";
+	close(F);
+	scriptcmd("mcopy -o $e/* m:", 0);
+	scriptcmd("mmd m:/EFI/BOOT", 0);
+	scriptcmd("mcopy -o $e/EFI/BOOT/* m:/EFI/BOOT", 0);
+	unlink($MTOOLSRC);
+	$iso_efi_args = "-eltorito-alt-boot -eltorito-platform efi -b boot/isolinux/efi.img -no-emul-boot";
+    }
+
+    if (scriptcmd("./scripts/fakestart.sh mkisofs -o $outfile -R -D -A \"oe_iso_boot\" -V \"oe_iso_boot\" -b boot/isolinux/isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table $iso_efi_args export/dist") != 0) {
 	print "ERROR: Failed to correctly generate ISO\n";
 	exit 1;
     }
-    scriptcmd("isohybrid export/bootimage.iso");
+    if ($use_efi) {
+	scriptcmd("isohybrid -u export/bootimage.iso");
+    } else {
+	scriptcmd("isohybrid export/bootimage.iso");
+    }
     print "# IMAGE COMPLETE: $outfile\n";
 }
 
@@ -367,6 +429,7 @@ sub create_img {
 
     mbr_check();
 
+    scriptcmd("rm -rf export/dist/EFI");
     print "== Starting USB Image creation ==\n";
     print "# Creating first sector with partition table and mbr\n";
     print "#    63 sectors * 512 bytes / sector = 32256 bytes\n";
@@ -604,10 +667,21 @@ sub dos_copy {
     } else {
 	system("perl -p -i -e 's/(append.* )ro /\$1rw /' $progroot/syslinux.cfg");
     }
-    scriptcmd("mcopy -o $iso_cfg_dir/help.txt $iso_cfg_dir/splash.lss $iso_cfg_dir/splash.txt m:");
-    scriptcmd("mcopy -o $syslinux_usr_dir/isolinux.bin $syslinux_usr_dir/vesamenu.c32 $syslinux_usr_dir/libcom32.c32 $syslinux_usr_dir/libutil.c32 $syslinux_usr_dir/menu.c32 $progroot/syslinux.cfg m:");
-    scriptcmd("mcopy -o $bzImage_file m:vmlinuz");
-    scriptcmd("mcopy -o $iso_initrd_file m:initrd");
+    scriptcmd("mcopy -o $iso_cfg_dir/help.txt $iso_cfg_dir/splash.lss $iso_cfg_dir/splash.txt m:", 0);
+    scriptcmd("mcopy -o $syslinux_usr_dir/vesamenu.c32 $syslinux_usr_dir/libcom32.c32 $syslinux_usr_dir/libutil.c32 $syslinux_usr_dir/menu.c32 m:", 0);
+    scriptcmd("mcopy -o $progroot/syslinux.cfg m:", 0);
+
+    scriptcmd("mmd m:/boot", 0);
+    scriptcmd("mmd m:/boot/isolinux", 0);
+    scriptcmd("mcopy -o $bzImage_file m:vmlinuz", 0);
+    scriptcmd("mcopy -o $iso_initrd_file m:initrd", 0);
+    if ($use_efi) {
+	create_startup_nsh();
+	scriptcmd("mcopy -o $progroot/startup.nsh m:", 0);
+	scriptcmd("mmd m:/EFI", 0);
+	scriptcmd("mmd m:/EFI/BOOT", 0);
+	scriptcmd("mcopy -o $efi_loader grub.cfg m:/EFI/BOOT", 0);
+    }
     unlink($MTOOLSRC);
 }
 
@@ -744,7 +818,7 @@ sub trycmd {
 }
 
 sub scriptcmd {
-    my ($cmd) = @_;
+    my ($cmd, $excheck) = @_;
     print "$cmd\n";
     my $output_redirect = " 2>&1";
     if ($cmd =~ /^.*?<<EOF.*/) {
@@ -758,7 +832,14 @@ sub scriptcmd {
 	    print "#      OUTPUT: $_";
 	}
 	close(RUN);
-	return $?;
+	my $ret = $?;
+	if ($excheck ne "") {
+	    if ($excheck != $ret) {
+		print "ERROR: executing: $cmd - return $ret\n";
+		exit_error();
+	    }
+	}
+	return $ret;
     }
     return 0;
 }
