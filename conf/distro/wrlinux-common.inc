@@ -79,9 +79,9 @@ hostname_pn-base-files ?= ""
 # Enable QA warnings related to split of / and /usr
 WARN_QA ?= "textrel files-invalid incompatible-license xorg-driver-abi \
             libdir unsafe-references-in-binaries unsafe-references-in-scripts \
-            ldflags installed-vs-shipped"
+            ldflags installed-vs-shipped rpaths"
 ERROR_QA ?= "dev-so debug-deps dev-deps debug-files arch pkgconfig la perms \
-            useless-rpaths rpaths staticdev pkgvarcheck already-stripped \
+            useless-rpaths staticdev pkgvarcheck already-stripped \
             compile-host-path dep-cmp install-host-path \
             packages-list perm-config perm-line perm-link pkgv-undefined \
             pn-overrides split-strip var-undefined version-going-backwards"
