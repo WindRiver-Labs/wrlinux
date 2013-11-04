@@ -663,6 +663,7 @@ sub mount_and_copy {
     }
     make_fs_template($MNTPOINT);
     print "\n#==Unmounting and syncing, may take some time...==\n";
+    scriptcmd("sync");
     scriptcmd("umount $MNTPOINT");
     scriptcmd("sync");
     print "\n# Copy complete\n";
