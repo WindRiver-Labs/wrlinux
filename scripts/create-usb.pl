@@ -76,6 +76,7 @@ my $do_system = 1;  # Internal debug variable for execing commands
 my @mounts; # List of what devices are mounted locally
 my @execARG = @ARGV;
 my $l_uid = (stat("$progroot/host-cross"))[4];
+my $distdir = "$progroot/export/dist";
 
 while (@ARGV) {
     if ($ARGV[0] eq "--usbimg") {
@@ -97,6 +98,8 @@ while (@ARGV) {
 	$ask_force = 0;
     } elsif ($ARGV[0] =~ /--pristine/) {
 	$pristine = 1;
+    } elsif ($ARGV[0] =~ /--distdir=(.*)/) {
+	$distdir = $1;
     } elsif ($ARGV[0] =~ /--initrd=(.*)/) {
 	$iso_initrd_file = $1;
     } elsif ($ARGV[0] =~  /--rootfs=(.*)/) {
@@ -195,8 +198,8 @@ if (!$use_img) {
 }
 
 if ($use_img) {
-    if (! (-e "$progroot/export/dist/.")) {
-	print "ERROR: No export/dist directory exists, stopping\n";
+    if (! (-e "$distdir/.")) {
+	print "ERROR: No $distdir directory exists, stopping\n";
 	exit_error();
     }
     $size_of_fat16 = ask_general("Size of FAT16 boot <#MEGS>", $size_of_fat16) if $ask_fat16;
@@ -329,13 +332,13 @@ sub create_startup_nsh {
 }
 
 sub create_iso {
-    my $ldir = "export/dist/boot/isolinux";
+    my $ldir = "$distdir/boot/isolinux";
     scriptcmd("./scripts/fakestart.sh mkdir -p $ldir");
     scriptcmd("./scripts/fakestart.sh cp $progroot/isolinux.cfg $ldir/isolinux.cfg");
     scriptcmd("./scripts/fakestart.sh cp $syslinux_usr_dir/isolinux.bin $syslinux_usr_dir/vesamenu.c32 $syslinux_usr_dir/libcom32.c32 $syslinux_usr_dir/libutil.c32 $syslinux_usr_dir/ldlinux.c32 $syslinux_usr_dir/menu.c32 $iso_cfg_dir/help.txt $iso_cfg_dir/splash.lss $iso_cfg_dir/splash.txt $ldir");
     scriptcmd("./scripts/fakestart.sh cp $bzImage_file $ldir/vmlinuz");
     scriptcmd("./scripts/fakestart.sh cp $iso_initrd_file $ldir/initrd");
-    make_fs_template("export/dist");
+    make_fs_template("$distdir");
 
     my $iso_efi_args = "";
     if ($use_efi) {
@@ -345,10 +348,10 @@ sub create_iso {
 	scriptcmd("rm -rf $e");
 	scriptcmd("mkdir -p $e/EFI/BOOT");
 	scriptcmd("cp $efi_loader $e/EFI/BOOT");
-	scriptcmd("./scripts/fakestart.sh mkdir -p export/dist/EFI/BOOT");
-	scriptcmd("./scripts/fakestart.sh cp grub.cfg export/dist/EFI/BOOT/grub.cfg");
+	scriptcmd("./scripts/fakestart.sh mkdir -p $distdir/EFI/BOOT");
+	scriptcmd("./scripts/fakestart.sh cp grub.cfg $distdir/EFI/BOOT/grub.cfg");
 	if ($use_iso) {
-	    scriptcmd("perl -p -i -e 's/wr_usb_boot/oe_iso_boot/; s# /vmlinuz# /boot/isolinux/vmlinuz#; s# /initrd# /boot/isolinux/initrd#' export/dist/EFI/BOOT/grub.cfg");
+	    scriptcmd("perl -p -i -e 's/wr_usb_boot/oe_iso_boot/; s# /vmlinuz# /boot/isolinux/vmlinuz#; s# /initrd# /boot/isolinux/initrd#' $distdir/EFI/BOOT/grub.cfg");
 	}
 	scriptcmd("cp $progroot/startup.nsh $e");
 	my $sz = `du -sk --apparent-size $e`;
@@ -372,7 +375,7 @@ sub create_iso {
 	$iso_efi_args = "-eltorito-alt-boot -eltorito-platform efi -b boot/isolinux/efi.img -no-emul-boot";
     }
 
-    if (scriptcmd("./scripts/fakestart.sh mkisofs -o $outfile -R -D -A \"oe_iso_boot\" -V \"oe_iso_boot\" -b boot/isolinux/isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table $iso_efi_args export/dist") != 0) {
+    if (scriptcmd("./scripts/fakestart.sh mkisofs -o $outfile -R -D -A \"oe_iso_boot\" -V \"oe_iso_boot\" -b boot/isolinux/isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table $iso_efi_args $distdir") != 0) {
 	print "ERROR: Failed to correctly generate ISO\n";
 	exit 1;
     }
@@ -391,8 +394,8 @@ sub ask_convert {
 }
 
 sub ask_ext2_size {
-    my $sz = `du -sk --apparent-size $progroot/export/dist/.`;
-    my $sz2 = `du -sk $progroot/export/dist/.`;
+    my $sz = `du -sk --apparent-size $distdir/.`;
+    my $sz2 = `du -sk $distdir/.`;
     chop($sz);
     ($sz) = split(/\s+/,$sz);
     $sz = int($sz);
@@ -434,7 +437,7 @@ sub create_img {
 
     mbr_check();
 
-    scriptcmd("rm -rf export/dist/EFI");
+    scriptcmd("rm -rf $distdir/EFI");
     print "== Starting USB Image creation ==\n";
     print "# Creating first sector with partition table and mbr\n";
     print "#    63 sectors * 512 bytes / sector = 32256 bytes\n";
@@ -511,10 +514,10 @@ EOF
 
     print "#======Create partition 2======\n";
     print "# Modify rootfs\n";
-    make_fs_template("export/dist");
+    make_fs_template("$distdir");
     chdir($progroot) || die "Could not change dir to $progroot";
 
-    if (scriptcmd("./scripts/fakestart.sh genext2fs -i $bytes_per_inode -z -b $prtsz[1][2] -d export/dist $tmpinst.2") != 0) {
+    if (scriptcmd("./scripts/fakestart.sh genext2fs -i $bytes_per_inode -z -b $prtsz[1][2] -d $distdir $tmpinst.2") != 0) {
 	print "ERROR: File system creation failed!\n";
 	exit_error();
     }
@@ -707,13 +710,13 @@ sub mount_and_copy {
 	print "(cd $MNTPOINT && tar --numeric-owner -xSjvf $rootfs_file)\n";
 	open(F, "cd $MNTPOINT && tar --numeric-owner -xSjvf $rootfs_file|");
     } else {
-	if (! (-e "$progroot/export/dist/.")) {
+	if (! (-e "$distdir/.")) {
 	    scriptcmd("umount $MNTPOINT");
-	    print "ERROR: No export/dist directory exists, stopping\n";
+	    print "ERROR: No $distdir directory exists, stopping\n";
 	    return -1;
 	}
-	print "./scripts/fakestart.sh tar -C export/dist --numeric-owner -cSpf - . | (cd $MNTPOINT && tar --numeric-owner -xSvf -)\n";
-	open(F, "./scripts/fakestart.sh tar -C export/dist --numeric-owner -cSpf - . | (cd $MNTPOINT && tar --numeric-owner -xSvf -) |");
+	print "./scripts/fakestart.sh tar -C $distdir --numeric-owner -cSpf - . | (cd $MNTPOINT && tar --numeric-owner -xSvf -)\n";
+	open(F, "./scripts/fakestart.sh tar -C $distdir --numeric-owner -cSpf - . | (cd $MNTPOINT && tar --numeric-owner -xSvf -) |");
     }
     print "#==Copying files to media, each . == 1000 files copied, this may take a while==\n";
     print "#";
@@ -933,13 +936,13 @@ sub make_fs_template {
 	scriptcmd("cp -f $fs_dir/initial_setup.sh $dir");
 	scriptcmd("chmod 755 $dir/etc/initial_setup/00read_only_root.sh $dir/initial_setup.sh");
 	scriptcmd("cd $dir && $progroot/scripts/fakestart.sh sh $fs_final_loc");
-	if (-f "export/dist/etc/init.d/checkroot.sh") {
-	    system("perl -p -i -e 's/rootremount=yes/rootremount=no/; s/rootcheck=yes/rootcheck=no/' export/dist/etc/init.d/checkroot.sh");
+	if (-f "$distdir/etc/init.d/checkroot.sh") {
+	    system("perl -p -i -e 's/rootremount=yes/rootremount=no/; s/rootcheck=yes/rootcheck=no/' $distdir/etc/init.d/checkroot.sh");
 	}
     } else {
 	scriptcmd("cd $dir && ENV_FORCE_RW_USB=force $progroot/scripts/fakestart.sh sh $fs_final_loc");
-	if (-f "export/dist/etc/init.d/checkroot.sh") {
-	    system("perl -p -i -e 's/rootremount=no/rootremount=yes/' export/dist/etc/init.d/checkroot.sh");
+	if (-f "$distdir/etc/init.d/checkroot.sh") {
+	    system("perl -p -i -e 's/rootremount=no/rootremount=yes/' $distdir/etc/init.d/checkroot.sh");
 	}
     }
 }
@@ -1089,6 +1092,7 @@ Usage: $0
  Advanced:
  --initrd=<initrd> Use an alternate initrd image
  --pristine        Do not modify anything in export/dist
+ --distdir=<dir>   Use an alternate location for export/dist
 EOF
 exit 0;
 }
