@@ -35,6 +35,7 @@ my $format = -1;
 my $ask_force = 1;
 my $instdev = "";
 my $bytes_per_inode = 1900;
+my $ask_outfile = 1;
 my $outfile = "$progroot/export/usb.img";
 my $rootfs_file = `ls -tr $progroot/export/*-dist.tar.bz2 2> /dev/null |head`; 
 my $bzImage_file = `ls -tr $progroot/export/*bzImage* 2> /dev/null |head -1`;
@@ -87,7 +88,9 @@ while (@ARGV) {
 	$use_img = 1;
 	$use_iso = 1;
 	$iso_cfg_file = "isolinux.cfg";
-	$outfile = "$progroot/export/bootimage.iso";
+	if ($ask_outfile) {
+	    $outfile = "$progroot/export/bootimage.iso";
+	}
 	$ask_fat16 = 0;
 	$ask_ext2 = 0;
 	$convert_ext = 1;
@@ -98,6 +101,9 @@ while (@ARGV) {
 	$ask_force = 0;
     } elsif ($ARGV[0] =~ /--pristine/) {
 	$pristine = 1;
+    } elsif ($ARGV[0] =~ /--outfile=(.*)/) {
+	$outfile = $1;
+	$ask_outfile = 0;
     } elsif ($ARGV[0] =~ /--distdir=(.*)/) {
 	$distdir = $1;
     } elsif ($ARGV[0] =~ /--initrd=(.*)/) {
@@ -193,8 +199,10 @@ if (!$use_img) {
     }
     ask_usb_device();
 } else {
-    # set output file unless already set
-    $outfile = ask_general("Location to write image file", $outfile);
+    if ($ask_outfile) {
+	# set output file unless already set
+	$outfile = ask_general("Location to write image file", $outfile);
+    }
 }
 
 if ($use_img) {
@@ -1072,6 +1080,7 @@ Usage: $0
   --usbimg         Write a usb image
   --fileimg        Write a file image to later copy to usb
   --isoimg         Write a iso/usb hybrid image
+  --outfile=<file> Specify the output file location
   --instdev=<DEV>  Location to write the syslinux and rootfs
   --rootfs=<bz2>   Absolute path to *tar.bz2 to use for root file system
   --bzImage=<img>  Kernel boot image to include in fat16 fs
