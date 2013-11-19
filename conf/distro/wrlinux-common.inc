@@ -111,3 +111,4 @@ MULTILIBS ?= ""
 require conf/multilib.conf
 
 PACKAGECONFIG_pn-sysstat = "lm-sensors"
+PACKAGECONFIG_pn-ntp = "openssl cap"
