@@ -78,8 +78,7 @@ hostname_pn-base-files ?= ""
 # QA check settings - a little stricter than the OE-Core defaults
 # Enable QA warnings related to split of / and /usr
 WARN_QA ?= "textrel files-invalid incompatible-license xorg-driver-abi \
-            libdir unsafe-references-in-binaries unsafe-references-in-scripts \
-            ldflags installed-vs-shipped rpaths"
+            libdir ldflags installed-vs-shipped rpaths"
 ERROR_QA ?= "dev-so debug-deps dev-deps debug-files arch pkgconfig la perms \
             useless-rpaths staticdev pkgvarcheck already-stripped \
             compile-host-path dep-cmp install-host-path \
