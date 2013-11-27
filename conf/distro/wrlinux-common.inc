@@ -27,7 +27,6 @@ INHERIT += "image-fs_finalize"
 # Add the ability to generate the companion debuginfo filesystem
 # To enable the image set IMAGE_GEN_DEBUGFS = "1"
 INHERIT += "image-debuginfo"
-BB_HASHBASE_WHITELIST_append += "IMAGE_GEN_DEBUGFS"
 
 # Override these in wrlinux based distros to modify DISTRO_EXTRA_R*
 WRLINUX_DEFAULT_EXTRA_RDEPENDS = "packagegroup-core-boot"
