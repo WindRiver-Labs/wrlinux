@@ -84,6 +84,9 @@ ERROR_QA ?= "dev-so debug-deps dev-deps debug-files arch pkgconfig la perms \
             packages-list perm-config perm-line perm-link pkgv-undefined \
             pn-overrides split-strip var-undefined version-going-backwards"
 
+# Allow dangling .bbappends for now
+BB_DANGLINGAPPENDS_WARNONLY = "1"
+
 # Change base package dependency in -dbg packages from recommends to suggests
 RRECOMMENDS_${PN}-dbg = ""
 RSUGGESTS_${PN}-dbg = "${PN} (= ${EXTENDPKGV})"
