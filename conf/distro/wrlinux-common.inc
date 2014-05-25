@@ -61,8 +61,7 @@ https://.*/.*    http://downloads.yoctoproject.org/mirror/sources/ \n"
 # The CONNECTIVITY_CHECK_URI's are used to test whether we can succesfully
 # fetch from the network (and warn you if not). To disable the test set
 # the variable to be empty.
-CONNECTIVITY_CHECK_URIS ?= "git://git.yoctoproject.org/yocto-firewall-test;protocol=git;rev=HEAD \
-                          https://eula-downloads.yoctoproject.org/index.php \
+CONNECTIVITY_CHECK_URIS ?= "https://eula-downloads.yoctoproject.org/index.php \
                           http://bugzilla.yoctoproject.org/report.cgi"
 
 # Default hash policy for distro
