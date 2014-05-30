@@ -30,3 +30,4 @@ python buildstats_summary () {
     bb.note("  From scratch: %d" % len(no_sstate))
 }
 addhandler buildstats_summary
+buildstats_summary[eventmask] = "bb.event.BuildCompleted"
