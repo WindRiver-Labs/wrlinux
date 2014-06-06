@@ -107,3 +107,5 @@ require conf/multilib.conf
 
 PACKAGECONFIG_pn-sysstat = "lm-sensors"
 PACKAGECONFIG_pn-${MLPREFIX}ntp = "openssl cap"
+
+require conf/distro/exclude-from-world.conf
