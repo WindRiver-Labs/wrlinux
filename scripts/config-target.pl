@@ -247,6 +247,8 @@ if ($virt_type eq "qemu") {
 [ "TARGET_QEMU_CPU", "Use an alternate qemu cpu", "", "String", "", ""],
 [ "TARGET_QEMU_INITRD", "Initrd iamge", "", "String", "", ""],
 [ "TARGET_VIRT_DISK", "Hard disk image", "", "String", "", ""],
+[ "TARGET_QEMU_DISK_ARGS", "Qemu arg to instantiate disk", "-hda", "String", "", ""],
+[ "TARGET_VIRT_DISK_DEV", "Kernel disk device name", "hda", "String", "", ""],
 [ "TARGET_VIRT_DISK_UNIT", "Hard disk unit for root file system", "", "String", "", ""],
 [ "TARGET_VIRT_CDROM", "CDROM", "", "String", "", ""],
 [ "TARGET_VIRT_ROOT_MOUNT", "How to mount the root file system [rw,ro]", "rw", "String", "", ""],
@@ -1334,7 +1336,7 @@ sub qemu_start {
   }
   # Hard Disk
   if ($tgt_vars{'TARGET_VIRT_DISK'} ne "") {
-    $qopts .= " -hda $tgt_vars{'TARGET_VIRT_DISK'}";
+    $qopts .= " $tgt_vars{'TARGET_QEMU_DISK_ARGS'} $tgt_vars{'TARGET_VIRT_DISK'}";
   }
 
   # Alternate cpu
@@ -1414,7 +1416,7 @@ sub qemu_start {
   $kopts .= getUserNFS();
 
   if ($tgt_vars{'TARGET_VIRT_BOOT_TYPE'} eq "disk") {
-    $kopts .= " root=/dev/hda$tgt_vars{'TARGET_VIRT_DISK_UNIT'}";
+    $kopts .= " root=/dev/$tgt_vars{'TARGET_VIRT_DISK_DEV'}$tgt_vars{'TARGET_VIRT_DISK_UNIT'}";
     $kopts .= " $tgt_vars{'TARGET_VIRT_ROOT_MOUNT'}";
   } elsif ($tgt_vars{'TARGET_VIRT_BOOT_TYPE'} eq "cdrom") {
     $kopts .= " root=/dev/hdc$tgt_vars{'TARGET_VIRT_DISK_UNIT'}";
