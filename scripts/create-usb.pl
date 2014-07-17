@@ -20,7 +20,7 @@ use Cwd;
 my $progroot = $0;
 my $orig_progroot = $0;
 compute_top_build_dir();
-$ENV{'PATH'} = "$progroot/host-cross/bin:$progroot/host-cross/usr/bin:$progroot/host-cross/usr/sbin:/usr/bin:/bin:/usr/sbin:/sbin";
+$ENV{'PATH'} = "$progroot/host-cross/bin:$progroot/host-cross/usr/bin:$progroot/host-cross/usr/sbin:$progroot/host-cross/sbin:/usr/bin:/bin:/usr/sbin:/sbin";
 
 chdir($progroot) || die "Could not change directory $progroot";
 # Question answer globals
@@ -34,7 +34,6 @@ my $pristine = 0;
 my $format = -1;
 my $ask_force = 1;
 my $instdev = "";
-my $bytes_per_inode = 1900;
 my $ask_outfile = 1;
 my $outfile = "$progroot/export/usb.img";
 my $rootfs_file = `ls -tr $progroot/export/*-dist.tar.bz2 2> /dev/null |head`; 
@@ -121,8 +120,6 @@ while (@ARGV) {
     } elsif ($ARGV[0] =~  /--ext2-mb=(.*)/) {
 	$size_of_ext2 = $1;
 	$ask_ext2 = 0;
-    } elsif ($ARGV[0] =~ /--inode-bytes=(.*)/) {
-	$bytes_per_inode = $1;
     } elsif ($ARGV[0] =~  /--fat16-mb=(.*)/) {
 	$size_of_fat16 = $1;
 	$ask_fat16 = 0;
@@ -399,6 +396,7 @@ sub ask_convert {
     if ($convert_ext == 0) {
 	$convert_ext = ask_general("Use ext 2,3,4", 2);
     }
+    $convert_ext = 2 if ($convert_ext == 1);
 }
 
 sub ask_ext2_size {
@@ -483,7 +481,7 @@ EOF
     scriptcmd("sync");
     scriptcmd("fdisk -H $heads -S $sects -C $cyl -l -u $tmpinst0");
 
-    scriptcmd("partprobe") if ($useloop);
+    scriptcmd("partprobe $instdev") if ($useloop);
     # Read partition map for internal use
     my $i = 0;
     open(F, "fdisk -b 512 -H $heads -S $sects -C $cyl -l -u $tmpinst0|");
@@ -525,24 +523,11 @@ EOF
     make_fs_template("$distdir");
     chdir($progroot) || die "Could not change dir to $progroot";
 
-    if (scriptcmd("./scripts/fakestart.sh genext2fs -i $bytes_per_inode -z -b $prtsz[1][2] -d $distdir $tmpinst.2") != 0) {
+    scriptcmd("dd if=/dev/zero of=$tmpinst.2 bs=1024 count=0 seek=$prtsz[1][2]");
+    if (scriptcmd("./scripts/fakestart.sh mke2fs -F -t ext$convert_ext -L wr_usb_boot -d $distdir $tmpinst.2") != 0) {
 	print "ERROR: File system creation failed!\n";
 	exit_error();
     }
-    if ($convert_ext == 3) {
-	if (scriptcmd("./scripts/fakestart.sh tune2fs -j $tmpinst.2") != 0) {
-	    print "ERROR: tunefs for ext3!\n";
-	    exit_error();
-	}
-    }
-    if ($convert_ext == 4) {
-	if (scriptcmd("./scripts/fakestart.sh tune2fs -O extents,uninit_bg,dir_index,has_journal $tmpinst.2") != 0) {
-	    print "ERROR: tunefs for ext4 failed!\n";
-	    exit_error();
-	}
-	scriptcmd("./scripts/fakestart.sh e2fsck -yfDC0 $tmpinst.2")
-    }
-    scriptcmd("e2label $tmpinst.2 wr_usb_boot");
 
     print "#======Create final image======\n";
     scriptcmd("cat $tmpinst0 $tmpinst.1 $tmpinst.2 > $outfile\n");
@@ -630,7 +615,7 @@ sub format_usb_and_copy {
 	scriptcmd("/sbin/losetup $instdev $outfile");
     }
     format_partitions();
-    scriptcmd("partprobe");
+    scriptcmd("partprobe $instdev");
     scriptcmd("sync");
     call_dd_mbr($mbr_file, $instdev);
     scriptcmd("fdisk -l $instdev");
@@ -1095,7 +1080,6 @@ Usage: $0
   --no-rm          Do not remove temporary files
   --force          Answer y to the warning about possibility to destroy data
   --loop	   Use the loopback device (requires sudo) to write the usb image
-  --inode-bytes    Set the bytes per inode ratio for genext2fs
   --tarfiles       Use tar files for the root files system [default is contents of export/dist]
                    *** Only works with --usbimg or --loop
  Advanced:
