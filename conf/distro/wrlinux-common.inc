@@ -50,7 +50,7 @@ TCLIBCAPPEND = ""
 #default locale / local language processing settings
 IMAGE_LINGUAS ?= ""
 
-QEMU_TARGETS ?= "arm i386 mips mipsel mips64 mips64el ppc x86_64"
+QEMU_TARGETS ?= "arm aarch64 i386 mips mipsel mips64 mips64el ppc x86_64"
 # Other QEMU_TARGETS "sh4"
 
 MIRRORS =+ "\
