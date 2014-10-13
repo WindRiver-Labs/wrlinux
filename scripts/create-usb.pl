@@ -484,10 +484,21 @@ EOF
     scriptcmd("partprobe $instdev") if ($useloop);
     # Read partition map for internal use
     my $i = 0;
+    my $partitioninfo_start = 0;
     open(F, "fdisk -b 512 -H $heads -S $sects -C $cyl -l -u $tmpinst0|");
     while (<F>) {
 	chop;
-	if ($_ =~ /^\/.*?\s.*?(\d+).*?(\d+).*?(\d+)/) {
+	# identify the partition info line first
+	if ($_ =~ /Device\s+Boot\s+Start\s+End\s+Blocks\s+Id\s+System/) {
+	## The after lines are partition info
+	$partitioninfo_start = 1;
+	next;
+	}
+	if ($partitioninfo_start != 1) {
+	next;
+	}
+	
+	if ($_ =~ /^\S+\s+\*?\s+(\d+)\s+(\d+)\s+(\d+)/) {
 	    $prtsz[$i][0] = $1 * 512;
 	    $prtsz[$i][1] = $2 * 512;
 	    $prtsz[$i][2] = $3;
