@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Wind River Systems, Inc.
+# Copyright (C) 2012 - 2014 Wind River Systems, Inc.
 #
 # Implement routines to help make late (post rootfs) changes to the
 # constructed filesystem image.
@@ -18,6 +18,16 @@
 #
 WRL_CHANGELIST_PATH ?= "${TOPDIR}/conf"
 WRL_FS_FINAL_PATH   ?= "${TOPDIR}/conf"
+
+python() {
+	fs_final_uris = "\n"
+	for dir in (d.getVar('WRL_FS_FINAL_PATH', True) or '').split():
+		for f in os.listdir(dir):
+			if f.startswith('fs_final') and f.endswith('.sh'):
+				fs_final_uris += "file://%s\n" % os.path.join(dir, f)
+	d.appendVar('SRC_URI', fs_final_uris)
+}
+
 
 wrl_fs_local_pkg() {
 	smart --data-dir=${IMAGE_ROOTFS}/var/lib/smart config --set rpm-force=1
