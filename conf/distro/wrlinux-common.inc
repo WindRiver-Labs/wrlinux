@@ -22,7 +22,7 @@ SDKPATH = "/opt/windriver/${DISTRO}/${SDK_VERSION}"
 TOOLCHAIN_OUTPUTNAME = "${DISTRO}-${DISTRO_VERSION}-${TCLIBC}-${SDK_ARCH}-${MACHINE_ARCH}-${PN}-sdk"
 
 # Add changelist.xml and fs_final*.sh processing
-INHERIT += "image-fs_finalize"
+IMAGE_CLASSES += "image-fs_finalize"
 
 # Override these in wrlinux based distros to modify DISTRO_EXTRA_R*
 WRLINUX_DEFAULT_EXTRA_RDEPENDS = "packagegroup-core-boot"
