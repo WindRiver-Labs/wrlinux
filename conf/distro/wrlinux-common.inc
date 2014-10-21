@@ -24,10 +24,6 @@ TOOLCHAIN_OUTPUTNAME = "${DISTRO}-${DISTRO_VERSION}-${TCLIBC}-${SDK_ARCH}-${MACH
 # Add changelist.xml and fs_final*.sh processing
 INHERIT += "image-fs_finalize"
 
-# Add the ability to generate the companion debuginfo filesystem
-# To enable the image set IMAGE_GEN_DEBUGFS = "1"
-INHERIT += "image-debuginfo"
-
 # Override these in wrlinux based distros to modify DISTRO_EXTRA_R*
 WRLINUX_DEFAULT_EXTRA_RDEPENDS = "packagegroup-core-boot"
 WRLINUX_DEFAULT_EXTRA_RRECOMMENDS = "kernel-module-af-packet"
