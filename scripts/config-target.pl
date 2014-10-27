@@ -223,7 +223,6 @@ if ($virt_type eq "qemu") {
 [ "TARGET_QEMU_PROXY_PORT", "Console proxy port for telnet", "4442", "Long", "", ""],
 [ "TARGET_QEMU_PROXY_LISTEN_PORT", "Console proxy port qemu backend", "4446", "Long", "", ""],
 [ "TARGET_QEMU_DEBUG_PORT" , "QEMU ICE style debug port", "1234", "Long", "", ""],
-[ "TARGET_QEMU_AGENT_RPORT" , "usermode-agent port", "udp:4444::17185", "String", "", ""],
 [ "TARGET_QEMU_TCF_RPORT" , "tcf-agent tcp port", "tcp:4447::1534", "String", "", ""],
 [ "TARGET_QEMU_UTCF_RPORT" , "tcf-agent udp port", "udp:4447::1534", "String", "", ""],
 [ "TARGET_QEMU_HTTP_RPORT" , "HTTP web port", "tcp:4448::80", "String", "", ""],
@@ -254,7 +253,7 @@ if ($virt_type eq "qemu") {
 [ "TARGET_VIRT_ROOT_MOUNT", "How to mount the root file system [rw,ro]", "rw", "String", "", ""],
 [ "TARGET_QEMU_BOOT_DEVICE", "Default boot device", "", "String", "", ""],
 [ "TARGET_QEMU_KERNEL_OPTS", "Extra Kernel Options", "", "String", "", ""],
-[ "TARGET_VIRT_UMA_START", "Start usermode agent on boot", "yes", "String", "", ""],
+[ "TARGET_VIRT_TCF_START", "Start tcf agent on boot", "yes", "String", "", ""],
 [ "TARGET_QEMU_OPTS" , "Extra QEMU Options", "", "String", "", ""],
 [ "TARGET_VIRT_EXT_WINDOW", "Use the external window to spawn the target", "no", "String", "", ""],
 [ "TARGET_VIRT_EXT_CON_CMD" , "Application for extneral console", "xterm -T Virtual-WRLinux -e", "String", "", ""],
@@ -294,7 +293,6 @@ if ($virt_type eq "qemu") {
 [ "TARGET_UML_PROXY_PORT", "Console proxy port for telnet", "4442"],
 [ "TARGET_UML_PROXY_LISTEN_PORT", "Console proxy port qemu backend", "4446"],
 [ "TARGET_UML_DEBUG_PORT" , "UML ICE style debug port", "1234"],
-[ "TARGET_UML_AGENT_RPORT" , "usermode-agent port", "udp:4444:10.0.2.15:17185"],
 [ "TARGET_UML_TCF_RPORT" , "tcf-agent port", "1534:10.0.2.15:1534", "String", "", ""],
 [ "TARGET_UML_TELNET_RPORT" , "Telnet port", "4441:10.0.2.15:23"],
 [ "TARGET_UML_SSH_RPORT" , "ssh port", "4440:10.0.2.15:22"],
@@ -308,7 +306,7 @@ if ($virt_type eq "qemu") {
 [ "TARGET_VIRT_ROOT_MOUNT", "How to mount the root file system [rw,ro]", "rw", "String", "", ""],
 [ "TARGET_UML_BOOT_DEVICE", "Default boot device", "" ],
 [ "TARGET_UML_KERNEL_OPTS", "Extra Kernel Options", "" ],
-[ "TARGET_VIRT_UMA_START", "Start usermode agent on boot", "yes", "String", "", ""],
+[ "TARGET_VIRT_TCF_START", "Start tcf agent on boot", "yes", "String", "", ""],
 [ "TARGET_UML_OPTS" , "Extra UML Options", ""],
 [ "TARGET_VIRT_EXT_WINDOW", "Use the external window to spawn the target", "no"],
 [ "TARGET_VIRT_EXT_CON_CMD" , "Application for extneral console", "xterm -T VIRTUAL-WRLinux -e"],
@@ -1205,9 +1203,9 @@ sub uml_start {
     $kopts .= " $tgt_vars{'TARGET_UML_KERNEL_OPTS'}";
   }
 
-  # Usermode agent
-  if ($tgt_vars{"TARGET_VIRT_UMA_START"} eq "yes") {
-    $kopts .= " UMA=1";
+  # TCF agent
+  if ($tgt_vars{"TARGET_VIRT_TCF_START"} eq "yes") {
+    $kopts .= " TCF=1";
   }
 
   ## Start up the UML Engine
@@ -1427,9 +1425,9 @@ sub qemu_start {
     $kopts .= " $tgt_vars{'TARGET_QEMU_KERNEL_OPTS'}";
   }
 
-  # Usermode agent
-  if ($tgt_vars{"TARGET_VIRT_UMA_START"} eq "yes") {
-    $kopts .= " UMA=1";
+  # TCF agent
+  if ($tgt_vars{"TARGET_VIRT_TCF_START"} eq "yes") {
+    $kopts .= " TCF=1";
   }
 
   # Chop off leading spaces
