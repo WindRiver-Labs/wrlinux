@@ -1317,9 +1317,13 @@ sub qemu_start {
       }
     }
     my $ex_user = ",hostname=\"$tgtname\"" if $tgtname ne "";
-    $qopts .= " -net user$ex_user -net nic,macaddr=$mac";
-    $qopts .= ",model=$tgt_vars{'TARGET_QEMU_ENET_MODEL'}" if $tgt_vars{'TARGET_QEMU_ENET_MODEL'} ne "auto" &&
-	$tgt_vars{'TARGET_QEMU_ENET_MODEL'} ne "";
+    if ($tgt_vars{'TARGET_BOARD'} eq "qemuarm64") {
+      $qopts .= " -device virtio-net-device,netdev=net0 -netdev user$ex_user,id=net0";
+    } else {
+      $qopts .= " -net user$ex_user -net nic,macaddr=$mac";
+      $qopts .= ",model=$tgt_vars{'TARGET_QEMU_ENET_MODEL'}" if $tgt_vars{'TARGET_QEMU_ENET_MODEL'} ne "auto" &&
+         $tgt_vars{'TARGET_QEMU_ENET_MODEL'} ne "";
+    }
   } elsif ($tgt_vars{'TARGET_VIRT_ENET_TYPE'} eq "slirpvde") {
     $qopts .= " -net nic,macaddr=$mac";
     $qopts .= ",model=$tgt_vars{'TARGET_QEMU_ENET_MODEL'}" if $tgt_vars{'TARGET_QEMU_ENET_MODEL'} ne "auto" &&
