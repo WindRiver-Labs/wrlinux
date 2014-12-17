@@ -12,7 +12,8 @@ LOCALCONF_VERSION = "1"
 
 SDK_NAME = "${DISTRO}-${TCLIBC}-${SDK_ARCH}-${TARGET_ARCH}"
 SDKPATH = "/opt/windriver/${DISTRO}/${SDK_VERSION}"
-TOOLCHAIN_OUTPUTNAME = "${DISTRO}-${DISTRO_VERSION}-${TCLIBC}-${SDK_ARCH}-${MACHINE_ARCH}-${PN}-sdk"
+TCSDKMACH = "${@['', '_${SDK_OS}']['${SDK_OS}' != 'linux']}"
+TOOLCHAIN_OUTPUTNAME = "${DISTRO}-${DISTRO_VERSION}-${TCLIBC}-${SDK_ARCH}${TCSDKMACH}-${MACHINE_ARCH}-${PN}-sdk"
 
 # Add changelist.xml and fs_final*.sh processing
 IMAGE_CLASSES += "image-fs_finalize"
