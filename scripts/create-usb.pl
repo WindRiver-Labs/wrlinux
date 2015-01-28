@@ -676,6 +676,8 @@ sub dos_copy {
     }
     if ($readonly) {
 	system("perl -p -i -e 's/(append.* )rw /\$1ro /' $progroot/syslinux.cfg");
+	system("perl -p -i -e 's/selinux=.*enforcing=.//' $progroot/syslinux.cfg");
+	system("perl -p -i -e 's/(append.*root=LABEL=wr_usb_boot)/\$1 selinux=0 enforcing=0/' $progroot/syslinux.cfg");
     } else {
 	system("perl -p -i -e 's/(append.* )ro /\$1rw /' $progroot/syslinux.cfg");
     }
@@ -941,13 +943,10 @@ sub make_fs_template {
 	scriptcmd("chmod 755 $dir/etc/initial_setup/00read_only_root.sh $dir/initial_setup.sh");
 	scriptcmd("cd $dir && $progroot/scripts/fakestart.sh sh $fs_final_loc");
 	if (-f "$distdir/etc/init.d/checkroot.sh") {
-	    system("perl -p -i -e 's/rootremount=yes/rootremount=no/; s/rootcheck=yes/rootcheck=no/' $distdir/etc/init.d/checkroot.sh");
+	    system("perl -p -i -e 's/^mount -n -o remount.*//; s/rootcheck=.*/rootcheck=no/' $distdir/etc/init.d/checkroot.sh");
 	}
     } else {
 	scriptcmd("cd $dir && ENV_FORCE_RW_USB=force $progroot/scripts/fakestart.sh sh $fs_final_loc");
-	if (-f "$distdir/etc/init.d/checkroot.sh") {
-	    system("perl -p -i -e 's/rootremount=no/rootremount=yes/' $distdir/etc/init.d/checkroot.sh");
-	}
     }
 }
 
