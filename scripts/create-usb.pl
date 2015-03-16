@@ -25,6 +25,7 @@ $ENV{'PATH'} = "$progroot/host-cross/bin:$progroot/host-cross/usr/bin:$progroot/
 chdir($progroot) || die "Could not change directory $progroot";
 # Question answer globals
 my $use_img = -1; # -1 = ask, 0 = write usb, 1 = write image
+my $default_all = 0; # 1 = default all, 0 = custom all
 my $size_of_fat16 = 64;  # Default fat 16 size
 my $size_of_ext2 = "all"; # Use rest of usb stick for ext2
 my $readonly_ask = "y"; # Should mounted root file system be readonly?
@@ -149,6 +150,8 @@ while (@ARGV) {
 	$ask_force = 0;
 	$format = 1;
 	$useloop = 1;
+    } elsif ($ARGV[0] eq "--default") {
+        $default_all = 1;
     } else {
 	if (!($ARGV[0] eq "--help" || $ARGV[0] eq "-h")) {
 	    print "ERROR: invalid arg: $ARGV[0]\n";
@@ -197,8 +200,10 @@ if (!$use_img) {
     ask_usb_device();
 } else {
     if ($ask_outfile) {
-	# set output file unless already set
-	$outfile = ask_general("Location to write image file", $outfile);
+        if (!$default_all) {
+            # set output file unless already set
+            $outfile = ask_general("Location to write image file", $outfile);
+        }
     }
 }
 
@@ -207,7 +212,9 @@ if ($use_img) {
 	print "ERROR: No $distdir directory exists, stopping\n";
 	exit_error();
     }
-    $size_of_fat16 = ask_general("Size of FAT16 boot <#MEGS>", $size_of_fat16) if $ask_fat16;
+    if (!$default_all) {
+        $size_of_fat16 = ask_general("Size of FAT16 boot <#MEGS>", $size_of_fat16) if $ask_fat16;
+    }
     ask_ext2_size();
     ask_convert();
 } else {
@@ -235,9 +242,15 @@ if (!$use_img) {
     # For usb write we ask for a bz2
     $rootfs_file = ask_general("Location of file system tar.bz2", $rootfs_file, 1) if ($ask_rootfs && $use_tarfiles);
 }
-$bzImage_file = ask_general("Location of bzImage", $bzImage_file, 1) if $ask_bzImage;
+if (!$default_all) {
+    $bzImage_file = ask_general("Location of bzImage", $bzImage_file, 1) if $ask_bzImage;
+}
 if ($readonly_ask ne "") {
-    $readonly = ask_yn("Make root file system readonly?", $readonly_ask);
+    if (!$default_all) {
+        $readonly = ask_yn("Make root file system readonly?", $readonly_ask);
+    } else {
+       $readonly = "y";
+    }
 }
 
 # Search for the installer/dist/syslinux/syslinux.cfg file
@@ -394,7 +407,11 @@ sub create_iso {
 
 sub ask_convert {
     if ($convert_ext == 0) {
-	$convert_ext = ask_general("Use ext 2,3,4", 2);
+        if (!$default_all) {
+	    $convert_ext = ask_general("Use ext 2,3,4", 2);
+        } else {
+            $convert_ext = 2;
+        }
     }
     $convert_ext = 2 if ($convert_ext == 1);
 }
@@ -423,7 +440,9 @@ sub ask_ext2_size {
 	print "       NOTE: You can make size of the ext2fs partition as large as you like \n";
 	print "             so long as it does not exceed the size of the target device.\n";
 	$size_of_ext2 += $extra_mb;
-	$size_of_ext2 = ask_general("Size of ext2 fs <#MEGS>", $size_of_ext2) if $ask_ext2;
+        if (!$default_all) {
+	    $size_of_ext2 = ask_general("Size of ext2 fs <#MEGS>", $size_of_ext2) if $ask_ext2;
+        }
     }
 
 }
@@ -1081,6 +1100,7 @@ Usage: $0
   --bzImage=<img>  Kernel boot image to include in fat16 fs
   --fat16-mb=<#MB> Fixed size of fat16 to hold kernel and static initrd
   --ext2-mb=<#MB>  Fixed size of ext2 partition
+  --default        Use all the default parameters to generate usb.img
   --extra-mb=<#MB> Extra megabytes for the file system creation
                    --ext2-mb overrides this
   --convert-extX=# Specify using ext2, ext3 or ext4 where # = 2, 3, or 4
