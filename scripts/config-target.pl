@@ -243,6 +243,7 @@ if ($virt_type eq "qemu") {
 [ "TARGET_QEMU_GDBSERVER_ATTACH_3_RPORT" , "GDBServer attach 3 port", "tcp:49283::49283", "String", "", ""],
 [ "TARGET_QEMU_GDBSERVER_ATTACH_4_RPORT" , "GDBServer attach 4 port", "tcp:49284::49284", "String", "", ""],
 [ "TARGET_QEMU_KERNEL", "Absolute kernel location or kernel to search for", "bzImage", "String", "", ""],
+[ "TARGET_QEMU_DTB", "Absolute dtb location", "", "String", "", ""],
 [ "TARGET_QEMU_CPU", "Use an alternate qemu cpu", "", "String", "", ""],
 [ "TARGET_QEMU_INITRD", "Initrd iamge", "", "String", "", ""],
 [ "TARGET_VIRT_DISK", "Hard disk image", "", "String", "", ""],
@@ -1299,6 +1300,29 @@ sub qemu_start {
       } else {
 	print "-----------------------------------------\n";
 	print "ERROR: Could not locate kernel: $findfile\n";
+	print "target startup failed\n";
+	exit -1;
+      }
+    }
+  }
+  # Find dtb
+  if ($tgt_vars{"TARGET_QEMU_DTB"} ne "") {
+    if (-f "$tgt_vars{'TARGET_QEMU_DTB'}") {
+      $qopts .= " -dtb $tgt_vars{'TARGET_QEMU_DTB'}";
+    } else {
+      my $findfile = "$progroot/export/$tgt_vars{'TARGET_BOARD'}-$tgt_vars{'TARGET_QEMU_DTB'}-WR$tgt_vars{'PACKAGE_VERSION'}$tgt_vars{'PACKAGE_EXTRAVERSION'}_$tgt_vars{'TARGET_KERNEL'}";
+      if (!(-f $findfile)) {
+	# try without the -WR
+	my $ff = "$progroot/bitbake_build/tmp/deploy/images/$tgt_vars{'TARGET_BOARD'}/$tgt_vars{'TARGET_QEMU_KERNEL'}-$tgt_vars{'TARGET_QEMU_DTB'}";
+	if ($findfile) {
+	  $findfile = $ff;
+	}
+      }
+      if (-f $findfile) {
+	$qopts .= " -dtb $findfile";
+      } else {
+	print "-----------------------------------------\n";
+	print "ERROR: Could not locate dtb: $findfile\n";
 	print "target startup failed\n";
 	exit -1;
       }
