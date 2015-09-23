@@ -169,7 +169,7 @@ function pr_start
 		echo "You should not attempt to halt this server by killing the process. Instead you"
 		echo "should stop it by running this script with the 'stop' action or by echo issuing:"
 		echo ""
-		echo "	'bitbake-prserver --stop --host=${pr_host} --port=${pr_port}' in a bitbake shell"
+		echo "	'bitbake-prserv --stop --host=${pr_host} --port=${pr_port}' in a bitbake shell"
 		echo ""
 		echo "You can access this server from another build by passing:"
 		echo ""
