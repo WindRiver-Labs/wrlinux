@@ -1388,6 +1388,11 @@ sub qemu_start {
     $qopts .= " -serial mon:tcp:localhost:$tgt_vars{'TARGET_QEMU_PROXY_LISTEN_PORT'} -monitor null";
   }
 
+  if ($tgt_vars{'TARGET_BOARD'} eq "qemux86") {
+    if ($tgt_vars{'TARGET_QEMU_MEM'} ne "" && $tgt_vars{'TARGET_QEMU_MEM'} gt "3000") {
+      print "\nqemux86 does not enable PAE, and largest usable memory is 3GB\n\n";
+    }
+  }
   # Memory options
   if ($tgt_vars{'TARGET_QEMU_MEM'} ne "" && $tgt_vars{'TARGET_QEMU_MEM'} ne "default") {
     $qopts .= " -m $tgt_vars{'TARGET_QEMU_MEM'}";
