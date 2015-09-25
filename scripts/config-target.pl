@@ -1534,6 +1534,11 @@ sub qemu_start {
     exit 1;
   }
 
+  if ($tgt_vars{'TARGET_BOARD'} eq "qemuarm" ||
+	  $tgt_vars{'TARGET_BOARD'} eq "qemuarma9") {
+    $cmd = "QEMU_AUDIO_DRV='none' $cmd";
+  }
+
   # Start the simulator
   print "Running QEMU:\n$cmd\n";
   if ($tgt_vars{'TARGET_VIRT_EXT_WINDOW'} eq "yes") {
