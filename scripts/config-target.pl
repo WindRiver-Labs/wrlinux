@@ -114,7 +114,7 @@ sub setup_makefile_vars {
     open(VAR, $bbconf) || die "Could not open: $bbconf";
     while($_ = <VAR>) {
       chop();
-      if ($_ =~ /^\s*MACHINE\s*=\s*(\S+)/) {
+      if ($_ =~ /^\s*MACHINE\s*\?*=\s*(\S+)/) {
 	$mach = $1;
 	$mach =~ s/\"//g;
       }
