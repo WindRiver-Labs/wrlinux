@@ -83,13 +83,13 @@ RRECOMMENDS_${PN}-dbg = ""
 RSUGGESTS_${PN}-dbg = "${PN} (= ${EXTENDPKGV})"
 
 # Extra host tool packages
-require conf/distro/include/wr-host-tools.inc
+require conf/distro/include/wrlinux-host-tools.inc
 
 # Blacklist recipes we explicitly disallow in wrlinux
-require conf/distro/blacklist.conf
+require conf/distro/include/wrlinux-blacklist.conf
 
-# Whilist recipes we explicitly sallow in wrlinux
-require conf/distro/whitelist.conf
+# Whitelist recipes we explicitly sallow in wrlinux
+require conf/distro/include/wrlinux-whitelist.conf
 
 # Make sure DISTRO_FEATURES backfill has pulseaudio 
 # this is a temporary fix until pulseaudio is fixed
@@ -103,4 +103,5 @@ require conf/multilib.conf
 PACKAGECONFIG_pn-sysstat = "lm-sensors"
 PACKAGECONFIG_pn-${MLPREFIX}ntp = "openssl cap"
 
-require conf/distro/exclude-from-world.conf
+require conf/distro/include/wrlinux-exclude-from-world.conf
+require conf/distro/include/wrlinux-distro-settings.conf
