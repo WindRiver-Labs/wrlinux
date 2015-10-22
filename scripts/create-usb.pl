@@ -498,17 +498,17 @@ w
 EOF
 ");
     scriptcmd("sync");
-    scriptcmd("fdisk -H $heads -S $sects -C $cyl -l -u $tmpinst0");
+    scriptcmd("fdisk fdisk -o device,boot,start,end,Size,Id,type -H $heads -S $sects -C $cyl -l -u $tmpinst0");
 
     scriptcmd("partprobe $instdev") if ($useloop);
     # Read partition map for internal use
     my $i = 0;
     my $partitioninfo_start = 0;
-    open(F, "fdisk -b 512 -H $heads -S $sects -C $cyl -l -u $tmpinst0|");
+    open(F, "fdisk -o device,boot,start,end,Size,Id,type -b 512 -H $heads -S $sects -C $cyl -l -u $tmpinst0|");
     while (<F>) {
 	chop;
 	# identify the partition info line first
-	if ($_ =~ /Device\s+Boot\s+Start\s+End\s+Blocks\s+Id\s+System/) {
+	if ($_ =~ /Device\s+Boot\s+Start\s+End\s+Size\s+Id\s+Type/) {
 	## The after lines are partition info
 	$partitioninfo_start = 1;
 	next;
@@ -520,7 +520,7 @@ EOF
 	if ($_ =~ /^\S+\s+\*?\s+(\d+)\s+(\d+)\s+(\d+)/) {
 	    $prtsz[$i][0] = $1 * 512;
 	    $prtsz[$i][1] = $2 * 512;
-	    $prtsz[$i][2] = $3;
+	    $prtsz[$i][2] = $3 * 1024;
 	    $prtsz[$i][3] = $prtsz[$i][1] - $prtsz[$i][0];
 	    print "# Parition$i offsets start; $prtsz[$i][0] bytes end: $prtsz[$i][1] bytes $prtsz[$i][2] blocks\n";
 	    $i++;
