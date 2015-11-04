@@ -54,11 +54,12 @@ $progroot =~ s/\/$//;
 if ($ENV{'NO_CONFIG_TARGET_ENV_READ'} ne "1") {
   open(MFILE, "$progroot/Makefile");
   while (<MFILE>) {
-    if ($_ =~ /^get_env:/) {
-      open(ENVREAD, "make -f $progroot/Makefile get_env|");
+    if (/^(get_env):/ || /^(get_vars):/) {
+      open(ENVREAD, "make -C $progroot -f Makefile $1 |");
       while (<ENVREAD>) {
 	chop;
 	my ($a, $b) = split(/=/, $_, 2);
+	next unless $a =~ /^\w+$/a;
 	$ENV{$a} = $b;
       }
       close(ENVREAD);
@@ -89,7 +90,7 @@ my $debug = 0;
 print "Program root: $progroot\n" if $debug;
 ### END Compute TOP_BUILD_DIR ###
 
-my $config_file = "$progroot/config.sh";
+my $config_file = "";
 if ($ENV{'TARGET_CONFIG_FILE'} ne "") {
   $config_file = $ENV{'TARGET_CONFIG_FILE'}
 }
@@ -101,6 +102,7 @@ our %tgt_vars;
 our $use_taskset = 1;
 
 sub setup_makefile_vars {
+  # This *must* be a Makefile path (we invoke "make get_vars" on it)
   my $toparse = "$progroot/Makefile";
   # For bitbake search for local.conf
   my $bbconf = "$progroot/bitbake_build/conf/local.conf";
@@ -108,22 +110,41 @@ sub setup_makefile_vars {
     $tgt_vars{'TOP_PRODUCT_DIR'} = "$progroot/..";
   } 
 
-  if (!(-e $config_file) && (-e $bbconf)) {
-    my $mach = "";
-    my $fstype = "";
+  my $mach = "";
+  if ($ENV{'MACHINE'} ne "") {
+    $mach = $ENV{'MACHINE'}
+  }
+
+  my $fstype = "";
+  if ($ENV{'DEFAULT_IMAGE'} ne "") {
+    $fstype = $ENV{'DEFAULT_IMAGE'}
+  }
+
+  if (($mach eq "" && $fstype eq "") && -e $bbconf) {
     open(VAR, $bbconf) || die "Could not open: $bbconf";
     while($_ = <VAR>) {
       chop();
-      if ($_ =~ /^\s*MACHINE\s*\?*=\s*(\S+)/) {
+      if (($mach eq "") && ($_ =~ /^\s*MACHINE\s*\?*=\s*(\S+)/)) {
 	$mach = $1;
 	$mach =~ s/\"//g;
       }
-      if ($_ =~ /^\s*DEFAULT_IMAGE\s*=\s*(\S+)/) {
+      if (($mach eq "") && ($_ =~ /^\s*DEFAULT_IMAGE\s*=\s*(\S+)/)) {
 	$fstype = $1;
 	$fstype =~ s/\"//g;
       }
     }
     close(VAR);
+  }
+
+  if ($config_file eq "") {
+    if ($mach ne "") {
+      $config_file = "$progroot/config_$mach.sh";
+    } else {
+      $config_file = "$progroot/config.sh";
+    }
+  }
+
+  if (! -e $config_file) {
     my $bbfile = "$progroot/bitbake_build/tmp/deploy/images/$mach/config-vars-$fstype-$mach";
     if (-e $bbfile) {
       copy($bbfile, $config_file);
@@ -134,15 +155,16 @@ sub setup_makefile_vars {
     }
   }
 
-  open(VAR, "$toparse");
+  open(VAR, "make -C $progroot -f $toparse get_vars |");
   while (<VAR>) {
-    if (($_ =~ /^(PACKAGE_.*?) = (.*)/) ||
-	($_ =~ /^(TOP_.*?) = (.*)/) ||
-	($_ =~ /^(TARGET_KERNEL.*?) = (.*)/) ||
-	($_ =~ /^(LAYER_DIRS_.*?) = (.*)/) ||
-	($_ =~ /^(TARGET_ROOTFS.*?) = (.*)/) ||
+    if (($_ =~ /^(PACKAGE_.*?)\s*=\s*(.*)/) ||
+	($_ =~ /^(TOP_.*?)\s*=\s*(.*)/) ||
+	($_ =~ /^(TARGET_KERNEL.*?)\s*=\s*(.*)/) ||
+	($_ =~ /^(LAYER_DIRS_.*?)\s*=\s*(.*)/) ||
+	($_ =~ /^(TARGET_ROOTFS.*?)\s*=\s*(.*)/) ||
 	($_ =~ /^(TARGET_BOARD.*?) = (.*)/) ||
-	($_ =~ /^(TARGET_BOARD)=\"(.*?)\"/)) {
+	($_ =~ /^(TARGET_BOARD)\s*=\s*\"(.*?)\"/)) {
+
       my $a = $1;
       my $b = $2;
       $b =~ s/^\"//;
