@@ -59,7 +59,8 @@ if ($ENV{'NO_CONFIG_TARGET_ENV_READ'} ne "1") {
       while (<ENVREAD>) {
 	chop;
 	my ($a, $b) = split(/=/, $_, 2);
-	next unless $a =~ /^\w+$/a;
+        # skip any variables where the name is non-alphanumeric
+	next unless $a =~ /^[A-Za-z0-9_]+$/;
 	$ENV{$a} = $b;
       }
       close(ENVREAD);
