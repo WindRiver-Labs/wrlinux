@@ -54,7 +54,7 @@ $progroot =~ s/\/$//;
 if ($ENV{'NO_CONFIG_TARGET_ENV_READ'} ne "1") {
   open(MFILE, "$progroot/Makefile");
   while (<MFILE>) {
-    if (/^(get_env):/ || /^(get_vars):/) {
+    if (/^(get_vars):/ || /^(get_env):/) {
       open(ENVREAD, "make -C $progroot -f Makefile $1 |");
       while (<ENVREAD>) {
 	chop;
@@ -163,9 +163,8 @@ sub setup_makefile_vars {
 	($_ =~ /^(TARGET_KERNEL.*?)\s*=\s*(.*)/) ||
 	($_ =~ /^(LAYER_DIRS_.*?)\s*=\s*(.*)/) ||
 	($_ =~ /^(TARGET_ROOTFS.*?)\s*=\s*(.*)/) ||
-	($_ =~ /^(TARGET_BOARD.*?) = (.*)/) ||
-	($_ =~ /^(TARGET_BOARD)\s*=\s*\"(.*?)\"/)) {
-
+	($_ =~ /^(TARGET_BOARD.*?)\s*=\s*(.*)/) ||
+	($_ =~ /^(TARGET_BOARD.*?)\s*=\s*\"(.*?)\"/)) {
       my $a = $1;
       my $b = $2;
       $b =~ s/^\"//;
@@ -1177,6 +1176,7 @@ sub uml_start {
 	$findfile .= "_$tgt_vars{'TARGET_KERNEL'}";
       }
     }
+    printf "Looking for file: $findfile\n" if $debug;
     if (-f $findfile) {
       $umlRunTime = $findfile;
     } else {
@@ -1307,17 +1307,16 @@ sub qemu_start {
     } else {
       my $findfile = "$progroot/export/$tgt_vars{'TARGET_BOARD'}-$tgt_vars{'TARGET_QEMU_KERNEL'}-WR$tgt_vars{'PACKAGE_VERSION'}$tgt_vars{'PACKAGE_EXTRAVERSION'}_$tgt_vars{'TARGET_KERNEL'}";
       if (!(-f $findfile)) {
+	printf "Looking for, but did not file $findfile\n" if $debug;
 	# try without the -WR
-	my $ff = "$progroot/bitbake_build/tmp/deploy/images/$tgt_vars{'TARGET_BOARD'}/$tgt_vars{'TARGET_QEMU_KERNEL'}-$tgt_vars{'TARGET_BOARD'}.bin";
-	if ($findfile) {
-	  $findfile = $ff;
-	}
+	$findfile = "$progroot/bitbake_build/tmp/deploy/images/$tgt_vars{'TARGET_BOARD'}/$tgt_vars{'TARGET_QEMU_KERNEL'}-$tgt_vars{'TARGET_BOARD'}.bin";
       }
       if ($tgt_vars{'TARGET_KERNEL'} ne "") {
 	my $ff = $findfile;
 	$ff .= "_$tgt_vars{'TARGET_KERNEL'}";
 	$findfile = $ff if (-e $ff);
       }
+      printf "Looking for file $findfile\n" if $debug;
       if (-f $findfile) {
 	$qopts .= " -kernel $findfile";
       } else {
