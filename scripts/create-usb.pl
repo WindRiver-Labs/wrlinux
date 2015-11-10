@@ -24,6 +24,10 @@ $ENV{'PATH'} = "$progroot/host-cross/bin:$progroot/host-cross/usr/bin:$progroot/
 
 chdir($progroot) || die "Could not change directory $progroot";
 # Question answer globals
+my $mach = "*";
+if ($ENV{'MACHINE'} ne "") {
+  $mach = $ENV{'MACHINE'}
+}
 my $use_img = -1; # -1 = ask, 0 = write usb, 1 = write image
 my $default_all = 0; # 1 = default all, 0 = custom all
 my $size_of_fat16 = 64;  # Default fat 16 size
@@ -37,8 +41,8 @@ my $ask_force = 1;
 my $instdev = "";
 my $ask_outfile = 1;
 my $outfile = "$progroot/export/usb.img";
-my $rootfs_file = `ls -tr $progroot/export/*-dist.tar.bz2 2> /dev/null |head`; 
-my $bzImage_file = `ls -tr $progroot/export/*bzImage* 2> /dev/null |head -1`;
+my $rootfs_file = `ls -tr $progroot/export/$mach-*-dist.tar.bz2 2> /dev/null |head -1`;
+my $bzImage_file = `ls -tr $progroot/export/$mach-bzImage* 2> /dev/null |head -1`;
 chop($rootfs_file);
 chop($bzImage_file);
 my $do_unlink = 1;
