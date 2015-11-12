@@ -865,12 +865,16 @@ sub scriptcmd {
 	$cmd .= $output_redirect;
     }
     if ($do_system) {
-	open(RUN, "$cmd|");
+	my $forked = open(RUN, "$cmd|");
 	while (<RUN>) {
 	    print "#      OUTPUT: $_";
 	}
 	close(RUN);
 	my $ret = $?;
+	if ($forked eq "") {
+	    print "ERROR: Fork failed or command not found for: $cmd\n";
+	    exit_error();
+	}
 	if ($excheck ne "") {
 	    if ($excheck != $ret) {
 		print "ERROR: executing: $cmd - return $ret\n";
