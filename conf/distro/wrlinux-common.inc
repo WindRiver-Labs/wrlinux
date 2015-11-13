@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Wind River Systems, Inc.
+# Copyright (C) 2012 - 2015 Wind River Systems, Inc.
 #
 # information common to all wrlinux distros
 #
@@ -64,16 +64,10 @@ LICENSE_FLAGS_WHITELIST += "commercial_windriver"
 hostname_pn-base-files ?= ""
 
 # QA check settings - a little stricter than the OE-Core defaults
-# Enable QA warnings related to split of / and /usr
-WARN_QA ?= "textrel files-invalid incompatible-license xorg-driver-abi \
-            libdir ldflags installed-vs-shipped rpaths \
-            unknown-configure-option build-deps \
-            "
-ERROR_QA ?= "dev-so debug-deps dev-deps debug-files arch pkgconfig la perms \
-            useless-rpaths staticdev pkgvarcheck already-stripped \
-            compile-host-path dep-cmp install-host-path \
-            packages-list perm-config perm-line perm-link pkgv-undefined \
-            pn-overrides split-strip var-undefined version-going-backwards"
+WARN_TO_ERROR_QA = "already-stripped compile-host-path install-host-path \
+                    pn-overrides staticdev useless-rpaths"
+WARN_QA_remove = "${WARN_TO_ERROR_QA}"
+ERROR_QA_append = " ${WARN_TO_ERROR_QA}"
 
 # Allow dangling .bbappends for now
 BB_DANGLINGAPPENDS_WARNONLY = "1"
