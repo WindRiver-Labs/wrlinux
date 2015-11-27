@@ -164,6 +164,7 @@ sub setup_makefile_vars {
 	($_ =~ /^(LAYER_DIRS_.*?)\s*=\s*(.*)/) ||
 	($_ =~ /^(TARGET_ROOTFS.*?)\s*=\s*(.*)/) ||
 	($_ =~ /^(TARGET_BOARD.*?)\s*=\s*(.*)/) ||
+	($_ =~ /^(DEFAULT_IMAGE.*?)\s*=\s*(.*)/) ||
 	($_ =~ /^(TARGET_BOARD.*?)\s*=\s*\"(.*?)\"/)) {
       my $a = $1;
       my $b = $2;
