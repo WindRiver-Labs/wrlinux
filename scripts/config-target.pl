@@ -46,6 +46,14 @@ if ($ENV{'BUILDDIR'} ne "") {
 while ($progroot =~ /\/[^\/]*?\/\.\.\//) {
   $progroot =~ s/(\/[^\/]*?\/\.\.\/)/\//;
 }
+
+my $builddir;
+if ($ENV{'BUILDDIR'} eq "") {
+  $builddir = "$progroot/bitbake_build";
+} else {
+  $builddir = $ENV{'BUILDDIR'};
+}
+
 # And finally remove the trailing slash
 $progroot =~ s/\/$//;
 
@@ -460,6 +468,9 @@ while ($ARGV[0]) {
   } elsif ($ARGV[0] eq "-in") {
     die "ERROR: -in requires an argument" if $ARGV[1] eq "";
     $instance = $ARGV[1];
+    if ($instance + 0 > 50) {
+      die "ERROR: -in value should be between 1 and 50";
+    }
     shift @ARGV;
 ### Help ###
   } elsif ($ARGV[0] eq "-h" || $ARGV[0] eq "-?") {
@@ -932,7 +943,7 @@ sub tuntap_test_start {
   my ($tgtip,$tapdev,$gw,$netmask) = computeTap();
   my $res = system("/sbin/ifconfig $tapdev > /dev/null 2>/dev/null");
   if ($res != 0) {
-    my $cmd = "perl $0 net-start -in $instance";
+    my $cmd = "BUILDDIR=\"$builddir\" perl $0 net-start -in $instance";
     if ($tgt_vars{'TARGET_VIRT_EXT_WINDOW'} eq "yes") {
       external_console($cmd, 1)
     } else {
