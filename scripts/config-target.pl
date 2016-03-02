@@ -1420,6 +1420,19 @@ sub qemu_start {
       $tgt_vars{'TARGET_QEMU_PROXY_PORT'} ne "0" &&
       $tgt_vars{'TARGET_QEMU_USE_STDIO'} ne "yes") {
     $qopts .= " -serial mon:tcp:localhost:$tgt_vars{'TARGET_QEMU_PROXY_LISTEN_PORT'} -monitor null";
+  } else {
+
+     if ($tgt_vars{"TARGET_QEMU_GRAPHICS"} ne "yes") {
+        $qopts .= " -serial mon:stdio";
+     } else {
+        $qopts .= " -serial mon:vc";
+     }
+
+     if ($ENV{'MACHINE'} ne "qemuarm64") {
+        $qopts .= " -serial null";
+     } else {
+        $qopts .= "  -device virtio-serial-device -chardev null,id=virtcon -device virtconsole,chardev=virtcon";
+     }
   }
 
   if ($tgt_vars{'TARGET_BOARD'} eq "qemux86") {
