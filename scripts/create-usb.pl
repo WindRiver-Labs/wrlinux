@@ -355,6 +355,7 @@ sub create_startup_nsh {
 
 sub create_iso {
     my $ldir = "$distdir/boot/isolinux";
+    my $uefi_dir = "$distdir/boot/efi/EFI/BOOT";
     scriptcmd("./scripts/fakestart.sh mkdir -p $ldir");
     scriptcmd("./scripts/fakestart.sh cp $progroot/isolinux.cfg $ldir/isolinux.cfg");
     scriptcmd("./scripts/fakestart.sh cp $syslinux_usr_dir/isolinux.bin $syslinux_usr_dir/vesamenu.c32 $syslinux_usr_dir/libcom32.c32 $syslinux_usr_dir/libutil.c32 $syslinux_usr_dir/ldlinux.c32 $syslinux_usr_dir/menu.c32 $iso_cfg_dir/help.txt $iso_cfg_dir/splash.lss $iso_cfg_dir/splash.txt $ldir");
@@ -393,6 +394,13 @@ sub create_iso {
 	scriptcmd("mcopy -o $e/* m:", 0);
 	scriptcmd("mmd m:/EFI/BOOT", 0);
 	scriptcmd("mcopy -o $e/EFI/BOOT/* m:/EFI/BOOT", 0);
+
+	# For some add-on profiles, for example, SCP or GWP, there will
+	# be more files for secure-boot in /boot/efi/EFI/BOOT directory.
+	# Copy all UEFI files from rootfs (export/dist), will overwrite
+	# the boot loader and grub.cfg, which are copied in above lines.
+	scriptcmd("mcopy -o -/ $uefi_dir m:/EFI", 0);
+
 	unlink($MTOOLSRC);
 	$iso_efi_args = "-eltorito-alt-boot -eltorito-platform efi -b boot/isolinux/efi.img -no-emul-boot";
     }
@@ -685,6 +693,7 @@ sub format_usb_and_copy {
 sub dos_copy {
     my ($tgt) = @_;
     my $MTOOLSRC = "$progroot/mtools.conf";
+    my $uefi_dir = "$distdir/boot/efi/EFI/BOOT";
 
     unlink($MTOOLSRC);
     open(F, ">$MTOOLSRC");
@@ -718,6 +727,12 @@ sub dos_copy {
 	scriptcmd("mmd m:/EFI", 0);
 	scriptcmd("mmd m:/EFI/BOOT", 0);
 	scriptcmd("mcopy -o $efi_loader grub.cfg m:/EFI/BOOT", 0);
+
+	# For some add-on profiles, for example, SCP or GWP, there will
+	# be more files for secure-boot in /boot/efi/EFI/BOOT directory.
+	# Copy all UEFI files from rootfs (export/dist), will overwrite
+	# the boot loader and grub.cfg, which are copied in above lines.
+	scriptcmd("mcopy -o -/ $uefi_dir m:/EFI", 0);
     }
     unlink($MTOOLSRC);
 }
