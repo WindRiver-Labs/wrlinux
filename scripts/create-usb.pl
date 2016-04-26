@@ -399,7 +399,7 @@ sub create_iso {
 	# be more files for secure-boot in /boot/efi/EFI/BOOT directory.
 	# Copy all UEFI files from rootfs (export/dist), will overwrite
 	# the boot loader and grub.cfg, which are copied in above lines.
-	scriptcmd("mcopy -o -/ $uefi_dir m:/EFI", 0);
+	scriptcmd("mcopy -o -/ $uefi_dir m:/EFI");
 
 	unlink($MTOOLSRC);
 	$iso_efi_args = "-eltorito-alt-boot -eltorito-platform efi -b boot/isolinux/efi.img -no-emul-boot";
@@ -732,7 +732,7 @@ sub dos_copy {
 	# be more files for secure-boot in /boot/efi/EFI/BOOT directory.
 	# Copy all UEFI files from rootfs (export/dist), will overwrite
 	# the boot loader and grub.cfg, which are copied in above lines.
-	scriptcmd("mcopy -o -/ $uefi_dir m:/EFI", 0);
+	scriptcmd("mcopy -o -/ $uefi_dir m:/EFI");
     }
     unlink($MTOOLSRC);
 }
