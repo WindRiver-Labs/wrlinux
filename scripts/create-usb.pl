@@ -535,9 +535,9 @@ EOF
 	
 	if ($_ =~ /^\S+\s+\*?\s+(\d+)\s+(\d+)\s+(\d+)/) {
 	    $prtsz[$i][0] = $1 * 512;
-	    $prtsz[$i][1] = $2 * 512;
+	    $prtsz[$i][1] = ($2 + 1) * 512 - 1;
 	    $prtsz[$i][2] = $3 / 1024;
-	    $prtsz[$i][3] = $prtsz[$i][1] - $prtsz[$i][0];
+	    $prtsz[$i][3] = $prtsz[$i][1] - $prtsz[$i][0] + 1;
 	    print "# Parition$i offsets start; $prtsz[$i][0] bytes end: $prtsz[$i][1] bytes $prtsz[$i][2] blocks\n";
 	    $i++;
 	}
@@ -555,7 +555,7 @@ EOF
     return if ($useloop);
     
     print "#======Create partition 1======\n";
-    my $sz = $prtsz[0][3] + 512;
+    my $sz = $prtsz[0][3];
     print "# Create FAT 16 partition - $prtsz[0][1] - $prtsz[0][0] + 512 = $sz\n";
     $ddcmd = "dd if=/dev/zero of=$tmpinst.1 bs=$sz count=1";
     scriptcmd($ddcmd);
