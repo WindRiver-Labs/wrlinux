@@ -27,7 +27,8 @@ python() {
 		for f in os.listdir(dir):
 			if f.startswith('fs_final') and f.endswith('.sh'):
 				fs_final_uris += "file://%s\n" % os.path.join(dir, f)
-	d.appendVar('SRC_URI', fs_final_uris)
+	if fs_final_uris != "\n":
+		d.appendVar('SRC_URI', fs_final_uris)
 }
 
 
