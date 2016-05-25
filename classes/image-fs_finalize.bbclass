@@ -104,5 +104,5 @@ wrl_fs_final_run() {
 	fi
 }
 
-ROOTFS_POSTINSTALL_COMMAND += "${@base_contains('IMAGE_INSTALL', 'fs-local-pkg', 'wrl_fs_local_pkg ;', '', d)}"
+ROOTFS_POSTINSTALL_COMMAND += "${@bb.utils.contains('IMAGE_INSTALL', 'fs-local-pkg', 'wrl_fs_local_pkg ;', '', d)}"
 ROOTFS_POSTPROCESS_COMMAND += "wrl_fs_final_run ;"

@@ -31,7 +31,7 @@ DISTRO_EXTRA_RDEPENDS += " ${WRLINUX_DEFAULT_EXTRA_RDEPENDS}"
 DISTRO_EXTRA_RRECOMMENDS += " ${WRLINUX_DEFAULT_EXTRA_RRECOMMENDS}"
 
 # do not include qemu-config by default
-#WRLINUXQEMUDEPS = "${@base_contains("INCOMPATIBLE_LICENSE", "GPLv3", "", "qemu-config",d)}"
+#WRLINUXQEMUDEPS = "${@bb.utils.contains("INCOMPATIBLE_LICENSE", "GPLv3", "", "qemu-config",d)}"
 WRLINUXQEMUDEPS = ""
 
 DISTRO_EXTRA_RDEPENDS_append_qemuarm = " ${WRLINUXQEMUDEPS}"
@@ -104,7 +104,7 @@ PACKAGECONFIG_pn-${MLPREFIX}ntp = "openssl cap"
 
 # we usually use gnutls as the default PACKAGECONFIG of wpa-supplicant, but its sub-packege gnutls-openssl
 # is GPLv3, so need this check to switch to openssl if GLPv3 is blacklisted.
-PACKAGECONFIG_pn-wpa-supplicant = "${@base_contains('INCOMPATIBLE_LICENSE', 'GPLv3', 'openssl', 'gnutls', d)}"
+PACKAGECONFIG_pn-wpa-supplicant = "${@bb.utils.contains('INCOMPATIBLE_LICENSE', 'GPLv3', 'openssl', 'gnutls', d)}"
 
 require conf/distro/include/wrlinux-exclude-from-world.conf
 require conf/distro/include/wrlinux-distro-settings.conf
