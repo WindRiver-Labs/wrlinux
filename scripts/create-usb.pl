@@ -42,7 +42,11 @@ my $instdev = "";
 my $ask_outfile = 1;
 my $outfile = "$progroot/export/usb.img";
 my $rootfs_file = `ls -tr $progroot/export/$mach-*-dist.tar.bz2 2> /dev/null |head -1`;
-my $bzImage_file = `ls -tr $progroot/export/$mach-bzImage* 2> /dev/null |head -1`;
+my $bzImage_file = `ls -tr $progroot/export/images/bzImage-initramfs* 2> /dev/null |head -1`;
+if ($bzImage_file eq "") {
+    $bzImage_file = `ls -tr $progroot/export/$mach-bzImage* 2> /dev/null |head -1`;
+}
+
 chop($rootfs_file);
 chop($bzImage_file);
 my $do_unlink = 1;
