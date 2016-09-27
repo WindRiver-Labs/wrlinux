@@ -1,0 +1,19 @@
+Upstream-Status: Pending
+
+rpm2cpio can't expand rpm macro %{_dbpath} since it doesn't read the rpm
+config files at all, this will cause segment fault in runtime.
+
+This is a known issue for rpm 5.x, just workaround it for now.
+=================================================
+diff --git a/tools/rpm2cpio.c b/tools/rpm2cpio.c
+index 0b85472..5e1a992 100644
+--- a/tools/rpm2cpio.c
++++ b/tools/rpm2cpio.c
+@@ -88,6 +88,7 @@ int main(int argc, char **argv)
+ 	(void) rpmtsSetVSFlags(ts, vsflags);
+ 
+ 	/*@-mustmod@*/      /* LCL: segfault */
++	rc = rpmReadConfigFiles(NULL, NULL);
+ 	rc = rpmReadPackageFile(ts, fdi, "rpm2cpio", &h);
+ 	/*@=mustmod@*/
+ 
