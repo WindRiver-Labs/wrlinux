@@ -7,8 +7,9 @@ distribution-specific integration and bug fixes, and other wrlinux components.
 
 Dependencies
 ------------
-This layer depends on the oe-core version supplied with Wind River Linux.
-It is also recommended that it be used with the wrlcompat layer.
+This layer depends on the openembedded-core version supplied with Wind River
+Linux.  It also requires the wr-base layer.
+
 
 Maintenance
 -----------
@@ -19,25 +20,17 @@ information on submitting changes.
 
 Building the wrlinux layer
 -----------------------------------
-This layer should be added to the bblayers.conf file.  This is done
-automatically when using the Wind River configure wrapper.
+This layer should be added to the bblayers.conf file.
 
-If you are not using the configure wrapper, you will need to set the
-following in your local.conf file to use Wind River Linux distribution
-configuration:
+To enable the 'wrlinux' distribution, you will need to set the following in
+local.conf file:
 
 DISTRO = "wrlinux"
-SDKMACHINE = "native"
-
-A configuration sample has been included under the templates
-directory.  Each of the samples can be added to your configuration by
-adding an include into your local.conf file, or by using the Wind River
-configure program and --with-template=...
 
 
 License
 -------
-Copyright (C) 2012-2013 Wind River Systems, Inc.
+Copyright (C) 2012-2016 Wind River Systems, Inc.
 
 Source code included in the tree for individual recipes is under the LICENSE
 stated in the associated recipe (.bb file) unless otherwise stated.
