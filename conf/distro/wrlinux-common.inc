@@ -99,6 +99,11 @@ DISTRO_FEATURES_BACKFILL_CONSIDERED += " pulseaudio"
 MULTILIBS ?= ""
 require conf/multilib.conf
 
+# Append boost libs that are not enabled by default in oe-core
+# Notes: mpi and graph_parallel depends on mpich which is in
+#        meta-oe, so they are disabled in oe-core.
+PACKAGECONFIG_append_pn-boost = " graph_parallel mpi"
+
 PACKAGECONFIG_pn-sysstat = "lm-sensors"
 
 # we usually use gnutls as the default PACKAGECONFIG of wpa-supplicant, but its sub-packege gnutls-openssl
