@@ -84,12 +84,6 @@ RSUGGESTS_${PN}-dbg = "${PN} (= ${EXTENDPKGV})"
 # Extra host tool packages
 require conf/distro/include/wrlinux-host-tools.inc
 
-# Blacklist recipes we explicitly disallow in wrlinux
-require conf/distro/include/wrlinux-blacklist.conf
-
-# Whitelist recipes we explicitly sallow in wrlinux
-require conf/distro/include/wrlinux-whitelist.conf
-
 # Make sure DISTRO_FEATURES backfill has pulseaudio 
 # this is a temporary fix until pulseaudio is fixed
 
@@ -105,5 +99,4 @@ PACKAGECONFIG_pn-sysstat = "lm-sensors"
 # is GPLv3, so need this check to switch to openssl if GLPv3 is blacklisted.
 PACKAGECONFIG_pn-wpa-supplicant = "${@bb.utils.contains('INCOMPATIBLE_LICENSE', 'GPLv3', 'openssl', 'gnutls', d)}"
 
-require conf/distro/include/wrlinux-exclude-from-world.conf
 require conf/distro/include/wrlinux-distro-settings.conf
