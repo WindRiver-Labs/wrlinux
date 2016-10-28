@@ -20,6 +20,8 @@ TOOLCHAIN_OUTPUTNAME_pn-buildtools-tarball_forcevariable = "${SDK_ARCH}-buildtoo
 # Workaround for extensible SDK
 TOOLCHAIN_OUTPUTNAME_pn-uninative-tarball = "${BUILD_ARCH}-nativesdk-libc"
 
+TOOLCHAIN_HOST_TASK_append = " nativesdk-rpm-common"
+
 # Add changelist.xml and fs_final*.sh processing
 IMAGE_CLASSES += "image-fs_finalize"
 
