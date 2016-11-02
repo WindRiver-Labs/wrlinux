@@ -29,6 +29,9 @@ WRSDK_RDEPENDS ?= "\
         nativesdk-util-linux \
 "
 
+# We must disable this for a mingw sdk!
+WRSDK_RDEPENDS_sdkmingw32 = ""
+
 TOOLCHAIN_HOST_TASK_append = " ${WRSDK_RDEPENDS}"
 
 # Add changelist.xml and fs_final*.sh processing
