@@ -1,10 +1,3 @@
-EXTRA_IMAGEDEPENDS += "unfs3-native"
-EXTRA_IMAGEDEPENDS += "syslinux-native"
-EXTRA_IMAGEDEPENDS += "qemu-native"
-EXTRA_IMAGEDEPENDS += "qemu-helper-native"
-EXTRA_IMAGEDEPENDS += "e2fsprogs-native"
-EXTRA_IMAGEDEPENDS += "gdb-cross-${TARGET_ARCH}"
-
 # copied from meta-mentor/conf/distro/include/sstate.inc
 def lsb_distro_adjust(distro_id, ver):
     """This hook ensures that RHEL server, RHEL client, and CentOS all return
