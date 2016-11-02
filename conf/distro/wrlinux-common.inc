@@ -20,6 +20,8 @@ TOOLCHAIN_OUTPUTNAME_pn-buildtools-tarball_forcevariable = "${SDK_ARCH}-buildtoo
 # Workaround for extensible SDK
 TOOLCHAIN_OUTPUTNAME_pn-uninative-tarball = "${BUILD_ARCH}-nativesdk-libc"
 
+TOOLCHAIN_HOST_TASK_append = " nativesdk-rpm-common"
+
 # Add changelist.xml and fs_final*.sh processing
 IMAGE_CLASSES += "image-fs_finalize"
 
@@ -84,12 +86,6 @@ RSUGGESTS_${PN}-dbg = "${PN} (= ${EXTENDPKGV})"
 # Extra host tool packages
 require conf/distro/include/wrlinux-host-tools.inc
 
-# Blacklist recipes we explicitly disallow in wrlinux
-require conf/distro/include/wrlinux-blacklist.conf
-
-# Whitelist recipes we explicitly sallow in wrlinux
-require conf/distro/include/wrlinux-whitelist.conf
-
 # Make sure DISTRO_FEATURES backfill has pulseaudio 
 # this is a temporary fix until pulseaudio is fixed
 
@@ -99,16 +95,10 @@ DISTRO_FEATURES_BACKFILL_CONSIDERED += " pulseaudio"
 MULTILIBS ?= ""
 require conf/multilib.conf
 
-# Append boost libs that are not enabled by default in oe-core
-# Notes: mpi and graph_parallel depends on mpich which is in
-#        meta-oe, so they are disabled in oe-core.
-PACKAGECONFIG_append_pn-boost = " graph_parallel mpi"
-
 PACKAGECONFIG_pn-sysstat = "lm-sensors"
 
 # we usually use gnutls as the default PACKAGECONFIG of wpa-supplicant, but its sub-packege gnutls-openssl
 # is GPLv3, so need this check to switch to openssl if GLPv3 is blacklisted.
 PACKAGECONFIG_pn-wpa-supplicant = "${@bb.utils.contains('INCOMPATIBLE_LICENSE', 'GPLv3', 'openssl', 'gnutls', d)}"
 
-require conf/distro/include/wrlinux-exclude-from-world.conf
 require conf/distro/include/wrlinux-distro-settings.conf
