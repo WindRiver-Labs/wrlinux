@@ -20,7 +20,16 @@ TOOLCHAIN_OUTPUTNAME_pn-buildtools-tarball_forcevariable = "${SDK_ARCH}-buildtoo
 # Workaround for extensible SDK
 TOOLCHAIN_OUTPUTNAME_pn-uninative-tarball = "${BUILD_ARCH}-nativesdk-libc"
 
-TOOLCHAIN_HOST_TASK_append = " nativesdk-rpm-common"
+WRSDK_RDEPENDS ?= "\
+        nativesdk-cmake \
+        nativesdk-mtools \
+        nativesdk-rpm-common \
+        nativesdk-syslinux \
+        nativesdk-unfs3 \
+        nativesdk-util-linux \
+"
+
+TOOLCHAIN_HOST_TASK_append = " ${WRSDK_RDEPENDS}"
 
 # Add changelist.xml and fs_final*.sh processing
 IMAGE_CLASSES += "image-fs_finalize"
