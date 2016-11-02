@@ -95,8 +95,8 @@ BB_DANGLINGAPPENDS_WARNONLY = "1"
 RRECOMMENDS_${PN}-dbg = ""
 RSUGGESTS_${PN}-dbg = "${PN} (= ${EXTENDPKGV})"
 
-# Extra host tool packages
-require conf/distro/include/wrlinux-host-tools.inc
+# lsb distro adjust
+require conf/distro/include/wrlinux-lsb-distro-adjust.inc
 
 # Make sure DISTRO_FEATURES backfill has pulseaudio 
 # this is a temporary fix until pulseaudio is fixed
