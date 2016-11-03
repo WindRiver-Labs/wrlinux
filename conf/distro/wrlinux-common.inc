@@ -18,7 +18,7 @@ TOOLCHAIN_OUTPUTNAME_task-populate-sdk-ext_forcevariable = "${DISTRO}-${DISTRO_V
 TOOLCHAIN_OUTPUTNAME_pn-buildtools-tarball_forcevariable = "${SDK_ARCH}-buildtools-nativesdk-standalone-${DISTRO_VERSION}"
 
 # Workaround for extensible SDK
-TOOLCHAIN_OUTPUTNAME_pn-uninative-tarball = "${SDK_ARCH}-nativesdk-libc"
+TOOLCHAIN_OUTPUTNAME_pn-uninative-tarball = "${BUILD_ARCH}-nativesdk-libc"
 
 WRSDK_RDEPENDS ?= "\
         nativesdk-cmake \
@@ -114,5 +114,3 @@ PACKAGECONFIG_pn-sysstat = "lm-sensors"
 PACKAGECONFIG_pn-wpa-supplicant = "${@bb.utils.contains('INCOMPATIBLE_LICENSE', 'GPLv3', 'openssl', 'gnutls', d)}"
 
 require conf/distro/include/wrlinux-distro-settings.conf
-
-require conf/distro/include/wrlinux-uninative.inc
