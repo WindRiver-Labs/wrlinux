@@ -120,3 +120,6 @@ PACKAGECONFIG_pn-wpa-supplicant = "${@bb.utils.contains('INCOMPATIBLE_LICENSE', 
 require conf/distro/include/wrlinux-distro-settings.conf
 
 require conf/distro/include/wrlinux-uninative.inc
+
+# Exclude download layers from eSDK.
+SDK_LAYERS_EXCLUDE_PATTERN ?= ".*-dl$ .*-dl-2.2$"
