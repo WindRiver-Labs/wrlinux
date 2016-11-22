@@ -14,11 +14,12 @@ SDK_NAME = "${DISTRO}-${TCLIBC}-${SDK_ARCH}-${TARGET_ARCH}"
 SDKPATH = "/opt/windriver/${DISTRO}/${SDK_VERSION}"
 TCSDKMACH = "${@['', '_${SDK_OS}']['${SDK_OS}' != 'linux']}"
 TOOLCHAIN_OUTPUTNAME = "${DISTRO}-${DISTRO_VERSION}-${TCLIBC}-${SDK_ARCH}${TCSDKMACH}-${MACHINE_ARCH}-${PN}-sdk"
-TOOLCHAIN_OUTPUTNAME_task-populate-sdk-ext_forcevariable = "${DISTRO}-${DISTRO_VERSION}-${TCLIBC}-${SDK_ARCH}${TCSDKMACH}-${MACHINE_ARCH}-${PN}-sdk-ext"
+TOOLCHAINEXT_OUTPUTNAME = "${DISTRO}-${DISTRO_VERSION}-${TCLIBC}-${SDK_ARCH}${TCSDKMACH}-${MACHINE_ARCH}-${PN}-sdk-ext"
+
 TOOLCHAIN_OUTPUTNAME_pn-buildtools-tarball_forcevariable = "${SDK_ARCH}-buildtools-nativesdk-standalone-${DISTRO_VERSION}"
 
 # Workaround for extensible SDK
-TOOLCHAIN_OUTPUTNAME_pn-uninative-tarball = "${BUILD_ARCH}-nativesdk-libc"
+TOOLCHAIN_OUTPUTNAME_pn-uninative-tarball = "${SDK_ARCH}-nativesdk-libc"
 
 WRSDK_RDEPENDS ?= "\
         nativesdk-cmake \
@@ -31,6 +32,10 @@ WRSDK_RDEPENDS ?= "\
 
 # We must disable this for a mingw sdk!
 WRSDK_RDEPENDS_sdkmingw32 = ""
+
+# eSDk doesn't need extra TOOLCHAIN_HOST_TASK, eSDK ships
+# buildtools-tarball which includes them.
+WRSDK_RDEPENDS_task-populate-sdk-ext = ""
 
 TOOLCHAIN_HOST_TASK_append = " ${WRSDK_RDEPENDS}"
 
@@ -70,8 +75,7 @@ https://.*/.*    http://downloads.yoctoproject.org/mirror/sources/ \n"
 # The CONNECTIVITY_CHECK_URI's are used to test whether we can succesfully
 # fetch from the network (and warn you if not). To disable the test set
 # the variable to be empty.
-CONNECTIVITY_CHECK_URIS ?= "https://eula-downloads.yoctoproject.org/index.php \
-                          http://bugzilla.yoctoproject.org/report.cgi"
+CONNECTIVITY_CHECK_URIS ?= "https://www.example.com/"
 
 # Default hash policy for distro
 BB_SIGNATURE_HANDLER ?= 'OEBasicHash'
@@ -95,8 +99,8 @@ BB_DANGLINGAPPENDS_WARNONLY = "1"
 RRECOMMENDS_${PN}-dbg = ""
 RSUGGESTS_${PN}-dbg = "${PN} (= ${EXTENDPKGV})"
 
-# Extra host tool packages
-require conf/distro/include/wrlinux-host-tools.inc
+# lsb distro adjust
+require conf/distro/include/wrlinux-lsb-distro-adjust.inc
 
 # Make sure DISTRO_FEATURES backfill has pulseaudio 
 # this is a temporary fix until pulseaudio is fixed
@@ -114,3 +118,8 @@ PACKAGECONFIG_pn-sysstat = "lm-sensors"
 PACKAGECONFIG_pn-wpa-supplicant = "${@bb.utils.contains('INCOMPATIBLE_LICENSE', 'GPLv3', 'openssl', 'gnutls', d)}"
 
 require conf/distro/include/wrlinux-distro-settings.conf
+
+require conf/distro/include/wrlinux-uninative.inc
+
+# Exclude download layers from eSDK.
+SDK_LAYERS_EXCLUDE_PATTERN ?= ".*-dl$ .*-dl-2.2$"
