@@ -83,9 +83,6 @@ BB_SIGNATURE_HANDLER ?= 'OEBasicHash'
 # Add our license to the acceptable restricted license list
 LICENSE_FLAGS_WHITELIST += "commercial_windriver"
 
-# Don't include a /etc/hostname file in our rootfs
-hostname_pn-base-files ?= ""
-
 # QA check settings - a little stricter than the OE-Core defaults
 WARN_TO_ERROR_QA = "already-stripped compile-host-path install-host-path \
                     pn-overrides staticdev useless-rpaths"
