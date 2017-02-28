@@ -27,6 +27,12 @@ python() {
 		for f in os.listdir(dir):
 			if f.startswith('fs_final') and f.endswith('.sh'):
 				fs_final_uris += "file://%s\n" % os.path.join(dir, f)
+	#If the WRL_FS_FINAL_PATH variable is set, the images's SRC_URI will be set by the
+	#following sentence, then the LIC_FILES_CHKSUM of related image that will be built
+	# must be set. If not it will occur the QA error at populate_lic_qa_checksum
+	#function in meta/classes/insane.bbclass.
+	#For example:
+	#   add a bbapend for iamge to set the LIC_FILES_CHKSUM.
 	if fs_final_uris != "\n":
 		d.appendVar('SRC_URI', fs_final_uris)
 }
