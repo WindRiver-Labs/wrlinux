@@ -39,7 +39,14 @@ WRSDK_RDEPENDS_task-populate-sdk-ext = ""
 
 TOOLCHAIN_HOST_TASK_append = " ${WRSDK_RDEPENDS}"
 
+# We have a LICENSE_DIR to search for additional licenses
+WR_EXTRA_LIC_DIR = "${LAYER_PATH_wrlinux}/files/common-licenses"
+LICENSE_PATH[vardepsexclude] += "WR_EXTRA_LIC_DIR"
+LICENSE_PATH += "${WR_EXTRA_LIC_DIR}"
+
 # Add changelist.xml and fs_final*.sh processing
+# the fs-final processing requires lua support in rpm
+PACKAGECONFIG_append_class-native_pn-rpm = " lua"
 IMAGE_CLASSES += "image-fs_finalize"
 
 # Override these in wrlinux based distros to modify DISTRO_EXTRA_R*
