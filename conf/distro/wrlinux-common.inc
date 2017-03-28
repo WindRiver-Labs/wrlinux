@@ -24,7 +24,6 @@ TOOLCHAIN_OUTPUTNAME_pn-uninative-tarball = "${SDK_ARCH}-nativesdk-libc"
 WRSDK_RDEPENDS ?= "\
         nativesdk-cmake \
         nativesdk-mtools \
-        nativesdk-rpm-common \
         nativesdk-syslinux \
         nativesdk-unfs3 \
         nativesdk-util-linux \
