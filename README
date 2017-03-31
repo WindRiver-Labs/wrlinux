@@ -23,7 +23,7 @@ Building the wrlinux layer
 This layer should be added to the bblayers.conf file.
 
 To enable the 'wrlinux' distribution, you will need to set the following in
-local.conf file:
+the local.conf file:
 
 DISTRO = "wrlinux"
 
