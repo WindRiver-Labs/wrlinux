@@ -104,5 +104,16 @@ wrl_fs_final_run() {
 	fi
 }
 
-ROOTFS_POSTINSTALL_COMMAND += "${@bb.utils.contains('IMAGE_INSTALL', 'fs-local-pkg', 'wrl_fs_local_pkg ;', '', d)}"
+add_ld_so_conf_d() {
+    if [ -f ${IMAGE_ROOTFS}${sysconfdir}/ld.so.conf ]; then
+        if ! `grep -q 'include ld.so.conf.d\/\*.conf' /etc/ld.so.conf`; then
+            echo 'include ld.so.conf.d/*.conf' >> ${IMAGE_ROOTFS}${sysconfdir}/ld.so.conf
+        fi
+        mkdir -p ${IMAGE_ROOTFS}${sysconfdir}/ld.so.conf.d
+    fi
+}
+
+ROOTFS_POSTINSTALL_COMMAND += "${@bb.utils.contains('IMAGE_INSTALL', 'fs-local-pkg', 'wrl_fs_local_pkg ;', '', d)} \
+                               ${@bb.utils.contains('DISTRO_FEATURES', 'ldconfig', 'add_ld_so_conf_d ;', '', d)} \
+"
 ROOTFS_POSTPROCESS_COMMAND += "wrl_fs_final_run ;"
