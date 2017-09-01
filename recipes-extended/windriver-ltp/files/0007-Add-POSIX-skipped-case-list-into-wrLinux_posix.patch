@@ -1,0 +1,68 @@
+From af6a9f1dedb5ecdcf94ec58f5bf44d8998c7963c Mon Sep 17 00:00:00 2001
+From: Jin Li <jin.li@windriver.com>
+Date: Wed, 3 Sep 2014 06:59:26 +0800
+Subject: [PATCH 07/15] Add POSIX skipped case list into wrLinux_posix
+
+Upstream-Status: Inappropriate [WR Linux specific change]
+
+The cases in list will NOT be run by wr-runposix
+
+Signed-off-by: Jin Li <jin.li@windriver.com>
+---
+ .../wrLinux_posix/skiptest/common                  | 44 ++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
+ create mode 100644 testcases/open_posix_testsuite/wrLinux_posix/skiptest/common
+
+diff --git a/testcases/open_posix_testsuite/wrLinux_posix/skiptest/common b/testcases/open_posix_testsuite/wrLinux_posix/skiptest/common
+new file mode 100644
+index 0000000..539fb0d
+--- /dev/null
++++ b/testcases/open_posix_testsuite/wrLinux_posix/skiptest/common
+@@ -0,0 +1,44 @@
++
++# Copyright (c) 2012 Wind River Systems, Inc.
++#
++# The right to copy, distribute, modify, or otherwise make use
++# of this software may be licensed only pursuant to the terms
++# of an applicable Wind River license agreement.
++
++Test Suit -- conformance/interfaces TPS
++---------------------------------------
++#preempt-rt conformance/interfaces/sched_setparam sched_setparam_9-1.run-test | Not a bug. Test case is NOT compatible to the preempt-rt kernel
++The implementation of test case is NOT compatible to the preempt-rt kernel and system will hang during test execution.
++
++#cgl conformance/interfaces/sched_setparam sched_setparam_9-1.run-test | Not a bug. Test case is NOT compatible to the cgl kernel
++The implementation of test case is NOT compatible to the cgl kernel and system will hang during test execution.
++
++#preempt-rt conformance/interfaces/sched_yield sched_yield_1-1.run-test | Not a bug. Test case is NOT compatible to the preempt-rt kernel
++The implementation of test case is NOT compatible to the preempt-rt kernel and system will hang during test execution.
++
++#cgl conformance/interfaces/sched_yield sched_yield_1-1.run-test | Not a bug. Test case is NOT compatible to the cgl kernel
++The implementation of test case is NOT compatible to the cgl kernel and system will hang during test execution.
++
++#preempt-rt conformance/interfaces/sched_setparam sched_setparam_10-1.run-test | Not a bug. Test case is NOT compatible to the preempt-rt kernel
++The implementation of test case is NOT compatible to the preempt-rt kernel and system will hang during test execution.
++
++#cgl conformance/interfaces/sched_setparam sched_setparam_10-1.run-test | Not a bug. Test case is NOT compatible to the cgl kernel
++The implementation of test case is NOT compatible to the cgl kernel and system will hang during test execution.
++
++
++Test Suit -- conformance/interfaces THR
++---------------------------------------
++#preempt-rt conformance/interfaces/pthread_create pthread_create_1-6.run-test | Not a bug. Test case is NOT compatible to the preempt-rt kernel
++The implementation of test case is NOT compatible to the preempt-rt kernel and system will hang during test execution.
++
++#cgl conformance/interfaces/pthread_create pthread_create_1-6.run-test | Not a bug. Test case is NOT compatible to the cgl kernel
++The implementation of test case is NOT compatible to the cgl kernel and system will hang during test execution.
++
++
++Test Suit -- conformance/interfaces MSG
++---------------------------------------
++#preempt-rt conformance/interfaces/mq_timedreceive mq_timedreceive_5-2.run-test | Not a bug. Test case is NOT supported in preempt-rt kernel
++The time() can not specifies an abs_timeout to mq_timedreceiver () for preempt-rt kernel
++
++#preempt-rt conformance/interfaces/mq_timedreceive mq_timedreceive_10-2.run-test | Not a bug. Test case is NOT supported in preempt-rt kernel
++The time() can not specifies an abs_timeout to mq_timedreceiver () for preempt-rt kernel
+-- 
+1.8.1.4
+

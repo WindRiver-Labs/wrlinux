@@ -1,0 +1,29 @@
+From d55e1ab6e8e4ed2bb3bb6c53d6c778c4f645983a Mon Sep 17 00:00:00 2001
+From: Jin Li <jin.li@windriver.com>
+Date: Wed, 30 Jan 2013 12:51:17 +0800
+Subject: [PATCH 09/15] Change the POSIX install folder to
+ /opt/open_posix_testsuite
+
+Upstream-Status: Inappropriate [WR Linux specific change]a
+
+Signed-off-by: Jin Li <jin.li@windriver.com>
+---
+ testcases/open_posix_testsuite/bin/Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/testcases/open_posix_testsuite/bin/Makefile b/testcases/open_posix_testsuite/bin/Makefile
+index b36e8a9..c30a123 100644
+--- a/testcases/open_posix_testsuite/bin/Makefile
++++ b/testcases/open_posix_testsuite/bin/Makefile
+@@ -16,6 +16,7 @@ clean:
+ 	@rm -f t0.val
+ 
+ install: clean
++	mkdir -p $(DESTDIR)/opt/open_posix_testsuite/bin/
+ 	@set -e; for i in `ls *`; do \
+-	    install -m 0755 $$i $(DESTDIR)/$(bindir)/. ;\
++	    install -m 0755 $$i $(DESTDIR)/opt/open_posix_testsuite/bin/ ;\
+ 	done
+-- 
+1.8.1.4
+

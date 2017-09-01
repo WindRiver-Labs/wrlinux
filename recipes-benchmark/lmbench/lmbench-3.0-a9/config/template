@@ -1,0 +1,14 @@
+## case_name : test suite/case name
+case_name="lmbench"
+
+## board: target name
+board="Canoe Pass"
+
+spin="LB08"
+## test_id: unique name for each test run, which is used by database to manage test results
+### recommend name: OS-kernel-rootfs-others
+#
+test_id="WRLinux7.0"
+bsp="intel-x86-64"
+kernel="standard"
+rootfs="glibc_std"

@@ -1,0 +1,38 @@
+From 4921e145e288538d4701944ddd4224337f32bc21 Mon Sep 17 00:00:00 2001
+From: Jin Li <jin.li@windriver.com>
+Date: Wed, 3 Sep 2014 07:01:49 +0800
+Subject: [PATCH 08/15] Add wr-runposix.install into wrLinux_posix
+
+Upstream-Status: Inappropriate [WR Linux specific change]
+
+Signed-off-by: Jin Li <jin.li@windriver.com>
+---
+ .../wrLinux_posix/wr-runposix.install                    | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+ create mode 100644 testcases/open_posix_testsuite/wrLinux_posix/wr-runposix.install
+
+diff --git a/testcases/open_posix_testsuite/wrLinux_posix/wr-runposix.install b/testcases/open_posix_testsuite/wrLinux_posix/wr-runposix.install
+new file mode 100644
+index 0000000..82e451d
+--- /dev/null
++++ b/testcases/open_posix_testsuite/wrLinux_posix/wr-runposix.install
+@@ -0,0 +1,16 @@
++#!/bin/sh
++
++cd `dirname $0` || \
++{
++    echo "FATAL: unable to change directory to $(dirname $0)"
++    exit $TEST_RETVAL_FAIL
++}
++
++cd ../conformance/interfaces/
++
++for subfolder in `ls -d */speculative/`;do
++    cp $subfolder/*.run-test $subfolder/../
++done
++
++
++
+-- 
+1.8.1.4
+

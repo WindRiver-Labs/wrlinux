@@ -1,0 +1,2 @@
+# using the test template implies --with-template=feature/ptest as well
+feature/ptest

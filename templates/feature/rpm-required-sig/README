@@ -1,0 +1,5 @@
+Instruct RPM to enforce package signature authentication on the target.
+
+This treats self-signed RPM 5 packages as 'untrusted'.  Only signatures
+known by RPM will allow a package to be installed, otherwise an error
+will be generated and installation prevented.

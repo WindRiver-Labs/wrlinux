@@ -1,0 +1,169 @@
+From c23102e9044b6572b9e77974f3a5fd95285a38f4 Mon Sep 17 00:00:00 2001
+From: Jin Li <jin.li@windriver.com>
+Date: Wed, 3 Sep 2014 06:54:11 +0800
+Subject: [PATCH 06/15] Add POSIX test known failure reason into wrLinux_posix
+
+Upstream-Status: Inappropriate [WR Linux specific change]
+
+wr-runposix creates POSIX test report with known failure reason
+
+Signed-off-by: Jin Li <jin.li@windriver.com>
+---
+ .../wrLinux_posix/failtest/common                  | 145 +++++++++++++++++++++
+ 1 file changed, 145 insertions(+)
+ create mode 100644 testcases/open_posix_testsuite/wrLinux_posix/failtest/common
+
+diff --git a/testcases/open_posix_testsuite/wrLinux_posix/failtest/common b/testcases/open_posix_testsuite/wrLinux_posix/failtest/common
+new file mode 100644
+index 0000000..4d837e0
+--- /dev/null
++++ b/testcases/open_posix_testsuite/wrLinux_posix/failtest/common
+@@ -0,0 +1,145 @@
++
++# Copyright (c) 2012 Wind River Systems, Inc.
++#
++# The right to copy, distribute, modify, or otherwise make use
++# of this software may be licensed only pursuant to the terms
++# of an applicable Wind River license agreement.
++
++Test Suit -- conformance/interfaces AIO
++---------------------------------------
++
++#std conformance/interfaces/aio_error aio_error_3-1.run-test | Not a bug. Test result depends on system implement
++This test tries to call aio_error with argument aiocbp which does not point at
++a control block for an asynchronous I/O request, and expect error EINVAL.
++
++The POSIX spec says about aio_error:
++
++ERRORS
++The aio_error( ) function may fail if:
++[EINVAL]   The aiocbp argument does not refer to an asynchronous operation whose
++           return status has not yet been retrieved.
++
++It just say "may" and not a compelling contraint, so this is implement dependent and not a bug.
++
++#std conformance/interfaces/aio_return aio_return_2-1.run-test | Not a bug. Test result depends on system implement
++In specification, second call to aio_return() return -1 is a kind of possibility
++depending on implementation. In eglibc the return value is same as first return.
++
++#std conformance/interfaces/aio_return aio_return_3-2.run-test | Not a bug. Test result depends on system implement
++Same with test aio_return/2-1.run-test.
++
++#std conformance/interfaces/aio_return aio_return_4-1.run-test | Not a bug. Test result depends on system implement
++The case tries to call aio_return with argument aiocbp which does not point
++at a control block for an asynchronous I/O request, and expect error EINVAL. But
++this is optional and depends on system implementation.
++
++
++Test Suit -- conformance/interfaces TMR
++---------------------------------------
++
++#std conformance/interfaces/timer_settime timer_settime_5-3.run-test | Not a bug. Test pass when executed manually
++It take a little longer for test to run. So POSIX take the result as HUNG.
++
++#std conformance/interfaces/clock_getcpuclockid clock_getcpuclockid_5-1.run-test | Not a bug. Test result depends on system implementation
++When call clock_getcpuclockid() as a unpriviledge user to get process 'init' cpu
++time, it succeeds but expect fails with EPERM.
++
++In Linux man page, it addresses EPERM:
++Specified as an optional error in POSIX.1-2001; does not occur on Linux unless
++the kernel does not support obtaining the per-process CPU-time clock of another process.
++
++
++Test Suit -- conformance/interfaces MEM
++---------------------------------------
++
++#std conformance/interfaces/mmap mmap_13-1.run-test | Not a bug. Time fields limitation on NFS
++Not all of the Linux filesystems implement all of the time fields. Some file
++system types allow mounting in such a way that file accesses do not cause an
++update of the st_atime field, also see 'noatime' in mount(8).
++
++#std conformance/interfaces/mmap mmap_11-4.run-test | Not a bug. Test fails when the mapped page is cached
++Test case map a file with size of 1/2 * page_size, then write char 'b' to next
++byte of 1/2 * page_size. Then try to re-mmap() the file and expect the byte
++next to of 1/2 * page_size should not be character 'b'. Test on all platforms
++are failed. The reason is after first mmap(), the mapped page for the file is
++cached in page cache. When do the 2nd or 3rd mmap() still get the same mapped page. 
++
++mmap() is a system call and implemented by mmap2(). Then the call sequence is
++mmap2() ==> sys_mmap_pgoff() ==> do_mmap_pgoff() ==> mmap_region() ==> file->f_op->mmap().
++In ext3 file system, file->f_op->mmap() point to generic_file_mmap().
++In generic_file_mmap(), assign the Page Fault Exception Handler to filemap_fault().
++When access the Virtual Memory Area, page fault will occur and the run filemap_fault().
++In filemap_fault(), kernel run find_get_page() to search the physical page in the page cache.
++
++#std conformance/interfaces/mmap mmap_11-5.run-test | Not a bug. Test fails when the mapped page is cached
++Same with mmap/11-4, and this test case is to test share memory,
++so file->f_op->mmap() point to shm_fault() in ipc/shm.c, then it call
++shmem_fault() ==> shmem_getpage() ==> shmem_getpage_gfp() ==> find_lock_page().
++In find_lock_page() it will search the desired pagecache page. 
++
++#std conformance/interfaces/mmap mmap_31-1.run-test | Not a bug. This case is NOT supported by Linux
++Test parameters lenth and offset for mmap() are too large. In function
++get_unmapped_area(), it checks that len should less than TASK_SIZE, otherwise
++it returns -ENOMEM. TASK_SIZE value differs on different platforms.
++
++#cgl conformance/interfaces/mmap mmap_5-1.run-test | Not a bug. This case is NOT supported cgl platform
++In the cgl platform where the kernel option CONFIG_PAX_MPROTECT is enabled,
++invoking mmap with explicit usage of PROT_WRITE and PROT_EXEC together will be
++denied with "Operation not permitted".
++
++
++Test Suit -- conformance/interfaces THR
++---------------------------------------
++
++#std conformance/interfaces/pthread_key_create pthread_key_create_speculative_5-1.run-test | Test case issue. Bug will be fixed upstream
++The  pthread_key_delete()  function  shall delete a thread-specific data key
++previously returned by pthread_key_create
++
++#std conformance/interfaces/pthread_mutexattr_gettype pthread_mutexattr_gettype_speculative_3-1.run-test | Not a bug. Test result depends on system implement
++Test case try to initialize a pthread_mutexattr_t object with
++pthread_mutexattr_init() and call pthread_mutexattr_gettype() with an invalid 'attr'.
++
++#std conformance/interfaces/pthread_rwlock_rdlock pthread_rwlock_rdlock_2-1.run-test | Not a bug. This case is NOT supported by eglibc
++This test case is to test option Thread Execution Scheduling of pthread rwlock.
++But eglibc don not support this option Main thread read lock 'rwlock' with high
++priority. Child thread1 write lock 'wrlock' with medium priority will block.
++child thread2 read lock 'rwlock' with low priority should block because a high
++priority write lock is waiting, but read lock doesn't block.
++
++#std conformance/interfaces/pthread_rwlock_rdlock pthread_rwlock_rdlock_2-2.run-test | Not a bug. This case is NOT supported by eglibc
++Same with pthread_rwlock_rdlock/2-1.run-test
++
++#std conformance/interfaces/pthread_rwlock_unlock pthread_rwlock_unlock_3-1.run-test | Not a bug. This case is NOT supported by eglibc
++Same with pthread_rwlock_rdlock/2-1.run-test
++
++#std conformance/interfaces/pthread_cond_broadcast pthread_cond_broadcast_1-2.run-test | Not a bug. Lack of memory
++
++#cgl conformance/interfaces/pthread_create pthread_create_3-2.run-test | Not a bug. Not enough timeout value in cgl platform
++In cgl platform, this case need more time to execute. Test case pass when it is executed as a single case,
++/opt/open_posix_testsuite/conformance/interfaces/pthread_create# ./pthread_create_3-2.run-test
++
++Test Suit -- conformance/interfaces TPS
++---------------------------------------
++
++#std conformance/interfaces/sched_getparam sched_getparam_6-1.run-test | Not a bug. Test is NOT supported by Linux
++This case tries to call sched_getparam as non-root user to get scheduling parameters
++of process with pid 0.
++
++In the manual of sched_getparam about return value:
++
++EPERM  The calling process does not have appropriate privileges (Linux: does not have the CAP_SYS_NICE capability).
++
++It is obvious that Linux does NOT support this case. 
++
++#std conformance/interfaces/sched_getscheduler sched_getscheduler_7-1.run-test | Not a bug. Test is NOT supported by Linux
++Same with test case sched_getparam/6-1.run-test
++
++Test Suit -- conformance/interfaces SIG
++---------------------------------------
++
++#std conformance/interfaces/sigaction sigaction_16-1.run-test | Not a bug. The test case will be updated upstream in POSIX
++The case tries to check that if SA_RESTART is set in sa_flags, interruptible
++function interrupted by signal shall restart silently. The global varialbe
++"ready" which is used to synced up between threads is incorrectly set to static.
++Remove the "static" and the test passed as expected.
++
+-- 
+1.8.1.4
+

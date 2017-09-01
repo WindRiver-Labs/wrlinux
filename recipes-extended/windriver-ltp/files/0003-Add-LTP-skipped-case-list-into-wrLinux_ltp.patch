@@ -1,0 +1,94 @@
+From ca082590a1b6feb4c919966672a57e0efc45f080 Mon Sep 17 00:00:00 2001
+From: Jin Li <jin.li@windriver.com>
+Date: Wed, 3 Sep 2014 05:54:46 +0800
+Subject: [PATCH 03/15] Add LTP skipped case list into wrLinux_ltp
+
+Upstream-Status: Inappropriate [WR Linux specific change]
+
+The cases in list will NOT be run by wr-runltp
+
+Signed-off-by: Jin Li <jin.li@windriver.com>
+---
+ wrLinux_ltp/skiptest/stress | 70 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 70 insertions(+)
+ create mode 100644 wrLinux_ltp/skiptest/stress
+
+diff --git a/wrLinux_ltp/skiptest/stress b/wrLinux_ltp/skiptest/stress
+new file mode 100644
+index 0000000..5e291af
+--- /dev/null
++++ b/wrLinux_ltp/skiptest/stress
+@@ -0,0 +1,70 @@
++
++# Copyright (c) 2012 Wind River Systems, Inc.
++#
++# The right to copy, distribute, modify, or otherwise make use
++# of this software may be licensed only pursuant to the terms
++# of an applicable Wind River license agreement.
++
++Test Suit -- mm
++---------------------------------------
++
++#std mmapstress01 | stress test
++#std mmapstress02 | stress test
++#std mmapstress03 | stress test
++#std mmapstress04 | stress test
++#std mmapstress05 | stress test
++#std mmapstress06 | stress test
++#std mmapstress07 | stress test
++#std mmapstress08 | stress test
++#std mmapstress09 | stress test
++#std mmapstress10 | stress test
++#std mtest05 | stress test
++#std mtest06 | stress test
++#std mtest06_2 | stress test
++#std mtest06_3 | stress test
++#std mallocstress01 | stress test
++
++Test Suit -- fs
++---------------------------------------
++
++#std gf01 | stress test
++#std gf02 | stress test
++#std gf03 | stress test
++#std gf04 | stress test
++#std gf05 | stress test
++#std gf06 | stress test
++#std gf07 | stress test
++#std gf08 | stress test
++#std gf09 | stress test
++#std gf10 | stress test
++#std gf11 | stress test
++#std gf12 | stress test
++#std gf13 | stress test
++#std gf14 | stress test
++#std gf15 | stress test
++#std gf16 | stress test
++#std gf17 | stress test
++#std gf18 | stress test
++#std gf19 | stress test
++#std gf20 | stress test
++#std gf21 | stress test
++#std gf22 | stress test
++#std gf23 | stress test
++#std gf24 | stress test
++#std gf25 | stress test
++#std gf26 | stress test
++#std gf27 | stress test
++#std gf28 | stress test
++#std gf29 | stress test
++#std gf30 | stress test
++#std rwtest01 | stress test
++#std rwtest02 | stress test
++#std rwtest03 | stress test
++#std rwtest04 | stress test
++#std rwtest05 | stress test
++
++Test Suit -- fsx
++---------------------------------------
++
++#std fsx-linux | stress test
++
+-- 
+1.8.1.4
+

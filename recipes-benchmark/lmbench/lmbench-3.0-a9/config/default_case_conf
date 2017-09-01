@@ -1,0 +1,72 @@
+#case_name:group_name:case_sequence_number
+#---------------------------------
+syscall_overhead_null:Simple syscall overhead:0
+syscall_overhead_read:Simple syscall overhead:1
+syscall_overhead_write:Simple syscall overhead:2
+syscall_overhead_stat:Simple syscall overhead:3
+syscall_overhead_fstat:Simple syscall overhead:4
+syscall_overhead_open_close:Simple syscall overhead:5
+
+sig_installation:Signal handling:0
+sig_catch:Signal handling:1
+sig_protection_fault:Signal handling:2
+
+proc_exec_latency:Process Creation:0
+proc_fork_latency:Process Creation:1
+proc_shell_latency:Process Creation:2
+
+ctx_latency:Context Switching:0
+
+pipe_latency:Local Communication Latencies:0
+unix_sock_latency:Local Communication Latencies:1
+udp_latency:Local Communication Latencies:2
+tcp_latency:Local Communication Latencies:3
+tcp_connect_latency:Local Communication Latencies:4
+rpc_latency_udp:Local Communication Latencies:5
+rpc_latency_tcp:Local Communication Latencies:6
+memory_load_latency:Local Communication Latencies:7
+
+10K_file_create_latency:File create/delete latencies:0
+10K_file_delete_latency:File create/delete latencies:1
+100K_file_create_latency:File create/delete latencies:2
+100K_file_delete_latency:File create/delete latencies:3
+
+mmap_latency:Mmap latency:0
+
+pagefaults_latency:Other File/VM system latencies:0
+select_file_latency:Other File/VM system latencies:1
+select_tcp_latency:Other File/VM system latencies:2
+
+pipe_bandwidth:Local Communication bandwidths:0
+unix_bandwidth:Local Communication bandwidths:1
+tcp_bandwidth:Local Communication bandwidths:2
+file_read_bandwidth:Local Communication bandwidths:3
+file_open2close_bandwidth:Local Communication bandwidths:4
+mmap_read_bandwidth:Local Communication bandwidths:5
+mmap_open2close_bandwidth:Local Communication bandwidths:6
+memory_bcopy_bandwidth:Local Communication bandwidths:7
+memory_read_bandwidth:Local Communication bandwidths:8
+memory_write_bandwidth:Local Communication bandwidths:9
+
+integer_add:Basic integer operations:0
+integer_bit:Basic integer operations:1
+integer_mul:Basic integer operations:2
+integer_div:Basic integer operations:3
+integer_mod:Basic integer operations:4
+
+uint64_add:Basic uint64 operations:0
+int64_bit:Basic uint64 operations:1
+int64_mul:Basic uint64 operations:2
+int64_div:Basic uint64 operations:3
+int64_mod:Basic uint64 operations:4
+
+float_add:Basic float operations:0
+float_mul:Basic float operations:1
+float_div:Basic float operations:2
+float_bogomflops:Basic float operations:3
+
+double_add:Basic double operations:0
+double_mul:Basic double operations:1
+double_div:Basic double operations:2
+double_bogomflops:Basic double operations:3
+

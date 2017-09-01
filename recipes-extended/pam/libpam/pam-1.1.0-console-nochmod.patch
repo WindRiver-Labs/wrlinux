@@ -1,0 +1,42 @@
+Subject: [PATCH] pam_console nochmod
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Joe Slater <jslater@windriver.com>
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ modules/pam_console/Makefile.am      | 2 +-
+ modules/pam_console/console.handlers | 2 --
+ 2 files changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/modules/pam_console/Makefile.am b/modules/pam_console/Makefile.am
+index fdddb8b..6b06db7 100644
+--- a/modules/pam_console/Makefile.am
++++ b/modules/pam_console/Makefile.am
+@@ -38,7 +38,6 @@ sbin_PROGRAMS = pam_console_apply
+ 
+ 
+ secureconf_DATA = console.perms console.handlers
+-permsd_DATA = 50-default.perms
+ 
+ FLEX_OPTS = -Cr
+ BISON_OPTS = -d
+@@ -62,4 +61,5 @@ configfile.c: configfile.tab.c configfile.lex.c
+ 
+ install-data-local:
+ 	mkdir -p $(DESTDIR)$(secureconfdir)/console.apps
++	mkdir -p $(DESTDIR)$(permsddir)
+ 	mkdir -m $(LOCKMODE) -p -p $(DESTDIR)$(LOCKDIR)
+diff --git a/modules/pam_console/console.handlers b/modules/pam_console/console.handlers
+index 98cc071..b23a7f2 100644
+--- a/modules/pam_console/console.handlers
++++ b/modules/pam_console/console.handlers
+@@ -15,5 +15,3 @@
+ # touch unlock wait /var/run/console-unlocked
+ 
+ console consoledevs tty[0-9][0-9]* vc/[0-9][0-9]* :[0-9]+\.[0-9]+ :[0-9]+
+-/sbin/pam_console_apply lock logfail wait -t tty -s
+-/sbin/pam_console_apply unlock logfail wait -r -t tty -s
+-- 
+1.9.1
+

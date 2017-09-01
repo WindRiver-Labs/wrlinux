@@ -1,0 +1,39 @@
+Subject: [PATCH] build redhat modules
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Joe Slater <jslater@windriver.com>
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ configure.ac        | 2 ++
+ modules/Makefile.am | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 9e1257f..e0b920a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -618,6 +618,8 @@ AC_CONFIG_FILES([Makefile libpam/Makefile libpamc/Makefile libpamc/test/Makefile
+ 	libpam_misc/Makefile conf/Makefile conf/pam_conv1/Makefile \
+ 	po/Makefile.in \
+ 	modules/Makefile \
++	modules/pam_chroot/Makefile modules/pam_console/Makefile \
++	modules/pam_postgresok/Makefile \
+ 	modules/pam_access/Makefile modules/pam_cracklib/Makefile \
+         modules/pam_debug/Makefile modules/pam_deny/Makefile \
+ 	modules/pam_echo/Makefile modules/pam_env/Makefile \
+diff --git a/modules/Makefile.am b/modules/Makefile.am
+index 0c80cea..869b7cc 100644
+--- a/modules/Makefile.am
++++ b/modules/Makefile.am
+@@ -3,6 +3,7 @@
+ #
+ 
+ SUBDIRS = pam_access pam_cracklib pam_debug pam_deny pam_echo \
++	pam_chroot pam_console pam_postgresok \
+ 	pam_env pam_exec pam_faildelay pam_filter pam_ftp \
+ 	pam_group pam_issue pam_keyinit pam_lastlog pam_limits \
+ 	pam_listfile pam_localuser pam_loginuid pam_mail \
+-- 
+1.9.1
+

@@ -1,0 +1,12 @@
+system-stats
+============
+
+This template adds the System and process monitoring utilities.
+
+To use it, add
+
+--templates feature/system-stats
+
+as a setup.sh option.
+
+See the template configuration file for the list of packages included with this feature.

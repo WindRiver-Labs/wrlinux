@@ -1,0 +1,6 @@
+This template adds grub, grubby and kernel-image to the image which are
+needed by the anaconda installer.
+
+To use, add it as a template:
+
+  --templates feature/installer-support

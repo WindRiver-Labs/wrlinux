@@ -1,0 +1,31 @@
+From f372326181d70c9d2c9d4314e2e33abf8f7c73e8 Mon Sep 17 00:00:00 2001
+From: fli <fupan.li@windriver.com>
+Date: Wed, 11 Sep 2013 15:06:31 +0800
+Subject: [PATCH] add the WRLinux release support
+
+add the WRLinux release support
+
+Signed-off-by: fli <fupan.li@windriver.com>
+---
+ microcode_ctl.start |    5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/microcode_ctl.start b/microcode_ctl.start
+index 6fa9d72..1f17035 100755
+--- a/microcode_ctl.start
++++ b/microcode_ctl.start
+@@ -47,8 +47,9 @@ elif [ -f /etc/slackware-version ]; then
+ 		END=slack_end
+ 	fi
+ else
+-	echo "$0: Can't guess distribution, aborting!"
+-	exit 1
++#add support for WRLinux
++	START=
++        END=
+ fi
+ 
+ # Lets just be sure we have a device file...
+-- 
+1.7.9.5
+

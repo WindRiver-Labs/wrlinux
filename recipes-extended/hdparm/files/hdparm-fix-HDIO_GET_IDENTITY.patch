@@ -1,0 +1,48 @@
+commit cd9b09423cf6b3fec541340a9c3c3561c6616db5
+Author: Aws Ismail <aws.ismail@windriver.com>
+Date:   Fri Jan 18 17:39:40 2013 -0500
+
+    hdparm: handle fringe cases when -i and -c are not fully supported
+    
+    -i (HDIO_GET_IDENTITY) might not work very well on some old
+    hardware, so gracefully notify the user instead of failing.
+    
+    -c (HDIO_GET_32BIT) is irrelevant if DMA is being used or,
+    because of libata, default transfer width will always be
+    16-bit.
+    
+    Upstream-Status: Pending
+    
+    Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+
+diff --git a/hdparm.c b/hdparm.c
+index 96a2db8..da66150 100644
+--- a/hdparm.c
++++ b/hdparm.c
+@@ -2064,9 +2064,10 @@ void process_dev (char *devname)
+ 				default:printf("\?\?\?)\n");
+ 			}
+                } else if (get_io32bit) {
+-                       err = errno;
+-                       perror(" HDIO_GET_32BIT failed");
+-		}
++                    printf(" Could not check HDIO_GET_32BIT status value \n");
++                    printf(" Please check that the device is not in DMA mode. \n" ); 
++                    printf(" Otherwise, default is 16-bit \n");		
++        }
+ 	}
+ 	if (do_defaults || get_unmask) {
+ 		if (0 == ioctl(fd, HDIO_GET_UNMASKINTR, &parm)) {
+@@ -2180,8 +2181,10 @@ void process_dev (char *devname)
+ 				id2[59] &= ~0x100;
+ 			}
+ 			dump_identity(id2);
+-		} else if (errno == -ENOMSG) {
+-			printf(" no identification info available\n");
++         } else if ((errno == -ENOMSG)                      
++         || (errno == -EINVAL)
++         || (errno == -ENOTTY)) {
++             printf(" no identification info available\n");
+ 		} else {
+ 			err = errno;
+ 			perror(" HDIO_GET_IDENTITY failed");

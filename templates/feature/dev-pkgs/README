@@ -1,0 +1,9 @@
+This feature causes developement packages to be installed in the image.
+This feature is usually needed if the user wants to build a project on
+the target which links to libraries on the target.
+
+To use, add
+
+--templates feature/dev-pkgs
+
+as a setup option.

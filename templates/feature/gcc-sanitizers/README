@@ -1,0 +1,10 @@
+This template adds gcc-sanitizers and the development libraries
+(libasan-dev, liblsan-dev, libtsan-dev, libubsan-dev).
+
+It is supported for x86 and x86-64 targets only.
+
+To use, add
+
+--templates feature/gcc-sanitizers
+
+as a setup option.

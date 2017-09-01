@@ -1,0 +1,30 @@
+From 69c3987ee57eaec4f5912db1313f14e4f93197fc Mon Sep 17 00:00:00 2001
+From: Yanjiang Jin <yanjiang.jin@windriver.com>
+Date: Sat, 21 Jan 2017 17:27:41 +0800
+Subject: [PATCH] mmap.c: Workaround for grub_mmap_iterate()
+
+If we use the tune Skylake-64 to build Intel-Kabylake-64 BSP,
+board would hang without this printf.
+
+Signed-off-by: Yanjiang Jin <yanjiang.jin@windriver.com>
+---
+ grub-core/mmap/mmap.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/grub-core/mmap/mmap.c b/grub-core/mmap/mmap.c
+index 0b734dd..368d679 100644
+--- a/grub-core/mmap/mmap.c
++++ b/grub-core/mmap/mmap.c
+@@ -185,6 +185,9 @@ grub_mmap_iterate (grub_memory_hook_t hook)
+ 
+   lastaddr = scanline_events[0].pos;
+   lasttype = scanline_events[0].memtype;
++  /* FIXME: Intel-Kabylake-64 BSP would hang without this printf
++     if it is built with the tune Skylake-64. */
++  grub_printf(" ");
+   for (i = 0; i < 2 * mmap_num; i++)
+     {
+       unsigned k;
+-- 
+2.9.3
+

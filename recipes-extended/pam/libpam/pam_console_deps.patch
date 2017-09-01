@@ -1,0 +1,26 @@
+Subject: [PATCH] pam_console deps
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Joe Slater <jslater@windriver.com>
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ modules/pam_console/Makefile.am | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/modules/pam_console/Makefile.am b/modules/pam_console/Makefile.am
+index 6b06db7..7131497 100644
+--- a/modules/pam_console/Makefile.am
++++ b/modules/pam_console/Makefile.am
+@@ -53,6 +53,8 @@ configfile.tab.c: configfile.y
+ 	$(YACC) $(BISON_OPTS) -o $@ -p _pc_yy $<
+ 	sh $(srcdir)/sed-static $@
+ 
++configfile.tab.h: configfile.tab.c
++
+ configfile.lex.c: configfile.l configfile.tab.c
+ 	$(LEX) $(FLEX_OPTS) -o$@ -P_pc_yy $<
+ 	sh $(srcdir)/sed-static $@
+-- 
+1.9.1
+

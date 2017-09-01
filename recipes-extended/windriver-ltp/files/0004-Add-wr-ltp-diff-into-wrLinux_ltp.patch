@@ -1,0 +1,186 @@
+From 714d21e1d535d25613fc6227df8c6617bbeae1c6 Mon Sep 17 00:00:00 2001
+From: Jin Li <jin.li@windriver.com>
+Date: Wed, 3 Sep 2014 05:57:31 +0800
+Subject: [PATCH 04/15] Add wr-ltp-diff into wrLinux_ltp
+
+Upstream-Status: Inappropriate [WR Linux specific change]
+
+This tool is designed to compare the difference between two LTP test results
+
+Signed-off-by: Jin Li <jin.li@windriver.com>
+---
+ wrLinux_ltp/wr-ltp-diff | 162 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 162 insertions(+)
+ create mode 100644 wrLinux_ltp/wr-ltp-diff
+
+diff --git a/wrLinux_ltp/wr-ltp-diff b/wrLinux_ltp/wr-ltp-diff
+new file mode 100644
+index 0000000..b2e192f
+--- /dev/null
++++ b/wrLinux_ltp/wr-ltp-diff
+@@ -0,0 +1,162 @@
++#!/bin/bash
++
++# Copyright (c) 2014 Wind River Systems, Inc.
++#
++# The right to copy, distribute, modify, or otherwise make use
++# of this software may be licensed only pursuant to the terms
++# of an applicable Wind River license agreement.
++
++# This script is designed to compare the difference between two LTP test results
++
++TEST_RETVAL_FAIL=1
++
++usage() 
++{
++    cat <<-EOF >&2
++
++wr-ltp-diff
++
++    Usage:                   $(basename "$0") baseline_result current_result
++
++    -h                       display this help and exit
++
++	EOF
++exit 0
++}
++
++env_check()
++{
++	for file in "$BASE_RESULT" "$CURRENT_RESULT";
++	do
++		if [ -f "$file" ];then
++			if ! grep -q '[Test Result]' $file;then
++				echo "The incomplete LTP test result $file"
++				usage
++				exit $TEST_RETVAL_FAIL
++			fi
++		else
++			usage
++			exit $TEST_RETVAL_FAIL
++		fi
++	done
++}
++
++while getopts "h" arg
++do
++	case $arg in
++		h) usage;;
++	esac
++done
++
++BASE_RESULT=$1
++CURRENT_RESULT=$2
++
++env_check
++
++# Section One
++# 1. Get the failed test case list in $BASE_RESULT
++# 2. Output the case which failed in $BASE_RESULT, but disappeared in the $CURRENT_RESULT
++# 3. Output the case which failed in $BASE_RESULT, passed in $CURRENT_RESULT
++
++exception_list=""
++pass_list=""
++test_list=`cat $BASE_RESULT | sed -n '1,/Total Tests/ p' | grep FAIL | awk '{print $1}' | xargs`
++
++if [ -n "$test_list" ];then
++
++	for testcase in $test_list;
++		do
++		if ! grep  -q $testcase $CURRENT_RESULT;then
++			exception_list="$exception_list $testcase"
++			continue
++		fi
++		test_result=`cat $CURRENT_RESULT | sed -n '1,/Total Tests/ p' | grep "^$testcase" | awk '{print $2}'`
++		if [ "$test_result" = "PASS" ];then
++			pass_list="$pass_list $testcase"
++		fi
++	done
++
++	exception_list=`echo $exception_list | sed 's/^ *//'`
++	pass_list=`echo $pass_list | sed 's/^ *//'`
++
++	[ -n "$exception_list" ] && {
++		echo "[Diff Obsolete] The following LTP test case failed in baseline \
++result, but are NOT found in current result"
++		echo -e "$exception_list \n"
++	}
++
++	if [ -n "$pass_list" ];then
++
++		echo "[Diff Result] The following LTP test case failed in baseline \
++result, but passed in current result"
++		echo -e "$pass_list \n"
++
++	elif [ "$test_list" != "$exception_list" -a -n "$exception_list" ];then
++		echo "[Diff Result] Except for the obsolete test case, the failed \
++LTP test case in baseline result also failed in current result"
++
++	elif [ "$test_list" != "$exception_list" -a -z "$exception_list" ];then
++		echo "[Diff Result] The failed LTP test case in baseline result also \
++failed in current result"
++	else
++		echo "[Diff Result] All the failed LTP test cases in baseline result \
++are NOT found in current result"
++	fi
++
++else
++	echo "[Diff Result] There is no failed LTP test case in baseline result"
++fi
++
++
++# Section Two
++# 1. Get the failed test case list in $CURRENT_RESULT
++# 2. Output failed test case which is new to the baseline result
++# 3. Output the case which passed in $BASE_RESULT, failed in $CURRENT_RESULT
++
++new_list=""
++pass_list=""
++test_list=`cat $CURRENT_RESULT | sed -n '1,/Total Tests/ p' | grep FAIL | awk '{print $1}' | xargs`
++
++if [ -n "$test_list" ];then
++
++	for testcase in $test_list;
++		do
++		if ! grep  -q $testcase $BASE_RESULT;then
++			new_list="$new_list $testcase"
++			continue
++		fi
++		test_result=`cat $BASE_RESULT | sed -n '1,/Total Tests/ p' | grep "^$testcase" | awk '{print $2}'`
++		if [ "$test_result" = "PASS" ];then
++			pass_list="$pass_list $testcase"
++		fi
++	done
++
++	new_list=`echo $new_list | sed 's/^ *//'`
++	pass_list=`echo $pass_list | sed 's/^ *//'`
++
++	[ -n "$new_list" ] && {
++		echo "[Diff New] The following failed LTP test case is newly added in \
++current result"
++		echo -e "$new_list \n"
++	}
++
++	if [ -n "$pass_list" ];then
++		echo "[Diff Result] The following LTP test case passed in baseline \
++result, but failed in current result"
++		echo -e "$pass_list \n"
++
++	elif [ "$test_list" != "$new_list" -a -n "$new_list" ];then
++		echo "[Diff Result] Except for the newly added case in current result, \
++the failed LTP test case in current result also failed in baseline result"
++	elif [ "$test_list" != "$new_list" -a -z "$new_list" ];then
++		echo "[Diff Result] The failed LTP test case in current result also \
++failed in baseline result"
++	else
++		echo "[Diff Result] All the failed LTP test case in current result is \
++newly added ones"
++	fi
++else
++	echo "[Diff Result] There is no failed LTP test case in current result"
++fi
++
++
+-- 
+1.8.1.4
+

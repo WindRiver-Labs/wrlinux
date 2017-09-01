@@ -1,0 +1,49 @@
+From 18626b1060752aa65721c300afd703105ba39095 Mon Sep 17 00:00:00 2001
+From: Jin Li <jin.li@windriver.com>
+Date: Tue, 9 Jul 2013 10:22:33 +0800
+Subject: [PATCH 11/15] Ignore PROT_EXEC|PROT_WRITE mmap EPERM error in CGL
+ kernel
+
+Upstream-Status: Inappropriate [WR Linux specific change]
+
+With CGL kernel which is grsecurity enabled, it won't allow a map which is
+PROT_EXEC|PROT_WRITE and kernel will return -EPERM. Mark test case passed when
+a map of PROT_EXEC or PROT_WRITE return with EPERM errno
+
+Signed-off-by: Jin Li <jin.li@windriver.com>
+---
+ .../open_posix_testsuite/conformance/interfaces/mmap/5-1.c    | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/testcases/open_posix_testsuite/conformance/interfaces/mmap/5-1.c b/testcases/open_posix_testsuite/conformance/interfaces/mmap/5-1.c
+index 544406b..0a86939 100644
+--- a/testcases/open_posix_testsuite/conformance/interfaces/mmap/5-1.c
++++ b/testcases/open_posix_testsuite/conformance/interfaces/mmap/5-1.c
+@@ -93,6 +93,7 @@ int main(void)
+ 	size_t size = 1024;
+ 	int fd, fail = 0;
+ 	unsigned int i;
++	int prot_wrexec = (PROT_EXEC | PROT_WRITE);
+ 
+ 	snprintf(tmpfname, sizeof(tmpfname), "/tmp/pts_mmap_5_1_%d", getpid());
+ 	unlink(tmpfname);
+@@ -114,8 +115,14 @@ int main(void)
+ 
+ 		if (pa == MAP_FAILED) {
+ 			if (errno != ENOTSUP) {
+-				print_error(&testcases[i], errno);
+-				fail++;
++				if ((errno == EPERM) &&
++					((testcases[i].prot & prot_wrexec) == prot_wrexec)) {
++					/* CGL kernels may not allow writeable, executable, pages */
++					}
++				else {
++					print_error(&testcases[i], errno);
++					fail++;
++				}
+ 			}
+ 		} else {
+ 			munmap(pa, size);
+-- 
+1.8.1.4
+

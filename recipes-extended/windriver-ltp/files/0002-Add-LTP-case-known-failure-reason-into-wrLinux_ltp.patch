@@ -1,0 +1,516 @@
+From cc52f018c6c23fa0626c33031a94ff2c3df8ebb7 Mon Sep 17 00:00:00 2001
+From: Jin Li <jin.li@windriver.com>
+Date: Wed, 3 Sep 2014 05:28:49 +0800
+Subject: [PATCH 02/15] Add LTP case known failure reason into wrLinux_ltp
+
+Upstream-Status: Inappropriate [WR Linux specific change]
+
+wr-runltp will create LTP test report with failure reason
+
+Signed-off-by: Jin Li <jin.li@windriver.com>
+---
+ wrLinux_ltp/failtest/arm    |  34 ++++
+ wrLinux_ltp/failtest/common | 383 ++++++++++++++++++++++++++++++++++++++++++++
+ wrLinux_ltp/failtest/mips   |  29 ++++
+ wrLinux_ltp/failtest/ppc    |  22 +++
+ 4 files changed, 468 insertions(+)
+ create mode 100644 wrLinux_ltp/failtest/arm
+ create mode 100644 wrLinux_ltp/failtest/common
+ create mode 100644 wrLinux_ltp/failtest/mips
+ create mode 100644 wrLinux_ltp/failtest/ppc
+
+diff --git a/wrLinux_ltp/failtest/arm b/wrLinux_ltp/failtest/arm
+new file mode 100644
+index 0000000..f86cc5b
+--- /dev/null
++++ b/wrLinux_ltp/failtest/arm
+@@ -0,0 +1,34 @@
++
++# Copyright (c) 2012 Wind River Systems, Inc.
++#
++# The right to copy, distribute, modify, or otherwise make use
++# of this software may be licensed only pursuant to the terms
++# of an applicable Wind River license agreement.
++
++
++Test Suit -- syscall
++---------------------------------------
++
++#std getcontext01 | Not a bug. Test case is NOT supported on arm arch
++eglibc doesn't implement getcontext for arm, so this result is expected.
++
++#std readahead02 | Not a bug. Test case is NOT supported on arm arch
++The proc interface /proc/pid/io is NOT implemented in arm arch.
++
++Test Suit -- hyperthreading
++---------------------------------------
++
++#std smt_smp_enabled | Not a bug. Test case is NOT supported on arm arch
++
++#std smt_smp_affinity | Not a bug. Test case is NOT supported on arm arch
++
++Test Suit -- mm
++---------------------------------------
++
++#std shmat01 | Not a bug. Test case issue. Test case is NOT supported on arm arch
++On arm arch, test case shmat01 fails on
++"addr = shmat(*(tc.shmid), base_addr + tc.offset,tc.flags);" with a EINVAL error.
++
++The test case probes an available address and align the address to SHMLBA. After
++the alignment on arm arch, the new address is no guarantee to be available any more.
++
+diff --git a/wrLinux_ltp/failtest/common b/wrLinux_ltp/failtest/common
+new file mode 100644
+index 0000000..8e73245
+--- /dev/null
++++ b/wrLinux_ltp/failtest/common
+@@ -0,0 +1,383 @@
++
++# Copyright (c) 2012 Wind River Systems, Inc.
++#
++# The right to copy, distribute, modify, or otherwise make use
++# of this software may be licensed only pursuant to the terms
++# of an applicable Wind River license agreement.
++
++
++Test Suit -- hugetlb
++---------------------------------------
++
++#std hugeshmat02 | Not a bug. The limitation of function shmget
++If the value of hugepages in wr-runltp is bigger than /proc/sys/kernel/shmmax,
++the shmget() will fail with the error EINVAL
++
++#std hugeshmat03 | Not a bug. The limitation of function shmget
++If the value of hugepages in wr-runltp is bigger than /proc/sys/kernel/shmmax,
++the shmget() will fail with the error EINVAL
++
++#std hugeshmctl02 | Not a bug. The limitation of function shmget
++If the value of hugepages in wr-runltp is bigger than /proc/sys/kernel/shmmax,
++the shmget() will fail with the error EINVAL
++
++#std hugeshmget02 | Not a bug. The limitation of function shmget
++If the value of hugepages in wr-runltp is bigger than /proc/sys/kernel/shmmax,
++the shmget() will fail with the error EINVAL
++
++
++Test Suit -- syscall
++---------------------------------------
++
++#std sysctl03 | Not a bug. Expected result when kernel version is greater than 2.6.32
++TWARN is not a failure, especially in this case. The test sysctl03 throws out
++the warning when the kernel version >2.6.32
++
++#std set_robust_list01 | Not a bug. Pass after disable GRSecurity and PAX kernel option
++Pass after disable GRSecurity and PAX kernel option
++
++#std cacheflush01 | Test case issue. meanlingless test
++cache argument is ignored in kernel and testing this argument is meaningless
++
++#cgl mq_timedsend01 | Not a bug. CFLAGS fstack protector issue
++In the cgl-glibc_cgl combs, -fstack-protector is set in the default CFLAGS.
++When there are stack overflow, kernel will print error informations, and stop
++the applications.mq_timedsend01 case has stack overflow in the fouth sub-case
++and cause failure in cgl-glibc_cgl comb. If compile the application with
++-fno-stack-protector, this case will be PASS.
++
++#std msgctl11 | Not a bug. Test fails on the target with memeory more than 4GB
++
++The test msgctl11 will fail with log as follows once it is on the
++target with more than 4G memory and use default maximum pid value 32768.
++
++"msgctl11    1  TBROK  :  Not enough free pids"
++
++Because in this case, the maxnkids is always 0 which will cause fail
++and exit: maxnkids = ((free_pids / 4) / MSGMNI);
++
++#std pselect01 | Not a bug. May fail because user application latency
++This test case is very sensitive to timestamp. It may fail because of
++user application latency associated with workload.
++
++#std pelect01_64 | Not a bug. May fail because user application latency
++This test case is very sensitive to timestamp. It may fail because of
++user application latency associated with workload.
++
++#cgl get_robust_list01 | Not a bug. CGL kernel check uid instead of euid
++In CGL kernel, the futex code (get_robust_list()) uses ptrace_may_access() to
++check the current process's uid against the target process's euid instead of euid.
++
++#std clock_nanosleep01 | Not a bug. non-supported clock type MONOTONIC
++Test case03 use clock type MONOTONIC to test syscall clock_nanosleep. This kind
++of clock is not supproted in some processor architecture. In this situation,
++clock_nanosleep will returen ENOTSUP as error numer.
++
++#std clock_nanosleep2_01 | Not a bug. non-supported clock type MONOTONIC
++This test use clock type MONOTONIC to test syscall clock_nanosleep. This kind
++of clock is not supproted in some processor architecture. In this situation,
++clock_nanosleep will returen ENOTSUP as error numer.
++
++#std chdir01A | Not a bug. Test fails on NFS file system
++The test tries to make sure that the current working directory location is under
++/tmp. But on NFS, the /tmp link to /var/volatile/tmp, and the fail is expected.
++
++#std mount02 | Test case issue and will be fixed upstream
++This test tries to get the right "error" number of mount syscall. Currently, the
++number of test case have rised to 13, but the number of error array is still 8
++
++#std mount03 | Not a bug. Test tries to stat a nonexistent file
++
++#std getrusage03 | Not a bug. Test fails on embedded system with small memory
++To use this test also in embedded systems it needs to reduce the memory
++allocation to avoid the test failure when it check the ru_maxrss field expecting
++a value close to the allocated one. The ru_maxrss field contains the total amount
++of resident set memory used, so this field doesn't take into account of the
++swapped memory. Passing [num] parameter at command line the test is executed
++using the input parameter as multiply factor instead of 10, that is the default
++value when no argument is passed.
++
++#std getrusage04 | Test case issue and will be fixed upstream
++
++#cgl ioperm01 | Not a bug. Privileged IO is disabled in cgl platform
++Syscall ioperm will return an "Operation not permitted" error when Grsecurity
++kernel options are enabled in cgl platform.
++
++#cgl iopl01 | Not a bug. Privileged IO is disabled in cgl platform
++Syscall iopl will return an "Operation not permitted" error when Grsecurity
++kernel options are enabled in cgl platform.
++
++#cgl mincore01 | Not a bug. Invoking mmap with PROT_WRITE and PROT_EXEC will be denied in cgl platform
++When the kernel option CONFIG_PAX_MPROTECT is enabled, mmap() with
++explicit usage of PROT_WRITE and PROT_EXEC together will be denied with
++"Operation not permitted" in cgl platform
++
++#cgl mincore02 | Not a bug. Invoking mmap with PROT_WRITE and PROT_EXEC will be denied in cgl platform
++When the kernel option CONFIG_PAX_MPROTECT is enabled, mmap() with
++explicit usage of PROT_WRITE and PROT_EXEC together will be denied with
++"Operation not permitted" in cgl platform
++
++#std syslog01 | Not a bug. syslog-ng and rsyslog is usded as Linux system logging utilities
++Instead of syslogd, cgl platform uses syslog-ng as Linux system logging utility.
++The file /etc/syslog-ng/syslog-ng.conf is used as config file for syslog-ng.
++Instead of syslogd, standard platform uses rsyslog as Linux system logging utility.
++E.g. the file /var/log/mail.log is used in place of /var/log/maillog
++
++#std syslog02 | Not a bug. syslog-ng and rsyslog is usded as Linux system logging utilities
++Instead of syslogd, cgl platform uses syslog-ng as Linux system logging utility.
++The file /etc/syslog-ng/syslog-ng.conf is used as config file for syslog-ng.
++Instead of syslogd, standard platform uses rsyslog as Linux system logging utility.
++E.g. the file /var/log/mail.log is used in place of /var/log/maillog
++
++#std syslog03 | Not a bug. syslog-ng and rsyslog is usded as Linux system logging utilities
++Instead of syslogd, cgl platform uses syslog-ng as Linux system logging utility.
++The file /etc/syslog-ng/syslog-ng.conf is used as config file for syslog-ng.
++Instead of syslogd, standard platform uses rsyslog as Linux system logging utility.
++E.g. the file /var/log/mail.log is used in place of /var/log/maillog
++
++#std syslog04 | Not a bug. syslog-ng and rsyslog is usded as Linux system logging utilities
++Instead of syslogd, cgl platform uses syslog-ng as Linux system logging utility.
++The file /etc/syslog-ng/syslog-ng.conf is used as config file for syslog-ng.
++Instead of syslogd, standard platform uses rsyslog as Linux system logging utility.
++E.g. the file /var/log/mail.log is used in place of /var/log/maillog
++
++#std syslog05 | Not a bug. syslog-ng and rsyslog is usded as Linux system logging utilities
++Instead of syslogd, cgl platform uses syslog-ng as Linux system logging utility.
++The file /etc/syslog-ng/syslog-ng.conf is used as config file for syslog-ng.
++Instead of syslogd, standard platform uses rsyslog as Linux system logging utility.
++E.g. the file /var/log/mail.log is used in place of /var/log/maillog
++
++#std syslog06 | Not a bug. syslog-ng and rsyslog is usded as Linux system logging utilities
++Instead of syslogd, cgl platform uses syslog-ng as Linux system logging utility.
++The file /etc/syslog-ng/syslog-ng.conf is used as config file for syslog-ng.
++Instead of syslogd, standard platform uses rsyslog as Linux system logging utility.
++E.g. the file /var/log/mail.log is used in place of /var/log/maillog
++
++#std syslog07 | Not a bug. syslog-ng and rsyslog is usded as Linux system logging utilities
++Instead of syslogd, cgl platform uses syslog-ng as Linux system logging utility.
++The file /etc/syslog-ng/syslog-ng.conf is used as config file for syslog-ng.
++Instead of syslogd, standard platform uses rsyslog as Linux system logging utility.
++E.g. the file /var/log/mail.log is used in place of /var/log/maillog
++
++#std syslog08 | Not a bug. syslog-ng and rsyslog is usded as Linux system logging utilities
++Instead of syslogd, cgl platform uses syslog-ng as Linux system logging utility.
++The file /etc/syslog-ng/syslog-ng.conf is used as config file for syslog-ng.
++Instead of syslogd, standard platform uses rsyslog as Linux system logging utility.
++E.g. the file /var/log/mail.log is used in place of /var/log/maillog
++
++#std syslog09 | Not a bug. syslog-ng and rsyslog is usded as Linux system logging utilities
++Instead of syslogd, cgl platform uses syslog-ng as Linux system logging utility.
++The file /etc/syslog-ng/syslog-ng.conf is used as config file for syslog-ng.
++Instead of syslogd, standard platform uses rsyslog as Linux system logging utility.
++E.g. the file /var/log/mail.log is used in place of /var/log/maillog
++
++#std syslog10 | Not a bug. syslog-ng and rsyslog is usded as Linux system logging utilities
++Instead of syslogd, cgl platform uses syslog-ng as Linux system logging utility.
++The file /etc/syslog-ng/syslog-ng.conf is used as config file for syslog-ng.
++Instead of syslogd, standard platform uses rsyslog as Linux system logging utility.
++E.g. the file /var/log/mail.log is used in place of /var/log/maillog
++
++#std syslog11 | Not a bug. syslog-ng and rsyslog is usded as Linux system logging utilities
++Instead of syslogd, cgl platform uses syslog-ng as Linux system logging utility.
++The file /etc/syslog-ng/syslog-ng.conf is used as config file for syslog-ng.
++Instead of syslogd, standard platform uses rsyslog as Linux system logging utility.
++E.g. the file /var/log/mail.log is used in place of /var/log/maillog
++
++#cgl syslog12 | Not a bug. syslog-ng and rsyslog is usded as Linux system logging utilities
++Instead of syslogd, cgl platform uses syslog-ng as Linux system logging utility.
++The file /etc/syslog-ng/syslog-ng.conf is used as config file for syslog-ng.
++Instead of syslogd, standard platform uses rsyslog as Linux system logging utility.
++E.g. the file /var/log/mail.log is used in place of /var/log/maillog
++
++#cgl migrate_pages02 | Not a bug. Kernel option CONFIG_GRKERNSEC_PROC_MEMMAP is enabled in cgl platform
++When the kernel option CONFIG_GRKERNSEC_PROC_MEMMAP is enabled, the migrate_pages
++defined in the mm/mempolicy.c will check whether the task's memory management structure
++is the same as the current process's as well as that the latter structure have
++MF_PAX_RANDMMAP or MF_PAX_SEGMEXEC flags set. If it is yes, the syscall
++migrate_pages will return with EPERM (Permission Denied)
++
++Test Suit -- commands
++---------------------------------------
++
++#std file | Not a bug. gcc is not supported on runtime target
++Test 6 use gcc to build C file, but wrLinux don't support gcc.
++
++Test Suit -- fs
++---------------------------------------
++
++#std iogen01 | Not a bug. NFS rootfs read or write speed limitation
++fail is caused by read or write stress over NFS, could pass in harddisk filesystem.
++
++#cgl proc01 | Not a bug. Test fails when the CONFIG_GRKERNSEC option is enabled
++The CGL kernel option CONFIG_GRKERNSEC, which will pretent the reading from
++/proc/kpageflags and /proc/kpagecount, is set and cause "read failed and Bad
++address" error
++
++#std proc01 | Not a bug. Test will fail if acpi daemon stopped
++The test case tries to read /proc/acpi/event but failed when acpi daemon stopped
++
++Test Suit -- dio
++---------------------------------------
++
++#std dio10 | Not a bug. Test fails when /tmp has space less than 256M
++Test case dio10 need to creat 256M file under /tmp folder.
++
++Test Suit -- mm
++---------------------------------------
++
++#std mtest01 | Not a bug. Test fails due to the lack of memory
++The fail is caused by the parameter. Memory used by case as parameter is over
++80% in total.
++
++#std mtest01w | Not a bug. Test fails due to the lack of memory
++The fail is caused by the parameter. Memory used by case as parameter is over
++80% in total.
++
++#std mtest06 | Test case issue. Lack of msync before reading
++The test mtest06 is aimed at stressing the memory manager by simultanious
++map/unmap/read by light weight processes. "msync" should be used to make sure
++the data is written back to the file before the other light weight processes
++read it such as:
++
++   memset(map_address, 'a', mwuargs[1]);
+++  msync (map_address, (size_t)mwuargs[1], MS_SYNC);
++
++#std overcommit_memory02 | On target with 0 swap, this test is expected to fail
++In some target with 0 swap, the value of CommitLimit (Swap+RAM*overcommit_ratio)
++is 0 when overcommit_ratio is set to 0. This will break the test because the
++test want to make sure that CommitLimit > Committed_AS.
++
++#std vma01 | Test case issue. This test assume the wrong value of child vma pointer
++The test case assumes child vma pointer < parent vma pointer. It is true on
++x86 arch, but false on ppc and arm. So, on ppc and arm, the test case will
++search vma out of the bound to cause the issue.
++Even in x86, although u = mmap(t + 3*ps, 3*ps, PROT_WRITE, MAP_ANONYMOUS|MAP_PRIVATE, 0, 0) 
++is called to get child vma pointer, kernel assigns child vma pointer to t - 3*ps.
++According to man page of mmap, the addr parameter is just a hint, so kernel
++doesn't make sure the final address is as same as addr parameter.
++
++#std max_map_count | Not a bug. Difference of system implement
++The test case tries to invoke mmap() endless until triggering MAP_FAILED, then
++read the process's maps file /proc/[pid]/maps, save the line number to map_count
++variable, compare it with /proc/sys/vm/max_map_count and make sure that the
++map_count should less than max_map_count. 
++
++Generally speaking, there are two special vmas VDSO and VSYSCALL, which are
++allocated via install_special_mapping(), install_specail_mapping() which allows
++the VMAs to be allocated and inserted without checking the sysctl_map_map_count.
++So during comparing with map_count and /proc/sys/vm/max_map_count, we should
++except the two special vmas from map_count: map_count -= 2
++
++But the output of /proc/self/maps vary in different arch. In i686, the key word
++"vsyscall" is missed. In addition, the gate_vma is used for vectors user mapping
++in arm arch. So key word "vectors" should also be removed from map_count in arm arch :
++
++In i686: map_count -= 3
++In arm : map_count -= 4
++
++#std thp02 | Not a bug. Test break when CONFIG_HUGETLBFS is not enabled
++When the kernel feature CONFIG_HUGETLBFS is not enabled, this test case will fail with:
++
++thp02       1  TBROK  :  cannot find "Hugepagesize:" in /proc/meminfo
++thp02       2  TBROK  :  Remaining cases broken
++
++#std thp03 | Not a bug. Test break when CONFIG_HUGETLBFS is not enabled
++When the kernel feature CONFIG_HUGETLBFS is not enabled, this test case will fail with:
++
++thp03       1  TBROK  :  cannot find "Hugepagesize:" in /proc/meminfo
++thp03       2  TBROK  :  Remaining cases broken 
++
++#std ksm01 | Test case issue. Test pass when being executed separately
++
++#std ksm03 | Test case issue. Test pass when being executed separately
++
++#std oom01 | Test case issue. Test pass when being executed separately
++
++#std ksm05 | Not a bug. The test fails when CONFIG_KSM is disabled
++
++
++Test Suit -- math
++---------------------------------------
++
++#std float_exp_log | Not a bug. Test fails due to the lack of memory
++
++#std float_bessel | Not a bug. Test fails due to the lack of memory
++
++#std float_trigo | Not a bug. Test fails due to the lack of memory
++
++#std float_power | Not a bug. Test fails due to the lack of memory
++
++Test Suit -- admin_tools
++---------------------------------------
++
++#std cron | Not a bug. Test fail because different implement of cron
++The crontab is recorded in /var/log/sysctl in wrLinux5.0.
++
++#std cron_allow01 | Not a bug. Test fail because different implement of cron
++cronie itself lacks of necessary files and permissions to support non-root
++user using crontab.
++
++#std cron_deny01 | Not a bug. Test fail because different implement of cron
++cronie itself lacks of necessary files and permissions to support non-root
++user using crontab.
++
++#std cron02 | Not a bug. Test fail because different implement of cron
++Firstly, the same reason as cron_allow01.
++
++Secondly, LTP cron test assumes vixie-cron behavior, which allows any user to
++use crontab if there's no /etc/cron.deny and /etc/cron.allow. cronie however
++enforces the reverse, that only superuser is allowed under that condition. LTP
++test case needs to be enhanced to explicitly set cron.allow before the test. 
++
++#std cron_dirs_checks01 | Not a bug. Lack of write permission to cron
++This case tries to get write permission for other users, however the write
++permission of /var/spool/cron is owned only by user root and group crontab.
++The write permission for /var/spool/cron is kept to make crontab working correctly.
++They are controlled by final policy deployed on the product.
++
++#std su01 | Test case issue. The invalid option of su
++The case use invalid option "-e" as follows:
++/bin/su -l root -c passwd -e su_usr2
++
++#cgl at_deny01 | Not a bug. The test case failed on CGL platform with NFS rootfs
++When start target with nfs rootfs, the SELinux is abnormal, and when create a
++user, The role and label is wrong, which lead to atd unable to get user the
++context, detail see:
++
++    set_selinux_context() --->getseuserbyname() --->get_default_context_with_level()
++
++This error will lead to atd exit directly, and not do the task of a user.
++The workaround is to disable selinux at bootup, pass "selinux=0, enforcing=0" to kernel 
++
++#cgl at_allow01 | Not a bug. The test case failed on CGL platform with NFS rootfs
++When start target with nfs rootfs, the SELinux is abnormal, and when create a
++user, The role and label is wrong, which lead to atd unable to get user the
++context, detail see:
++
++    set_selinux_context() --->getseuserbyname() --->get_default_context_with_level()
++
++This error will lead to atd exit directly, and not do the task of a user.
++The workaround is to disable selinux at bootup, pass "selinux=0, enforcing=0" to kernel 
++
++
++Test Suit -- commands
++---------------------------------------
++
++#std ld | Not a bug. gcc is not supported on runtime target
++
++#std ldd | Not a bug. gcc is not supported on runtime target
++
++#std nm | Not a bug. gcc is not supported on runtime target
++
++Test Suit -- io
++---------------------------------------
++
++#std aio02 | Test case issue. Test invoke io_fsync write with invalid argument
++
++Test Suit -- cpuhotplug
++---------------------------------------
++
++#std cpuhotplug05 | Not a bug. sar is not installed in rootfs
++
++#std cpuhotplug07 | Not a bug. wrLinux do not support to compile kernel on target 
++
+diff --git a/wrLinux_ltp/failtest/mips b/wrLinux_ltp/failtest/mips
+new file mode 100644
+index 0000000..c877315
+--- /dev/null
++++ b/wrLinux_ltp/failtest/mips
+@@ -0,0 +1,29 @@
++
++# Copyright (c) 2012 Wind River Systems, Inc.
++#
++# The right to copy, distribute, modify, or otherwise make use
++# of this software may be licensed only pursuant to the terms
++# of an applicable Wind River license agreement.
++
++Test Suit -- commands
++---------------------------------------
++
++#std file | LSB and MSB issue on mips or mips64 architecture on TEST 6
++Test 6 of case "file" assume that the target of mipcs arch is MSB. But mips and mips64 arch
++support both LSB and MSB. This test will fail when it's LSB on mips or mips64 arch
++
++Test Suit -- syscall
++---------------------------------------
++
++#std readahead02 | Not a bug. Test case is NOT supported on mips arch
++The proc interface /proc/pid/io is NOT implemented in mips arch.
++
++#std signalfd01 | Not a bug. The MIPS architecture use different syscall implement
++SYSC_signalfd4() is used in sys_signalfd4 instead of compat_sys_signalfd4() in MIPS kernel.
++
++#std fallocate01 | Test case issue. Test caes use a faulty system call strategy based on WORDSIZE for MIPS arch
++This case passed on n64 rootfs, but fails on n32 rootfs in MIPS arch.
++The __WORDSIZE for n32 builds is 32, because integers and addresses are 32 bits
++in length. However, in n32, registers are 64 bits long, and system calls expect 64-bit
++parameters to be passed in a single 64-bit register, not split into two registers,
++as is done in the 'fallocate' function in fallocate01.c when __WORDSIZE==32.
+diff --git a/wrLinux_ltp/failtest/ppc b/wrLinux_ltp/failtest/ppc
+new file mode 100644
+index 0000000..3b9ab40
+--- /dev/null
++++ b/wrLinux_ltp/failtest/ppc
+@@ -0,0 +1,22 @@
++
++# Copyright (c) 2012 Wind River Systems, Inc.
++#
++# The right to copy, distribute, modify, or otherwise make use
++# of this software may be licensed only pursuant to the terms
++# of an applicable Wind River license agreement.
++
++Test Suit -- mm
++---------------------------------------
++
++#std mem02 | Not a bug. The memory is less than 64M or calloc issue on ppc64 target
++1. For the target with memory less than 64M such as fsl_mpc8323e, the case
++requires a space larger than 64M.
++2. For the ppc64 target such as fsl_p50x0, calloc don't guaranty the pointer
++created at the second time is equal to the one just freed.
++
++Test Suit -- syscall
++---------------------------------------
++
++#std readahead02 | Not a bug. Test case is NOT supported on ppc arch
++The proc interface /proc/pid/io is NOT implemented in ppc arch.
++
+-- 
+1.8.1.4
+

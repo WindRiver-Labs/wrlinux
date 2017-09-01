@@ -1,0 +1,30 @@
+Fix bug as seen in Debian Bug report #586156
+
+Replace strcpy with memmove to fix continuation line problems on 64bit
+architectures, patch by David Couture.
+---
+ syslogd.c |    6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+--- a/syslogd.c
++++ b/syslogd.c
+@@ -494,6 +494,10 @@
+  * Wed Jul  4 21:02:22 CEST 2007: Martin Schulze <joey@infodrom.org>
+  *	Open a pipe with O_NOCTTY to avoid them becoming the controlling
+  *	tty and normal files with O_NONBLOCK to avoid blocking.
++ *
++ * Fri Sep 10 08:29:04 CEST 2010: Martin Schulze <joey@infodrom.org>
++ *    Replace strcpy with memmove to fix continuation line problems
++ *    on 64bit architectures, patch by David Couture.
+  */
+ 
+ 
+@@ -2392,7 +2396,7 @@
+ 		if (*p == '\0' || *p == '#')
+ 			continue;
+ #if CONT_LINE
+-		strcpy(cline, p);
++		memmove(cline, p, strlen(p)+1);
+ #endif
+ 		for (p = strchr(cline, '\0'); isspace(*--p););
+ #if CONT_LINE

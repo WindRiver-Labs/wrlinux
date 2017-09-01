@@ -1,0 +1,366 @@
+lmbench: Allow automatic configuration
+
+Also fix up the Makefile to allow buildsystem values to be passed in.
+
+Signed-off-by: Haotian Zhang <haotian.zhang@windriver.com>
+Signed-off-by: Fupan Li <fupan.li@windriver.com>
+
+Upstream-status: inappropriate [ configuration ]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+repatched based on the recipe in meta-oe
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ scripts/config-run | 69 ++++++++++++++++++++++++++----------------------------
+ scripts/os         |  2 +-
+ src/Makefile       |  4 +---
+ 3 files changed, 35 insertions(+), 40 deletions(-)
+
+diff --git a/scripts/config-run b/scripts/config-run
+index 096ed12..05e12f2 100755
+--- a/scripts/config-run
++++ b/scripts/config-run
+@@ -49,7 +49,7 @@ EOF
+ AGAIN=Y
+ while [ $AGAIN = Y ]
+ do	echo $ECHON "MULTIPLE COPIES [default 1]: $ECHOC"
+-	read SYNC_MAX
++	SYNC_MAX=""
+ 	if [ "X$SYNC_MAX" != X ]
+ 	then	case "$SYNC_MAX" in
+ 		[0-9]|[0-9][0-9]|[0-9][0-9][0-9])
+@@ -101,7 +101,7 @@ three benchmark processes reading data and doing the measurements.
+ 
+ EOF
+ 	echo $ECHON "Job placement selection [default 1]: $ECHOC"
+-	read LMBENCH_SCHED
++	LMBENCH_SCHED=""
+ 	if [ "X$LMBENCH_SCHED" = X ]
+ 	then
+ 	    LMBENCH_SCHED=1
+@@ -186,6 +186,21 @@ then	MB=`expr $TOTAL_MEM \* 7`
+ 	MB=`expr $MB / 10`
+ fi
+ 
++#CONFIGURATION=`../scripts/config`
++#case "$CONFIGURATION" in
++
++       # This is for PPC wrsSbc8560 target
++#      "CONFIG.wrsSbc8560")
++#                      echo "PPC wrsSbc8560 is found. MB value will be changed ...."
++#                      echo "MB value found by default = $MB"
++#                      MB=200
++#                      echo -e "MB value after modifying = $MB\n";;
++
++       # Take the default value, no need to change
++#      *) echo "MB value is not modified ... So default value is taken ...."
++#               echo -e "MB value found by default = $MB\n";;
++#esac
++
+ echo $L
+ cat<<EOF;
+ 
+@@ -204,7 +219,7 @@ MB=512
+ fi
+ 
+ echo $ECHON "MB [default $MB]: $ECHOC"
+-read TMP
++TMP=""
+ if [ X$TMP != X ]
+ then	MB=$TMP
+ fi
+@@ -254,7 +269,7 @@ to do a full run or one of the predefined OS or hardware subsets.
+ EOF
+ 
+ echo $ECHON "SUBSET (ALL|HARWARE|OS|DEVELOPMENT) [default all]: $ECHOC"
+-read subset
++subset=""
+ BENCHMARK_HARDWARE=NO
+ BENCHMARK_OS=NO
+ BENCHMARK_DEVELOPMENT=NO
+@@ -263,133 +278,116 @@ case "$subset" in
+ 	[oO]*)	BENCHMARK_OS=YES;;
+ 	[dD]*)	BENCHMARK_DEVELOPMENT=YES;;
+ 	*)	BENCHMARK_HARDWARE=YES;
+-		BENCHMARK_OS=YES;;
++		BENCHMARK_OS=YES;
++		BENCHMARK_DEVELOPMENT=YES;;
+ esac
+ 
+ if [ X$BENCHMARK_DEVELOPMENT = XYES ]; then
+ 	echo $L
+ 
+ 	echo $ECHON "SYSCALL [default yes]: $ECHOC"
+-	read bench
+ 	case "$bench" in
+ 	    [nN]*)	BENCHMARK_SYSCALL=NO;;
+ 	    *)		BENCHMARK_SYSCALL=YES;;
+ 	esac
+ 
+ 	echo $ECHON "SELECT [default yes]: $ECHOC"
+-	read bench
+ 	case "$bench" in
+ 	    [nN]*)	BENCHMARK_SELECT=NO;;
+ 	    *) 		BENCHMARK_SELECT=YES;;
+ 	esac
+ 
+ 	echo $ECHON "SIGNAL [default yes]: $ECHOC"
+-	read bench
+ 	case "$bench" in
+ 	    [nN]*)	BENCHMARK_SIG=NO;;
+ 	    *) 		BENCHMARK_SIG=YES;;
+ 	esac
+ 
+ 	echo $ECHON "PROCESS CREATION [default yes]: $ECHOC"
+-	read bench
+ 	case "$bench" in
+ 	    [nN]*)	BENCHMARK_PROC=NO;;
+ 	    *)		BENCHMARK_PROC=YES;;
+ 	esac
+ 
+ 	echo $ECHON "PAGEFAULT [default yes]: $ECHOC"
+-	read bench
+ 	case "$bench" in
+ 	    [nN]*)	BENCHMARK_PAGEFAULT=NO;;
+ 	    *)		BENCHMARK_PAGEFAULT=YES;;
+ 	esac
+ 
+ 	echo $ECHON "FILE [default yes]: $ECHOC"
+-	read bench
+ 	case "$bench" in
+ 	    [nN]*)	BENCHMARK_FILE=NO;;
+ 	    *)		BENCHMARK_FILE=YES;;
+ 	esac
+ 
+ 	echo $ECHON "MMAP [default yes]: $ECHOC"
+-	read bench
+ 	case "$bench" in
+ 	    [nN]*)	BENCHMARK_MMAP=NO;;
+ 	    *)		BENCHMARK_MMAP=YES;;
+ 	esac
+ 
+ 	echo $ECHON "CONTEXT SWITCH [default yes]: $ECHOC"
+-	read bench
+ 	case "$bench" in
+ 	    [nN]*)	BENCHMARK_CTX=NO;;
+ 	    *)		BENCHMARK_CTX=YES;;
+ 	esac
+ 
+ 	echo $ECHON "PIPE [default yes]: $ECHOC"
+-	read bench
+ 	case "$bench" in
+ 	    [nN]*)	BENCHMARK_PIPE=NO;;
+ 	    *)		BENCHMARK_PIPE=YES;;
+ 	esac
+ 
+ 	echo $ECHON "UNIX socket [default yes]: $ECHOC"
+-	read bench
+ 	case "$bench" in
+ 	    [nN]*)	BENCHMARK_UNIX=NO;;
+ 	    *)		BENCHMARK_UNIX=YES;;
+ 	esac
+ 
+ 	echo $ECHON "UDP [default yes]: $ECHOC"
+-	read bench
+ 	case "$bench" in
+ 	    [nN]*)	BENCHMARK_UDP=NO;;
+ 	    *)		BENCHMARK_UDP=YES;;
+ 	esac
+ 
+ 	echo $ECHON "TCP [default yes]: $ECHOC"
+-	read bench
+ 	case "$bench" in
+ 	    [nN]*)	BENCHMARK_TCP=NO;;
+ 	    *)		BENCHMARK_TCP=YES;;
+ 	esac
+ 
+ 	echo $ECHON "TCP CONNECT [default yes]: $ECHOC"
+-	read bench
+ 	case "$bench" in
+ 	    [nN]*)	BENCHMARK_CONNECT=NO;;
+ 	    *)		BENCHMARK_CONNECT=YES;;
+ 	esac
+ 
+ 	echo $ECHON "RPC [default yes]: $ECHOC"
+-	read bench
+ 	case "$bench" in
+ 	    [nN]*)	BENCHMARK_RPC=NO;;
+ 	    *)		BENCHMARK_RPC=YES;;
+ 	esac
+ 
+ 	echo $ECHON "HTTP [default yes]: $ECHOC"
+-	read bench
+ 	case "$bench" in
+ 	    [nN]*)	BENCHMARK_HTTP=NO;;
+ 	    *)		BENCHMARK_HTTP=YES;;
+ 	esac
+ 
+ 	echo $ECHON "BCOPY [default yes]: $ECHOC"
+-	read bench
+ 	case "$bench" in
+ 	    [nN]*)	BENCHMARK_BCOPY=NO;;
+ 	    *)		BENCHMARK_BCOPY=YES;;
+ 	esac
+ 
+ 	echo $ECHON "MEMORY HIERARCHY [default yes]: $ECHOC"
+-	read bench
+ 	case "$bench" in
+ 	    [nN]*)	BENCHMARK_MEM=NO;;
+ 	    *)		BENCHMARK_MEM=YES;;
+ 	esac
+ 
+ 	echo $ECHON "CPU OPERATIONS [default yes]: $ECHOC"
+-	read bench
+ 	case "$bench" in
+ 	    [nN]*)	BENCHMARK_OPS=NO;;
+ 	    *)		BENCHMARK_OPS=YES;;
+@@ -417,7 +415,7 @@ Answering yes means that we measure memory latency with a 128 byte stride.
+ EOF
+ 
+ 	echo $ECHON "FASTMEM [default no]: $ECHOC"
+-	read fast
++	fast=""
+ 	case "$fast" in
+ 	    [yY]*) FASTMEM=YES;;
+ 	    *)	   FASTMEM=NO;;
+@@ -443,7 +441,7 @@ If you want to skip the file system latency tests, answer "yes" below.
+ EOF
+ 
+ echo $ECHON "SLOWFS [default no]: $ECHOC"
+-read slow
++slow=""
+ case "$slow" in
+     [yY]*) SLOWFS=YES;;
+     *)	   SLOWFS=NO;;
+@@ -480,7 +478,7 @@ or
+ EOF
+ 
+ 	echo $ECHON "DISKS [default none]: $ECHOC"
+-	read disks
++	disks=""
+ 	if [ X"$disks" != X ]
+ 	then	
+ 		for i in $disks
+@@ -528,7 +526,7 @@ separated list such as: ether-host fddi-host hippi-host.
+ 
+ EOF
+ 	echo $ECHON "REMOTE [default none]: $ECHOC"
+-	read REMOTE
++	REMOTE=""
+ 
+ 	if [ "X$REMOTE" != X ]
+ 	then	cat<<EOF;
+@@ -542,12 +540,12 @@ itself and the associated copy tool (e.g. rcp vs scp) to be entered.
+ 
+ EOF
+ 		echo $ECHON "RSH [default $RSH]: $ECHOC"
+-		read rsh
++		rsh="ssh"
+ 		if [ -n "$rsh" ]
+ 		then	RSH=$rsh
+ 		fi
+ 		echo $ECHON "RCP [default $RCP]: $ECHOC"
+-		read rcp
++		rcp="scp"
+ 		if [ -n "$rsh" ]
+ 		then	RCP=$rcp
+ 		fi
+@@ -572,7 +570,7 @@ EOF
+ 
+ 		for r in $REMOTE
+ 		do	echo $ECHON "Network type for $r: $ECHOC"
+-			read n
++			n="ethernet"
+ 			X=`$RSH $r echo foo`
+ 			if [ X$X = Xfoo ]
+ 			then	echo Remote access to $r worked, thanks.
+@@ -607,7 +605,7 @@ will be roughly double the advertised clock rate.  For example, a
+ 
+ EOF
+ echo $ECHON "Processor mhz [default $MHZ]: $ECHOC"
+-read mhz
++mhz=""
+ if [ -n "$mhz" ]
+ then	MHZ=$mhz
+ fi
+@@ -637,7 +635,7 @@ EOF
+ 		fi
+ 	done
+ 	echo $ECHON "FSDIR [default $DEFAULTFSDIR]: $ECHOC"
+-	read FSDIR
++	FSDIR=""
+ 	if [ X$FSDIR = X ]
+ 	then	FSDIR=$DEFAULTFSDIR
+ 	else	mkdir -p $FSDIR 2>/dev/null
+@@ -662,7 +660,7 @@ it to any file you wish (such as /dev/null...).
+ EOF
+ 
+ echo $ECHON "Status output file [default /dev/tty]: $ECHOC"
+-read OUTPUT
++OUTPUT=""
+ if [ "X$OUTPUT" = X ]
+ then	OUTPUT=/dev/tty;
+ fi
+@@ -684,7 +682,7 @@ fast box, they may be made available on the lmbench web page, which is
+ EOF
+ 
+ echo $ECHON "Mail results [default yes]: $ECHOC"
+-read MAIL
++MAIL="no"
+ case $MAIL in 
+     [Nn]*)	MAIL=no
+ 		echo OK, no results mailed.
+@@ -705,7 +703,6 @@ then	if [ ! -f $INFO ]
+ 		do	echo ""
+ 			echo $ECHON \
+ "Reuse previous description [default yes, other options: no|view]: $ECHOC"
+-			read REUSE
+ 			case $REUSE in 
+ 	    		[Nn]*)	REUSE=no
+ 				;;
+@@ -734,7 +731,7 @@ If you want to skip filling out this form (please don't) then answer
+ 
+ EOF
+ 		echo $ECHON "Editor [default $EDITOR]: $ECHOC"
+-		read TMP
++		TMP=""
+ 		if [ X$TMP != X ]
+ 		then	EDITOR=$TMP
+ 		fi
+diff --git a/scripts/os b/scripts/os
+index 31c1bcf..0c9baef 100755
+--- a/scripts/os
++++ b/scripts/os
+@@ -17,4 +17,4 @@ then	OS=bloat-os
+     then	OS=`../../scripts/gnu-os | sed s/unknown-//`
+     fi
+ fi
+-echo $OS
++echo linux
+diff --git a/src/Makefile b/src/Makefile
+index 96467d7..539fc52 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -104,7 +104,7 @@ EXES =	$O/bw_file_rd $O/bw_mem $O/bw_mmap_rd $O/bw_pipe $O/bw_tcp 	\
+ 	$O/msleep $O/loop_o $O/lat_fifo $O/lmhttp $O/lat_http		\
+ 	$O/lat_fcntl $O/disk $O/lat_unix_connect $O/flushdisk		\
+ 	$O/lat_ops $O/line $O/tlb $O/par_mem $O/par_ops 		\
+-	$O/stream
++	$O/stream $O/lmbench
+ OPT_EXES=$O/cache $O/lat_dram_page $O/lat_pmake $O/lat_rand 		\
+ 	$O/lat_usleep $O/lat_cmd
+ LIBOBJS= $O/lib_tcp.o $O/lib_udp.o $O/lib_unix.o $O/lib_timing.o 	\
+@@ -116,8 +116,6 @@ lmbench: $(UTILS)
+ 	-@env CFLAGS+=-O MAKE="$(MAKE)" MAKEFLAGS="k$(MAKEFLAGS)" CC="$(CC)" OS="$(OS)" ../scripts/build opt
+ 
+ results: lmbench
+-	@env OS="${OS}" ../scripts/config-run
+-	@env OS="${OS}" ../scripts/results
+ 
+ rerun: lmbench
+ 	@if [ ! -f $(CONFIG) ]; then env OS="${OS}" ../scripts/config-run; fi
+-- 
+2.11.0
+

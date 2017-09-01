@@ -1,0 +1,11 @@
+[Unit]
+Description=Apply Cpu Microcode
+
+[Service]
+Type=forking
+KillMode=process
+RemainAfterExit=yes
+ExecStart=@SBINDIR@/microcode_ctl -Qu
+
+[Install]
+WantedBy=multi-user.target

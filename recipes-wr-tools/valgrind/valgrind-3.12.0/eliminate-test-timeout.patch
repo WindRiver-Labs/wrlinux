@@ -1,0 +1,42 @@
+eliminate 30 second test timeout for WRS testing
+
+On a 32 core host, running qemuarma9 ptest for valgrind more than 90% 
+of the tests are killed due to the 30 second timeout imposed by recent
+upstream patches to vg_regtest.  
+
+After disabling the timeout, running and timing each test on the same
+target showed a maximum test time of 18 minutes, but 99% of the tests
+taking less than 9 minutes. 
+
+Wind River engineering and system test should accept the inconvenience
+of longer test periods in order to get a more accurate and complete set
+set of test results.  The tests for valgrind have been critical for
+regression testing proposed patches and also for evaluation of
+valgrind's compatibility with toolchain core variants and new bsps.
+
+Upstream-status: Not applicable
+
+Signed-off-by: Dave Lerner <dave.lerner@windriver.com>
+
+
+diff --git a/tests/vg_regtest b/tests/vg_regtest
+index 1a17ca2..728925d 100755
+--- a/tests/vg_regtest.in
++++ b/tests/vg_regtest.in
+@@ -344,14 +344,14 @@ sub read_vgtest_file($)
+ #----------------------------------------------------------------------------
+ # Since most of the program time is spent in system() calls, need this to
+ # propagate a Ctrl-C enabling us to quit.
+-# Enforce 30 seconds limit for the test.
++# Don't enforce any time limits for Wind River System testing.
+ # This resume execution of the remaining tests if valgrind hangs.
+ sub mysystem($)
+ {
+     my $exit_code=0;
+     eval {
+         local $SIG{'ALRM'} = sub { die "timed out\n" };
+-        alarm(30);
++        alarm(0);
+         $exit_code = system($_[0]);
+         alarm (0);
+         ($exit_code == 2) and die "SIGINT\n";   # 2 is SIGINT

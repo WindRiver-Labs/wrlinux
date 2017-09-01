@@ -1,0 +1,16 @@
+This feature causes native qemu to build with SDL support.
+It's disabled by default, so users might encounter the problem of qemu-native
+hanging on graphic console on remote servers.
+
+To enable it, add
+
+--templates feature/qemu-sdl
+
+as a setup option.
+
+As a known issue, SLED 11 servers cannot build qemu-native with this template
+enabled. The root cause is that SLED 11 has old and broken libxcb-xlib. So
+we would have errors like below.
+
+/usr/lib64/libxcb-xlib.so.0: undefined reference to `_xcb_unlock_io'
+/usr/lib64/libxcb-xlib.so.0: undefined reference to `_xcb_lock_io'

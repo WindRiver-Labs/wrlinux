@@ -1,0 +1,10 @@
+This template adds binutils, gcc, and the core development
+libraries (libc-dev, libgcc-dev).
+
+It is supported for x86 and x86-64 targets only.
+
+To use, add
+
+--templates feature/target-toolchain
+
+as a setup option.

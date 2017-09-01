@@ -1,0 +1,57 @@
+[PATCH] fix the help return code
+
+Upstream-Status: Pending
+
+not always return 1 when call usage(), differ the return code by user action;
+if a use wants to get help information, it is normal action, should be
+return 0;
+if input parameter is wrong, and microcode_ctl prompts the help information,
+it should be return 1;
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ microcode_ctl.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/microcode_ctl.c b/microcode_ctl.c
+index 3f9c151..cdcdc10 100644
+--- a/microcode_ctl.c
++++ b/microcode_ctl.c
+@@ -40,7 +40,6 @@ static void usage(void)
+ 			"  -u	upload microcode (default filename:\"%s\"\n"
+ 			"  -f	upload microcode from named Intel formatted file\n\n", 
+ 			progname, MICROCODE_FILE_DEFAULT);
+-	exit(1);
+ }
+ 
+ /* 
+@@ -141,6 +140,7 @@ int main(int argc, char *argv[])
+ 		switch(c) {
+ 			case 'h':
+ 				usage();
++				return 0;
+ 
+ 			case 'q':
+ 				print_normal_messages=0;
+@@ -168,14 +168,17 @@ int main(int argc, char *argv[])
+ 
+ 			case '?':
+ 				usage();
++				return 0;
+ 		}
+ 	}
+ 
+ 	if (upload) {
+ 		if((return_code = do_update(device, filename)))
+ 			exit(return_code);
+-	} else
++	} else {
+ 		usage();
++		return 1;
++	}
+ 
+ 	return 0;
+ }
+-- 
+1.9.1
+

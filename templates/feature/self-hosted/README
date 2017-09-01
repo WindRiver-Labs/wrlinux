@@ -1,0 +1,11 @@
+This template adds packagegroup-self-hosted, which includes
+packages required to run the build system. It facilitates building
+wrlinux on wrlinux for x86/x86-64.
+
+It is supported for x86 and x86-64 targets only.
+
+To use, add
+
+--templates feature/self-hosted
+
+as a setup option.

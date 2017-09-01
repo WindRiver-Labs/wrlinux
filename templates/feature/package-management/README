@@ -1,0 +1,8 @@
+This template adds oe-core's package-management feature to install package
+management tools and preserve the package manager database on target.
+
+To use, add
+
+--templates feature/package-management
+
+as a setup option.

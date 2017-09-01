@@ -1,0 +1,43 @@
+From 91a1e32725b07f6ef2f995ae0dc2b488c0da3fb2 Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Thu, 18 May 2017 02:00:59 +0000
+Subject: [PATCH] tracing_enabled: remove this test
+
+The test case tracing_enabled.sh use a deprecated API in kernel:
+
+    tracing_enabled
+
+now is:
+
+    tracing_on
+
+In the current version of ltp, it contains test case for tracing_on
+and tracing_enabled.
+
+The old test case will be removed in the future. This patch is based
+on Jin Li <jin.li@windriver.com>'s patch. But after the ltp upgrade,
+his patch can't apply ltp any more, so I make a new one.
+
+Upstream-Status: Inappropriate [WR Linux specific change]
+
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ testcases/kernel/tracing/ftrace_test/ftrace_stress_test.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testcases/kernel/tracing/ftrace_test/ftrace_stress_test.sh b/testcases/kernel/tracing/ftrace_test/ftrace_stress_test.sh
+index 159ba1a66..a41339bb3 100755
+--- a/testcases/kernel/tracing/ftrace_test/ftrace_stress_test.sh
++++ b/testcases/kernel/tracing/ftrace_test/ftrace_stress_test.sh
+@@ -30,7 +30,7 @@ export TST_COUNT=1
+ test_targets=" \
+ trace_pipe current_tracer ftrace_enabled function_profile_enabled \
+ set_event set_ftrace_pid stack_max_size stack_trace trace trace_clock \
+-trace_options trace_stat tracing_enabled tracing_max_latency \
++trace_options trace_stat tracing_max_latency \
+ tracing_on function_profile_enabled buffer_size_kb tracing_cpumask \
+ set_ftrace_filter"
+ 
+-- 
+2.11.0
+

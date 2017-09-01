@@ -1,0 +1,30 @@
+From a5d4baf79ee332cf73e5259a2568958babcdbce2 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 1 Aug 2016 07:00:35 -0400
+Subject: [PATCH] fix No GNU_HASH in the elf binary
+
+Let recipe's LDFLAGS work in Makefile.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 590ae7e..d4e0610 100644
+--- a/Makefile
++++ b/Makefile
+@@ -37,7 +37,7 @@ RCFILETO        = $(RCDIR)/$(RCHOMEDIR)
+ all: microcode_ctl
+ 
+ microcode_ctl: microcode_ctl.c
+-	$(CC) $(CFLAGS) -o $(PROGRAM) microcode_ctl.c
++	$(CC) $(CFLAGS) -o $(PROGRAM) microcode_ctl.c $(LDFLAGS)
+ 	mkdir intel-ucode amd-ucode
+ 	tar xfz $(MICROCODE_INTEL) -C intel-ucode
+ 	tar --strip-components 1 -xf $(MICROCODE_AMD) -C amd-ucode
+-- 
+2.8.1
+

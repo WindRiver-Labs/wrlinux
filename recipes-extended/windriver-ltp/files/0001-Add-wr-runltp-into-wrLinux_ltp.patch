@@ -1,0 +1,745 @@
+From 1ba761efb89fd5570d0da1c72d49f206a30425cc Mon Sep 17 00:00:00 2001
+From: Jin Li <jin.li@windriver.com>
+Date: Wed, 3 Sep 2014 05:26:43 +0800
+Subject: [PATCH 01/15] Add wr-runltp into wrLinux_ltp
+
+Upstream-Status: Inappropriate [WR Linux specific change]
+
+wr-runltp is used to create a automated test execution and analysis environment.
+
+The wr-runltp supports most parameters supported by runltp and would pass them
+to runltp when given.
+
+Limitation:
+
+	In order to create LTP execution environment automatically, wr-runltp use
+	the
+	following parameters offerred by runltp. So these parameters are no longer
+	supported by wr-runltp:
+
+	-b DEVICE         Some tests require an unmounted block device to run
+	correctly.
+	-B DEVICE_FS_TYPE The type of file system the block device has.
+	-l LOGFILE        Log results of test in a logfile.
+	-S SKIPFILE       Skip tests specified in SKIPFILE.
+
+Enhanced function:
+
+    Continue the remaining Ltp test after rebooting
+
+Signed-off-by: Jin Li <jin.li@windriver.com>
+---
+ wrLinux_ltp/wr-runltp | 701 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 701 insertions(+)
+ create mode 100755 wrLinux_ltp/wr-runltp
+
+diff --git a/wrLinux_ltp/wr-runltp b/wrLinux_ltp/wr-runltp
+new file mode 100755
+index 0000000..3037077
+--- /dev/null
++++ b/wrLinux_ltp/wr-runltp
+@@ -0,0 +1,701 @@
++#!/bin/bash
++
++# Copyright (c) 2012 Wind River Systems, Inc.
++#
++# The right to copy, distribute, modify, or otherwise make use
++# of this software may be licensed only pursuant to the terms
++# of an applicable Wind River license agreement.
++
++# Set up the proper environment for test environment
++
++TEST_RETVAL_FAIL=1
++
++cd `dirname $0` || \
++{
++    echo "FATAL: unable to change directory to $(dirname $0)"
++    exit $TEST_RETVAL_FAIL
++}
++
++export WRLTPROOT=${PWD}
++export LTPROOT=$(dirname $WRLTPROOT)
++
++external_parameter="$*"
++cmdline_skip=""
++EXECUTION_TIME=`date +"%Y_%b_%d-%Hh_%Mm_%Ss"`
++START_TIME=`date`
++KERNEL_VERSION=`uname -a| cut -d ' ' -f 3`
++
++TMP_MOUNT_FILE=$WRLTPROOT/tmp_mount_file
++LOOP_DEVICE_TMP=""
++TMPDIR=$WRLTPROOT/tmpdir
++
++SWAP_MOUNT_POINT=/mnt/swap
++SWAP_FILE=$SWAP_MOUNT_POINT/swapfile
++SWAP_FILE_REPOSITORY=/swap_$$
++LOOP_DEVICE_SWAP=""
++SWAPON=0
++
++BLOCK_DEVICE_FILE=$WRLTPROOT/block_device_file
++BLOCK_DEVICE_FSTYPE=ext4
++TMP_MOUNT_FSTYPE=ext4
++LOOP_DEVICE_BLOCK=""
++
++SKIP_PATH="$WRLTPROOT/skiptest"
++STRESS_CASE="$SKIP_PATH/stress"
++FAIL_PATH="$WRLTPROOT/failtest"
++LOGPATH="$WRLTPROOT/results"
++LOGFILE="$LOGPATH/LTP_RUN_ON-$EXECUTION_TIME.log"
++LTPLOG=$LOGPATH/LTP.log
++SCENARIO_GROUP_LIST="syscalls,fs,fs_perms_simple,fsx,dio,io,mm,ipc,sched,math,nptl,pty,\
++containers,fs_bind,filecaps,cap_bounds,connectors,fcntl-locktests,admin_tools,timers,commands,\
++hyperthreading,kernel_misc,modules"
++
++RUN_RESUME_TEST=0
++RUN_SELECTED_GROUP=0
++RUN_SELECTED_CASE=0
++RUN_STRESS_CASE=0
++SELECTED_CASE=""
++RUNTIME_PATH="$WRLTPROOT/runtime"
++TEST_SKIPFILE="$RUNTIME_PATH/skipfile"
++RUNTIME_SKIPFILE=""
++RUNTIME_TESTFILE="$RUNTIME_PATH/testfile"
++FAIL_REPORT="$RUNTIME_PATH/failtest.report"
++SKIP_REPORT="$RUNTIME_PATH/skiptest.report"
++RUNTIME_LOGFILE=""
++RESUME_LOGFILE="$RUNTIME_PATH/resume.log"
++SCREEN_LOGFILE=$RUNTIME_PATH/Ltp_console_output.log
++
++CPU_ARCH=""
++KERNEL_ARCH="std"
++SCENARIO_GROUP_FILE="$WRLTPROOT/runtime/scenario_group"
++RUN_HUGETLB_TEST=0
++UNKNOWN_FAILURE=0
++KNOWN_FAILURE=0
++LTP_passnum=0
++LTP_failnum=0
++LTP_skipnum=0
++
++usage() 
++{
++    cat <<-EOF >&2
++
++wr-runltp
++
++    Usage:                   $(basename "$0") [-f GROUPFILE [-s TESTCASE]] [-R] [-h] [-P]
++
++    -f groupfile             Execute the selected scenario group command file.
++                             More than one groupfile seperated by comma can be selected.
++    -h                       Help. Prints all available options.
++    -P                       Run stress case in scenarion groupfile.
++    -R                       Continue the remaining LTP test after rebooting.
++    -f groupfile -s testcase Execute the selected test case in scenario groupfile.
++
++	EOF
++    echo "runltp"
++    $LTPROOT/runltp -h
++
++exit 0
++}
++
++
++# LTP runtime environment check
++
++env_check()
++{
++    [ -e "$RUNTIME_PATH/config" ] && rm $RUNTIME_PATH/config
++    [ -r /proc/config.gz -o -r /boot/config-$KERNEL_VERSION ] || {
++        echo "FATAL: missing file /proc/config.gz"
++        exit $TEST_RETVAL_FAIL
++    }
++
++    [ -d ~ ] || {
++        echo "FATAL: missing home directory"
++        exit $TEST_RETVAL_FAIL
++    }
++
++    which gunzip >& /dev/null || {
++        echo "FATAL: gunzip not found"
++        exit $TEST_RETVAL_FAIL
++    }
++}
++
++
++# Add a file as a swap partition for target with memroy less than 64M
++create_swap()
++{
++    local total_memory=`free -ot | tail -n 1 | awk '{print $2}'`
++    local swap_size=$[total_memory*2]
++    local swap_fs_type=ext3
++    LOOP_DEVICE_SWAP=$(losetup -f)
++
++    if [ -z $LOOP_DEVICE_SWAP ]; then
++        echo "No loop device available in system!"
++        echo "We coun't setup a swap partition"
++        return $TEST_RETVAL_FAIL
++    fi
++
++    dd if=/dev/zero of=$SWAP_FILE_REPOSITORY bs=1K count=$[swap_size+10] >/dev/null 2>&1
++    losetup $LOOP_DEVICE_SWAP $SWAP_FILE_REPOSITORY
++    mkfs.$swap_fs_type $LOOP_DEVICE_SWAP >/dev/null 2>&1
++
++    if [ $? -ne 0 ]; then
++        echo "Make $swap_fs_type filesystem failed! We'll try ext2..."
++        swap_fs_type=ext2
++        mkfs.$swap_fs_type $LOOP_DEVICE_SWAP >/dev/null 2>&1
++        if [ $? -ne 0 ]; then
++            echo "Make $swap_fs_type failed!"
++            return $TEST_RETVAL_FAIL
++        fi
++    fi
++
++    mkdir -p $SWAP_MOUNT_POINT
++    if [ $? -ne 0 ]; then
++        echo "Create swap partition mount point failed!"
++        return $TEST_RETVAL_FAIL
++    fi
++
++    mount -t $swap_fs_type $LOOP_DEVICE_SWAP $SWAP_MOUNT_POINT
++    if [ $? -ne 0 ]; then
++        echo "Mount $LOOP_DEVICE_SWAP to $SWAP_MOUNT_POINT failed!"
++        return $TEST_RETVAL_FAIL
++    fi
++
++    dd if=/dev/zero of=$SWAP_FILE bs=1K count=$swap_size >/dev/null 2>&1
++    mkswap -f -c $SWAP_FILE >/dev/null 2>&1
++    if [ $? -ne 0 ]; then
++        echo "mkswap create $SWAP_FILE failed!"
++        return $TEST_RETVAL_FAIL
++    fi
++
++    swapon $SWAP_FILE
++    if [ $? -ne 0 ]; then
++        echo "Trun on $SWAP_FILE failed!"
++        return $TEST_RETVAL_FAIL
++    fi
++    return 0
++}
++
++hugetlb_setup()
++{
++    # System configurations
++    hugepagesize=$(gawk '/^Hugepagesize:/ { print $2; exit; }' /proc/meminfo)
++    hugepages=$(($(gawk '/^MemFree:/ { print $2; exit; }' /proc/meminfo)/hugepagesize/2))
++
++    # Allocate half of free memory for huge pages
++    echo ${hugepages} > /proc/sys/vm/nr_hugepages
++
++    [[ $(cat /proc/sys/vm/nr_hugepages) -eq ${hugepages} ]] || {
++        echo "Cannot allocate huge pages"
++        RUN_HUGETLB_TEST=0
++    }
++
++    [[ $(gawk '/^HugePages_Free:/ { print $2; }' /proc/meminfo) -eq ${hugepages} ]] || {
++        echo "Number of free huge pages is not as expected"
++        RUN_HUGETLB_TEST=0
++    }
++
++    # Configure maximum size for a shared memory segment: all of huge pages allocated
++    echo  $((hugepages*hugepagesize*1024)) > /proc/sys/kernel/shmmax
++
++    # Mount hugetlbfs
++
++    mount -t hugetlbfs none ${hugefspath} || {
++        echo "Cannot mount hugetlbfs"
++        RUN_HUGETLB_TEST=0
++    }
++
++
++    # Patch hugetlb
++    sed -i -e "s#-H[[:space:]]*[^[:space:]]\+#-H ${hugefspath}#" $LTPROOT/runtest/hugetlb
++
++    # Specify a small number of shmmni for hugeshmget03 to run as expected
++    # $LTPROOT/runtest/hugetlb:hugeshmget03 hugeshmget03 -c 10 -i 10
++    grep -q -E -e '^hugeshmget03 orignmi' $LTPROOT/runtest/hugetlb ||
++    sed -i -e 's#^\(hugeshmget03\)\(.*\)#\1 orignmi=$(cat /proc/sys/kernel/shmmni); echo 16 > /proc/sys/kernel/shmmni; \2; echo ${orignmi} > /proc/sys/kernel/shmmni#' $LTPROOT/runtest/hugetlb
++}
++
++# Create an unmounted block device for syscalls test
++create_block_device()
++{
++    LOOP_DEVICE_BLOCK=$(losetup -f)
++    [[ ${LOOP_DEVICE_BLOCK} ]] || {
++        echo No free loop device
++        return 1
++    }
++
++    dd if=/dev/zero of=${BLOCK_DEVICE_FILE} bs=1M count=256 > /dev/null 2>&1 || {
++        echo "Failed to create file $BLOCK_DEVICE_FILE"
++        return 1
++    }
++
++    losetup $LOOP_DEVICE_BLOCK $BLOCK_DEVICE_FILE > /dev/null 2>&1 || {
++        echo "Fail to setup loop device $LOOP_DEVICE_BLOCK"
++        return 1
++    }
++
++    mkfs.${BLOCK_DEVICE_FSTYPE} ${LOOP_DEVICE_BLOCK} > /dev/null 2>&1 || {
++        echo Failed to format ${LOOP_DEVICE_BLOCK} into ${BLOCK_DEVICE_FSTYPE}
++        return 1
++    }
++    return 0
++}
++
++# Setup LTP runtime environment
++setup()
++{
++
++# Get runtime LTP related system feature
++
++    [ -d "$RUNTIME_PATH" ] || mkdir $RUNTIME_PATH
++    [ -d "$LOGPATH" ] || mkdir $LOGPATH
++    [ -r /proc/config.gz ] && cp /proc/config.gz $RUNTIME_PATH && gunzip -f $RUNTIME_PATH/config.gz
++    [ -r /boot/config-$KERNEL_VERSION ] && cp /boot/config-$KERNEL_VERSION $RUNTIME_PATH/config
++
++# Create unmounted block device
++if [ -z "$LOOP_DEVICE_BLOCK" ]; then
++    if losetup -a | grep -q "$BLOCK_DEVICE_FILE"; then
++        LOOP_DEVICE_BLOCK=$(losetup -a | grep "$BLOCK_DEVICE_FILE" | cut -d " " -f 1 | tr -d ":")
++    else
++        create_block_device
++    fi
++fi
++
++# Create a swap partition when the total memory is less than 64M.
++
++    MemTotal=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`
++    test_swap_size=`free | tail -n 1 | awk '{print $2}'`
++
++    [ $test_swap_size -eq 0 ] && [ $MemTotal -lt 65536 ] && {
++        echo "Start to add a swap partition ..."
++        create_swap
++        if [ $? -ne 0 ]; then
++            echo "Add swap partition failed, we'll run ltp without swap partion..."
++        else
++            echo "Create swap partition complete!"
++	    SWAPON=1
++        fi
++    }
++
++# Get runtime cpu and kernel version
++
++    uname -m | grep -q -E "i686|x86_64" && CPU_ARCH=x86
++    uname -m | grep -q -E "ppc|ppc64" && CPU_ARCH=ppc
++    uname -m | grep -q "arm" && CPU_ARCH=arm
++    uname -m | grep -q -E "mips|mips64" && CPU_ARCH=mips
++    uname -r | grep -q "preempt-rt$" && KERNEL_ARCH=preempt-rt
++    uname -r | grep -q "cgl$" && KERNEL_ARCH=cgl
++
++# Set runtime log file
++[ -z "$RUNTIME_LOGFILE" ] && RUNTIME_LOGFILE="$RUNTIME_PATH/runtime.log"
++
++# Create scenario group file
++
++# When it is a fresh LTP execution, create scenario group file based on
++# default scenario group list or the one given from parameter
++
++# When it is NOT a fresh LTP execution, create scenario group list from
++# existing runtime scenario group
++
++    if [ "$RUN_RESUME_TEST" -eq 0 ]; then
++
++        # Before start a fresh LTP execution, delete the obsolete runtime file
++        [ -f "$RUNTIME_TESTFILE" ] && rm $RUNTIME_TESTFILE
++        [ -f "$RUNTIME_LOGFILE" ] && rm $RUNTIME_LOGFILE
++        [ -f "$SCENARIO_GROUP_FILE" ] && rm $SCENARIO_GROUP_FILE
++        [ -f "$TEST_SKIPFILE" ] && rm $TEST_SKIPFILE
++        [ -f "$RESUME_LOGFILE" ] && rm $RESUME_LOGFILE
++        [ -f "$FAIL_REPORT" ] && rm $FAIL_REPORT
++        [ -f "$SKIP_REPORT" ] && rm $SKIP_REPORT
++
++        # Check kernel option before execute some scenario group
++            echo $SCENARIO_GROUP_LIST | grep -q "numa" && {
++		grep -q "CONFIG_NUMA=y" $RUNTIME_PATH/config || {
++                    echo "FATAL: please open proper kernel option for numa test"
++                    exit $TEST_RETVAL_FAIL
++		}
++            }
++
++            echo $SCENARIO_GROUP_LIST | grep -q "hugetlb" && {
++		grep -q "CONFIG_HUGETLBFS=y" $RUNTIME_PATH/config || {
++                    echo "FATAL: please open proper kernel option for hugetlb test"
++                    exit $TEST_RETVAL_FAIL
++		}
++		RUN_HUGETLB_TEST=1
++            }
++
++            echo $SCENARIO_GROUP_LIST | grep -q "controllers" && {
++		grep -q "CONFIG_CGROUPS=y" $RUNTIME_PATH/config || {
++                    echo "FATAL: please open proper kernel option for controllers test"
++                    exit $TEST_RETVAL_FAIL
++		}
++            }
++
++            echo $SCENARIO_GROUP_LIST | grep -q "cpuhotplug" && {
++		grep -q "CONFIG_HOTPLUG_CPU=y" $RUNTIME_PATH/config || {
++                    echo "FATAL: please open proper kernel option for cpuhotplug test"
++                    exit $TEST_RETVAL_FAIL
++		}
++            }
++
++        [ "$RUN_SELECTED_CASE" -eq 0 ] && echo "$SCENARIO_GROUP_LIST" > $SCENARIO_GROUP_FILE
++
++    else
++        if [ ! -f "$SCENARIO_GROUP_FILE" ]; then
++	    echo "FATAL: There is NO runtime scenario group file"
++            exit $TEST_RETVAL_FAIL
++        fi
++        SCENARIO_GROUP_LIST=$(cat $SCENARIO_GROUP_FILE)
++    fi
++
++    # Print out the LTP test plan: scenario group list or selected case
++    echo "<<wr-runltp Test Plan>>"
++    if [ "$RUN_SELECTED_CASE" -eq 0 ]; then
++        echo "LTP scenario group list : $SCENARIO_GROUP_LIST"
++    else
++        [ -z "$SELECTED_CASE" ] && {
++           echo "There is NO selected case name"
++           exit $TEST_RETVAL_FAIL
++        }
++        echo "LTP test case : $SELECTED_CASE"
++    fi
++
++    # Check the scenario group name
++    availabel_group=$(ls $LTPROOT/runtest)
++    for group in `echo "$SCENARIO_GROUP_LIST" | tr ',' ' '`; do
++        echo "$availabel_group" | grep "^$group$"  >/dev/null 2>&1 || {
++            echo "FATAL: there is no group file $group under $LTPROOT/runtest/"
++            exit $TEST_RETVAL_FAIL
++	}
++    done
++
++    if [ "$RUN_HUGETLB_TEST" -eq 1 ]; then
++        hugefspath=/mnt/huge
++        mkdir -p ${hugefspath}
++        hugetlb_setup
++    fi
++
++# Create runtime skipped test file
++
++# Senario one 
++# When it is a fresh LTP execution, create skipped test file based on
++# skipped test data base and runtime test file
++
++# Senario two
++# When it is NOT a fresh LTP execution, create skipped tets file based on
++# the existing one and runtime test log
++
++if [ "$RUN_RESUME_TEST" -eq 0 ]; then
++
++    # Create runtime command file based on scenario group list or selected case
++    
++    if [ "$RUN_SELECTED_CASE" -eq 0 ]; then
++        for cmdfile in `echo "$SCENARIO_GROUP_LIST" | tr ',' ' '`; do
++            cmdfile="$LTPROOT/runtest/$cmdfile"
++            cat "$cmdfile" | grep -v -E "^#|^$"  >> $RUNTIME_TESTFILE
++        done
++    else
++        echo "$SELECTED_CASE " > $RUNTIME_TESTFILE
++    fi
++
++    # Create LTP skipped case list of stress test
++    if [ -z "$RUNTIME_SKIPFILE" ]; then
++        RUNTIME_SKIPFILE="$RUNTIME_PATH/runtime.skip"
++        [ -f "$RUNTIME_SKIPFILE" ] && rm $RUNTIME_SKIPFILE
++
++        if [ "$RUN_STRESS_CASE" -eq 0 ]; then
++            while read line
++            do
++                if echo $line | grep -E -q "^#std" ; then
++                    testcase=$(echo $line | awk '{print $2}')
++                    skip_reason=$(echo $line | cut -d "|" -f 2)
++                    if grep -q "^$testcase[[:space:]]" $RUNTIME_TESTFILE; then
++                        printf "%-50s %-20s %s \n" "$testcase" SKIP "$skip_reason" >> $TEST_SKIPFILE
++                        echo "$testcase" >> $RUNTIME_SKIPFILE
++                    fi
++                fi
++            done < $STRESS_CASE
++        fi
++    fi
++else
++
++    if [ ! -f "$RUNTIME_TESTFILE" -o ! -f "$RUNTIME_LOGFILE" ]; then
++        echo "FATAL: There is NO runtime test file to resume LTP execution"
++        exit $TEST_RETVAL_FAIL
++    fi
++
++    if grep "Total Tests" $RUNTIME_LOGFILE >/dev/null 2>&1; then
++        echo "FATAL: last LTP execution has finished."
++        exit $TEST_RETVAL_FAIL
++    fi
++
++    # Find out the test case which make system panic
++
++    last_test=$(sed '1,4d' $RUNTIME_LOGFILE | tail -n 1 | awk '{print $1}')
++    panic_test=$last_test
++    find_out=0
++
++    if [ -z "$last_test" ];then
++	echo "Failed to find out last test case and resume stop"
++        exit $TEST_RETVAL_FAIL
++    fi
++
++    while [ "$find_out" -eq 0 ]; do
++        panic_test=$(cat $RUNTIME_TESTFILE | awk '{print $1}' | sed -n "/\<$last_test\>/{n;p;q}")
++	find_out=1
++        if [ -f $TEST_SKIPFILE ];then
++            grep -q "^$panic_test " $TEST_SKIPFILE && {
++                last_test=$panic_test
++                find_out=0
++            }
++        fi
++    done
++
++    if [ -z "$panic_test" ];then
++        echo "Failed to find out panic test and resume stop"
++        exit $TEST_RETVAL_FAIL
++    fi
++    printf "%-50s %-21s %s \n" "$panic_test" "SKIP" "system panic" >> $TEST_SKIPFILE
++
++    # Create runtime skipped file for this execution
++    RUNTIME_SKIPFILE="$RUNTIME_PATH/runtime.skip"
++    [ -e "$RUNTIME_SKIPFILE" ] && rm $RUNTIME_SKIPFILE
++    [ -e "$TEST_SKIPFILE" ] && cat $TEST_SKIPFILE | awk '{print $1}' > $RUNTIME_SKIPFILE
++
++    # Record the finished LTP runtime log
++    if [ -f "$RESUME_LOGFILE" ]; then
++        sed '1,4d' $RUNTIME_LOGFILE >> $RESUME_LOGFILE
++    else
++        cp $RUNTIME_LOGFILE $RESUME_LOGFILE
++    fi
++
++    # Delete any runtime log before run LTP Test
++    rm $RUNTIME_LOGFILE || exit $TEST_RETVAL_FAIL
++
++    # Add the finished test case to runtime skipped test file
++    sed '1,4d' $RESUME_LOGFILE | awk '{print $1}' >> $RUNTIME_SKIPFILE
++
++fi
++
++    [ -e "$RUNTIME_SKIPFILE" ] && cmdline_skip="-S $RUNTIME_SKIPFILE"
++
++}
++
++# mount ext4 file system on TMPDIR over loop device, where temporary
++# files will be created
++
++mount_tmp()
++{
++    [ -e "$TMPDIR" ] || mkdir $TMPDIR
++
++    # Check if TMPDIR has been mounted with ext3/4 file system
++
++    [[ $(df -P -T $TMPDIR | tail -1 | awk '{print $2}' ) =~ ext(3|4) ]] || {
++        LOOP_DEVICE_TMP=$(losetup -f)
++
++        if [ -z $LOOP_DEVICE_TMP ]; then
++            echo "No loop device available!"
++            exit $TEST_RETVAL_FAIL
++        fi
++
++        echo "mounting ext4 file system on $TMPDIR over loop device for LTP test..."
++        dd if=/dev/zero of=$TMP_MOUNT_FILE bs=1M count=256 > /dev/null 2>&1 || {
++            echo "Failed to create file $TMP_MOUNT_FILE"
++            exit $TEST_RETVAL_FAIL
++        }
++
++        losetup $LOOP_DEVICE_TMP $TMP_MOUNT_FILE >/dev/null 2>&1 || {
++            echo "Fail to setup loop device $LOOP_DEVICE_TMP"
++            exit $TEST_RETVAL_FAIL
++        }
++
++        mkfs.${TMP_MOUNT_FSTYPE} -m 0 $LOOP_DEVICE_TMP >/dev/null 2>&1 || {
++            echo Failed to format $LOOP_DEVICE_TMP into $TMP_MOUNT_FSTYPE
++            exit $TEST_RETVAL_FAIL
++        }
++
++        mount -t $TMP_MOUNT_FSTYPE -o mand $LOOP_DEVICE_TMP $TMPDIR >/dev/null 2>&1 || {
++            echo "Failed to mount $LOOP_DEVICE_TMP to $TMPDIR"
++            exit $TEST_RETVAL_FAIL
++        }
++    }
++
++    chmod 777 $TMPDIR || {
++        echo Cannot chmod $TMPDIR to 777
++        exit $TEST_RETVAL_FAIL
++    }
++
++    return 0
++}
++
++
++# Execute LTP Test with runltp
++
++main()
++{
++    if [ "$RUN_SELECTED_CASE" -eq 0 ]; then
++        $LTPROOT/runltp -l $RUNTIME_LOGFILE -f $SCENARIO_GROUP_LIST \
++        -b $LOOP_DEVICE_BLOCK -B $BLOCK_DEVICE_FSTYPE -d $TMPDIR \
++        $external_parameter $cmdline_skip -p | tee $SCREEN_LOGFILE
++    else
++        $LTPROOT/runltp -l $RUNTIME_LOGFILE -f $SCENARIO_GROUP_LIST \
++        -b $LOOP_DEVICE_BLOCK -B $BLOCK_DEVICE_FSTYPE -d $TMPDIR -s "\<$SELECTED_CASE\>" \
++        $external_parameter $cmdline_skip -p | tee $SCREEN_LOGFILE
++    fi
++
++    # In resumed LTP test, join runtime log and resume log together
++    if [ "$RUN_RESUME_TEST" -eq 1 ]; then
++        sed '1,4d' $RUNTIME_LOGFILE >> $RESUME_LOGFILE
++        cp $RESUME_LOGFILE $RUNTIME_LOGFILE
++    fi
++}
++
++report()
++{
++
++# Summarize LTP test result
++
++    echo "<<wr-runltp Test Result>>"
++
++    if grep -q "Total Tests" $RUNTIME_LOGFILE; then
++        grep "PASS" $RUNTIME_LOGFILE >/dev/null 2>&1 && \
++        LTP_passnum=$(grep -c PASS $RUNTIME_LOGFILE)
++        sed -i "/Total Tests/a\Total Passes: $LTP_passnum" $RUNTIME_LOGFILE
++
++        grep "SKIP" $TEST_SKIPFILE >/dev/null 2>&1 && \
++        LTP_skipnum=$(grep -c SKIP $TEST_SKIPFILE)
++        sed -i "/Total Passes/a\Total Skips: $LTP_skipnum" $RUNTIME_LOGFILE
++
++        grep "FAIL" $RUNTIME_LOGFILE >/dev/null 2>&1 && \
++        LTP_failnum=$(grep -c FAIL $RUNTIME_LOGFILE)
++
++        LTP_testnum=$(expr $LTP_passnum + $LTP_skipnum + $LTP_failnum)
++        sed -i "s/^Total Tests.*/Total Tests: $LTP_testnum/" $RUNTIME_LOGFILE
++        sed -i "s/^Total Failures.*/Total Failures: $LTP_failnum/" $RUNTIME_LOGFILE
++    else
++        echo "There is no LTP test result"
++	exit $TEST_RETVAL_FAIL
++    fi
++
++
++# Create formatted failed test report and detailed failure analysis
++
++    if [[ $LTP_testnum -gt 0 && $LTP_failnum -gt 0 ]]; then
++        sed -n '1,4p' $RUNTIME_LOGFILE | sed -e '/Testcase/ s/$/\tFail Reason/' \
++                                         -e '4 s/$/\t----------/' > $FAIL_REPORT
++        failtest=$(grep "FAIL" $RUNTIME_LOGFILE | awk '{print $1}')
++
++        for test in $failtest; do
++            failreason=$(grep "^#std[[:space:]]$test[[:space:]]" $FAIL_PATH/common | cut -d "|" -f 2)
++            [ -z "$failreason" -a "$KERNEL_ARCH" != "std" ] && \
++            failreason=$(grep "^#$KERNEL_ARCH[[:space:]]$test[[:space:]]" $FAIL_PATH/common | cut -d "|" -f 2)
++            [ -z "$failreason" -a -e "$FAIL_PATH/$CPU_ARCH" ] && \
++            failreason=$(grep "^#std[[:space:]]$test[[:space:]]" $FAIL_PATH/$CPU_ARCH | cut -d "|" -f 2)
++            [ -z "$failreason" -a -e "$FAIL_PATH/$CPU_ARCH" -a "$KERNEL_ARCH" != "std" ] && \
++            failreason=$(grep "^#$KERNEL_ARCH[[:space:]]$test[[:space:]]" $FAIL_PATH/$CPU_ARCH | cut -d "|" -f 2)
++            [ -z "$failreason" ] && UNKNOWN_FAILURE=$(expr $UNKNOWN_FAILURE + 1)
++            grep "FAIL" $RUNTIME_LOGFILE | sed -n "/^$test / s/$/\t\t$failreason/p" >> $FAIL_REPORT
++         done
++
++        KNOWN_FAILURE=$(expr $LTP_failnum - $UNKNOWN_FAILURE)
++        sed -i "/Total Failures/a\Known Failures: $KNOWN_FAILURE" $RUNTIME_LOGFILE
++        sed -i "/Known Failures/a\Unknown Failures: $UNKNOWN_FAILURE" $RUNTIME_LOGFILE
++
++        # Tm-Fast use this console output to decide whether LTP test passes
++        if [ "$UNKNOWN_FAILURE" -eq 0 ]; then
++	    echo "[Test Result] LTP test passed with known failure" >> $RUNTIME_LOGFILE
++        else
++	    echo "[Test Result] Warning : LTP test failed with unknown failure" >> $RUNTIME_LOGFILE
++        fi
++        echo "[Test Knowledge Base] LTP test case known failure : $FAIL_PATH" >> $RUNTIME_LOGFILE
++    elif [[ $LTP_testnum -gt 0 ]]; then
++        echo "[Test Result] LTP test passed" >> $RUNTIME_LOGFILE
++    fi
++
++    # Creat skipped test report and detailed skip reason
++    if grep "SKIP" $TEST_SKIPFILE > /dev/null 2>&1 ; then
++        echo "LTP Test Start Time: $START_TIME" > $SKIP_REPORT
++        echo "-------------------------------------------" >> $SKIP_REPORT
++        printf "%-50s %-21s %s \n" Testcase Type "Skip Reason" >> $SKIP_REPORT
++        printf "%-50s %-21s %s \n" -------- ----  -----------  >> $SKIP_REPORT
++        cat $TEST_SKIPFILE >> $SKIP_REPORT
++        echo "[Test Knowledge Base] LTP test case skip reason: $SKIP_PATH" >> $RUNTIME_LOGFILE
++    fi
++
++    # Output test result
++    if grep -q "Total Tests" $RUNTIME_LOGFILE; then
++        echo "[Log Path] LTP test console output log: $SCREEN_LOGFILE" >> $RUNTIME_LOGFILE
++        echo "[Log Path] LTP test log : $LTPLOG" >> $RUNTIME_LOGFILE
++        sed -n '/Total Tests/,$'p $RUNTIME_LOGFILE
++
++        cp $RUNTIME_LOGFILE $LOGFILE
++        [ -e "$LTPLOG" ] && rm $LTPLOG
++        ln -s $LOGFILE $LTPLOG
++    fi
++
++    [ -e "$FAIL_REPORT" -a -e "$LOGFILE" ] && {
++
++        echo "[LTP Test Failed Case]" >> $LOGFILE
++        echo "----------------------" >> $LOGFILE
++        cat $FAIL_REPORT >> $LOGFILE
++    }
++
++    [ -e "$SKIP_REPORT" -a -e "$LOGFILE" ] && {
++
++        echo "[LTP Test Skipped Case]" >> $LOGFILE
++        echo "-----------------------" >> $LOGFILE
++        cat $SKIP_REPORT >> $LOGFILE
++    }
++
++    echo "<<wr-runltp Test Result>>"
++}
++
++cleanup()
++{
++    # clean up hugetlb test environment
++    [ "$RUN_HUGETLB_TEST" -eq 1 ] && {
++        umount ${hugefspath}
++        rm -fr ${hugefspath}
++    }
++
++    [ "$SWAPON" -eq 1 ] && {
++        swapoff $SWAP_FILE >/dev/null 2>&1
++        umount $SWAP_MOUNT_POINT >/dev/null 2>&1
++        rm -fr $SWAP_MOUNT_POINT >/dev/null 2>&1
++        rm $SWAP_FILE_REPOSITORY >/dev/null 2>&1
++        losetup -d $LOOP_DEVICE_SWAP >/dev/null 2>&1
++    }
++}
++
++while getopts hRPa:c:C:d:D:f:F:ehi:K:g:l:m:M:Nno:pqr:s:S:t:T:w:x:b:B: arg
++    do  case $arg in
++        f)  RUN_SELECTED_GROUP=1
++            SCENARIO_GROUP_LIST=$OPTARG;;
++        h)  usage;;
++        s)  RUN_SELECTED_CASE=1
++            SELECTED_CASE=$OPTARG
++            external_parameter=$(echo $external_parameter | sed "s/-s $OPTARG//g");;
++        b)  LOOP_DEVICE_BLOCK=$OPTARG;;
++        B)  BLOCK_DEVICE_FSTYPE=$OPTARG;;
++        S)  RUNTIME_SKIPFILE=$OPTARG;;
++        l)  RUNTIME_LOGFILE=$OPTARG;;
++        R)  RUN_RESUME_TEST=1
++            external_parameter=$(echo $external_parameter | sed "s/-R//g");;
++        P)  RUN_STRESS_CASE=1
++            external_parameter=$(echo $external_parameter | sed "s/-P//g");;
++        esac
++    done
++
++env_check
++
++mount_tmp
++
++setup
++
++main
++
++report
++
++[ "$RUN_SELECTED_CASE" -eq 0 ] && cleanup
++[ "$UNKNOWN_FAILURE" -eq 1  ] && exit $TEST_RETVAL_FAIL
++exit 0
++
+-- 
+1.8.1.4
+

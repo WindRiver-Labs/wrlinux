@@ -1,0 +1,17 @@
+
+None of the code we compile for native uses the -mcmodel=large
+option, but configure requires it to exist if we are building
+for x86-64.  Here, we make sure we do not require it.
+
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -558,7 +558,7 @@ if test "x$target_m64" = x1; then
+   TARGET_MODULE_FORMAT="elf64"
+ fi
+ 
+-if test "$target_cpu"-"$platform" = x86_64-efi; then
++if test "$target_cpu"-"$platform" = no_such_platform; then
+   # Use large model to support 4G memory
+   AC_CACHE_CHECK([whether option -mcmodel=large works], grub_cv_cc_mcmodel, [
+     SAVED_CFLAGS=$CFLAGS

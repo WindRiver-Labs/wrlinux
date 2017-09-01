@@ -1,0 +1,48 @@
+From 4a679f16a3728a9323d23a8466d22a984a58c7af Mon Sep 17 00:00:00 2001
+From: Dennis Hall <dennis.hall@windriver.com>
+Date: Fri, 31 Aug 2012 10:15:13 -0400
+Subject: [PATCH] Limit kbdrate to x86, mips and sparc.
+
+    CQID: WIND00371274
+
+    The application will exit with an error if it runs on any other architecture.
+
+    The code relies on hardware specific memory locations to access
+    and modify the keyboard repeat rate.  It also requires read/write
+    access to /dev/port which doesn't exist on every architecture's
+    root fs.  The CQ was raised for Qemu PowerPC but it also fails on
+    ARM.  The keyboard emulation in qemuppc is for an ADB (Apple Desktop Bus)
+    device and not compatible with an Intel driver.  There's also no
+    indication in the documentation that the code should work on
+    anything other than Intel architecture but it also works on MIPS32.
+    MIPS64 is not supported at this time so it was not tested.
+
+Signed-off-by: Dennis Hall <dennis.hall@windriver.com>
+---
+ src/kbdrate.c |   10 ++++++++++
+ 1 files changed, 10 insertions(+), 0 deletions(-)
+
+diff --git a/src/kbdrate.c b/src/kbdrate.c
+index 95ff723..9a79774 100644
+--- a/src/kbdrate.c
++++ b/src/kbdrate.c
+@@ -241,6 +241,16 @@ main( int argc, char **argv ) {
+ 	unsigned int i;
+ 	extern char *optarg;
+ 
++#if !(  defined(__i386__)   \
++     || defined(__x86_64__) \
++     || defined(__mips__)   \
++     || defined(__sparc___)) 
++
++	fprintf(stderr,
++		"ERROR:  %s should only be used on MIPS, x86 and Sparc archicture boards\n", basename(argv[0]));
++        exit(1);
++#endif
++ 	set_progname(argv[0]);
+ 	set_progname(argv[0]);
+ 
+ 	setlocale(LC_ALL, "");
+-- 
+1.7.1
+

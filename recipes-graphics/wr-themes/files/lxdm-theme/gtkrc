@@ -1,0 +1,49 @@
+style "back"
+{
+	engine "pixmap"
+	{
+		image
+		{
+			function = FLAT_BOX
+			shadow=NONE
+			state = NORMAL
+			file="%DEFAULT_BACKGROUND%"
+			stretch=TRUE
+			detail = "base"
+		}
+	}
+}
+
+style "time"
+{
+	fg[NORMAL]="#ffffff"
+	font_name="Sans 12"
+}
+
+style "prompt"
+{
+	fg[NORMAL]="#ffffff"
+	font_name="Sans Bold 14"
+}
+
+style "bottom"
+{
+        font_name="Sans 12"
+        fg[NORMAL] = "#9E9D9B"
+        engine "pixmap"
+        {
+                image
+                {
+                        function = FLAT_BOX
+                        file="shade.png"
+                        stretch=TRUE
+                        detail="eventbox"
+                }
+        }
+}
+
+widget "lxdm" style "back"
+widget "lxdm.*.time" style "time"
+widget "*.prompt" style "prompt"
+widget "lxdm.*.bottom_pane" style "bottom"
+widget_class "GtkWindow.*.GtkEventBox.*.<GtkLabel>" style "bottom"

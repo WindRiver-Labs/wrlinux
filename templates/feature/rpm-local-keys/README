@@ -1,0 +1,25 @@
+Instructs RPM to look on the local disk for Armored PGP keys when needed.
+
+Using the HKP support, instead of pointing to an external server, we point
+rpm to a local directory where it can read the keys when requested.  This
+can make it easier for external programs to manage the keys that RPM uses
+to validate packages.  (When used with the feature/rpm-required-sig, it 
+can be used to more easily make keys available to RPM for authorization to
+install.)
+
+The local keys should be installed into /etc/rpm/keys/ (you may have to 
+create the directory.)  The format of the key filename is (all lowercase)
+'0x<long key id>'.  You can get the log key id, using:
+
+$ gpg2 --keyid-format=0xlong --list-keys
+
+pub   2048R/0xCDB3BC792BF72D35 2015-05-26
+uid                 [ultimate] Test RPM Signing Key (Test key) <test@localhost.local>
+sub   2048R/0xBB8ED715EA922778 2015-05-26
+
+
+The key can exported using:
+
+$ gpg2 --export -a 'Test RPM Signing Key' > 0xcdb3bc792bf72d35
+
+and then copied onto the target into '/etc/rpm/keys'.

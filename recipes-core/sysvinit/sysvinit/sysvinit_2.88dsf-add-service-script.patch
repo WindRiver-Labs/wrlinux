@@ -1,0 +1,266 @@
+From a8c4484603f184e1180752fce8690a205198d7bf Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Thu, 28 Jun 2012 15:49:54 +0800
+Subject: [PATCH] sysvinit_2.88dsf-add-service-script
+
+This patch is part of the sysvinit_2.88dsf-13.10ubuntu11.diff
+which is the patch for ubuntu12.04
+
+---
+ debian/service/service   |  140 ++++++++++++++++++++++++++++++++++++++++++++++
+ debian/service/service.8 |   96 +++++++++++++++++++++++++++++++
+ 2 files changed, 236 insertions(+), 0 deletions(-)
+ create mode 100644 debian/service/service
+ create mode 100644 debian/service/service.8
+
+diff --git a/debian/service/service b/debian/service/service
+new file mode 100644
+index 0000000..3d1dffe
+--- /dev/null
++++ b/debian/service/service
+@@ -0,0 +1,140 @@
++#!/bin/sh
++
++###########################################################################
++#
++# A convenient wrapper for the /etc/init.d init scripts.
++#
++# This script is a modified version of the /sbin/service utility found on
++# Red Hat/Fedora systems (licensed GPLv2+).
++#
++# Copyright (C) 2006 Red Hat, Inc. All rights reserved.
++# Copyright (C) 2008 Canonical Ltd.
++#   * August 2008 - Dustin Kirkland <kirkland@canonical.com>
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++#
++###########################################################################
++
++
++is_ignored_file() {
++	case "$1" in
++		skeleton | README | *.dpkg-dist | *.dpkg-old | rc | rcS | single | reboot | bootclean.sh)
++			return 0
++		;;
++	esac
++	return 1
++}
++
++VERSION="`basename $0` ver. 0.91-ubuntu1"
++USAGE="Usage: `basename $0` < option > | --status-all | \
++[ service_name [ command | --full-restart ] ]"
++SERVICE=
++ACTION=
++SERVICEDIR="/etc/init.d"
++OPTIONS=
++
++if [ $# -eq 0 ]; then
++   echo "${USAGE}" >&2
++   exit 1
++fi
++
++cd /
++while [ $# -gt 0 ]; do
++  case "${1}" in
++    --help | -h | --h* )
++       echo "${USAGE}" >&2
++       exit 0
++       ;;
++    --version | -V )
++       echo "${VERSION}" >&2
++       exit 0
++       ;;
++    *)
++       if [ -z "${SERVICE}" -a $# -eq 1 -a "${1}" = "--status-all" ]; then
++          cd ${SERVICEDIR}
++          for SERVICE in * ; do
++            case "${SERVICE}" in
++              functions | halt | killall | single| linuxconf| kudzu)
++                  ;;
++              *)
++                if ! is_ignored_file "${SERVICE}" \
++		    && [ -x "${SERVICEDIR}/${SERVICE}" ]; then
++                        if ! grep -qs "^\W*status)" "$SERVICE"; then
++                          #printf " %s %-60s %s\n" "[?]" "$SERVICE:" "unknown" 1>&2
++                          echo " [ ? ]  $SERVICE" 1>&2
++                          continue
++                        else
++                          out=$(env -i LANG="$LANG" PATH="$PATH" TERM="$TERM" "$SERVICEDIR/$SERVICE" status 2>&1)
++                          if [ "$?" = "0" -a -n "$out" ]; then
++                            #printf " %s %-60s %s\n" "[+]" "$SERVICE:" "running"
++                            echo " [ + ]  $SERVICE"
++                            continue
++                          else
++                            #printf " %s %-60s %s\n" "[-]" "$SERVICE:" "NOT running"
++                            echo " [ - ]  $SERVICE"
++                            continue
++                          fi
++                        fi
++                  #env -i LANG="$LANG" PATH="$PATH" TERM="$TERM" "$SERVICEDIR/$SERVICE" status
++                fi
++                ;;
++            esac
++          done
++          exit 0
++       elif [ $# -eq 2 -a "${2}" = "--full-restart" ]; then
++          SERVICE="${1}"
++          if [ -x "${SERVICEDIR}/${SERVICE}" ]; then
++            env -i LANG="$LANG" PATH="$PATH" TERM="$TERM" "$SERVICEDIR/$SERVICE" stop
++            env -i LANG="$LANG" PATH="$PATH" TERM="$TERM" "$SERVICEDIR/$SERVICE" start
++            exit $?
++          fi
++       elif [ -z "${SERVICE}" ]; then
++         SERVICE="${1}"
++       elif [ -z "${ACTION}" ]; then
++         ACTION="${1}"
++       else
++         OPTIONS="${OPTIONS} ${1}"
++       fi
++       shift
++       ;;
++   esac
++done
++
++if [ -r "/etc/init/${SERVICE}.conf" ]; then
++   # Upstart configuration exists for this job
++   case "${ACTION}" in
++      start|stop|status|reload)
++         # Action is a valid upstart action
++         exec ${ACTION} ${SERVICE} ${OPTIONS}
++      ;;
++      restart)
++         # Map restart to the usual sysvinit behavior.
++         stop ${SERVICE} ${OPTIONS} || :
++         exec start ${SERVICE} ${OPTIONS}
++      ;;
++      force-reload)
++         # Upstart just uses reload for force-reload
++         exec reload ${SERVICE} ${OPTIONS}
++      ;;
++   esac
++fi
++
++# Otherwise, use the traditional sysvinit
++if [ -x "${SERVICEDIR}/${SERVICE}" ]; then
++   exec env -i LANG="$LANG" PATH="$PATH" TERM="$TERM" "$SERVICEDIR/$SERVICE" ${ACTION} ${OPTIONS}
++else
++   echo "${SERVICE}: unrecognized service" >&2
++   exit 1
++fi
+diff --git a/debian/service/service.8 b/debian/service/service.8
+new file mode 100644
+index 0000000..4f221af
+--- /dev/null
++++ b/debian/service/service.8
+@@ -0,0 +1,96 @@
++.\" A man page for service(8). -*- nroff -*-
++.\"
++.\" Copyright (C) 2006 Red Hat, Inc. All rights reserved.
++.\"
++.\" This copyrighted material is made available to anyone wishing to use,
++.\" modify, copy, or redistribute it subject to the terms and conditions of the
++.\" GNU General Public License v.2.
++.\"
++.\" This program is distributed in the hope that it will be useful, but WITHOUT
++.\" ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
++.\" FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for 
++.\" more details.
++.\"
++.\" You should have received a copy of the GNU General Public License along
++.\" with this program; if not, write to the Free Software Foundation, Inc.,
++.\" 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
++.\"
++.\" Author: Miloslav Trmac <mitr@redhat.com>
++.\" Updated by: Petter Reinholdtsen <pere@hungry.com>
++
++.TH service 8 "Jan 2006"
++
++.SH NAME
++service \- run a System V init script
++
++.SH SYNOPSIS
++\fBservice\fR \fISCRIPT\fR \fICOMMAND\fR [\fIOPTIONS\fR]
++
++\fBservice \-\-status\-all\fR
++
++\fBservice\fR \fB\-\-help\fR | \fB\-h\fR | \fB\-\-version\fR
++
++.SH DESCRIPTION
++.B service
++runs a System V init script or upstart job in as predictable environment as possible,
++removing most environment variables
++and with current working directory set to \fB/\fR.
++
++The
++.I SCRIPT
++parameter specifies a System V init script,
++located in \fB/etc/init.d/\fISCRIPT\fR, or the name of an upstart job in /etc/init. The existence of an upstart job of the same name as a script in /etc/init.d will cause the upstart job to take precedence over the init.d script.
++The supported values of
++.I COMMAND
++depend on the invoked script,
++.B service
++passes
++.I COMMAND
++and
++.I OPTIONS
++to the init script unmodified. For upstart jobs, start, stop, status, are passed through to their upstart equivilents. Restart will call the upstart 'stop' for the job, followed immediately by the 'start', and will exit with the return code of the start command.
++All scripts should support at least the
++.B start
++and
++.B stop
++commands.
++As a special case, if
++.I COMMAND
++is \fB\-\-full-restart\fR, the script is run twice, first with the
++.B stop
++command, then with the
++.B start
++command. This option has no effect on upstart jobs.
++
++.B service \-\-status\-all
++runs all init scripts, in alphabetical order, with the
++.B status
++command. This option only calls status for sysvinit jobs, upstart jobs can be queried in a similar manner with \fBinitctl list\fR'.
++
++.SH EXIT CODES
++.BR service
++calls the init script and returns the status returned by it.
++
++.SH FILES
++.TP
++\fB/etc/init.d\fR
++The directory containing System V init scripts.
++.TP
++\fB/etc/init\fR
++The directory containing upstart jobs.
++
++.SH ENVIRONMENT
++.TP
++\fBLANG\fR, \fBTERM\fR
++The only environment variables passed to the init scripts.
++
++.SH SEE ALSO
++.IR /etc/init.d/skeleton ,
++.br
++.BR update\-rc.d (8),
++.br
++.BR init (8),
++.br
++.BR invoke\-rc.d (8).
++.br
++.BR initctl (8).
+-- 
+1.7.4
+

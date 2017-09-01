@@ -1,0 +1,35 @@
+From 64ff8073139a56c9574c72d54689f34722c6e1c8 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Fri, 2 Dec 2016 11:43:25 +0800
+Subject: [PATCH] posix: skip the test pthread_barrier_destroy_2-1
+
+After glibc-2.23, the algorithm of pthread_barrier_destroy is changed,
+destroying a barrier is only allowed if no thread is blocked on it,
+so the test pthread_barrier_destroy_2-1 becomes invalid, just skip it
+since we are using glibc-2.24 in oe-core.
+
+Upstream-Status: Inappropriate [WR specific]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ testcases/open_posix_testsuite/wrLinux_posix/skiptest/common | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/testcases/open_posix_testsuite/wrLinux_posix/skiptest/common b/testcases/open_posix_testsuite/wrLinux_posix/skiptest/common
+index 539fb0d..9e0f0a9 100644
+--- a/testcases/open_posix_testsuite/wrLinux_posix/skiptest/common
++++ b/testcases/open_posix_testsuite/wrLinux_posix/skiptest/common
+@@ -34,6 +34,10 @@ The implementation of test case is NOT compatible to the preempt-rt kernel and s
+ #cgl conformance/interfaces/pthread_create pthread_create_1-6.run-test | Not a bug. Test case is NOT compatible to the cgl kernel
+ The implementation of test case is NOT compatible to the cgl kernel and system will hang during test execution.
+ 
++#cgl conformance/interfaces/pthread_barrier_destroy pthread_barrier_destroy_2-1.run-test | The case becomes invalid after glibc-2.23
++#preempt-rt conformance/interfaces/pthread_barrier_destroy pthread_barrier_destroy_2-1.run-test | The case becomes invalid after glibc-2.23
++#std conformance/interfaces/pthread_barrier_destroy pthread_barrier_destroy_2-1.run-test | The case becomes invalid after glibc-2.23
++#tiny conformance/interfaces/pthread_barrier_destroy pthread_barrier_destroy_2-1.run-test | The case becomes invalid after glibc-2.23
+ 
+ Test Suit -- conformance/interfaces MSG
+ ---------------------------------------
+-- 
+1.8.5.2
+

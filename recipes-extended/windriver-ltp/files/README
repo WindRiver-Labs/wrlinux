@@ -1,0 +1,479 @@
+
+Wind River Linux LTP & POSIX Testing
+=======================================
+
+Table of Contents
+-----------------
+1 Introduction
+    1.1 Purpose of this document
+    1.2 Feedback and corrections
+
+2 The overview of ltp package
+    2.1 The components of ltp package
+    2.2 Configure project with ltp package
+
+3 wrLtp and wrPosix test getting started
+    3.1 wrLtp test getting started
+    3.2 wrPosix test getting started
+
+4 wrLtp directory Layout and Usage
+    4.1 The layout of wrLtp directory
+    4.2 wrLtp runtime testing directory
+    4.3 wrLtp test knowledge base
+    4.4 LTP test results directory
+    4.5 Continue the remaining LTP test after rebooting
+    4.6 Skip LTP stress test cases
+
+5 wrPosix directory Layout and Usage
+    5.1 The layout of wrPosix directory
+    5.2 wrPosix execution script wr-runltp
+    5.3 wrPosix runtime testing directory
+    5.4 wrPosix test knowledge base
+    5.5 POSIX test results directory
+    5.6 Continue the remaining POSIX test after rebooting
+
+1 Introduction
+
+    1.1 Purpose of This Document
+---------------------------------
+
+This document intends to give a high level overview about the desin thought,
+project structure and usage of Wind River Linux LTP and POSIX test tools, also
+known as wrLtp and wrPosix.
+
+In this document, LTP refer to the linux ltp test suite and POSIX refer to the
+open posix testsuite. LTP and POSIX are released in the same LTP distribution by
+Linux Test Project.
+
+The detailed discussion about LTP and POSIX themselves is out of the scope of this
+document. Please refer to LTP homepage http://ltp.sourceforge.net.
+
+    1.2 Feedback and Corrections
+---------------------------------
+
+In order to make this document more user-friendly, any form of feedback is
+greatly appreciated. Feel free to e-mail support@windriver.com, or contact
+your support representative to point out any mistake in this document or
+contribute additional information.
+
+
+2 The overview of wrLtp and wrPosix
+
+    2.1 The components of ltp package
+-------------------------------------
+
+    * ltp package in wrLinux DVD
+
+The ltp package in wrlinux DVD is made of local mirror LTP git repository and
+bitbake recipe windriver-ltp.
+
+The LTP git repository is located in:
+git/github.com.linux-test-project.ltp.git
+
+The ltp recipe is located in:
+layers/oe-core/meta/recipes-extended/ltp
+
+The ltp bbappend file is located in:
+wr-base/recipes-extended/windriver-ltp
+
+
+    * ltp package in wrLinux project
+
+In wrLinux project, ltp package is made of LTP, wrLtp, POSIX and wrPosix.
+All these components are placed under <Path to wrLinux project>/build/ltp/git/
+
+    2.2 Configure project with ltp package
+------------------------------------------
+
+To build ltp package , you need to configure wrLinux project with --enable-test.
+
+
+3 wrLtp and wrPosix test getting started
+
+    3.1 wrLtp test getting started
+----------------------------------
+
+Script runltp is used to execute LTP test. Script wr-runltp is a wrapper of
+runltp and used by wrLtp to create a automated test execution and analysis
+environment.
+
+Here list all the available methods wr-runltp offers to run LTP test. For the
+detailed info about each method, please refer to chapter wrLtp directory Layout
+and Usage.
+
+    * LTP scenario groups
+
+A scenario group in LTP, such as syscalls or mm, refers to a set of test cases
+focusing on a particular feature of linux. Each scenario group has a command
+file placed under /opt/ltp/runtest/ on runtime target. These files are used by
+wr-runltp as well as runltp to launch LTP test.
+
+By default, the wr-runltp execute the following scenario groups:
+
+-syscalls
+-fs
+-fs_perms_simple
+-fsx
+-dio
+-io
+-mm
+-ipc
+-sched
+-math
+-nptl
+-pty
+-containers
+-fs_bind
+-filecaps
+-cap_bounds
+-fcntl-locktests
+-connectors
+-admin_tools
+-timers
+-commands
+-hyperthreading
+-kernel_misc
+-modules
+
+The following scenario groups depends on special linux kernel option or/and
+hardware environment. You can execute each one separately when the corresponding
+kenel option is enabled
+
+-hugetlb
+-controllers
+-cpuhotplug
+-numa
+-power_management_tests
+-fs_ext4
+
+Please refer to the linux kernel documentation if you have any question about
+how to enable linux kernel option for any kernel feature.
+
+    * LTP test case
+
+On runtime target, LTP test case is placed under /opt/ltp/testcases/bin/. Each
+test case is executed according to the test command line from the command file
+of each scenario group.
+
+    * Run LTP test based on default scenario group list defined in wr-runltp
+
+On runtime target, execute:
+#/opt/ltp/wrLinux_ltp/wr-runltp
+
+    * Run selected command file of scenario group under /opt/ltp/runtest/
+
+On runtime target, execute:
+#/opt/ltp/wrLinux_ltp/wr-runltp -f group1,group2
+
+    * Run selected test case based on the command line defined in command file
+of a scenario group
+
+On runtime target, execute:
+#/opt/ltp/wrLinux_ltp/wr-runltp -f group -s case
+
+    * Resume LTP test from last unfinished execution
+
+On runtime target, execute:
+#/opt/ltp/wrLinux_ltp/wr-runltp -R
+
+    3.2 wrPosix test getting started
+------------------------------------
+
+Script run-tests.sh is used to execute POSIX test. Same with wr-runltp, script
+wr-runposix is a wrapper of run-tests.sh and used by wrPosix in test automation.
+
+Here list all the available methods wr-runposix offers to run test case in open
+posix testsuite. For the detailed info about each method, please refer to the
+chapters wrPosix directory Layout and Usage.
+
+NOTE: The same with POSIX execution script run-posix-option-group-test.sh,
+script wr-runposix only support to run the test cases of POSIX under
+/opt/open_posix_testsuite/conformance/interfaces/
+
+    * scenario group, test suite and test case in POSIX
+
+A scenario group in POSIX, such as AIO or SIG, refers to a set of
+test suites. By default, the wr-runposix execute the following scenario groups:
+
+-AIO
+-MEM
+-MSG
+-SEM
+-SIG
+-THR
+-TMR
+-TPS
+
+A test suite includes a group of test cases focusing on one particular linux
+feature. Each test suite is executed accroding to the command line defined by
+the file run.sh under each suite folder. All conformance interface test suites
+are placed under /opt/open_posix_testsuite/conformance/interfaces/. Please refer
+to the wr-runposix for the test suite list of each scenario group.
+
+Each test case is named with index number such as 1-1.run-test. Therefore the
+test cae without the name of test suite is meaningless.
+
+    * Run test case based on default scenario group list defined in wr-runposix
+
+On runtime target, execute:
+#/opt/open_posix_testsuite/wrLinux_posix/wr-runposix
+
+    * Run selected scenario group :
+
+On runtime target, execute:
+#/opt/open_posix_testsuite/wrLinux_posix/wr-runposix -f group1,group2
+
+    * Run selected test suite:
+
+On runtime target, execute:
+#/opt/open_posix_testsuite/wrLinux_posix/wr-runposix -s suite1,suite2
+
+    * Run selected test case:
+On runtime target, execute:
+#/opt/open_posix_testsuite/wrLinux_posix/wr-runposix -s suite1 -t testcase1,testcase2
+
+Note: The selected test cases must be under the same test suite at one POSIX
+test execution.
+
+
+4 wrLtp Directory Layout and Usage
+
+The wrLtp include script wr-runltp and test knowledge base. In wrLinux project,
+they are placed under <Path to wrLinux project>/build/ltp-git-<version>/git/wrLinux_ltp.
+On runtime target, you can find them under /opt/ltp/wrLinux_ltp/.
+
+    4.1 The layout of wrLtp directory
+-------------------------------------
+
+The wrLtp directory is placed under LTP directory to hold wr-runltp and wrLtp
+test knowledge base. Directory runtime and results are created by wr-runltp at
+runtime target.
+
+	    /opt/ltp/wrLinux_ltp/
+				|
+				|__wr-runltp
+				|__runtime/
+				|    |
+				|    |__runtime.log
+				|    |__Ltp_console_output.log
+				|    |__runtime.skip
+				|    |__skipfile
+				|    \__testfile
+				|
+				|__skiptest/
+				|    |
+				|    \__stress
+				|
+				|__failtest/
+				|    |
+				|    |__common
+				|    |__ppc
+				|    |__arm
+				|    \__mips
+				|
+				|__results/
+				|    |__LTP_RUN_ON-*.log
+				|    |__failtest-*.report
+				|    \__skiptest-*.report
+
+
+    4.2 wrLtp runtime testing directory
+---------------------------------------
+
+Directory runtime is created by wr-runltp on test execution. 
+
+File runtime.log hold the test result of each case and the summary of whole
+LTP test.
+
+File testfile hold the LTP test case list which will be run on the current LTP
+test execution.
+
+File runtime.skip and skipfile are created by wr-runltp when the file testfile
+includes skipped test case on runtime target. These two files are used to record
+the test case which will not be executed. The file skipfile records the skipped
+test case with skip reason.
+
+File Ltp_console_output.log recored output of target console during LTP test.
+
+    4.3 wrLtp test knowledge base
+---------------------------------
+
+Directory skiptest and failtest under /opt/ltp/wrLinux_ltp/ are referred as
+test knowledge base in the rest of this document.
+
+Knowledge base skiptest include the non-supported test case and skip reason.
+Knowledge base failtest include failure analysis about known failed test case.
+
+Based on test knowledge base, wr-runltp skips non-supported case and create
+failure analysis report in the end of LTP test.
+
+    * wrLtp test knowledge base skiptest
+
+LTP execution script runtlp use "-S SKIPFILE" option to specify the skip file.
+Based on knowledge base skiptest, runtime.skip are created by wr-runltp at
+runtime target and passed to runltp as option "-S runtime.skip".
+
+At the end of LTP test, skiptest report is created by wr-runltp based on runtime
+log file skipfile. The skipped test case is followed by a brief skip reason.
+Detailed skip reason is recored in knowledge base file which is categorized by
+processor architecture.
+
+    * wrLtp test knowledge base failtest
+
+At the end of LTP test, failtest report is created by wr-runltp based on runtime
+log file runtime.log and knowledge base failtest. The failed test case with known
+reason is followed by a brief failure analysis. Detailed fail reason is recored
+in knowledge base files.
+
+The knowledge base includes file common with result analysis of general failure
+and files named after the name of processor architecture for architecture special
+failure.
+
+    4.4 LTP test results directory
+----------------------------------
+
+LTP results directory include LTP execution report, skipped test report and failed
+test report. These reports are created by wr-runltp and placed under
+/opt/ltp/wrLinux_ltp/results/.
+
+LTP Execution report prefixed by LTP_RUN_ON is created at the end of LTP test.
+The wr-runltp will not create this report when execute the single test case.
+The output of target console is clear enough to get the result of single case.
+
+File skiptest and failtest are created only when there is skipped test case or
+failed test case on that LTP test execution.
+
+    4.5 Continue the remaining LTP test after rebooting
+-------------------------------------------------------
+
+Sometimes, the Linux system will hang or crash when executing some LTP test case.
+In order to save time, it is necessary to continue the remaining LTP test after
+system rebooting. It is a brand new function introduced by wr-runltp.
+
+By default, wr-runltp will start a new LTP execution. With the option "-R",
+wr-runltp will resume the LTP test based on the previous LTP result. Use of
+parameter "-R" can protect a new LTP execution from getting disturbed by the
+previous obsolete LTP test result.
+
+Please don't use -f or -s option to tell wr-runltp which test case should be
+resumed. The wr-runltp will resume from last LTP execution as if it has never
+breaked up.
+
+It is notable that the last test case, which caused system hang or crash but has
+not been recorded in the test log, will be marked "system panic" in the runtime
+file skipfile and skipped in the following LTP execution.
+
+    4.6 Skip LTP stress test cases
+----------------------------------
+
+The file system and memory stress test cases are listed in the test knowledge
+base skiptest/stress and skipped by wrLtp by default.
+
+The memory stress test are not suitable for the embedded targets, which have less
+than 256M memory, and the filesystem stress test are not suitable for NFS deploy
+environment of automation test.
+
+The execution of skipped LTP stress test will be added in kernel stress test plan,
+which will set the test environment more properly.
+
+The LTP stress test case can be executed using the option "-P" as follows:
+
+#/opt/ltp/wrLinux_ltp/wr-runltp -P
+
+
+5 wrPosix Directory Layout and Usage
+
+The wrPosix include script wr-runposix and test knowledge base.
+
+In wrLinux project, they are placed under
+<wrLinux project>/build/ltp-git-<version>/git/testcases/open_posix_testsuite/wrLinux_posix
+
+In runtime target, they are placed under /opt/open_posix_testsuite/wrLinux_posix
+
+    5.1 The layout of wrPosix directory
+---------------------------------------
+
+The wrPosix directory is placed under open posix suite directory to hold
+wr-runposix and wrPosix test knowledge base. Directory runtime and results are
+created by wr-runposix at runtime target.
+
+open_posix_testsuite/wrLinux_posix/
+				|
+				|__wr-runposix
+				|
+				|__failtest/
+				|    |__common
+				|
+				|__runtime/
+				|    |
+				|    |__runtime.log
+				|    \__testfile
+				|
+				|__results/
+				     |__POSIX_RUN_ON-*.log
+				     \__failtest-*.log
+
+    5.2 wrPosix execution script wr-runposix
+--------------------------------------------
+
+By default, POSIX has its wrapper script to invoke run-test.sh,
+run-posix-option-group-test.sh and run-all-posix-option-group-tests.sh.
+
+As a wrapper of run-tests.sh, script wr-runposix is used by wrPosix to give more
+flexibility to POSIX automation test, such as run selected test suite, test case
+or resume unfinished POSIX test.
+
+    5.3 wrPosix runtime testing directory
+-----------------------------------------
+Directory runtime is created by wr-runPosix on test execution. This directory
+works in the same way as wrLtp.
+
+    5.4 wrPosix test knowledge base
+-----------------------------------
+There is no skipped POSIX test, therefore only knowledge base
+failtest record the known failed test case and failure reason. The knowledge base
+failtest works in the same way as wrLtp.
+
+    5.5 POSIX test results directory
+------------------------------------
+
+POSIX results directory include POSIX test report and failed test report. These
+reports are created by wr-runposix and placed under
+/opt/open_posix_testsuite/wrLinux_posix/results/.
+
+From POSIX file Documentation/HOWTO_ResultCodes, we can see that the
+PTS (Posix Test Suite) result codes are:
+
+#define PTS_PASS        0
+#define PTS_FAIL        1
+#define PTS_UNRESOLVED  2
+#define PTS_UNSUPPORTED 4
+#define PTS_UNTESTED    5
+
+A brief explanation of each of these follows:
+
+PTS_PASS        Used when the test executes fully with no problems and passes.
+PTS_FAIL        Used when the test executes fully, but fails.
+PTS_UNRESOLVED  Used when the test was blocked from fully completing and
+		the pass/failure results cannot be determined.
+PTS_UNSUPPORTED	Used if the test is for a conditional feature that is
+		not implemented.
+PTS_UNTESTED	Used when a feature does not have a test associated
+		with it because:
+		- The test is just a stub and doesn't do anything
+		- The test is only partially complete and can't really 
+		  finish the test
+		- The test is complete in some cases, but certain things 
+		  can happen that leave the test incomplete.  When these
+		  happen, it's PTP_UNTESTED.
+
+HUNG is another test result in POSIX test log and indicate the timeout of POSIX
+test case.
+
+The test case which is marked as FAIL, HUNG or UNRESOLVED is taken as failed
+test case and recoreded in the failed test report.
+
+    5.6 Continue the remaining POSIX test after rebooting
+---------------------------------------------------------
+The resume function works in the same way as wrLtp.
+

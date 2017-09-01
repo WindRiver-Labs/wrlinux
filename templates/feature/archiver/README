@@ -1,0 +1,74 @@
+This template adds an additional step to recipe building. It creates
+archive for the sources of:
+ 1) original (or unpacked) source: ARCHIVER_MODE[src] = "original" (default)
+    It also includes the original patch files, but the tar ball contains
+    patches between do_unpack and do_patch no longer provided.
+    In this situation ARCHIVER_MODE[diff] = "1" doesn't work.
+ 2) patched source: ARCHIVER_MODE[src] = "patched"
+ 3) configured source: ARCHIVER_MODE[src] = "configured"
+ 4) The patches between do_unpack and do_patch:
+    ARCHIVER_MODE[diff] = "1"
+    And you can set the one that you'd like to exclude from the diff:
+    ARCHIVER_MODE[diff-exclude] ?= ".pc autom4te.cache patches"
+ 5) The environment data, similar to 'bitbake -e recipe':
+    ARCHIVER_MODE[dumpdata] = "1"
+ 6) The recipe (.bb and .inc): ARCHIVER_MODE[recipe] = "1"
+ 7) Whether output the .src.rpm package:
+    ARCHIVER_MODE[srpm] = "1"
+ 8) Filter the license, the recipe whose license in
+    COPYLEFT_LICENSE_INCLUDE will be included, and in
+    COPYLEFT_LICENSE_EXCLUDE will be excluded.
+    COPYLEFT_LICENSE_INCLUDE = 'GPL* LGPL*'
+    COPYLEFT_LICENSE_EXCLUDE = 'CLOSED Proprietary'
+ 9) The recipe type that will be archived:
+    COPYLEFT_RECIPE_TYPES = 'target'
+
+Example:
+1. To use this template, add "--templates feature/archiver" to your
+   setup options:
+$ wrlinux-x/setup.sh --machine qemux86-64 \
+ --kernel standard \
+ --templates feature/archiver
+$ add PARALLEL_MAKE = "-j 8" to local.conf
+
+2. Build a package, such as 'bash':
+$ bitbake bash
+
+3. The result is copyed to export/sources or tmp/deploy/sources dir:
+$ ls export/sources/x86_64-wrs-linux/bash-4.2-r7/ -al
+total 6928
+drwxrwxr-x 2 jiahongxu jiahongxu    4096 May 18 18:34 .
+drwxrwxr-x 3 jiahongxu jiahongxu    4096 May 18 18:34 ..
+-rw-rw-r-- 2 jiahongxu jiahongxu    2944 May 18 18:34 bash42-001
+-rw-rw-r-- 2 jiahongxu jiahongxu    1780 May 18 18:34 bash42-002
+-rw-rw-r-- 2 jiahongxu jiahongxu    6896 May 18 18:34 bash42-003
+-rw-rw-r-- 2 jiahongxu jiahongxu    1686 May 18 18:34 bash42-004
+-rw-rw-r-- 2 jiahongxu jiahongxu    3424 May 18 18:34 bash42-005
+-rw-rw-r-- 2 jiahongxu jiahongxu    1187 May 18 18:34 bash42-006
+-rw-rw-r-- 2 jiahongxu jiahongxu    1394 May 18 18:34 bash42-007
+-rw-rw-r-- 2 jiahongxu jiahongxu    2164 May 18 18:34 bash42-008
+-rw-rw-r-- 2 jiahongxu jiahongxu    2384 May 18 18:34 bash42-009
+-rw-rw-r-- 2 jiahongxu jiahongxu    1818 May 18 18:34 bash42-010
+-rw-rw-r-- 2 jiahongxu jiahongxu 7009201 May 18 18:34 bash-4.2.tar.gz
+-rw-rw-r-- 2 jiahongxu jiahongxu    1331 May 18 18:34 bash-fix-error-path-of-getc_with_restart.patch
+-rw-rw-r-- 2 jiahongxu jiahongxu    1557 May 18 18:34 build-tests.patch
+-rw-rw-r-- 2 jiahongxu jiahongxu     656 May 18 18:34 execute_cmd.patch
+-rw-rw-r-- 2 jiahongxu jiahongxu     958 May 18 18:34 mkbuiltins_have_stringize.patch
+-rw-rw-r-- 2 jiahongxu jiahongxu      56 May 18 18:34 run-ptest
+-rw-rw-r-- 2 jiahongxu jiahongxu     303 May 18 18:34 series
+-rw-rw-r-- 2 jiahongxu jiahongxu     594 May 18 18:34 test-output.patch
+
+4. Append ARCHIVER_MODE[src] = "configured" and
+   ARCHIVER_MODE[diff] = "1" to local.conf
+
+5. Rebuild 'bash':
+$ bitbake bash -ccleansstate && bitbake bash
+
+6. Check result:
+$ ls export/sources/x86_64-wrs-linux/bash-4.2-r7/ -al
+total 7736
+drwxrwxr-x 2 jiahongxu jiahongxu    4096 May 19 10:05 .
+drwxrwxr-x 3 jiahongxu jiahongxu    4096 May 19 10:04 ..
+-rw-rw-r-- 2 jiahongxu jiahongxu 7902096 May 19 10:05 bash-4.2-r7-configured.tar.gz
+-rw-rw-r-- 2 jiahongxu jiahongxu    5411 May 19 10:04 bash-4.2-r7-diff.gz
+

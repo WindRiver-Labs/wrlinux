@@ -1,0 +1,2 @@
+This template is for the sole purpose of ensuring that gdb is
+installed on the target filesystem.

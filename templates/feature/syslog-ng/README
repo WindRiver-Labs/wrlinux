@@ -1,0 +1,7 @@
+This template sets syslog-ng as the default system log daemons.
+
+To use, add
+
+--templates feature/syslog-ng
+
+as a configure option.

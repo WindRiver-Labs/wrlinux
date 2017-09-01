@@ -1,0 +1,41 @@
+Don't abort if ppc instruction and data cache lines size differ
+
+The vg_assert, which is unconditional, aborts valgrind for ppc32 linux
+targets when the instruction and data cache lines sizes differ as with
+the lsi-acp34xx bsp.  The original code comment regarding issues with
+stack scanning logic seems to apply only to the valgrind 'cachegrind'
+tool. Regression testing this bsp with memcheck, massif, and helgrind
+had very successful results with no more failures than other bsps.
+
+For this bsp cachegrind fails regression tests, but as with other core
+variants with problem commonents, this failure is reported via the
+command:
+   valgrind --wrs-problematic-components
+as well as in the workbench interface dialogs that launch valgrind
+plugins.
+
+Signed-off-by: Dave Lerner <dave.lerner@windriver.com>
+---
+ coregrind/m_machine.c | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/coregrind/m_machine.c b/coregrind/m_machine.c
+index 42d8ce8..ed438d8 100644
+--- a/coregrind/m_machine.c
++++ b/coregrind/m_machine.c
+@@ -1615,12 +1615,6 @@ void VG_(machine_ppc32_set_clszB)( Int szB )
+ {
+    vg_assert(hwcaps_done);
+ 
+-   /* Either the value must not have been set yet (zero) or we can
+-      tolerate it being set to the same value multiple times, as the
+-      stack scanning logic in m_main is a bit stupid. */
+-   vg_assert(vai.ppc_icache_line_szB == 0
+-             || vai.ppc_icache_line_szB == szB);
+-
+    vg_assert(szB == 16 || szB == 32 || szB == 64 || szB == 128);
+    vai.ppc_icache_line_szB = szB;
+ }
+-- 
+1.9.1
+

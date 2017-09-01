@@ -1,0 +1,46 @@
+From 10ecc386dc9e8aec697f782473b71fd6702e849c Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Mon, 15 Apr 2013 17:12:26 +0800
+Subject: [PATCH] nfs-utils: support mountprog and nfsprog options
+
+Add back the support for mountprog and nfsprog options since they
+are supported by our kernel NFS client.
+
+Upstream-status: Inappropriate
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ utils/mount/stropts.c |   10 ----------
+ 1 files changed, 0 insertions(+), 10 deletions(-)
+
+diff --git a/utils/mount/stropts.c b/utils/mount/stropts.c
+index 50a1a2a..e14a68a 100644
+--- a/utils/mount/stropts.c
++++ b/utils/mount/stropts.c
+@@ -415,9 +415,6 @@ static int nfs_construct_new_options(struct mount_options *options,
+ 	char new_option[64];
+ 	char *netid;
+ 
+-	po_remove_all(options, "nfsprog");
+-	po_remove_all(options, "mountprog");
+-
+ 	po_remove_all(options, "v2");
+ 	po_remove_all(options, "v3");
+ 	po_remove_all(options, "vers");
+@@ -523,13 +520,6 @@ nfs_rewrite_pmap_mount_options(struct mount_options *options)
+ 		return 0;
+ 	}
+ 
+-	/*
+-	 * The kernel NFS client doesn't support changing the RPC
+-	 * program number for these services, so force the value of
+-	 * these fields before probing the server's ports.
+-	 */
+-	nfs_pmap.pm_prog = NFS_PROGRAM;
+-	mnt_pmap.pm_prog = MOUNTPROG;
+ 
+ 	/*
+ 	 * If the server's rpcbind service isn't available, we can't
+-- 
+1.7.4.1
+

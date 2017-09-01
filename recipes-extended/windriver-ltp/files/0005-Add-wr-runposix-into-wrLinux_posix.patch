@@ -1,0 +1,506 @@
+From 22f01e8ad56397f5561dead71055a0e2d99e57be Mon Sep 17 00:00:00 2001
+From: Jin Li <jin.li@windriver.com>
+Date: Wed, 3 Sep 2014 06:44:30 +0800
+Subject: [PATCH 05/15] Add wr-runposix into wrLinux_posix
+
+Upstream-Status: Inappropriate [WR Linux specific change]
+
+The wr-runposix is a wrapper of Posix execution script run-tests.sh.
+
+The wr-runposix is created to give more flexibility to Posix automation test
+such as running selected test case or resume unfinished Posix test.
+
+Enhanced Function:
+
+1. Run selected test suite
+2. Run selected test case
+
+Signed-off-by: Jin Li <jin.li@windriver.com>
+---
+ .../open_posix_testsuite/wrLinux_posix/wr-runposix | 474 +++++++++++++++++++++
+ 1 file changed, 474 insertions(+)
+ create mode 100644 testcases/open_posix_testsuite/wrLinux_posix/wr-runposix
+
+diff --git a/testcases/open_posix_testsuite/wrLinux_posix/wr-runposix b/testcases/open_posix_testsuite/wrLinux_posix/wr-runposix
+new file mode 100644
+index 0000000..cc6eb1e
+--- /dev/null
++++ b/testcases/open_posix_testsuite/wrLinux_posix/wr-runposix
+@@ -0,0 +1,474 @@
++#! /bin/sh
++
++# Copyright (c) 2012 Wind River Systems, Inc.
++#
++# The right to copy, distribute, modify, or otherwise make use
++# of this software may be licensed only pursuant to the terms
++# of an applicable Wind River license agreement.
++
++# Set up the proper environment for test environment
++
++cd `dirname $0` || \
++{
++    echo "FATAL: unable to change directory to $(dirname $0)"
++    exit 1
++}
++export WRPOSIXROOT=${PWD}
++export POSIXROOT=$(dirname $WRPOSIXROOT)
++binary_name=$(basename $0)
++
++BASEDIR="$POSIXROOT/conformance/interfaces"
++EXECUTION_TIME=`date +"%Y_%b_%d-%Hh_%Mm_%Ss"`
++START_TIME=`date`
++LOGPATH="$WRPOSIXROOT/results"
++SKIP_PATH="$WRPOSIXROOT/skiptest"
++FAIL_PATH="$WRPOSIXROOT/failtest"
++RUNTIME_PATH="$WRPOSIXROOT/runtime"
++RUNTIME_TMP_PATH=/tmp
++
++POSIX_LOGFILE="$LOGPATH/POSIX_RUN_ON-$EXECUTION_TIME.log"
++TESTLOG="$LOGPATH/POSIX.log"
++RUNTIME_SKIPFILE="$RUNTIME_PATH/runtime.skip"
++RUNTIME_LOGFILE="$RUNTIME_PATH/runtime.log"
++RESUME_LOGFILE="$RUNTIME_PATH/resume.log"
++SKIPTEST="$RUNTIME_PATH/skiptest"
++FAIL_REPORT="$RUNTIME_PATH/failtest.report"
++SKIP_REPORT="$RUNTIME_PATH/skiptest.report"
++
++tmpfile="$RUNTIME_TMP_PATH/posix_tmp"
++RUNTIME_TESTFILE="$RUNTIME_PATH/testfile"
++
++SCENARIO_GROUP_LIST="AIO,MEM,MSG,SEM,SIG,THR,TMR,TPS"
++TESTSUITE_LIST=""
++KERNEL_ARCH="std"
++
++RUN_SELECTED_SUITE=0
++RUN_SELECTED_CASE=0
++RUN_RESUME_TEST=0
++RIGHT_SUITE=0
++UNKNOWN_FAILURE=0
++KNOWN_FAILURE=0
++
++usage()
++{
++    cat <<EOF
++
++    Usage:         $(basename "$0") [ -f group ] [ -s suite [-t case] ] -R -h
++
++-f group1,group2   Scenario group such as AIO,MEM,MSG,SEM,SIG,THR,TMR,TPS
++-s suite1,suit2    Test suite under conformance/interfaces/
++-t test1,test2     Test case in the selected test suite
++-h                 Help. Prints all available options.
++-R                 Continue the remaining POSIX test after rebooting
++
++    Note:          Only one test suite under conformance/interfaces/ can be
++                   selected when specail test is specified with the "-t" option
++EOF
++}
++
++# Check the input parameter
++check()
++{
++    echo "[$binary_name] Checking POSIX test plan...."
++    if [ "$RUN_SELECTED_SUITE" -eq 1 ];then
++        for suite in `echo $TESTSUITE_LIST |  tr ',' ' '`; do
++            ls $BASEDIR/$suite 2>/dev/null | grep "run.sh" >/dev/null 2>&1 || {
++                echo "FATAL: unknown test suite name $suite"
++                exit 1
++            }
++        done
++    fi
++
++    if [ "$RUN_SELECTED_SUITE" -eq 0 -a "$RUN_SELECTED_CASE" -eq 1 ];then
++            echo "FATAL: test suite name must be set before test case name"
++            usage
++            exit 1
++    fi
++
++    if [ "$RUN_SELECTED_SUITE" -eq 1 -a "$RUN_SELECTED_CASE" -eq 1 ];then
++        if echo $TESTSUITE_LIST | grep -q "," ; then
++            echo "FATAL: can only run selected test case under one test suite"
++            usage
++            exit 1
++        fi
++    fi
++    echo "[$binary_name] POSIX test plan check pass"
++}
++
++# Create WRPOSIX runtime environment
++setup()
++{
++
++    [ -d "$RUNTIME_PATH" ] || mkdir $RUNTIME_PATH
++    [ -d "$LOGPATH" ] || mkdir $LOGPATH
++
++    uname -r | grep -q "preempt-rt$" && KERNEL_ARCH=preempt-rt
++    uname -r | grep -q "cgl$" && KERNEL_ARCH=cgl
++
++    # lengthen the value of timeout when run POSIX on QEMU BSP
++    if uname -a | grep qemu ;then
++        export TIMEOUT_VAL=1200
++    fi
++
++    # Create runtime test suite list based on scenario group list
++
++if [ "$RUN_RESUME_TEST" -eq 0 ]; then
++
++    # Before start a fresh POSIX execution, delete the obsolete runtime file
++    [ -f "$RUNTIME_LOGFILE" ] && rm $RUNTIME_LOGFILE
++    [ -f "$RESUME_LOGFILE" ] && rm $RESUME_LOGFILE
++    [ -f "$RUNTIME_SKIPFILE" ] && rm $RUNTIME_SKIPFILE
++    [ -f "$RUNTIME_TESTFILE" ] && {
++        rm $RUNTIME_TESTFILE || echo "Fail to delete obsolete testfile"
++    }
++    [ -f "$SKIPTEST" ] && rm $SKIPTEST
++    [ -f "$SKIP_REPORT" ] && rm $SKIP_REPORT
++    [ -f "$FAIL_REPORT" ] && rm $FAIL_REPORT
++
++    if [ "$RUN_SELECTED_SUITE" -eq 0 ]; then
++
++        for group in `echo "$SCENARIO_GROUP_LIST" | tr ',' ' '`; do
++
++            case $group in
++            AIO)
++                TESTSUITE_LIST="$TESTSUITE_LIST $BASEDIR/aio_*"
++                TESTSUITE_LIST="$TESTSUITE_LIST $BASEDIR/lio_listio"
++                TESTSUITE_LIST="$TESTSUITE_LIST $BASEDIR/fsync"
++                ;;
++            SIG)
++                TESTSUITE_LIST="$TESTSUITE_LIST $BASEDIR/sig*"
++                TESTSUITE_LIST="$TESTSUITE_LIST $BASEDIR/raise"
++                TESTSUITE_LIST="$TESTSUITE_LIST $BASEDIR/kill"
++                TESTSUITE_LIST="$TESTSUITE_LIST $BASEDIR/killpg"
++                TESTSUITE_LIST="$TESTSUITE_LIST $BASEDIR/pthread_kill"
++                TESTSUITE_LIST="$TESTSUITE_LIST $BASEDIR/pthread_sigmask"
++                ;;
++            SEM)
++                TESTSUITE_LIST="$TESTSUITE_LIST $BASEDIR/sem*"
++                ;;
++            THR)
++                TESTSUITE_LIST="$TESTSUITE_LIST $BASEDIR/pthread_*"
++                ;;
++            TMR)
++                TESTSUITE_LIST="$TESTSUITE_LIST $BASEDIR/time*"
++                TESTSUITE_LIST="$TESTSUITE_LIST $BASEDIR/*time"
++                TESTSUITE_LIST="$TESTSUITE_LIST $BASEDIR/clock*"
++                TESTSUITE_LIST="$TESTSUITE_LIST $BASEDIR/nanosleep"
++                ;;
++            MSG)
++                TESTSUITE_LIST="$TESTSUITE_LIST $BASEDIR/mq_*"
++                ;;
++            TPS)
++                TESTSUITE_LIST="$TESTSUITE_LIST $BASEDIR/*sched*"
++                TESTSUITE_LIST="$TESTSUITE_LIST $BASEDIR/fork"
++                TESTSUITE_LIST="$TESTSUITE_LIST $BASEDIR/getpid"
++                ;;
++            MEM)
++                TESTSUITE_LIST="$TESTSUITE_LIST $BASEDIR/m*lock*"
++                TESTSUITE_LIST="$TESTSUITE_LIST $BASEDIR/m*map"
++                TESTSUITE_LIST="$TESTSUITE_LIST $BASEDIR/shm_*"
++	        ;;
++            *)
++                echo "FATAL: unknown scenario group name $group"
++                usage
++                exit 1
++                ;;
++            esac
++        done
++    else
++        for suite in `echo "$TESTSUITE_LIST" | tr ',' ' '`; do
++            suite_list="$suite_list $BASEDIR/$suite"
++        done
++        TESTSUITE_LIST="$suite_list"
++    fi
++
++    # Create runtime test file based on test suite list
++    if [ "$RUN_SELECTED_CASE" -eq 0 ]; then
++    echo "[$binary_name] Creating POSIX test file..."
++
++        for suite in $TESTSUITE_LIST; do
++            for test_script in $(find $suite -name run.sh);do
++                for i in `seq $(cat $test_script | grep -v "^#" | xargs -n 1 | wc -l)`;do
++                    [ $i -gt 2 ] && \
++                    cat $test_script | awk "{print \$2,\$$i}" | \
++                    sed "/^ $/d" >> $RUNTIME_TESTFILE
++                done
++            done
++        done
++    else
++        TESTSUITE_LIST=$(echo $TESTSUITE_LIST | sed "s/\/opt\/open_posix_testsuite\///")
++        for testcase in `echo "$TESTCASE_LIST" | tr ',' ' '`; do
++            echo "$TESTSUITE_LIST $testcase" >> $RUNTIME_TESTFILE
++        done
++    fi
++    TESTSUITE_LIST=$(echo $TESTSUITE_LIST | sed "s/\/opt\/open_posix_testsuite\///")
++    echo "[$binary_name] POSIX test file creation pass"
++
++    # Create POSIX test plan when run selected test suite
++    echo "<<wr-runposix Test Plan>>"
++    if [ "$RUN_SELECTED_SUITE" -eq 0 ]; then
++        echo "POSIX scenario group list: $SCENARIO_GROUP_LIST"
++    else
++        echo "POSIX test suite list: $TESTSUITE_LIST"
++	[ "$RUN_SELECTED_CASE" -eq 1 ] && echo "POSIX test case list: $TESTCASE_LIST"
++    fi
++
++    # Filter the duplicated test case in test file.
++    sort -u $RUNTIME_TESTFILE -o $RUNTIME_TESTFILE
++
++    # Filter out the word "speculative" from test file.
++    sed -i "s/\/speculative//g" $RUNTIME_TESTFILE
++
++    # Create POSIX runtime skipped test file.
++    if [ -d $SKIP_PATH ];then
++        while read line
++        do
++            if echo $line | grep -E -q "^#std|^#$KERNEL_ARCH"; then
++                skip_suite=$(echo $line | awk '{print $2}')
++                skip_test=$(echo $line | awk '{print $3}')
++                skip_reason=$(echo $line | cut -d "|" -f 2)
++                if grep -q "^$skip_suite $skip_test" $RUNTIME_TESTFILE; then
++                    printf "%-60s %-20s %s \n" "$skip_suite $skip_test" SKIP "$skip_reason" >> $SKIPTEST
++                    echo "$skip_suite $skip_test" >> $RUNTIME_SKIPFILE
++                fi
++            fi
++        done < $SKIP_PATH/common
++    fi
++else
++    # When it is NOT a fresh POSIX execution, use the existing test file
++    echo "[$binary_name] To resume POSIX test execuion, use the existing test file"
++
++    if [ ! -f "$RUNTIME_LOGFILE" -o ! -f "$RUNTIME_TESTFILE" ]; then
++        echo "FATAL: There is NO enough runtime file to resume POSIX execution"
++        exit 1
++    fi
++
++    if grep "POSIX Test Finish" $RUNTIME_LOGFILE >/dev/null 2>&1; then
++        echo "FATAL: last POSIX execution has been finished."
++        exit 1
++    fi
++
++    # Find out the test case before system panic
++    lastlog=$(cat $RUNTIME_LOGFILE | grep "execution" | tail -n 1)
++    last_suite=$(echo "$lastlog" | awk '{print $1}' | awk -F"/" '{printf $3}')
++    last_subsuite=$(echo "$lastlog" | awk '{print $1}' | awk -F"/" '{printf $4}')
++    last_test=$(echo "$lastlog" | awk '{print $1}' | awk -F"/" '{printf $5}')
++
++    if [ -n "$last_test" ]; then
++        last_suite="$last_suite/$last_subsuite"
++    else
++        last_test="$last_subsuite"
++    fi
++    last_test=$(echo $last_test | tr -d ":")
++
++    # Find out the test case which make system panic
++    find_panic=0
++    while read line
++    do
++        [ "$find_panic" -eq 1 ] && break
++        echo $line | grep -q "$last_suite $last_test" && find_panic=1
++    done < $RUNTIME_TESTFILE
++    [ "$find_panic" -eq 0 ] && echo "fail to find panic test" && exit 1
++
++    panic_suite=$(echo "$line" | awk '{print $1}' | awk -F"/" '{printf $3}')
++    panic_subsuite=$(echo "$line" | awk '{print $1}' | awk -F"/" '{printf $4}')
++    panic_test=$(echo "$line" | awk '{print $2}')
++    [ -n "$panic_subsuite" ] && panic_suite="$panic_suite/$panic_subsuite"   
++
++    # Add finished test case to runtime skipped test file
++    testcase=$(echo "$panic_suite $panic_test" | sed 's#\/#\\\/#g')
++    cat $RUNTIME_TESTFILE | sed -n "1,/$testcase/p" >>  $RUNTIME_SKIPFILE
++
++    # Add panic test case to test skipped report
++    printf "%-60s %-20s %s \n" "$panic_suite $panic_test" SKIP "system panic" >> $SKIPTEST
++
++    # Back up the last rutime log as resume file
++    mv $RUNTIME_LOGFILE $RESUME_LOGFILE 
++
++fi
++
++    # Fliter out the skipped test case to create runtime test execution file
++    [ -f $RUNTIME_SKIPFILE ] && {
++        grep -v -f $RUNTIME_SKIPFILE $RUNTIME_TESTFILE > $tmpfile 2>/dev/null
++        mv $tmpfile $RUNTIME_TESTFILE
++    }
++}
++
++report()
++{
++
++    [ -f $RUNTIME_LOGFILE ] || exit 1
++
++    if [ "$RUN_RESUME_TEST" -eq 1  ]; then
++        cat $RUNTIME_LOGFILE >> $RESUME_LOGFILE
++	cp $RESUME_LOGFILE $RUNTIME_LOGFILE
++    fi
++
++    # Summarize POSIX test result
++
++    echo "<<wr-runposix Test Result>>"
++    pass_num=$(grep -c "execution: PASS" $RUNTIME_LOGFILE)
++    fail_num=$(grep -c "execution: FAILED" $RUNTIME_LOGFILE)
++    untested_num=$(grep -c "execution: UNTESTED" $RUNTIME_LOGFILE)
++    unresolved_num=$(grep -c "execution: UNRESOLVED" $RUNTIME_LOGFILE)
++    unsupported_num=$(grep -c "execution: UNSUPPORTED" $RUNTIME_LOGFILE)
++    hung_num=$(grep -c "execution: HUNG" $RUNTIME_LOGFILE)
++    skip_num=0
++    [ -e "$SKIPTEST" ] && skip_num=$(grep -c "SKIP" $SKIPTEST)
++
++    total_number=$(expr $pass_num + $fail_num + $untested_num + $unresolved_num + $unsupported_num + $hung_num + $skip_num)
++    hostname=$(hostname)
++    cpu_arch=$(uname -m)
++    kernel_version=$(uname -r)
++
++    echo "Total Tests: $total_number"             >> $RUNTIME_LOGFILE
++    echo "Total Pass: $pass_num"                  >> $RUNTIME_LOGFILE
++    echo "Total Fail: $fail_num"                  >> $RUNTIME_LOGFILE
++    echo "Total Untested: $untested_num"          >> $RUNTIME_LOGFILE
++    echo "Total Unresolved: $unresolved_num"      >> $RUNTIME_LOGFILE
++    echo "Total Unsupported: $unsupported_num"    >> $RUNTIME_LOGFILE
++    echo "Total Hung: $hung_num"                  >> $RUNTIME_LOGFILE
++    echo "Total Skip: $skip_num"                  >> $RUNTIME_LOGFILE
++    echo "Kernel Version: $kernel_version"        >> $RUNTIME_LOGFILE
++    echo "Machine Architecture: $cpu_arch"        >> $RUNTIME_LOGFILE
++    echo "Hostname: $hostname"                    >> $RUNTIME_LOGFILE
++
++
++    # Create formatted failed test report and detailed failure analysis
++
++if [ "$total_number" -gt 0 ]; then
++    if [ "$fail_num" -gt 0 -o "$unresolved_num" -gt 0 -o "$hung_num" -gt 0 ]; then
++
++        cat $RUNTIME_LOGFILE | sed -n '1,2p' > $FAIL_REPORT
++        printf "%-60s %-21s %s \n" Testcase Type "Fail Reason" >> $FAIL_REPORT
++        printf "%-60s %-21s %s \n" -------- ----  -----------  >> $FAIL_REPORT
++
++        while read line
++        do
++            if echo $line | grep -E -q 'execution: FAILED|execution: UNRESOLVED|execution: HUNG'; then
++                fail_suite=$(echo "$line" | awk '{print $1}' | awk -F"/" '{print $3}')
++                fail_subsuite=$(echo "$line" | awk '{print $1}' | awk -F"/" '{print $4}')
++                fail_test=$(echo "$line" | awk '{print $1}' | awk -F"/" '{printf $5}')
++        
++                if [ -n "$fail_test" ]; then
++                    fail_suite="$fail_suite/$fail_subsuite"
++                else
++                    fail_test="$fail_subsuite"
++                fi
++                fail_test=$(echo $fail_test | tr -d ":")
++                fail_type=$(echo "$line" | awk '{print $3}'| tr -d ":")
++
++                fail_reason=$(cat $FAIL_PATH/common | grep "^#std .*$fail_suite $fail_test" | cut -d "|" -f 2)
++                [ -z "$fail_reason" ] && \
++                fail_reason=$(cat $FAIL_PATH/common | grep "^#$KERNEL_ARCH .*$fail_suite $fail_test" | cut -d "|" -f 2)
++                [ -z "$fail_reason" ] && UNKNOWN_FAILURE=$(expr $UNKNOWN_FAILURE + 1)
++	        printf "%-60s %-20s %s \n" "$fail_suite/$fail_test" "$fail_type" "$fail_reason" >> $FAIL_REPORT
++            fi
++        done < $RUNTIME_LOGFILE
++
++        # Summary all failed, unresolved and hung test case
++        KNOWN_FAILURE=$(expr $fail_num + $unresolved_num + $hung_num  - $UNKNOWN_FAILURE)
++        sed -i "/Total Skip/a\Total Known Failures(Fail, Unresolved and Hung): $KNOWN_FAILURE" $RUNTIME_LOGFILE
++        sed -i "/Known Failures/a\Total Unknown Failures(Fail, Unresolved and Hung): $UNKNOWN_FAILURE" $RUNTIME_LOGFILE
++
++	if [ "$UNKNOWN_FAILURE" -eq 0 ]; then
++            echo "[$binary_name] POSIX test passed with known failure" >> $RUNTIME_LOGFILE
++        else
++            echo "[$binary_name] POSIX test failed with unknown failure" >> $RUNTIME_LOGFILE
++        fi
++	echo "[Log Path] POSIX failed test report: $FAIL_REPORT" >> $RUNTIME_LOGFILE
++        echo "[Test Knowledge Base] POSIX test case known failure: $FAIL_PATH" 	>> $RUNTIME_LOGFILE
++    else
++        echo "[$binary_name] POSIX test passed" >> $RUNTIME_LOGFILE
++    fi
++
++    # Create the skipped test report
++    if grep "SKIP" $SKIPTEST > /dev/null 2>&1 ; then
++        echo "POSIX Test Start Time: $START_TIME" > $SKIP_REPORT
++        echo "-------------------------------------------" >> $SKIP_REPORT
++        printf "%-60s %-21s %s \n" Testcase Type "Skip Reason" >> $SKIP_REPORT
++        printf "%-60s %-21s %s \n" -------- ----  -----------  >> $SKIP_REPORT
++        cat $SKIPTEST >> $SKIP_REPORT
++	echo "[Log Path] POSIX skipped test case report: $SKIP_REPORT" >> $RUNTIME_LOGFILE
++        echo "[Test Knowledge Base] POSIX test case skip reason: $SKIP_PATH" >> $RUNTIME_LOGFILE
++    fi
++
++else
++    echo "[$binary_name] There is no POSIX test result"
++    echo "[$binary_name] Please check the name of test suite and test case"
++    exit 1
++fi
++
++    # Save test log to result folder
++    echo "[Log Path] POSIX test log: $POSIX_LOGFILE" >> $RUNTIME_LOGFILE
++    cp $RUNTIME_LOGFILE $POSIX_LOGFILE
++    [ -e "$TESTLOG" ] && rm $TESTLOG
++    ln -s $POSIX_LOGFILE $TESTLOG
++
++    # Print out POSIX test result
++    sed -n '/Total Tests/,$'p $TESTLOG
++
++    [ -e "$FAIL_REPORT" -a -e "$TESTLOG" ] && {
++
++        echo "[POSIX Test Failed Case]" >> $TESTLOG
++        echo "------------------------" >> $TESTLOG
++        cat $FAIL_REPORT >> $TESTLOG
++    }
++
++    [ -e "$SKIP_REPORT" -a -e "$TESTLOG" ] && {
++
++        echo "[POSIX Test Skipped Case]" >> $TESTLOG
++        echo "-------------------------" >> $TESTLOG
++        cat $SKIP_REPORT >> $TESTLOG
++    }
++
++}
++
++main()
++{
++    export LOGFILE=$RUNTIME_LOGFILE
++
++    if [ "$RUN_RESUME_TEST" -eq 0 ]; then
++        echo "POSIX Test Start Time: $START_TIME" > $RUNTIME_LOGFILE
++        echo "-------------------------------------------" >> $RUNTIME_LOGFILE
++    fi
++
++    cat $RUNTIME_TESTFILE | while read line
++    do
++        folder=$(echo  ${line} | cut -d " " -f 1)
++        testcase=$(echo  ${line} | cut -d " " -f 2)
++        cd $POSIXROOT/$folder
++        suite=$(basename $folder)
++        echo "<<Test start>>"
++        echo "Test suite: $suite"
++        echo "Test case: $testcase"
++        $POSIXROOT/bin/run-tests.sh $folder $testcase
++        echo "<<Test end>>"
++    done
++    echo "-------------------------------------------" >> $RUNTIME_LOGFILE
++    echo "POSIX Test Finish" >> $RUNTIME_LOGFILE
++}
++
++while getopts hRf:s:t: arg
++    do  case $arg in
++        f)  SCENARIO_GROUP_LIST="$OPTARG";;
++        s)  RUN_SELECTED_SUITE=1
++            TESTSUITE_LIST="$OPTARG";;
++        t)  RUN_SELECTED_CASE=1
++            TESTCASE_LIST="$OPTARG";;
++        h)  usage
++            exit 0;;
++        R)  RUN_RESUME_TEST=1;;
++        esac
++    done
++
++check
++
++setup
++
++main
++
++report
++
++[ "$UNKNOWN_FAILURE" -eq 1 ] && exit 1
++exit 0
+-- 
+1.8.1.4
+

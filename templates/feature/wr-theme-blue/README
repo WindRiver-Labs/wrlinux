@@ -1,0 +1,10 @@
+This template sets the default theme to windriver-blue
+for XFCE desktop environment.
+
+It is supported for x86, x86-64 and arm targets only.
+
+To use this template, you need to add
+
+--templates=feature/xfce,feature/wr-theme-blue
+
+as a setup.sh option.

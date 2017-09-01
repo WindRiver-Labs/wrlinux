@@ -1,0 +1,9 @@
+This template adds test-related packages.
+
+To use, add
+
+--templates feature/test
+
+as a setup option.
+
+See the template configuration file for the list of packages included with this feature.

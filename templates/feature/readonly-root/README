@@ -1,0 +1,13 @@
+This feature causes the root filesystem to be mounted read-only with writable
+data (directories under /var) located on a ram disk.
+
+This feature is only expected to work on 'small' and 'standard' root
+filesystems.  Packages added by SATO or added manually may need to be
+updated by hand to work with a read-only root filesystem.
+
+To use, add
+
+--templates feature/readonly-root
+
+as a setup option.
+

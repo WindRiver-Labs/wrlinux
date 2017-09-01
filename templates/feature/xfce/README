@@ -1,0 +1,11 @@
+This template adds packagegroup-xfce, which includes
+packages required to run the XFCE desktop environment.
+
+It is supported for x86, x86-64 and arm targets only.
+
+It depends on layer meta-xfce and meta-gnome,
+to use this template, you need to add
+
+--templates=feature/xfce
+
+as a setup.sh option.
