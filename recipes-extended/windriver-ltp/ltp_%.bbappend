@@ -2,9 +2,6 @@
 # Copyright (C) 2014 Wind River Systems, Inc.
 #
 
-DEPENDS_append_x86-64 += "numactl"
-DEPENDS_append_x86 += "numactl"
-
 SRC_URI += " file://README \
              file://0001-Add-wr-runltp-into-wrLinux_ltp.patch \
              file://0002-Add-LTP-case-known-failure-reason-into-wrLinux_ltp.patch \
