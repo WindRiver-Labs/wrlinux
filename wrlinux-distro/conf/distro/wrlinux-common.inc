@@ -1,8 +1,10 @@
 #
-# Copyright (C) 2012 - 2015 Wind River Systems, Inc.
+# Copyright (C) 2012 - 2017 Wind River Systems, Inc.
 #
 # information common to all wrlinux distros
 #
+
+require conf/distro/include/wrlinux-base-whitelist.inc
 
 MAINTAINER = "Wind River <info@windriver.com>"
 

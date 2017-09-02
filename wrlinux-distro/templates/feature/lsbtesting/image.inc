@@ -7,13 +7,13 @@
 # LSB compliance.
 
 # Add wr-lsbtest task from the the new glibc-std task lists
-IMAGE_FEATURES += "wr-lsbtest"
+IMAGE_INSTALL += "wr-lsbtest"
 
 # Add image features from oe-core that are related to LSB
 # Note: those have now been renamed to wr-core-* instead
 # of core-*
 
-IMAGE_FEATURES += "wr-core-lsb-more wr-core-lsb-graphics-plus"
+IMAGE_INSTALL += "wr-core-lsb-more wr-core-lsb-graphics-plus"
 
 # add missing packages into build as required by LSB
 

@@ -127,7 +127,6 @@ DEPENDS = "\
     pixman-native \
     pkgconfig-native \
     popt-native \
-    postfix-native \
     prelink-native \
     pseudo-native \
     python-native \

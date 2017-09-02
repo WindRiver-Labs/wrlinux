@@ -1,13 +1,12 @@
 wrlinux
 =======
 
-This layer provides many of the base components for Wind River Linux.  It
-is required by most other layers provided by Wind River.
+This layer provides the Wind River Linux distribution definitions.
 
 
 Dependencies
 ------------
-This layer depends on the openembedded-core and wr-templates layers.
+This layer depends on the wrlinux layer.
 
 
 Maintenance
@@ -19,7 +18,13 @@ information on submitting changes.
 
 Building the wrlinux layer
 -----------------------------------
-This layer should be added to the bblayers.conf file.
+This layer should be added to the bblayers.conf file, as well as any required
+layers.
+
+To enable the 'wrlinux' distribution, you will need to set the following in
+local.conf file:
+
+DISTRO = "wrlinux"
 
 
 License

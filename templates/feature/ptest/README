@@ -1,11 +1,3 @@
 This template adds ptest (package-test) functionality.  This includes the
 'ptest' DISTRO_FEATURE, a 'ptest-pkgs' option to EXTRA_IMAGE_FEATURES, and the
 ptest-runner package, used for running the full ptest suite.
-
-To use, add
-
---templates feature/ptest
-
-as a setup option.
-
-The scripts/ subdirectory contains ptest-related tools.
