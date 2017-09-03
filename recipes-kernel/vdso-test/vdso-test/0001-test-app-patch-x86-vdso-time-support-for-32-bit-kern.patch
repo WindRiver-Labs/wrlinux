@@ -1,0 +1,53 @@
+From 124e6d76cf2bb132e1926cef2620f37867c6bb90 Mon Sep 17 00:00:00 2001
+From: Jianchuan Wang <jianchuan.wang@windriver.com>
+Date: Tue, 29 Jul 2014 14:10:02 +0800
+Subject: [PATCH] test app patch: x86 vdso time support for 32 bit kernel
+Signed-off-by: Jianchuan Wang <jianchuan.wang@windriver.com>
+
+---
+ vdso.c |   32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+
+diff --git a/vdso.c b/vdso.c
+index c950649..d11a80c 100644
+--- a/vdso.c
++++ b/vdso.c
+@@ -216,3 +216,35 @@ time_t time(time_t *t)
+ 	return vdso_time(t);
+ }
+ 
++int main(int argc, char *argv[])
++{
++	struct  timeval    tv;
++	struct  timezone   tz;
++	time_t t; 
++	struct timespec ts;
++
++	printf ("start ...\n\n");
++
++	if (unlikely(!init)) 
++		init_vdso();
++
++	printf ("-----vdso gettimeofday-----\n");
++	vdso_gettimeofday(&tv, &tz);
++
++	printf("tv_sec:%d\n",tv.tv_sec);
++	printf("tv_usec:%d\n",tv.tv_usec);
++	printf("tz_minuteswest:%d\n",tz.tz_minuteswest);
++	printf("tz_dsttime:%d\n",tz.tz_dsttime);
++
++	printf ("-----vdso time-----\n");
++	t = vdso_time(NULL);
++	printf("The number of seconds since January 1, 1970 is %ld\n",t);
++
++	printf ("-----vdso clock_gettime-----\n");
++	vdso_clock_gettime(CLOCK_MONOTONIC,&ts);
++	printf("sec :%d nsec: %d\n",ts.tv_sec, ts.tv_nsec);
++
++	printf ("end ...\n\n");
++	return 0;
++}
++
+-- 
+1.7.9.5
+

@@ -1,0 +1,100 @@
+From bc4f422abb06d034a00bbb3a5d46f0df4ab3598b Mon Sep 17 00:00:00 2001
+Message-Id: <bc4f422abb06d034a00bbb3a5d46f0df4ab3598b.1358525916.git.Jim.Somerville@windriver.com>
+From: Jim Somerville <Jim.Somerville@windriver.com>
+Date: Fri, 18 Jan 2013 11:16:13 -0500
+Subject: [PATCH 1/1] intel-pcm: modify Makefile to fit wrlinux build system
+
+To make init-pcm cross compile, remove CC variable in Makefile.
+Also get rid of OPT, and change to use CXX instead of CC
+because the code is C++.
+
+Signed-off-by: Jim Somerville <Jim.Somerville@windriver.com>
+---
+ Makefile |   35 ++++++++++++++++-------------------
+ 1 files changed, 16 insertions(+), 19 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 8ea503e..04ec750 100644
+--- a/Makefile
++++ b/Makefile
+@@ -5,9 +5,6 @@
+ 
+ all: pcm-power.x pcm.x pcm-sensor.x pcm-msr.x pcm-memory.x
+ 
+-CC=g++ -Wall
+-OPT= -g -O3 
+-
+ UNAME:=$(shell uname)
+ 
+ ifeq ($(UNAME), Linux)
+@@ -22,51 +19,51 @@ endif
+ 
+ 
+ msr.o: msr.h msr.cpp 
+-	$(CC) $(OPT) -c msr.cpp
++	$(CXX) -c msr.cpp
+ 
+ pci.o: pci.h pci.cpp
+-	$(CC) $(OPT) -c pci.cpp
++	$(CXX) -c pci.cpp
+ 
+ pcm-msr.o: msr.h msr.cpp pcm-msr.cpp
+-	$(CC) $(OPT) -c pcm-msr.cpp
++	$(CXX) -c pcm-msr.cpp
+ 
+ pcm-memory.o: pcm-memory.cpp msr.h pci.h cpucounters.h types.h width_extender.h
+-	$(CC) $(OPT) -c pcm-memory.cpp
++	$(CXX) -c pcm-memory.cpp
+ 
+ cpucounters.o: msr.h msr.cpp cpucounters.h cpucounters.cpp types.h width_extender.h 
+-	$(CC) $(OPT) -c cpucounters.cpp
++	$(CXX) -c cpucounters.cpp
+ 
+ msrtest.x: msrtest.cpp msr.o cpucounters.o cpucounters.h  msr.h  types.h
+-	$(CC) $(OPT) msrtest.cpp -o msrtest.x msr.o cpucounters.o
++	$(CXX) msrtest.cpp -o msrtest.x msr.o cpucounters.o
+ 
+ cpucounterstest.o: cpucounterstest.cpp cpucounters.h pci.h msr.h  types.h
+-	$(CC) $(OPT) -c cpucounterstest.cpp
++	$(CXX) -c cpucounterstest.cpp
+ 
+ pcm-power.o: pcm-power.cpp msr.h types.h pci.h cpucounters.h
+-	$(CC) $(OPT) -c pcm-power.cpp
++	$(CXX) -c pcm-power.cpp
+ 
+ realtime.o: realtime.cpp cpucounters.h  msr.h  types.h
+-	$(CC) $(OPT) -c realtime.cpp
++	$(CXX) -c realtime.cpp
+ 
+ pcm.x: msr.o cpucounters.o cpucounterstest.o pci.o
+-	$(CC) $(OPT) msr.o pci.o cpucounters.o cpucounterstest.o -o pcm.x $(LIB)
++	$(CXX) msr.o pci.o cpucounters.o cpucounterstest.o -o pcm.x $(LIB)
+ 
+ pcm-power.x: msr.o cpucounters.o pci.o pcm-power.o
+-	$(CC) $(OPT) msr.o cpucounters.o pci.o pcm-power.o -o pcm-power.x $(LIB)
++	$(CXX) msr.o cpucounters.o pci.o pcm-power.o -o pcm-power.x $(LIB)
+ 
+ pcm-msr.x: msr.o pcm-msr.o
+-	$(CC) $(OPT) msr.o pcm-msr.o -o pcm-msr.x $(LIB)
++	$(CXX) msr.o pcm-msr.o -o pcm-msr.x $(LIB)
+ 
+ realtime.x: msr.o cpucounters.o realtime.o
+-	$(CC) $(OPT) pci.o msr.o cpucounters.o realtime.o -o realtime.x $(LIB)
++	$(CXX) pci.o msr.o cpucounters.o realtime.o -o realtime.x $(LIB)
+ 
+ pcm-memory.x: msr.o pcm-memory.o pci.o cpucounters.o
+-	$(CC) $(OPT) msr.o pci.o cpucounters.o pcm-memory.o -o pcm-memory.x $(LIB)
++	$(CXX) msr.o pci.o cpucounters.o pcm-memory.o -o pcm-memory.x $(LIB)
+ pcm-sensor.o: pcm-sensor.cpp cpucounters.h cpuasynchcounter.h msr.h  types.h
+-	$(CC) $(OPT) -c pcm-sensor.cpp
++	$(CXX) -c pcm-sensor.cpp
+ 
+ pcm-sensor.x: msr.o cpucounters.o pcm-sensor.o pci.o
+-	$(CC) $(OPT) msr.o pci.o cpucounters.o pcm-sensor.o -o pcm-sensor.x $(LIB)
++	$(CXX) msr.o pci.o cpucounters.o pcm-sensor.o -o pcm-sensor.x $(LIB)
+ 
+ nice:
+ 	uncrustify --replace -c ~/uncrustify.cfg *.cpp *.h WinMSRDriver/Win7/*.h WinMSRDriver/Win7/*.c WinMSRDriver/WinXP/*.h WinMSRDriver/WinXP/*.c  PCM_Win/*.h PCM_Win/*.cpp  
+-- 
+1.7.4.1
+

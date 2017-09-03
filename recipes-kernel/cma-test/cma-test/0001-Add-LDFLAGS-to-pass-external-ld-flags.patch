@@ -1,0 +1,26 @@
+From 40f491ca1f26be96c3ead3e7c3f3ba41d3166f9e Mon Sep 17 00:00:00 2001
+From: He Zhe <zhe.he@windriver.com>
+Date: Wed, 2 Nov 2016 02:47:50 +0000
+Subject: [PATCH] Add LDFLAGS to pass external ld flags
+
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 68429b2..cf3993e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -10,7 +10,7 @@ CFLAGS ?= -g -Wall
+ all: $(TARGETS)
+ 
+ .c: $@.c
+-	$(CC) $(CFLAGS) $@.c -o $@
++	$(CC) $(CFLAGS) $(LDFLAGS) $@.c -o $@
+ 
+ clean:
+ 	rm -f $(TARGETS) *~
+-- 
+2.9.3
+

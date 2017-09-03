@@ -1,0 +1,51 @@
+From 2bc004ea7394a6b778ce05c959c5223e71d2e659 Mon Sep 17 00:00:00 2001
+From: Liwei Song <liwei.song@windriver.com>
+Date: Wed, 30 Nov 2016 09:16:32 +0000
+Subject: [PATCH] wr-kernel/intel-pcm fix No GNU_HASH in the elf binary QA
+ warning
+
+Fix No GNU_HASH in the elf binary add LDFLAGS to Makefile.
+
+Signed-off-by: Liwei Song <liwei.song@windriver.com>
+---
+ Makefile     | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/build/tmp/work/skylake-avx512-64-wrs-linux/intel-pcm/2.3a-r0/IntelPerformanceCounterMonitorV2.3a/Makefile b/build/tmp/work/skylake-avx512-64-wrs-linux/intel-pcm/2.3a-r0/IntelPerformanceCounterMonitorV2.3a/Makefile
+index 04ec750..037ba0c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -46,24 +46,24 @@ realtime.o: realtime.cpp cpucounters.h  msr.h  types.h
+ 	$(CXX) -c realtime.cpp
+ 
+ pcm.x: msr.o cpucounters.o cpucounterstest.o pci.o
+-	$(CXX) msr.o pci.o cpucounters.o cpucounterstest.o -o pcm.x $(LIB)
++	$(CXX) msr.o pci.o cpucounters.o cpucounterstest.o ${LDFLAGS} -o pcm.x $(LIB)
+ 
+ pcm-power.x: msr.o cpucounters.o pci.o pcm-power.o
+-	$(CXX) msr.o cpucounters.o pci.o pcm-power.o -o pcm-power.x $(LIB)
++	$(CXX) msr.o cpucounters.o pci.o pcm-power.o ${LDFLAGS} -o pcm-power.x $(LIB)
+ 
+ pcm-msr.x: msr.o pcm-msr.o
+-	$(CXX) msr.o pcm-msr.o -o pcm-msr.x $(LIB)
++	$(CXX) msr.o pcm-msr.o ${LDFLAGS} -o pcm-msr.x $(LIB)
+ 
+ realtime.x: msr.o cpucounters.o realtime.o
+-	$(CXX) pci.o msr.o cpucounters.o realtime.o -o realtime.x $(LIB)
++	$(CXX) pci.o msr.o cpucounters.o realtime.o ${LDFLAGS} -o realtime.x $(LIB)
+ 
+ pcm-memory.x: msr.o pcm-memory.o pci.o cpucounters.o
+-	$(CXX) msr.o pci.o cpucounters.o pcm-memory.o -o pcm-memory.x $(LIB)
++	$(CXX) msr.o pci.o cpucounters.o pcm-memory.o ${LDFLAGS}  -o pcm-memory.x $(LIB)
+ pcm-sensor.o: pcm-sensor.cpp cpucounters.h cpuasynchcounter.h msr.h  types.h
+ 	$(CXX) -c pcm-sensor.cpp
+ 
+ pcm-sensor.x: msr.o cpucounters.o pcm-sensor.o pci.o
+-	$(CXX) msr.o pci.o cpucounters.o pcm-sensor.o -o pcm-sensor.x $(LIB)
++	$(CXX) msr.o pci.o cpucounters.o pcm-sensor.o ${LDFLAGS} -o pcm-sensor.x $(LIB)
+ 
+ nice:
+ 	uncrustify --replace -c ~/uncrustify.cfg *.cpp *.h WinMSRDriver/Win7/*.h WinMSRDriver/Win7/*.c WinMSRDriver/WinXP/*.h WinMSRDriver/WinXP/*.c  PCM_Win/*.h PCM_Win/*.cpp  
+-- 
+2.9.3
+

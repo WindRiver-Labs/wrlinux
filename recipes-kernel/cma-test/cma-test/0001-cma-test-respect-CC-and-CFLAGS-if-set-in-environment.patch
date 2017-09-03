@@ -1,0 +1,27 @@
+Upstream-Status: Pending
+
+Subject: cma-test: respect CC and CFLAGS if set in environment
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index b1d9ea2..68429b2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -4,8 +4,8 @@ TARGETS=setup_process_vm_readv_simple t_process_vm_readv_simple \
+ 	setup_process_vm_writev t_process_vm_writev
+ 
+ 
+-CC=gcc
+-CFLAGS=-g -Wall
++CC ?= gcc
++CFLAGS ?= -g -Wall
+ 
+ all: $(TARGETS)
+ 
+-- 
+1.9.1
+

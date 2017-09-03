@@ -1,0 +1,54 @@
+From 012ae5941da3a794523c5f2a32900152289c26fe Mon Sep 17 00:00:00 2001
+From: Jianchuan Wang <jianchuan.wang@windriver.com>
+Date: Tue, 29 Jul 2014 13:59:21 +0800
+Subject: [PATCH] test app patch: x86 vdso time support for 64 bit kernel
+Signed-off-by: Jianchuan Wang <jianchuan.wang@windriver.com>
+
+---
+ vdso_test.c |   30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
+
+diff --git a/vdso_test.c b/vdso_test.c
+index fff6334..be4e99d 100644
+--- a/vdso_test.c
++++ b/vdso_test.c
+@@ -94,6 +94,36 @@ __attribute__((externally_visible)) void c_main(void **stack)
+ 		linux_exit(ret);
+ 	}
+ 
++	/* Find time */
++	typedef long (*vdso_time_t)(time_t *t);
++	vdso_time_t vdso_time = (vdso_time_t)vdso_sym("LINUX_2.6", "__vdso_time");
++
++	if (!vdso_time)
++		linux_exit(1);
++
++	time_t  t;
++	t = vdso_time(NULL);
++	{
++		char tbuf[] ="The number of seconds since January 1, 1970 is         \n";
++		to_base10(tbuf + 48, t);
++		linux_write(1, tbuf, sizeof(tbuf) - 1);
++	}
++
++	/* Find clock_gettime */
++	typedef long (*vdso_clktime_t)(int clockid, struct timespec *tp);
++	vdso_clktime_t vdso_clktime = (vdso_clktime_t)vdso_sym("LINUX_2.6", "__vdso_clock_gettime");
++
++	if (!vdso_clktime)
++		linux_exit(1);
++
++	struct timespec ts;
++	vdso_clktime(1,&ts);
++	{
++		char cbuf[] = "The time is                     .000000\n";
++		to_base10(cbuf + 31, ts.tv_sec);
++		to_base10(cbuf + 38, ts.tv_nsec);
++		linux_write(1, cbuf, sizeof(cbuf) - 1);
++	}
+ 	linux_exit(0);
+ }
+ 
+-- 
+1.7.9.5
+

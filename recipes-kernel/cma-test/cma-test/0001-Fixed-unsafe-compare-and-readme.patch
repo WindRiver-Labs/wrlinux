@@ -1,0 +1,45 @@
+From 8917af8c00018d075a75bfa01f83c0e3fee9d75d Mon Sep 17 00:00:00 2001
+From: Paul Barrette <paul.barrette@windriver.com>
+Date: Fri, 5 Oct 2012 11:07:02 -0400
+Subject: [PATCH] Fixed unsafe compare and readme.
+
+t_process_vm_readv_simple.c just does a strcmp after a read into a
+supposedly empty buffer.  Changed it to strncmp.
+
+Signed-off-by: Paul Barrette <paul.barrette@windriver.com>
+---
+ README                      |    6 +++---
+ t_process_vm_readv_simple.c |    2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/README b/README
+index 4164a6f..a461f03 100644
+--- a/README
++++ b/README
+@@ -16,7 +16,7 @@ Running the tests
+ There are three tests that can be run, each of them sets up a target process and then
+ displays what further command to run
+ 
+-setup_process_readv_simple
+-setup_process_readv_iovec
+-setup_process_writev
++setup_process_vm_readv_simple
++setup_process_vm_readv_iovec
++setup_process_vm_writev
+ 
+diff --git a/t_process_vm_readv_simple.c b/t_process_vm_readv_simple.c
+index 745a15d..1a78945 100644
+--- a/t_process_vm_readv_simple.c
++++ b/t_process_vm_readv_simple.c
+@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
+     printf("error code: %i\n", errno);
+     exit(1);
+   } else {
+-    if (strcmp(ref_buf, buf) == 0) {
++    if (strncmp(ref_buf, buf,len) == 0) {
+       printf("Test passed\n");
+       exit(0);
+     } else {
+-- 
+1.7.5.4
+
