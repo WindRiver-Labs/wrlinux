@@ -36,8 +36,3 @@ python do_patch () {
     bb.build.exec_func('do_lcl_rh_move', d)
     bb.build.exec_func('patch_do_patch', d)
 }
-
-python do_pam_sanity_append () {
-    if not bb.utils.contains('DISTRO_FEATURES', 'pam', True, False, d):
-        bb.error("Building libpam but 'pam' isn't in DISTRO_FEATURES.  You may want to add DISTRO_FEATURES_append=\"pam\" to local.conf.")
-}
