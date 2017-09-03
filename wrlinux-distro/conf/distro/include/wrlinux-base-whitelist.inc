@@ -6,12 +6,9 @@ PNWHITELIST_LAYERS_remove = "wrlinux-distro"
 
 # Define supported items from meta-openembedded
 PNWHITELIST_efl-layer += ""
-PNWHITELIST_filesystems-layer += " \
-	yaffs2-utils \
-	"
+PNWHITELIST_filesystems-layer += ""
 
 PNWHITELIST_gnome-layer += " \
-	dconf \
 	gvfs \
 	libwnck \
 	libwnck3 \
@@ -25,7 +22,6 @@ PNWHITELIST_multimedia-layer += ""
 PNWHITELIST_networking-layer += " \
 	dnsmasq \
 	ipsec-tools \
-	libmnl \
 	netcat \
 	netcat-openbsd \
 	postfix \
@@ -46,28 +42,17 @@ PNWHITELIST_openembedded-layer += " \
 	gtkmm \
 	iceauth \
 	iotop \
-	iozone3 \
 	jansson \
 	lemon-native \
 	libatasmart \
 	libdbd-mysql-perl \
 	libdbi-perl \
 	libcanberra \
-	libdevmapper \
-	libestr \
-	libfastjson \
 	libgphoto2 \
-	liblogging \
 	libndp \
 	libmcrypt \
-        librelp \
 	libsigc++-2.0 \
 	libunique \
-	lmbench \
-	lmsensors \
-	lmsensors-config \
-	lvm2 \
-	lxdm \
 	mailx \
 	mariadb \
 	memstat \
@@ -81,14 +66,10 @@ PNWHITELIST_openembedded-layer += " \
 	pmtools \
 	polkit \
 	rfkill \
-	rrdtool \
-	rsyslog \
 	sdparm \
-	setxkbmap \
 	sg3-utils \
 	sound-theme-freedesktop \
 	syslog-ng \
-	thin-provisioning-tools \
 	udisks2 \
 	unixodbc \
 	upower \
@@ -114,7 +95,6 @@ PNWHITELIST_meta-python += " \
 PNWHITELIST_ruby-layer += ""
 PNWHITELIST_systemd-layer += ""
 PNWHITELIST_webserver += " \
-	apache2 \
 	phpmyadmin \
 	xdebug \
 	"
@@ -151,7 +131,6 @@ PNWHITELIST_xfce-layer += " \
 	xfce4-netload-plugin \
 	xfce4-notes-plugin \
 	xfce4-notifyd \
-	xfce4-panel \
 	xfce4-places-plugin \
 	xfce4-power-manager \
 	xfce4-pulseaudio-plugin \
@@ -166,7 +145,6 @@ PNWHITELIST_xfce-layer += " \
 	xfce4-weather-plugin \
 	xfce4-xkb-plugin \
 	xfconf \
-	xfdesktop \
 	xfwm4 \
 	"
 
