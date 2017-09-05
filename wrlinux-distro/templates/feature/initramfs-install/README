@@ -1,0 +1,7 @@
+
+                                initramfs-install
+                               ----------------------
+
+Configure the build to create an initramfs image which will be integrated with
+the kernel image and install into rootfs. For additional information, please review the initramfs.txt
+document found in the layers/wr-kernel/Documentation directory.

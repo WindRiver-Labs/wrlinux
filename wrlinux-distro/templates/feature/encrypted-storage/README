@@ -1,0 +1,8 @@
+Encrypted Storage
+=================
+
+This feature provides secure storage for application data. Some applications
+need secure storage for sensitive data which must not be accessible to another
+device.
+
+Details please refer to meta-secure-core/meta-encrypted-storage/README.md.

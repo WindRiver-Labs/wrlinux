@@ -1,0 +1,10 @@
+IPS
+===
+
+Intrusion Prevention System (IPS), also known as intrusion detection and
+prevention systems (IDPS), are network security appliances that monitor
+network or system activities for malicious activity. The main functions of
+intrusion prevention systems are to identify malicious activity, log
+information about this activity, report it and attempt to block or stop it.
+
+Snort is the world's most widely deployed IPS technology.

@@ -1,0 +1,7 @@
+EFI secure boot feature
+=======================
+
+This feature consists of two widely used secure boot technologies: UEFI Secure
+Boot and MOK Secure Boot.
+
+Details please refer to meta-security-core/meta-efi-secure-boot/README.md.

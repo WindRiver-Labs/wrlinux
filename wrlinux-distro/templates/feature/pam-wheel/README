@@ -1,0 +1,8 @@
+pam-wheel
+=========
+
+The pam_wheel PAM module is used to enforce the so-called wheel group. By
+default it permits root access to the system if the applicant user is a member
+of the wheel group.
+
+Template pam-wheel enables pam_wheel PAM module for sudo by default.

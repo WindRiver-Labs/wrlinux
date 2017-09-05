@@ -1,0 +1,60 @@
+TPM 1.2 feature
+===============
+This feature enables tpm 1.2 support, including kernel option changes to enable tpm
+drivers, and picking up packages trousers, tpm-tools, openssl-tpm-engine, tpm-quote-tools.
+Note, testing package tss-testsuite isn't included in this feature.
+
+TPM 1.2 packages
+================
+The following open-source packages are supported for TPM 1.2.
+
+trousers v0.3.13
+----------------
+TrouSerS is an implementation of the Trusted Computing Group's Software Stack
+(TSS) specification. You can use Trousers to write applications that make use
+of your TPM hardware. See homepage:
+    http://trousers.sourceforge.net/
+
+Visit TCG official website for TSS API specification:
+    http://www.trustedcomputinggroup.org
+
+tpm-tools v1.3.8
+----------------
+The tpm-tools package contains commands to allow the platform administrator
+the ability to manage and diagnose the platform TPM.  Additionally, the
+package contains commands to utilize some of the capabilities available
+in the TPM. See the tools manual pages in package for usage of the tools.
+
+openssl-tpm-engine v0.4.2
+-------------------------
+openssl-tpm-engine is an OpenSSL secure engine based on TPM hardware.
+For more information and how to use, see README in package source.
+
+tpm-quote-tools v1.0.2
+----------------------
+The TPM Quote Tools is a collection of programs that provide support
+for TPM based attestation using the TPM quote mechanism. The manual
+page for tpm_quote_tools provides a usage overview.
+
+tss-testsuite v0.3
+------------------
+TSS api test suite for testing trousers and the underlay TPM.
+For more information and how to use, see README in package source.
+
+How to use TPM 1.2
+==================
+For TPM 1.2, the following typical steps can be performed to get the TPM
+ready for use:
+
+1. Clear and enable TPM from the BIOS.
+
+2. Take TPM ownership.
+     # tpm_takeownership -y -z
+
+3. Change owner and SRK passwords. These password are used for the
+   access permission to other functions including generate keys.
+     # tpm_changeownerauth -z -s -o
+
+Then, you can use the TPM for a specific need, such as key generation,
+sealing encrypted data, etc.
+

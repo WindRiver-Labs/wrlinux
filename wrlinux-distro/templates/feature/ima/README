@@ -1,0 +1,9 @@
+Integrity Measurement Architecture (IMA)
+========================================
+
+The Linux IMA subsystem introduces hooks within the Linux kernel to support
+measuring the integrity of files that are loaded (including application code)
+before it is executed or mmap()ed to memory. The measured value (hash) is then
+registered in a log that can be consulted by administrators.
+
+Details please refer to meta-secure-core/meta-integrity/README.md.

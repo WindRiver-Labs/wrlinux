@@ -1,0 +1,7 @@
+#
+# Copyright (C) 2017 Wind River Systems, Inc.
+#
+
+feature/tpm2
+feature/initramfs
+feature/initramfs-install

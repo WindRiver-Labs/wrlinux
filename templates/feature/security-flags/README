@@ -1,0 +1,3 @@
+Setup extra CFLAGS and LDFLAGS which have 'security' benefits. These
+don't work universally, there are recipes which can't use one, the other
+or both.

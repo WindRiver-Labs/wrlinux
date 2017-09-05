@@ -1,0 +1,9 @@
+Firewall
+========
+
+This feature ensures that the Linux network filter, iptables, is included
+in the image. An initial, permissive default rule is used. The iptables
+rules can be specified as desired to limit specific network traffic.
+
+When combined with snort, this feature can provide not only a firewall, but
+also network intrusion detection functionality.
