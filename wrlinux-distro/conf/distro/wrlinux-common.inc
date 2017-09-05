@@ -60,7 +60,7 @@ DISTRO_EXTRA_RDEPENDS_append_qemuppc = " ${WRLINUXQEMUDEPS}"
 DISTRO_EXTRA_RDEPENDS_append_qemux86 = " ${WRLINUXQEMUDEPS}"
 DISTRO_EXTRA_RDEPENDS_append_qemux86-64 = " ${WRLINUXQEMUDEPS}"
 
-TCLIBCAPPEND = ""
+#TCLIBCAPPEND = ""
 
 #default locale / local language processing settings
 IMAGE_LINGUAS ?= ""
