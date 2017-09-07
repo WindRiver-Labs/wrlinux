@@ -1,0 +1,42 @@
+From 49532df306a16d9dfd35abc31ce4704ea00e0596 Mon Sep 17 00:00:00 2001
+From: Mark Asselstine <mark.asselstine@windriver.com>
+Date: Fri, 26 Feb 2016 15:45:30 +0000
+Subject: [PATCH] udev rules:  add kvm rule
+
+Based on commit e8c942d0df396e3c756a7261a8bffcb8c9847a1a.
+
+Make /dev/kvm available to members of the kvm group. This improves
+security since it avoids having to be root to make use of kvm.
+
+Signed-off-by: Vu Tran <vu.tran@windriver.com>
+Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+---
+ Makefile.am        | 3 ++-
+ rules/99-kvm.rules | 1 +
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+ create mode 100644 rules/99-kvm.rules
+
+diff --git a/Makefile.am b/Makefile.am
+index 09d1533..24d4863 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -3407,7 +3407,8 @@ dist_udevrules_DATA += \
+ 	rules/70-mouse.rules \
+ 	rules/75-net-description.rules \
+ 	rules/78-sound-card.rules \
+-	rules/80-net-setup-link.rules
++	rules/80-net-setup-link.rules \
++	rules/99-kvm.rules
+ 
+ nodist_udevrules_DATA += \
+ 	rules/99-systemd.rules
+diff --git a/rules/99-kvm.rules b/rules/99-kvm.rules
+new file mode 100644
+index 0000000..c2f7317
+--- /dev/null
++++ b/rules/99-kvm.rules
+@@ -0,0 +1 @@
++KERNEL=="kvm", GROUP="kvm", MODE="0660"
+-- 
+2.5.0
+

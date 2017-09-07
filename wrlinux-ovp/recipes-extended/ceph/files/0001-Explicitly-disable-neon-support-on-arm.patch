@@ -1,0 +1,23 @@
+Subject: Explicitly disable neon support on arm
+
+Upstream-Status: Inappropriate [configuration]
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ m4/ax_arm.m4 | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/m4/ax_arm.m4 b/m4/ax_arm.m4
+index 37ea0aa..d4db61e 100644
+--- a/m4/ax_arm.m4
++++ b/m4/ax_arm.m4
+@@ -5,6 +5,7 @@ AC_DEFUN([AX_ARM_FEATURES],
+   case $target_cpu in
+     arm*)
+       AX_CHECK_COMPILE_FLAG(-mfpu=neon, ax_cv_support_neon_ext=yes, [])
++      ax_cv_support_neon_ext=no
+       if test x"$ax_cv_support_neon_ext" = x"yes"; then
+         ARM_NEON_FLAGS="-mfpu=neon -DARM_NEON"
+         AC_SUBST(ARM_NEON_FLAGS)
+-- 
+2.11.0
+

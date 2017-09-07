@@ -1,0 +1,110 @@
+From 17fd1b4adf6ccb342913407d68f0207300b3f4fc Mon Sep 17 00:00:00 2001
+From: Mark Asselstine <mark.asselstine@windriver.com>
+Date: Wed, 17 Dec 2014 18:57:13 +0000
+Subject: [PATCH 09/18] migration compression cache free
+
+This patch is rebased for qemu-2.4, based on Mark Asselstine's patch for
+qemu-2.2.
+
+Signed-off-by: Yunguo Wei <yunguo.wei@windriver.com>
+[Adjust code context
+ Use ram_migration_cleanup instead of migration_end which has been removed]
+Upstream-Status: Pending
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ include/migration/vmstate.h |  1 +
+ include/sysemu/sysemu.h     |  1 +
+ migration/migration.c       |  5 +++++
+ migration/ram.c             |  6 ++++++
+ migration/savevm.c          | 11 +++++++++++
+ 5 files changed, 24 insertions(+)
+
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index 1638ee57..7cf2f211 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -40,6 +40,7 @@ typedef struct SaveVMHandlers {
+     void (*set_params)(const MigrationParams *params, void * opaque);
+     SaveStateHandler *save_state;
+ 
++    void (*free)(void *opaque);
+     void (*cleanup)(void *opaque);
+     int (*save_live_complete_postcopy)(QEMUFile *f, void *opaque);
+     int (*save_live_complete_precopy)(QEMUFile *f, void *opaque);
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index ee7c7608..d819e1ac 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -113,6 +113,7 @@ int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy);
+ void qemu_savevm_state_cleanup(void);
+ void qemu_savevm_state_complete_postcopy(QEMUFile *f);
+ void qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only);
++void qemu_savevm_state_free(void);
+ void qemu_savevm_state_pending(QEMUFile *f, uint64_t max_size,
+                                uint64_t *res_non_postcopiable,
+                                uint64_t *res_postcopiable);
+diff --git a/migration/migration.c b/migration/migration.c
+index 82d0ed85..27218812 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1856,6 +1856,11 @@ static void *migration_thread(void *opaque)
+             }
+         }
+     }
++
++    if(s->state == MIGRATION_STATUS_COMPLETED) {
++        qemu_savevm_state_free();
++    }
++
+     qemu_bh_schedule(s->cleanup_bh);
+     qemu_mutex_unlock_iothread();
+ 
+diff --git a/migration/ram.c b/migration/ram.c
+index 1e7b8402..4f72de34 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -1436,6 +1436,11 @@ static void ram_migration_cleanup(void *opaque)
+     XBZRLE_cache_unlock();
+ }
+ 
++static void ram_migration_free(void *opaque)
++{
++    ram_migration_cleanup(opaque);
++}
++
+ static void reset_ram_globals(void)
+ {
+     last_seen_block = NULL;
+@@ -2586,6 +2591,7 @@ static SaveVMHandlers savevm_ram_handlers = {
+     .save_live_pending = ram_save_pending,
+     .load_state = ram_load,
+     .cleanup = ram_migration_cleanup,
++    .free = ram_migration_free,
+ };
+ 
+ void ram_mig_init(void)
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 33a2911e..8d16185b 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1142,6 +1142,17 @@ void qemu_savevm_state_cleanup(void)
+     }
+ }
+ 
++void qemu_savevm_state_free(void)
++{
++    SaveStateEntry *se;
++
++    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
++        if (se->ops && se->ops->free) {
++            se->ops->free(se->opaque);
++        }
++    }
++}
++
+ static int qemu_savevm_state(QEMUFile *f, Error **errp)
+ {
+     int ret;
+-- 
+2.11.0
+

@@ -1,0 +1,15 @@
+[Unit]
+Description=Nagios core
+After=syslog.target network.target
+
+[Service]
+Type=forking
+ExecStart=/etc/nagios/nagios-core-startup.sh start
+ExecStop=/etc/nagios/nagios-core-startup.sh stop
+ExecReload=/etc/nagios/nagios-core-startup.sh reload
+RemainAfterExit=yes
+PIDFile=/var/run/nagios/nagios.pid
+TimeoutSec=300
+
+[Install]
+WantedBy=multi-user.target

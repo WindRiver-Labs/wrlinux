@@ -1,0 +1,15 @@
+[Unit]
+Description=Zabbix PostgreSQL Server
+After=syslog.target network.target postgresql.service
+
+[Service]
+Type=forking
+ExecStartPre=/etc/zabbix/database/postgresql/zabbix_server_pgsql_setup.sh setup
+ExecStart=/usr/sbin/zabbix_server -c /etc/zabbix/zabbix_server.conf
+ExecReload=/usr/sbin/zabbix_server -R config_cache_reload
+RemainAfterExit=yes
+PIDFile=/var/run/zabbix/zabbix_server_pgsql.pid
+TimeoutSec=300
+
+[Install]
+WantedBy=multi-user.target

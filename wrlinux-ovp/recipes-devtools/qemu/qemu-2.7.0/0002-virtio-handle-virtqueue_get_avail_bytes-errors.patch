@@ -1,0 +1,70 @@
+From bb72ef4eabbcfda82a8205c5d3ecc41e1a83340b Mon Sep 17 00:00:00 2001
+From: Shan Hai <shan.hai@windriver.com>
+Date: Thu, 4 Aug 2016 10:40:08 +0800
+Subject: [PATCH 12/18] virtio: handle virtqueue_get_avail_bytes() errors
+
+If the vring is invalid, tell the caller no bytes are available and mark
+the device broken.
+
+Commit take from [PATCH v3 06/10] of "virtio: avoid exit() when device
+        enters invalid states" found at
+https://lists.gnu.org/archive/html/qemu-devel/2016-04/msg01978.html
+
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Shan Hai <shan.hai@windriver.com>
+[Adjust code context]
+Upstream-Status: Backport [d65abf85e7e5fce31905eaea322ef2ea26e5f2db]
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ hw/virtio/virtio.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 39d1b13f..14fe6c40 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -404,14 +404,14 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
+ 
+         if (desc.flags & VRING_DESC_F_INDIRECT) {
+             if (desc.len % sizeof(VRingDesc)) {
+-                error_report("Invalid size for indirect buffer table");
+-                exit(1);
++                virtio_error(vdev, "Invalid size for indirect buffer table");
++                goto err;
+             }
+ 
+             /* If we've got too many, that implies a descriptor loop. */
+             if (num_bufs >= max) {
+-                error_report("Looped descriptor");
+-                exit(1);
++                virtio_error(vdev, "Looped descriptor");
++                goto err;
+             }
+ 
+             /* loop over the indirect descriptor table */
+@@ -425,8 +425,8 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
+         do {
+             /* If we've got too many, that implies a descriptor loop. */
+             if (++num_bufs > max) {
+-                error_report("Looped descriptor");
+-                exit(1);
++                virtio_error(vdev, "Looped descriptor");
++                goto err;
+             }
+ 
+             if (desc.flags & VRING_DESC_F_WRITE) {
+@@ -451,6 +451,11 @@ done:
+     if (out_bytes) {
+         *out_bytes = out_total;
+     }
++    return;
++
++err:
++    in_total = out_total = 0;
++    goto done;
+ }
+ 
+ int virtqueue_avail_bytes(VirtQueue *vq, unsigned int in_bytes,
+-- 
+2.11.0
+

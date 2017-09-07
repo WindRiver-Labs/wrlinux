@@ -1,0 +1,32 @@
+From 4bc68c520d008f381e0160988ee0c49be0cef783 Mon Sep 17 00:00:00 2001
+From: Jiang Lu <lu.jiang@windriver.com>
+Date: Fri, 1 Apr 2016 15:52:21 +0800
+Subject: [PATCH] ceph:skip host distribution check
+
+No need to check host distribution for cross-compiling, just skip it.
+
+Signed-off-by: Jiang Lu <lu.jiang@windriver.com>
+---
+ src/ceph-detect-init/Makefile.am | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/src/ceph-detect-init/Makefile.am b/src/ceph-detect-init/Makefile.am
+index a2c885a..9923c76 100644
+--- a/src/ceph-detect-init/Makefile.am
++++ b/src/ceph-detect-init/Makefile.am
+@@ -62,11 +62,7 @@ clean-local::
+ install-data-local::
+ 	cd $(srcdir)/ceph-detect-init ; \
+ 	if test "$(DESTDIR)" ; then \
+-		if lsb_release -si | grep --quiet 'Ubuntu\|Debian\|Devuan' ; then \
+-			options=--install-layout=deb ; \
+-		else \
+-			options=--prefix=/usr ; \
+-		fi ; \
++		options=--install-lib=/usr/lib64/python2.7/site-packages --prefix=/usr \
+ 		root="--root=$(DESTDIR)" ; \
+ 	fi ; \
+ 	python setup.py install $$root $$options
+-- 
+1.9.1
+

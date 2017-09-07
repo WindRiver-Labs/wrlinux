@@ -1,0 +1,36 @@
+From becc9567d6ddd51caa98cdfbc0cf5abd58cb10fa Mon Sep 17 00:00:00 2001
+From: Mark Asselstine <mark.asselstine@windriver.com>
+Date: Thu, 14 Jun 2012 10:31:15 -0400
+Subject: [PATCH 01/18] qemu-kvm: drop 'cross' from pkg-config
+
+Since we use a sysroot instead of a combined set of -config files
+we can go right at pkg-config and drop the 'cross'. Without this
+change we would get an error like the following:
+
+Error: pkg-config binary 'x86_64-wrs-linux-pkg-config' not found
+
+Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+[ Adjust code context ]
+Upstream-Status: Inappropriate [upstream has switched to recipe
+specific sysroot which does not have this problem]
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index 0d26c47d..02647107 100755
+--- a/configure
++++ b/configure
+@@ -376,7 +376,7 @@ ld="${LD-${cross_prefix}ld}"
+ nm="${NM-${cross_prefix}nm}"
+ strip="${STRIP-${cross_prefix}strip}"
+ windres="${WINDRES-${cross_prefix}windres}"
+-pkg_config_exe="${PKG_CONFIG-${cross_prefix}pkg-config}"
++pkg_config_exe="${PKG_CONFIG-pkg-config}"
+ query_pkg_config() {
+     "${pkg_config_exe}" ${QEMU_PKG_CONFIG_FLAGS} "$@"
+ }
+-- 
+2.11.0
+

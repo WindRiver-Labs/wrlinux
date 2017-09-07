@@ -1,0 +1,82 @@
+From 045d0237b057e117228bcc41d5a7f74591dcbd9e Mon Sep 17 00:00:00 2001
+From: Thomas Gleixner <tglx@linutronix.de>
+Date: Thu, 31 May 2012 13:21:04 +0200
+Subject: [PATCH 05/18] cpus: Store VCPUs tid in /var/run/ file
+
+Store the TID of each VCPU in /var/run/kvm/$VMNAME/vcpu$N
+
+No proper way to unlink them yet. Let userspace deal with that.
+
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Signed-off-by: Yang Shi <yang.shi@windriver.com>
+Signed-off-by: Paul Barrette <paul.barrette@windriver.com>
+Signed-off-by: Michael Barabanov <michael.barabanov@windriver.com>
+Upstream-Status: Pending
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ cpus.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+
+diff --git a/cpus.c b/cpus.c
+index 2b1fe3c1..2ab447ad 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -54,6 +54,7 @@
+ #ifdef CONFIG_LINUX
+ 
+ #include <sys/prctl.h>
++#include <linux/unistd.h>
+ 
+ #ifndef PR_MCE_KILL
+ #define PR_MCE_KILL 33
+@@ -844,6 +845,38 @@ static void qemu_kvm_eat_signals(CPUState *cpu)
+     } while (sigismember(&chkset, SIG_IPI) || sigismember(&chkset, SIGBUS));
+ }
+ 
++#define gettid() syscall(__NR_gettid)
++
++static void qemu_kvm_store_tid(CPUState *env)
++{
++    char fname[256];
++    FILE *f;
++
++    if (!qemu_name)
++        return;
++
++    sprintf(fname, "/var/run/kvm/%s/vcpu%d", qemu_name, env->cpu_index);
++    f = fopen(fname, "w");
++    if (!f)
++        return;
++    fprintf(f, "%ld\n", gettid());
++    fclose(f);
++}
++
++#if 0
++/* TODO: Find a proper place to remove the vcpu files */
++static void qemu_kvm_remove_tid(CPUState *env)
++{
++    char fname[256];
++
++    if (!qemu_name)
++        return;
++
++    sprintf(fname, "/var/run/kvm/%s/vcpu%d", qemu_name, env->cpu_index);
++    unlink(fname);
++}
++#endif
++
+ #else /* !CONFIG_LINUX */
+ 
+ static void qemu_init_sigbus(void)
+@@ -1120,6 +1153,8 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
+         exit(1);
+     }
+ 
++    qemu_kvm_store_tid(cpu);
++
+     qemu_kvm_init_cpu_signals(cpu);
+ 
+     qemu_kvm_vcpu_sched_init(cpu);
+-- 
+2.11.0
+

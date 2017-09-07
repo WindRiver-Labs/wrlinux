@@ -1,0 +1,50 @@
+From b443171ca2e55ba5db1f260af4e05aa66a9ae966 Mon Sep 17 00:00:00 2001
+From: Nam Ninh <nam.ninh@windriver.com>
+Date: Mon, 2 Feb 2015 12:42:19 -0500
+Subject: [PATCH 17/18] qemu: inject NMI in i6300esb watchdog timer
+
+Inject the NMI to the guest instance of the current qemu if the WDT is
+triggered and expired. The other guests will not receive the NMI if
+the timer is not enabled or expired. The injection is in stage 1
+before the reboot happens in stage 2.
+
+Signed-off-by: Nam Ninh <nam.ninh@windriver.com>
+Upstream-Status: Pending
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ hw/watchdog/wdt_i6300esb.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/hw/watchdog/wdt_i6300esb.c b/hw/watchdog/wdt_i6300esb.c
+index 49b3cd18..626c6834 100644
+--- a/hw/watchdog/wdt_i6300esb.c
++++ b/hw/watchdog/wdt_i6300esb.c
+@@ -26,6 +26,7 @@
+ #include "sysemu/watchdog.h"
+ #include "hw/hw.h"
+ #include "hw/pci/pci.h"
++#include "qmp-commands.h"
+ 
+ /*#define I6300ESB_DEBUG 1*/
+ 
+@@ -179,6 +180,7 @@ static void i6300esb_reset(DeviceState *dev)
+ static void i6300esb_timer_expired(void *vp)
+ {
+     I6300State *d = vp;
++    Error *errp = NULL;
+ 
+     i6300esb_debug("stage %d\n", d->stage);
+ 
+@@ -192,6 +194,9 @@ static void i6300esb_timer_expired(void *vp)
+             fprintf(stderr, "i6300esb_timer_expired: I would send SMI here if I knew how (XXX)\n");
+             break;
+         }
++        /* Always send NMI at the end of stage 1 */
++        fprintf(stderr, "i6300esb_timer_expired: inject nmi \n");
++        qmp_inject_nmi(&errp);
+ 
+         /* Start the second stage. */
+         i6300esb_restart_timer(d, 2);
+-- 
+2.11.0
+

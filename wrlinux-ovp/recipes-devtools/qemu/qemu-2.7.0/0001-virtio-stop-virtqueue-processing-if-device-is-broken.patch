@@ -1,0 +1,151 @@
+From 681a8faa4362c4a37a0977b6d8893e0dc65eb585 Mon Sep 17 00:00:00 2001
+From: Shan Hai <shan.hai@windriver.com>
+Date: Fri, 19 Aug 2016 10:25:11 +0800
+Subject: [PATCH 11/18] virtio: stop virtqueue processing if device is broken
+
+QEMU prints an error message and exits when the device enters an invalid
+state.  Terminating the process is heavy-handed.  The guest may still be
+able to function even if there is a bug in a virtio guest driver.
+
+Moreover, exiting is a bug in nested virtualization where a nested guest
+could DoS other nested guests by killing a pass-through virtio device.
+I don't think this configuration is possible today but it is likely in
+the future.
+
+If the broken flag is set, do not process virtqueues or write back used
+descriptors.  The broken flag can be cleared again by resetting the
+device.
+
+Commit take from [PATCH v3 03/10] of "virtio: avoid exit() when device
+        enters invalid states" found at
+https://lists.gnu.org/archive/html/qemu-devel/2016-04/msg01978.html
+
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Shan Hai <shan.hai@windriver.com>
+[Adjust code context]
+Upstream-Status: Backport [f5ed36635d8fa73feb66fe12b3b9c2ed90a1adbe] 
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ hw/virtio/virtio.c         | 35 +++++++++++++++++++++++++++++++++++
+ include/hw/virtio/virtio.h |  3 +++
+ 2 files changed, 38 insertions(+)
+
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index d61146dd..39d1b13f 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -281,6 +281,10 @@ void virtqueue_fill(VirtQueue *vq, const VirtQueueElement *elem,
+ 
+     virtqueue_unmap_sg(vq, elem, len);
+ 
++    if (unlikely(vq->vdev->broken)) {
++        return;
++    }
++
+     idx = (idx + vq->used_idx) % vq->vring.num;
+ 
+     uelem.id = elem->index;
+@@ -291,6 +295,12 @@ void virtqueue_fill(VirtQueue *vq, const VirtQueueElement *elem,
+ void virtqueue_flush(VirtQueue *vq, unsigned int count)
+ {
+     uint16_t old, new;
++
++    if (unlikely(vq->vdev->broken)) {
++        vq->inuse -= count;
++        return;
++    }
++
+     /* Make sure buffer is written before we update index. */
+     smp_wmb();
+     trace_virtqueue_flush(vq, count);
+@@ -560,6 +570,10 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)
+     struct iovec iov[VIRTQUEUE_MAX_SIZE];
+     VRingDesc desc;
+ 
++    if (unlikely(vdev->broken)) {
++        return NULL;
++    }
++
+     if (virtio_queue_empty(vq)) {
+         return NULL;
+     }
+@@ -724,6 +738,10 @@ static void virtio_notify_vector(VirtIODevice *vdev, uint16_t vector)
+     BusState *qbus = qdev_get_parent_bus(DEVICE(vdev));
+     VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
+ 
++    if (unlikely(vdev->broken)) {
++        return;
++    }
++
+     if (k->notify) {
+         k->notify(qbus->parent, vector);
+     }
+@@ -807,6 +825,7 @@ void virtio_reset(void *opaque)
+         k->reset(vdev);
+     }
+ 
++    vdev->broken = false;
+     vdev->guest_features = 0;
+     vdev->queue_sel = 0;
+     vdev->status = 0;
+@@ -1114,6 +1133,10 @@ static void virtio_queue_notify_vq(VirtQueue *vq)
+     if (vq->vring.desc && vq->handle_output) {
+         VirtIODevice *vdev = vq->vdev;
+ 
++        if (unlikely(vdev->broken)) {
++            return;
++        }
++
+         trace_virtio_queue_notify(vdev, vq - vdev->vq, vq);
+         vq->handle_output(vdev, vq);
+     }
+@@ -1735,6 +1758,7 @@ void virtio_init(VirtIODevice *vdev, const char *name,
+     vdev->config_vector = VIRTIO_NO_VECTOR;
+     vdev->vq = g_malloc0(sizeof(VirtQueue) * VIRTIO_QUEUE_MAX);
+     vdev->vm_running = runstate_is_running();
++    vdev->broken = false;
+     for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
+         vdev->vq[i].vector = VIRTIO_NO_VECTOR;
+         vdev->vq[i].vdev = vdev;
+@@ -1921,6 +1945,17 @@ void virtio_device_set_child_bus_name(VirtIODevice *vdev, char *bus_name)
+     vdev->bus_name = g_strdup(bus_name);
+ }
+ 
++void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
++{
++    va_list ap;
++
++    va_start(ap, fmt);
++    error_vreport(fmt, ap);
++    va_end(ap);
++
++    vdev->broken = true;
++}
++
+ static void virtio_device_realize(DeviceState *dev, Error **errp)
+ {
+     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index d2490c19..0cdc7d87 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -87,6 +87,7 @@ struct VirtIODevice
+     VirtQueue *vq;
+     uint16_t device_id;
+     bool vm_running;
++    bool broken; /* device in invalid state, needs reset */
+     VMChangeStateEntry *vmstate;
+     char *bus_name;
+     uint8_t device_endian;
+@@ -135,6 +136,8 @@ void virtio_init(VirtIODevice *vdev, const char *name,
+                          uint16_t device_id, size_t config_size);
+ void virtio_cleanup(VirtIODevice *vdev);
+ 
++void virtio_error(VirtIODevice *vdev, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
++
+ /* Set the child bus name. */
+ void virtio_device_set_child_bus_name(VirtIODevice *vdev, char *bus_name);
+ 
+-- 
+2.11.0
+

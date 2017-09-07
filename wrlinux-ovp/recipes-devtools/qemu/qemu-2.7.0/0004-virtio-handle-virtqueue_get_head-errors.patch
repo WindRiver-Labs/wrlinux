@@ -1,0 +1,88 @@
+From 78bcc5ee6d12b9a148d83a66287141783155bb8a Mon Sep 17 00:00:00 2001
+From: Shan Hai <shan.hai@windriver.com>
+Date: Thu, 4 Aug 2016 10:55:23 +0800
+Subject: [PATCH 14/18] virtio: handle virtqueue_get_head() errors
+
+Stop processing the vring if virtqueue_get_head() fetches an
+out-of-bounds head index.
+
+Commit take from [PATCH v3 10/10] of "virtio: avoid exit() when device
+        enters invalid states" found at
+https://lists.gnu.org/archive/html/qemu-devel/2016-04/msg01978.html
+
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Shan Hai <shan.hai@windriver.com>
+[Adjust code context]
+Upstream-Status: Backport [fb1131b674e492a5f91abd77b9fcc9a9e2b88eb7]
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ hw/virtio/virtio.c | 28 ++++++++++++++++++----------
+ 1 file changed, 18 insertions(+), 10 deletions(-)
+
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 690b6a50..4c18a849 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -338,21 +338,20 @@ static int virtqueue_num_heads(VirtQueue *vq, unsigned int idx)
+     return num_heads;
+ }
+ 
+-static unsigned int virtqueue_get_head(VirtQueue *vq, unsigned int idx)
++static bool virtqueue_get_head(VirtQueue *vq, unsigned int idx,
++                               unsigned int *head)
+ {
+-    unsigned int head;
+-
+     /* Grab the next descriptor number they're advertising, and increment
+      * the index we've seen. */
+-    head = vring_avail_ring(vq, idx % vq->vring.num);
++    *head = vring_avail_ring(vq, idx % vq->vring.num);
+ 
+     /* If their number is silly, that's a fatal mistake. */
+-    if (head >= vq->vring.num) {
+-        error_report("Guest says index %u is available", head);
+-        exit(1);
++    if (*head >= vq->vring.num) {
++        virtio_error(vq->vdev, "Guest says index %u is available", *head);
++        return false;
+     }
+ 
+-    return head;
++    return true;
+ }
+ 
+ static unsigned virtqueue_read_next_desc(VirtIODevice *vdev, VRingDesc *desc,
+@@ -399,7 +398,11 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
+ 
+         max = vq->vring.num;
+         num_bufs = total_bufs;
+-        i = virtqueue_get_head(vq, idx++);
++
++        if (!virtqueue_get_head(vq, idx++, &i)) {
++            goto err;
++        }
++
+         desc_pa = vq->vring.desc;
+         vring_desc_read(vdev, &desc, desc_pa, i);
+ 
+@@ -602,11 +605,16 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)
+         exit(1);
+     }
+ 
+-    i = head = virtqueue_get_head(vq, vq->last_avail_idx++);
++    if (!virtqueue_get_head(vq, vq->last_avail_idx++, &head)) {
++        return NULL;
++    }
++
+     if (virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX)) {
+         vring_set_avail_event(vq, vq->last_avail_idx);
+     }
+ 
++    i = head;
++
+     vring_desc_read(vdev, &desc, desc_pa, i);
+     if (desc.flags & VRING_DESC_F_INDIRECT) {
+         if (desc.len % sizeof(VRingDesc)) {
+-- 
+2.11.0
+

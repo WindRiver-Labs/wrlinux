@@ -1,0 +1,79 @@
+From d1408204aedc6522c56f908e2ba20c9cddaa009c Mon Sep 17 00:00:00 2001
+From: Paul Barrette <paul.barrette@windriver.com>
+Date: Thu, 1 May 2014 16:47:21 -0400
+Subject: [PATCH 15/18] qemu: add trace events for do_device_add
+
+Add trace events for qmp_device_add.
+
+Signed-off-by: Paul Barrette <paul.barrette@windriver.com>
+[ywei: rename do_device_add to qmp_device_add as upstream API changed]
+Signed-off-by: Yunguo Wei <yunguo.wei@windriver.com>
+[Adjust code context
+ Remove ";" from qmp_device_add_* lines]
+Upstream-Status: Pending
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ hw/intc/trace-events | 7 +++++++
+ qdev-monitor.c       | 6 ++++++
+ 2 files changed, 13 insertions(+)
+
+diff --git a/hw/intc/trace-events b/hw/intc/trace-events
+index f12192c0..036cb98f 100644
+--- a/hw/intc/trace-events
++++ b/hw/intc/trace-events
+@@ -3,6 +3,13 @@
+ # hw/intc/apic_common.c
+ cpu_set_apic_base(uint64_t val) "%016"PRIx64
+ cpu_get_apic_base(uint64_t val) "%016"PRIx64
++
++# qdev-monitor.c
++qmp_device_add_enter(void *qdict, void **ret_data, void **errp) "qdict %p ret_data %p errp %p"
++qmp_device_add_error(void *qdict, void **ret_data, void **errp) "qdict %p ret_data %p errp %p"
++qmp_device_add_fast_return(void *qdict, void **ret_data, void **errp) "qdict %p ret_data %p errp %p"
++qmp_device_add_return(void *qdict, void **ret_data, void **errp) "qdict %p ret_data %p errp %p"
++
+ # coalescing
+ apic_report_irq_delivered(int apic_irq_delivered) "coalescing %d"
+ apic_reset_irq_delivered(int apic_irq_delivered) "old coalescing %d"
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index e19617fa..51c145df 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -28,6 +28,7 @@
+ #include "qemu/config-file.h"
+ #include "qemu/error-report.h"
+ #include "qemu/help_option.h"
++#include "trace.h"
+ 
+ /*
+  * Aliases were a bad idea from the start.  Let's keep them
+@@ -784,21 +785,26 @@ void qmp_device_add(QDict *qdict, QObject **ret_data, Error **errp)
+     DeviceState *dev;
+ 
+     opts = qemu_opts_from_qdict(qemu_find_opts("device"), qdict, &local_err);
++    trace_qmp_device_add_enter(qdict, ret_data, errp);
+     if (local_err) {
+         error_propagate(errp, local_err);
++        trace_qmp_device_add_error(qdict, ret_data, errp);
+         return;
+     }
+     if (!monitor_cur_is_qmp() && qdev_device_help(opts)) {
+         qemu_opts_del(opts);
++        trace_qmp_device_add_fast_return(qdict, ret_data, errp);
+         return;
+     }
+     dev = qdev_device_add(opts, &local_err);
+     if (!dev) {
+         error_propagate(errp, local_err);
+         qemu_opts_del(opts);
++        trace_qmp_device_add_error(qdict, ret_data, errp);
+         return;
+     }
+     object_unref(OBJECT(dev));
++    trace_qmp_device_add_return(qdict, ret_data, errp);
+ }
+ 
+ void qmp_device_del(const char *id, Error **errp)
+-- 
+2.11.0
+
