@@ -5,7 +5,6 @@
 PNWHITELIST_LAYERS_remove = "wrlinux-distro"
 
 # Define supported items from meta-openembedded
-PNWHITELIST_efl-layer += ""
 PNWHITELIST_filesystems-layer += " \
 	yaffs2-utils \
 	"
@@ -14,7 +13,6 @@ PNWHITELIST_gnome-layer += " \
 	libwnck3 \
 	"
 
-PNWHITELIST_gpe-layer += ""
 PNWHITELIST_meta-initramfs += ""
 PNWHITELIST_multimedia-layer += ""
 
@@ -79,8 +77,6 @@ PNWHITELIST_meta-python += " \
 	python3-django-south \
 	"
 
-PNWHITELIST_ruby-layer += ""
-PNWHITELIST_systemd-layer += ""
 PNWHITELIST_webserver += " \
 	phpmyadmin \
 	xdebug \
