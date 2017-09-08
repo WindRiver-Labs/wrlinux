@@ -1,0 +1,68 @@
+a) Write shell script as bellow (get template in doc directory)
+***************************************************
+***************************************************
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : SMM.7.1 Temperature Monitoring
+# 		You can execute this scripts directly.
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog
+# *
+# -
+
+#!/bin/sh
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+        echo "Clean System..."
+	<remove file and stop service>
+        echo "Finish"
+}
+
+<command you should run>
+
+result PASSED
+exit0
+***************************************************
+***************************************************
+
+Note:1) Must include "# description : ", behind this , you should write the test name, such as
+        # description : SMM.7.1 Temperature Monitoring
+        ./cgl_test will read this line and print out the name of test case.
+     2) Must include ". $CUTDIR/function.sh" , some usefull function included in this file.
+     3) Must include function clean(), remove the file that created in your test case and stop 
+	the service. If no this function , test case will fail.
+     4) Under function clean() , write your test case.
+     5) If you use "result PASSED", please add "exit 0", in case some unexpected error.
+
+b) Add shell script to test suite
+
+  1) Copy your test case to network-cgl4/testcase and add execute permission
+  2) Modify cgl_test
+     Add test case name to parameter "TESTCASE".
+
+Note: If this test case cover other one or two test, two steps should be done.
+	
+     1) Creat shell scripts and name them with covered test case name. Then write "# description : "
+        in this file.
+	e.g smm.7.2 and smm.7.3 is covered by smm.7.1
+	echo "# description : SMM.7.2 Fan Monitoring" > smm.7.2
+        echo "# description : SMM.7.3 Power Monitoring" > smm.7.3
+	chmod 755 smm.7.2 smm.7.3
+	
+     2) Modify cover.conf as below
+
+	smm.7.1:smm.7.2 smm.7.3
+
+	smm.7.1 is the test case will be run, separated with ":" ,smm.7.2 and smm.7.3 are covered by smm.7.1.
+
+c) If you want to use opensource test suite in your test case, you can copy it to network-cgl4,and modify Makefile to bulid it.
+   such as rb-futext,it's a test suite for prf.1.6.
+
+d) If you write test case by with C by yourself, put it in src and modify Makefile to build it.
+
+e) If need some config file or other tar file in your shell test case, put these file in resource.
+

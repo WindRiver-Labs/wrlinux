@@ -1,0 +1,52 @@
+#!/bin/sh
+
+# Copyright (c) 2008 - 2016 Wind River Systems, Inc.
+# description : SEC.1.2 Process Containment using File System Restrictions
+# 		After execute "chroot ***/jail",script will stop running, so
+# 		you should execute 'ls' in TAF after "chroot $CUTDIR/jail" , and get the resault of 'ls'
+# 		to print "passed" of "failed"
+# 		If "chroot $CUTDIR/jail" error , this scripts will print "FAILED" directly.
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog
+# * 02/22/2016 fix for cav-octeon3
+#
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+	echo "Clean System..."
+	rm -rf $TOPDIR/jail
+	rm -rf /tmp/sec.1.2
+	rm -rf /tmp/sec.1.2.out_of_jail
+	echo "Finish"
+}
+
+touch /tmp/sec.1.2.out_of_jail
+
+mkdir $TOPDIR/jail
+cd $TOPDIR/jail
+mkdir bin dev tmp usr etc
+cp /bin/bash bin
+cp /bin/ls bin
+chmod a=rwx tmp
+cp -a /lib* .
+cp -a /usr/lib* usr/
+cp -a /etc/* etc
+mknod dev/null c 1 3
+mknod dev/zero c 1 5
+chmod a=rw dev/null dev/zero
+
+cd ..
+chroot $TOPDIR/jail ls /tmp > /tmp/sec.1.2
+check "chroot failed"
+grep sec.1.2.out_of_jail /tmp/sec.1.2
+if [ $? -eq 0 ]; then
+	echo "access file out of jail"
+	result FAILED
+	exit 0
+fi
+
+result PASSED

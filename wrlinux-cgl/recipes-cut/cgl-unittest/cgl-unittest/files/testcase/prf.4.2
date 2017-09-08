@@ -1,0 +1,111 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : PRF.4.2 Support of Gigabit Ethernet Jumbo MTU
+#
+# developer : Xiaofeng.Liu  <xiaofeng.liu@windriver.com>
+#
+# changelog 
+# * 
+# - 
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+. $TOPDIR/config.sh
+
+clean()
+{
+	if [ $PRF_4_2_PHE = 1 ] ; then
+		ifconfig $ETH_JUM1 down
+	fi
+
+        if [ $PRF_4_2_PHE = 2 ] ; then
+		rmmod pktgen
+		sleep 1
+		ifconfig $ETH_JUM1 down
+        fi
+
+	echo "Exit from PRF.4.2: Support of Gigabit Ethernet Jumbo MTU"
+
+}
+
+#ETH_JUMBO_ADDR=192.168.29.200
+#GATE_JUMBO_ADDR=192.168.29.1
+
+ETH_LIST=`ifconfig -a | grep eth | cut -d" " -f1`
+ETH_USED=`ifconfig | grep eth | cut -d" " -f1`
+
+ETH_JUM1=0
+
+PRF_4_2_PHE=0
+
+for eth in $ETH_LIST ; do
+	found=0
+	if [ "`ethtool $eth | grep Link | cut -d : -f2`" = " yes" ] ; then 
+	echo "$eth is active"
+		for ethused in $ETH_USED; do
+			if [ "$eth" = "$ethused" ] ; then 	
+				found=1
+				break
+			fi
+		done
+		if [ found = 0 ] ; then 	
+			speed="`ethtool $eth | grep Speed | cut -d : -f2`"
+			if [ $speed = " 1000Mb/s" -o $speed = " 10000Mb/s"] ; then
+			ETH_JUM1="$eth"
+			echo "$ETH_JUM1 will be used"
+			break
+			fi
+		fi
+        fi
+done
+
+if [ $ETH_JUM1 = 0 ] ; then
+	echo "No GigE ethernet NIC devices on this target"
+	result NOTRUN
+	exit 1
+fi 
+
+ethtool $ETH_JUM1
+
+ifconfig $ETH_JUM1 up 2>&1
+check "bring up the NIC device"
+sleep 1
+
+PRF_4_2_PHE=1
+
+ifconfig $ETH_JUM1 $ETH_JUMBO_ADDR 2>&1
+check "config the NIC device ip address"
+sleep 1 
+
+route add -net default netmask 0.0.0.0 gateway $GATE_JUMBO_ADDR $ETH_JUM1 2>&1
+check "add route gateway address to NIC device"
+sleep 1
+
+modinfo pktgen
+
+modprobe pktgen 2>&1
+check "install the pktgen kernel moudel"
+sleep 1
+
+PRF_4_2_PHE=2
+
+export DST_IP=$ETH_JUMBO_ADDR
+getmac $ETH_JUM1
+export DST_MAC=$MACADDR
+
+export MAX_PKT_SIZE="max_pkt_size 9000"
+export MIN_PKT_SIZE="min_pkt_size 100"
+$TOPDIR/resource/pktgen_eth_test.sh $ETH_JUM1 2>&1
+check "run pkgen eth test stage 1"
+sleep 1
+
+export MAX_PKT_SIZE="max_pkt_size 9000"
+export MIN_PKT_SIZE="min_pkt_size 9000"
+$TOPDIR/resource/pktgen_eth_test.sh $ETH_JUM1 2>&1
+check "run pkgen eth test stage 2"
+sleep 1
+
+result PASSED
+exit 0
+

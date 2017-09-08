@@ -1,0 +1,94 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : AVL.5.3 Process-Level Non-Intrusive Application Monitor
+# developer : Chi Xu <chi.xu@windriver.com>
+# changelog:
+# * 02/04/2015 update the test for systemd
+# * Updated the use case to use monit instead of the old
+# * daemontools
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+if [ -f /etc/init.d/crond ]; then
+	CRON_START="/etc/init.d/crond start"
+	CRON_STOP="/etc/init.d/crond stop"
+else
+	CRON_START="/bin/systemctl start crond"
+	CRON_STOP="/bin/systemctl stop crond"
+fi
+
+clean()
+{
+	echo "Clean System..."
+	rm -rf /var/test/monit
+	echo "Finish"
+}
+
+if [ ! -d /var/test/monit ]
+then
+    echo "creating test area for monit"
+    mkdir -p /var/test/monit/log
+    touch /var/test/monit/log/test
+    touch /var/test/monit/test
+    chmod 700 /var/test/monit/log/test
+    chmod 700 /var/test/monit/test
+fi
+
+MONITRC="/var/test/monit/monitcutrc"
+cat > ${MONITRC} << EOF
+# This is a sample config for testing Monit capabilities!
+
+set httpd port 2812 and
+use address localhost
+allow localhost
+
+set daemon 10
+set logfile /var/test/monit/log/test
+set pidfile /var/test/monit/.monit.id
+set statefile /var/test/monit/.monit.state
+
+check system localhost
+ if loadavg (1min) > 4 then exec "/bin/echo 'load average is more than 4'"
+ if loadavg (5min) > 2 then exec "/bin/echo 'load average is more than 2'"
+ if memory usage > 75% then alert
+ if cpu usage (user) > 70% then alert
+ if cpu usage (system) > 30% then alert
+ if cpu usage (wait) > 20% then alert
+
+check process crond with pidfile /var/run/crond.pid
+ start program = "${CRON_START}"
+ stop program  = "${CRON_STOP}"
+ if cpu > 60% for 2 cycles then alert
+ if cpu > 80% for 5 cycles then restart
+ if totalmem > 200.0 MB for 5 cycles then restart
+ if children > 250 then restart
+ if loadavg(5min) greater than 10 for 8 cycles then stop
+ if 3 restarts within 5 cycles then timeout
+
+check file test with path /var/test/monit/test
+ if failed permission 700 then alert
+ if failed uid root then alert
+ if failed gid root then alert
+ if timestamp > 1 minutes then alert
+EOF
+chmod 700 ${MONITRC}
+
+echo "*****Start monit*****"
+monit -c ${MONITRC} -t
+monit -c ${MONITRC}
+check "Start monit error"
+echo "Monit has been started"
+
+sleep 5
+
+echo "*****Stop monit*****"
+monit -c ${MONITRC} status
+monit -c ${MONITRC} validate
+monit -c ${MONITRC} quit
+check "Stop monit error"
+echo "Monit has been stopped"
+sleep 5
+
+result PASSED

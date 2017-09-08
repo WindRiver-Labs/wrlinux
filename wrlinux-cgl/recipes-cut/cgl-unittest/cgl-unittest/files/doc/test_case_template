@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : SMM.7.1 Temperature Monitoring
+#               You can execute this scripts directly.
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog
+# *
+# -
+
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+        echo "Clean System..."
+        <remove file and stop service>
+        echo "Finish"
+}
+
+<command you should run>
+
+result PASSED
+exit0
+

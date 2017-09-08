@@ -1,0 +1,102 @@
+
+1. Summary:  Robust_pi_futex.
+2. CQ  Req ID:  WIND00121345 WIND00121346 WIND00121347 WIND00121348
+3. FB Case ID:  
+4. Author: Haotian Zhang
+5. Feature Developer: Bruce Ashfield
+6. Peer Reviewer: Xu Wang
+7. Group Reviewers: 
+8. Review Date: 
+
+9. Feature Description:
+	Robust_futexes provide a mechanism that is used in addition 
+	to normal futexes, for kernel assist of cleanup of held locks on task exit.
+	Priority Inheritance futex is to avoid priority inversion and helps 
+	achieving/improving determinism for user-space applications.
+	'Robustness' and 'PI' are two orthogonal  properties of futexes.
+
+10. Development Activity:
+     Patch kernel and patch glibc for feature implementation; 
+
+11. Testing Scope, dependency and limitation
+
+     11.1 Test Scopes
+        ARM: ti_omap2430sdp-standard-glibc_std  
+	MIPS64: mti_malta64f_le-standard-glibc_std
+	MIPS: nec_emma3p-standard-glibc_std
+        X86_64: sun_cp3220-standard-glibc_std  
+	i686: intel_mpcbl0040-standard-glibc_std, 
+	      common_pc-standard-glibc_std
+	PPC: wrs_sbc8641d-standard-glibc_std
+	PPC64: mot_atca6101-standard-glibc_std
+             
+     11.2 Test Scopes(re-run)
+        One typical bsp on 4 kernel types per arch. 
+     11.3 Test dependency
+        1) python.
+	2) PosixTestSuite package.
+
+     11.4 Test Limitaion
+	N/A.
+
+12. Testing resource
+     12.1 Hardware required to be purchas
+	N/A.
+     12.2 Hardware to be shared with another project
+	N/A.
+     12.3 Does location of hardware matter 
+	N/A.
+ 
+13. Test Approach:
+     Using the OpenPosixTestsuite to test this feature.
+     The rt-nptl tests in OpenPosixTest include two parts, 
+     one is robust mutex tests, the other is priority 
+     inheritance(pi) mutex tests.
+
+	Robust Mutex Tests
+	------------------------
+	Glibc/nptl testing cover this feature test.
+
+	Priority Inheritance Mutex Tests
+	--------------------------
+	The tests are under posixtestsuite/functional/threads/pi_test directory.
+
+	rt-nptl supports priority inheritance, if task TL with priority P(TL)
+	held a mutex, task TB with priority P(TB) claims the mutex and becomes
+	a waiter, P(TB)>P(TL), TL will boost to TB's priority until it
+	releases the lock. The pi mutex tests create several scenarios to test
+	this functionality. 
+
+14. Test Steps & commands:
+      1) Build kernel and rootfs.
+      2) Bootup.
+      3) Execute the shell script  
+         ./tst-robust-run.sh
+
+15. Expected Results:
+    The PASS or FAIL result can be obtained from the stdout.
+    Currently pi mutex tests don't provide automatic PASS or FAIL result display,
+    user need to analyze the output to get the PASS or FAIL test result manually.
+ 
+16. Automation
+     Yes.  Would enable the rtnpl-tests in posixtestsuite.
+   
+17. Effort and Reduplicate Efforts Estimation
+ 
+    17.1 Test Design :                      <N hrs>
+    17.2 Test Development:                  <N hrs>
+    17.3 Test Excution(once):               <N hrs>
+    17.4 Test Reduplicate Efforts:
+	17.4.1 Targets
+	  <11.1>
+	17.4.2 Hosts
+	  N/A.
+	17.4.3 Time
+	  N/A.
+
+18. Unanswered Questions
+     N/A.
+
+19. Miscellaneous Remarks
+     N/A.
+

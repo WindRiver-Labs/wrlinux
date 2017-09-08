@@ -1,0 +1,51 @@
+---
+ net-snmp-5.6.1/agent/mibgroup/host/data_access/swinst_rpm.c |    4 +++-
+ net-snmp-5.6.1/agent/mibgroup/host/hr_swinst.c              |    2 +-
+ net-snmp-5.6.1/configure.d/config_os_libs1                  |    6 +++---
+ 3 files changed, 7 insertions(+), 5 deletions(-)
+
+--- a/agent/mibgroup/host/data_access/swinst_rpm.c
++++ b/agent/mibgroup/host/data_access/swinst_rpm.c
+@@ -24,10 +24,12 @@
+ #endif
+ 
+ #ifdef HAVE_RPM_RPMLIB_H
++#include <stdio.h>
++#include <stdint.h>
+ #include <rpm/rpmlib.h>
+ #endif
+ #ifdef HAVE_RPM_RPMLIB_H
+-#include <rpm/header.h>
++#include <rpm/rpm4compat.h>
+ #endif
+ #ifdef HAVE_RPMGETPATH		/* HAVE_RPM_RPMMACRO_H */
+ #include <rpm/rpmmacro.h>
+--- a/agent/mibgroup/host/hr_swinst.c
++++ b/agent/mibgroup/host/hr_swinst.c
+@@ -42,7 +42,7 @@
+ 
+ #ifdef HAVE_LIBRPM
+ #include <rpm/rpmlib.h>
+-#include <rpm/header.h>
++#include <rpm/rpm4compat.h>
+ #include <fcntl.h>
+ 
+ #ifdef HAVE_RPM_RPMFILEUTIL_H
+--- a/configure.d/config_os_libs1
++++ b/configure.d/config_os_libs1
+@@ -11,12 +11,12 @@
+ #   RPM checks
+ #
+ ##
+-AC_CHECK_HEADERS(rpm/rpmlib.h rpm/header.h)
++AC_CHECK_HEADERS(rpm/rpmlib.h rpm/rpmtag.h)
+ 
+ AC_CHECK_HEADER(rpm/rpmlib.h,rpmlib_h=yes,rpmlib_h=no)
+-AC_CHECK_HEADER(rpm/header.h,rpmheader_h=yes,rpmheader_h=no)
++AC_CHECK_HEADER(rpm/rpmtag.h,rpmtag_h=yes,rpmtag_h=no)
+ 
+-if test "x$rpmheader_h" = "xno" -o "x$rpmlib_h" = "xno" ; then
++if test "x$rpmtag_h" = "xno" -o "x$rpmlib_h" = "xno" ; then
+   if test "x$with_rpm" = "xyes" ; then
+     AC_MSG_ERROR([Could not find either the RPM header files needed and was specifically asked to use RPM support])
+   else

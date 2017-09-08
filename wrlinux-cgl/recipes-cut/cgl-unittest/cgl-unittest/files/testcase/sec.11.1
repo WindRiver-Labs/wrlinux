@@ -1,0 +1,110 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : SEC.11.1 File Access Tracing
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# This case strategy as below:
+# 1, mount debugfs filesystem.
+# 2, stop tracing and clear trace file record.
+# 3, set funtion tracer and only trace the functions.
+# related to file operation such as do_sys_open,
+# SyS_read, SyS_write, SyS_close, SyS_unlink(SyS_unlinkat)
+# and SyS_chmod(SyS_fchmodat).
+# 4, run a test program which open file, read file,
+# write file, close file, change file attribute and
+# remove file.
+# 5, stop tracing.
+# 6, check the trace file record file operation event or
+# not, the test passed if record. Otherwise, the test failed.
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+TMP_DIR=`mktemp -d /tmp/sec.11.1.tmp.XXXXXX`
+
+clean()
+{
+    echo "Clean System..."
+    mount|grep $TMP_DIR/debug && umount $TMP_DIR/debug
+    rm -rf $TMP_DIR
+    echo "Finish"
+}
+
+# check if debugfs file system mounted or not
+# geneate TRACE_DIR
+TRACE_DIR=""
+mount|grep debugfs|grep /sys/kernel/debug
+if [ $? -eq 0 ]
+then
+    TRACE_DIR="/sys/kernel/debug"
+else
+    mkdir -p $TMP_DIR/debug
+    mount -t debugfs nodev $TMP_DIR/debug || cutna "Cannot mount debugfs"
+    TRACE_DIR="${TMP_DIR}/debug"
+fi
+
+# go to debugfs tracing direcotory
+cd $TRACE_DIR/tracing
+
+# enable the function tracer
+cat current_tracer|grep function ||echo function > current_tracer
+cat current_tracer|grep function|| cutna "Cannot enable function tracer"
+
+# stop the tracing
+echo 0 > tracing_on
+
+# clear tracing data
+echo > trace
+
+# set the tracing function
+# SyS_open to track file open
+# SyS_read to track file read
+# SyS_write to track file write
+# SyS_close to track file close
+# SyS_unlink to track file remove
+# SyS_chmod to track file attributes change
+echo > set_ftrace_filter 
+# In multilib env, the open function in kernel is
+# compat_SyS_open, and SyS_open in non-multilib env,
+# and both SyS_open and compat_SyS_open will 
+# continue to call do_sys_open
+echo do_sys_open > set_ftrace_filter
+echo SyS_read >>  set_ftrace_filter
+echo SyS_write >>  set_ftrace_filter
+echo SyS_close >>  set_ftrace_filter
+echo SyS_unlink >>  set_ftrace_filter
+# add specified SyS_unlink as SyS_unlinkat for cav-octeontx board
+echo SyS_unlinkat >>  set_ftrace_filter
+echo SyS_chmod >>  set_ftrace_filter
+# add specified SyS_chmod as SyS_fchmodat for cav-octeontx board
+echo SyS_fchmodat >>  set_ftrace_filter
+
+# start the tracing
+echo 1 > tracing_on
+# run the file operation test
+/opt/cut/bin/file_test &> $TMP_DIR/pid_log || cutfail
+
+# stop the tracing
+echo 0 > tracing_on
+
+pid_f=`cat $TMP_DIR/pid_log|awk '{print $3}'`
+if [ x"$pid_f" = x ]
+then
+    cutfail
+fi
+# add to check do_sys_open
+cat trace|grep file_test-${pid_f}|grep do_sys_open || cutfail
+cat trace|grep file_test-${pid_f}|grep SyS_read || cutfail
+cat trace|grep file_test-${pid_f}|grep SyS_write || cutfail
+cat trace|grep file_test-${pid_f}|grep SyS_close || cutfail
+arch=`uname -m`
+if [ "$arch" == "aarch64" ]; then
+    cat trace|grep file_test-${pid_f}|grep SyS_unlinkat || cutfail
+    cat trace|grep file_test-${pid_f}|grep SyS_fchmodat || cutfail
+else
+    cat trace|grep file_test-${pid_f}|grep SyS_unlink || cutfail
+    cat trace|grep file_test-${pid_f}|grep SyS_chmod || cutfail
+fi
+cutpass

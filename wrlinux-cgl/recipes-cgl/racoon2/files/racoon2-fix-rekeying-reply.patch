@@ -1,0 +1,29 @@
+racoon2: fix rekeying reply
+
+Why did node_a send the CREATE_CHILD_SA having the duplicated id?
+racoon2 has a counter for counting the number of transmitted request messages.
+You can find the counter named request_pending in the source code.
+This counter is counted up when a request message is sent,
+and it is counted down when the corresponding response message arrives.
+The problem is that racoon2 does not count up the counter mistakenly
+when sending the initial IKE_SA_INIT message in initiator mode.
+This makes the counter corrupt
+then the CREATE_CHILD_SA sent with an unexpected message id.
+
+Signed-off-by: LiWang <li.wang@windriver.com>
+
+This patch was carried over from WRL4.3
+
+Signed-of-by: Aws Ismail <aws.ismail@windriver.com>
+
+--- racoon2-20090327c.org/iked/ikev2.c	2010-05-14 10:19:34.000000000 +0800
++++ racoon2-20090327c/iked/ikev2.c	2010-05-14 10:23:54.000000000 +0800
+@@ -923,6 +923,8 @@
+ 	if (!pkt)
+ 		goto fail;
+ 
++	++ike_sa->request_pending;
++
+ 	/* save message data for AUTH calculation */
+ 	if (ike_sa->my_first_message)
+ 		rc_vfree(ike_sa->my_first_message);

@@ -1,0 +1,78 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : SEC.2.2 Password Integrity Checking 
+# 		In this script, change options in /etc/pam.d/passwd,enforce the length of the new 
+# 		password 12 to 40 characters. If new password is not long enough, change password will fail, then the 
+# 		test case passed.
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog 
+# * 
+# - 
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+	echo "Clean System..."
+	if [ ! -e "/etc/pam.d/userdel" ]; then
+	  cp -a  /etc/pam.d/useradd /etc/pam.d/userdel
+	  userdel tester
+	  rm -rf /etc/pam.d/userdel
+	else
+	  userdel tester
+	fi
+	rm -rf /home/tester
+	rm -rf /tmp/sec.2.2.tmp
+	if [ $PAM_CRACKLIB -eq 1 ]; then
+	  sed -i '/pam_cracklib.so/s/^#//g' /etc/pam.d/passwd
+	elif [ $PAM_CRACKLIB -eq 2 ]; then
+	  sed -i '/password/s/^#//g' /etc/pam.d/passwd
+	fi
+	if [ $PAM_CRACKLIB -ne 0 ]; then
+	  sed -i '/pam_passwdqc.so/d' /etc/pam.d/passwd
+	fi
+	echo "Finish"
+}
+
+PAM_CRACKLIB=0
+
+echo "******Add user tester******"
+useradd tester
+check "user add error"
+
+echo "******Change tester's password******"
+changepasswd tester 1234
+check "passwd execute error"
+
+if grep "pam_cracklib.so" /etc/pam.d/passwd
+then
+  sed -i '/pam_cracklib.so/s/^/'#'/g' /etc/pam.d/passwd
+  PAM_CRACKLIB=1
+else
+  #disable system-auth config for password
+  sed -i '/password/s/^/'#'/g' /etc/pam.d/passwd
+  PAM_CRACKLIB=2
+fi
+echo "password    required     pam_passwdqc.so      retry=3" \
+        >> /etc/pam.d/passwd
+
+echo "******Try to change tester's password again******"
+changepasswd tester 123 | tee /tmp/sec.2.2.tmp
+
+grep "Module is unknown" /tmp/sec.2.2.tmp > /dev/null
+if [ $? -eq 0 ]
+then
+	error "pam_passwdqc.so not avaliable"
+fi
+
+RETRY_TIMES=`grep "Weak password: too short" /tmp/sec.2.2.tmp | wc -l`
+if [ $RETRY_TIMES -eq 3 ]
+then
+	result PASSED
+else
+	error "password can be changed to 123, pam_passwdqc.so not available" 2
+fi
+

@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# Copyright (c) 2017 Wind River Systems, Inc.
+# description : SEC.1.3 Process Containment Using MAC-based Mechanism
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# The strategy as below:
+# 1. check if selinux policy is enabled, it not, then N/A
+# 2. check the load_policy privilege both in sysadm_r and
+#    secadm_r, it should be permitted in secadm_r role and
+#    prohibited in sysadm_r role.
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+    echo "Clean System..."
+    echo "Finish"
+}
+
+# check selinux policy is enabled or not
+which sestatus || cutna "Need to install sestatus"
+sestatus | grep "SELinux status" | grep enabled || cutna "The selinux not enabled"
+sestatus | grep "Current mode" | grep enforcing || cutna "The selinux not in enforcing mode"
+
+id -Z | awk -F: '{print $2}' | grep sysadm_r
+if [ $? -eq 0 ]; then
+    load_policy && cutfail
+else
+    newrole -r sysadm_r --  -c "/usr/sbin/load_policy" && cutfail
+fi
+
+newrole -r secadm_r --  -c "/usr/sbin/load_policy" || cutfail
+
+cutpass

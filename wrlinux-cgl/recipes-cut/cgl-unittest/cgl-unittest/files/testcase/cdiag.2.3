@@ -1,0 +1,99 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : CDIAG.2.3 Cluster Wide Log Collection
+# 		You can execute this scripts directly.
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog 
+# * 01/28/2015 Jackie: rework the test for both rsyslog and syslog-ng,
+#                      and make sure it works fine with both systemd
+#                      and sysvinit.
+# * Aws Ismail: complete rework to test for syslog-ng instead of evlog
+# - 
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+TEST_CONF="/etc/syslog-test.conf"
+if [ -f /etc/init.d/syslog ]; then
+	SYSLOG_START="/etc/init.d/syslog start"
+	SYSLOG_STOP="/etc/init.d/syslog stop"
+else
+	SYSLOG_START="systemctl start syslog"
+	SYSLOG_STOP="systemctl stop syslog.socket"
+fi
+
+# rsyslog is the default syslog, but the user may
+# choose to use syslog-ng
+SYSLOG="rsyslog"
+SYSLOGD="rsyslogd"
+if [ -f /etc/syslog-ng/syslog-ng.conf ]; then
+	SYSLOG="syslog-ng"
+	SYSLOGD="syslog-ng"
+fi
+
+clean()
+{
+        echo "Clean System..."
+        rm -rf /tmp/cdiag.2.3
+        rm -rf /tmp/cdiag.2.3.tmp
+        rm -rf /var/log/cdiag.2.3
+        rm -rf ${TEST_CONF}
+        killall ${SYSLOGD}
+        ${SYSLOG_START}
+        echo "Finish"
+}
+
+mkdir /var/log/cdiag.2.3/
+touch /var/log/cdiag.2.3/messages
+touch /tmp/cdiag.2.3
+
+ps -A | grep ${SYSLOGD} > /dev/null
+if [ $? -ne 0 ]
+then
+        echo "${SYSLOG} is stopped. start it"
+        echo "Start ${SYSLOG}"
+else
+        echo "${SYSLOG} is already running"
+        killall ${SYSLOGD}
+        ${SYSLOG_STOP}
+fi
+
+if [ ${SYSLOG} = "syslog-ng" ]; then
+	cp -a /etc/syslog-ng/syslog-ng.conf ${TEST_CONF}
+
+	echo " \
+	source s_file { file("/tmp/cdiag.2.3"); }; \
+	destination d_file {file("/var/log/cdiag.2.3/messages");}; \
+	log { source(s_file); filter(f_messages); destination(d_file); };" >> ${TEST_CONF}
+
+	${SYSLOGD} --process-mode=background -e -v -t -d --cfgfile=${TEST_CONF} &
+else
+	cp -a /etc/rsyslog.conf ${TEST_CONF}
+	cat >> ${TEST_CONF} <<EOF
+\$ModLoad imfile
+\$InputFileName /tmp/cdiag.2.3
+\$InputFileTag cdiag.2.3
+\$InputFileStateFile stat-cdiag.2.3
+\$InputFileFacility local7
+\$InputRunFileMonitor
+local7.* /var/log/cdiag.2.3/messages
+EOF
+	${SYSLOGD} -d -f ${TEST_CONF}
+fi
+
+check "${SYSLOG} start fail"
+ps -A | grep ${SYSLOGD}
+check "${SYSLOG} start fail"
+
+echo "******Test log event******"
+echo "Send log event..."
+echo "cdiag.2.3" > /tmp/cdiag.2.3
+sleep 20
+echo "read log..."
+cat /var/log/cdiag.2.3/messages | tee /tmp/cdiag.2.3.tmp
+grep cdiag.2.3 /tmp/cdiag.2.3.tmp > /dev/null
+check "Can not find test log"
+
+result PASSED

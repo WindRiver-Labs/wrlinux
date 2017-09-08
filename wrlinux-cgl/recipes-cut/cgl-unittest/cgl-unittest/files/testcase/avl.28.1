@@ -1,0 +1,89 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : AVL.28.1 File System De-fragmentation
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# The strategy as below:
+# Note: the on line defragmentor e4defrag only works in ext4
+# file system.
+# 1, write some files and continously update the first file
+# to try to generate some fragments.
+# 2, use the on line defragmentor e4defrag to check the first
+# file.
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+TMP_DIR=`mktemp -d /tmp/avl.28.1.tmp.XXXXXX`
+TMP_DIR1=`mktemp -d /tmp/avl.28.1.tmp1.XXXXXX`
+
+clean()
+{
+    echo "Clean System..."
+    # restore the console log level
+    [ -f ${TMP_DIR1}/printk ] && cp ${TMP_DIR1}/printk /proc/sys/kernel/printk
+    umount $TMP_DIR
+    losetup -d /dev/loop0
+    sleep 1
+    rm -rf $TMP_DIR
+    rm -rf $TMP_DIR1
+    echo "Finish"
+}
+
+prepare_fs()
+{
+    test -a /dev/loop0||modprobe loop
+    # generate the file system file
+    dd if=/dev/zero of=$TMP_DIR1/fs_file bs=1M count=600 || cutna "Cannot generate the specified 600M file system file"
+    losetup /dev/loop0 $TMP_DIR1/fs_file
+    mkfs.ext4 /dev/loop0 
+    if [ $? -ne 0 ]
+    then
+        cutna "The defragmentor only supports ext4 file system"
+    fi
+    # customise the console log level only print error message and above
+    # to avoid the noisy info message in test report.
+    cp /proc/sys/kernel/printk $TMP_DIR1
+    echo "3" > /proc/sys/kernel/printk
+    mount /dev/loop0 $TMP_DIR > /dev/null 2>&1 || cutna "Failed to mount the specified ext4 file system"
+}
+    
+file_num=5
+
+generate_files()
+{
+    dd if=/dev/urandom of=${TMP_DIR}/test${file_num}.txt bs=1048576 count=150
+    file_num=`expr $file_num - 1`
+    # generate five files
+    while [ $file_num -ne 0 ]
+    do
+        dd if=/dev/urandom of=${TMP_DIR}/test${file_num}.txt bs=1048576 count=90
+        file_num=`expr $file_num - 1`
+    done
+    rm -rf ${TMP_DIR}/test3.txt
+    file_num=5
+    # update the first file continously
+    rm -rf ${TMP_DIR}/test${file_num}.txt
+    dmesg &>> ${TMP_DIR}/test${file_num}.txt
+    dd if=/dev/urandom of=${TMP_DIR}/test${file_num}.txt bs=1048576 count=200
+    rm -rf ${TMP_DIR}/test${file_num}.txt
+    ifconfig &>> ${TMP_DIR}/test${file_num}.txt
+    dd if=/dev/urandom of=${TMP_DIR}/test3.txt bs=1048576 count=150
+    rm -rf ${TMP_DIR}/test${file_num}.txt
+    rm -rf ${TMP_DIR}/test2.txt
+    dd if=/dev/urandom of=${TMP_DIR}/test${file_num}.txt bs=1048576 count=10
+    dmesg &>> ${TMP_DIR}/test${file_num}.txt
+    rm -rf ${TMP_DIR}/test${file_num}.txt
+    dd if=/dev/urandom of=${TMP_DIR}/test${file_num}.txt bs=1048576 count=160
+}
+
+prepare_fs
+generate_files
+e4defrag -c ${TMP_DIR}/test${file_num}.txt
+if [ $? -eq 0 ] 
+then
+    cutpass
+fi
+result FAILED

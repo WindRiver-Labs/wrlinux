@@ -1,0 +1,31 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : SMM.7.4 Media Monitoring
+# 	
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog 
+# * 
+# - 
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+	echo "Clean System..."
+	echo "Finish"
+}
+
+echo "******Run fdisk******"
+fdisk -l
+check "Run fdisk fail"
+echo "******Run mount******"
+mount
+check "Run mount fail"
+echo "******Run df******"
+df -lh
+check "Run df fail"
+
+result PASSED

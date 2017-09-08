@@ -1,0 +1,98 @@
+#!/bin/bash
+#Copyright (c) 2008 Wind River Systems, Inc.
+#description : High Resolution timer testing
+# 
+#developer : Yongli He  <yongli.he@windriver.com>
+#
+# changelog 
+# * 
+# - 
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+
+
+
+clean()
+{
+    rm -rf    cyclictest.log
+    echo "High Resolution timer testing"
+
+}
+help(){
+echo "*****************************"
+echo "# please check the result, or test by hand again"
+echo "#Steps:"
+echo "# -booted without HRT enabled.  run the test and observe the results:"
+echo "# root@whip:/root/opt/scripts> ./cyclic-test -t 1 -p 80 -n -i 10000 -l 10000"
+echo "# T: 0 ( 3056) P:80 I:10000 C:   10000 Min:   2778 Act:3053321 Avg:1528062 Max: 3053321"
+echo "#"
+echo "#-reboot with a kernel with HRT enabled and re-run the same test:"
+echo "# root@whip:/root/opt/scripts> ./cyclic-test -t 1 -p 80 -n -i 10000 -l 10000"
+echo  "get result with very good response time"
+echo "#T: 0 ( 2692) P:80 I:10000 C:  10000 Min:      3 Act:   54 Avg:   40 Max: 80"
+echo "*****************************"
+}
+
+
+#cyclictest -t 1 : 1 thread
+#                -p 80 :prio 80
+#                -n use clock_nanosleep
+#                -i 10000: sleep 10000us for testing
+#                -l 10000: 10000 times testing
+#                     -q quite, only result is needed
+# test method : get now,calc expectant wake time, nanosleep(10000us), wakeup, 
+#calc diff between now and the expectant wake time
+$TOPDIR/bin/cyclictest -t 1 -p 80 -n -i 10000 -l 10000 -q  2>&1 > cyclictest.log
+check "cyclictest failed"  2  #2 means test failed
+cat cyclictest.log  #dump to standard log file
+
+#basic check 
+result=$(cat cyclictest.log | grep "WARNING: High resolution timers not available")
+if [ "$result" != ""  ]
+then
+   cutfail "please enable High resolution timer"
+fi
+
+
+result=$(cat cyclictest.log | grep "Avg:")
+# result sample
+#T: 0 ( 7879) P:80 I:10000 C:    100 Min:     17 Act:   18 Avg:   17 Max:      19
+max=$(echo $result | awk -F :  '{print  $9}')
+avg=$(echo $result | awk -F :  '{print  $8}' | awk '{print $1}')
+
+#expect avg< 200, max <1000
+echo "test result:"
+echo $result
+
+if [ "$avg" -le 200  ]
+then
+    if [ "$max" -le 1000  ]  # both is ok
+    then 
+        echo "meet expect"
+        cutpass
+     else
+        echo "max is bigger than expection"
+        help
+        cutpass
+    fi
+      
+else 
+    if [ "$max" -le 1000  ]
+    then 
+        echo "avg value is bigger than expection"
+        help
+        cutpass
+    else
+        echo "boch max and avg don't meet expection"
+        help
+        cuterr
+    fi
+fi        
+
+echo "test script error!"
+cutfail
+           
+
+

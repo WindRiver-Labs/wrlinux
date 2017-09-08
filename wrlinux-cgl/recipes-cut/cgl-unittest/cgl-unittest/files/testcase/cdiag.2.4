@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : CDIAG.2.4 Synchronized/Atomic Time Across Cluster
+#
+# developer : Xiaofeng.Liu  <xiaofeng.liu@windriver.com>
+#
+# changelog 
+# * 02/06/2015 update the test for systemd
+# - 
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+if [ -f /etc/init.d/ntpd ]; then
+        NTP_START="/etc/init.d/ntpd start"
+        NTP_STOP="/etc/init.d/ntpd stop"
+else
+        NTP_START="/bin/systemctl start ntpd"
+        NTP_STOP="/bin/systemctl stop ntpd"
+fi
+
+
+clean()
+{
+	mv -v /etc/ntp.conf.orig /etc/ntp.conf
+
+	if [ $CDIAG_2_4_PHE = 1 ] ; then
+		${NTP_STOP} 2>&1
+	fi
+
+	echo "Exit from CDIAG.2.4 Synchronized/Atomic Time Across Cluster"
+
+}
+
+
+CDIAG_2_4_PHE=0
+
+if [ -f /etc/ntp.conf ]
+then
+	cp -v /etc/ntp.conf /etc/ntp.conf.orig
+fi
+
+echo "server ${NTP_SERVER_ADDR:=147.11.1.11}" >> /etc/ntp.conf
+check "modify ntp.conf stage 1"
+
+echo "restrict default nomodify notrap noquery" >> /etc/ntp.conf
+check "modify ntp.conf stage 2"
+
+${NTP_START} 2>&1
+check "start the ntpd service"
+
+sleep 1
+
+CDIAG_2_4_PHE=1
+
+ntpq -p
+check "get ntp state"
+
+result PASSED
+exit 0
+

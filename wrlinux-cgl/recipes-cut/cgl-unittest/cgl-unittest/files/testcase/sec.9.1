@@ -1,0 +1,95 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : SEC.9.1 Role-Based Access Control
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# The strategy as below:
+# 1. check if selinux policy is enabled, it not, then N/A
+# 2. add user to a role
+# 3. verify the privileges for each role
+# 4. delete user from a role
+
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+    echo "Clean System..."
+    userdel testuser1
+    rm -rf /home/testuser1
+    echo "Finish"
+}
+
+# check selinux policy is enabled or not
+sestatus|grep "SELinux status"|grep enabled || cutna "The selinux not enabled"
+sestatus|grep "Current mode"|grep enforcing || cutna "The selinux not in enforcing mode"
+
+# check if in sysadm role
+id -Z|awk -F: '{print $2}'|grep sysadm_r || newrole -r sysadm_r
+useradd testuser1
+expect <<- END
+spawn passwd testuser1
+expect {
+        "Enter new"           {send "123456\r"}
+}
+expect {
+        "Retype new"           {send "123456\r"}
+}
+send "exit\r"
+expect eof
+END
+[ $? -eq 0 ] || cutfail
+
+# change to secadm_r role which responsible for selinux policy
+id -Z|awk -F: '{print $2}'|grep secadm_r || {
+expect <<- END
+spawn newrole -r secadm_r
+expect {
+        "Password:"           {send "root\r"}
+        "root@"             {send "semanage login -a -s sysadm_u -r s0-s15:c0.c1023 testuser1\r"}
+}
+send "semanage login -l\r"
+send "exit\r"
+expect eof
+END
+[ $? -eq 0 ] || cutfail
+}
+# mapping system user to selinux user
+#semanage login -a -s sysadm_u -r s0-s15:c0.c1023 testuser1
+
+# switch to testuser1 to verify the privileges under current role
+# should't set selinux policy as testuser1 in sysadm role, failed the case 
+# if return 0
+su -c "semanage login -a -s sysadm_u -r s0-s15:c0.c1023 testuser1" testuser1 && cutfail
+# should set password as testuser1 in sysadm role
+# failed the case if return not 0
+expect <<- END
+spawn su -c passwd testuser1
+expect {
+        "(current)"           {send "123456\r"}
+}
+expect {
+        "Enter new"           {send "1234567\r"}
+}
+expect {
+        "Re-type new"           {send "1234567\r"}
+}
+send "exit\r"
+expect eof
+END
+[ $? -eq 0 ] || cutfail
+# delete the testuser1 from sysadm role
+expect <<- END
+spawn newrole -r secadm_r
+expect {
+        "Password:"           {send "root\r"}
+        "root@"             {send "semanage login --delete testuser1\r"}
+}
+send "exit\r"
+expect eof
+END
+[ $? -eq 0 ] || cutfail
+cutpass

@@ -1,0 +1,29 @@
+#!/bin/sh
+
+# Copyright (c) 2008 - 2016 Wind River Systems, Inc.
+# description : PRF.1.7 Handling Interrupts As Threads
+# 		You can execute this scripts directly.
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog
+# * 03/01/2016 drop the rt-tester that needs kernel feature RT_MUTEX_TESTER
+#              since it has been deprecated and removed, and just simply
+#              check if the threadirqs kernel options are enabled.
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+        echo "Clean System..."
+        echo "Finished testcase [ PRF.1.7 Handling Interrupts As Threads ]"
+}
+
+zcat /proc/config.gz | grep CONFIG_IRQ_FORCED_THREADING=y
+checkerr "CONFIG_IRQ_FORCED_THREADING is not enabled"
+
+zcat /proc/config.gz | grep CONFIG_PREEMPT=y
+checkerr "CONFIG_PREEMPT is not enabled"
+
+result PASSED
+

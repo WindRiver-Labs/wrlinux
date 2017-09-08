@@ -1,0 +1,127 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : STD.10.0 802.1Q VLAN Endpoint
+#
+# developer : Xiaofeng.Liu  <xiaofeng.liu@windriver.com>
+#
+# changelog 
+# * 
+# - 
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+	if [ $STD_10_0_PHE = 1 ] ; then
+		rmmod 8021q
+	fi
+
+        if [ $STD_10_0_PHE = 2 ] ; then
+		ifconfig $ETH_VLAN1 down
+		sleep 1
+		rmmod 8021q
+        fi
+
+        if [ $STD_10_0_PHE = 3 ] ; then
+                ifconfig $ETH_VLAN1 down
+                sleep 1
+		ifconfig $ETH_VLAN2 down
+		sleep 1
+                rmmod 8021q
+        fi
+
+
+	echo "Exit from STD.10.0 802.1Q VLAN Endpoint"
+
+}
+
+ETH_LIST=`ifconfig -a | grep "Link encap:Ethernet" | cut -d" " -f1`
+ETH_USED=`ifconfig    | grep "Link encap:Ethernet" | cut -d" " -f1`
+
+ETH_VLAN1=0
+ETH_VLAN2=0
+
+STD_10_0_PHE=0
+
+for eth in $ETH_LIST ; do
+	found=0
+	if [ "`ethtool $eth | grep Link | cut -d : -f2`" = " yes" ] ; then 
+		echo "$eth is active"
+		for eth_used in $ETH_USED ; do
+			if [ "$eth" = "$eth_used" ] ; then 	
+				found=1
+				break
+			fi
+		done
+		if [ $found -eq 0 ]; then
+			if [ $ETH_VLAN1 = 0  ] ; then
+				ETH_VLAN1="$eth"
+				continue
+			fi
+
+			if [ $ETH_VLAN1 != 0 -a $ETH_VLAN2 = 0 ] ; then 
+			ETH_VLAN2="$eth"
+			echo "$ETH_VLAN1 will be used"
+			echo "$ETH_VLAN2 will be used"
+			break
+			fi
+		fi
+        fi
+done
+
+if [ $ETH_VLAN1 = 0 -o $ETH_VLAN2 = 0 ] ; then
+	echo "No enough ethernet NIC devices on this target"
+	result NOTRUN
+	exit 1
+fi 
+
+modinfo 8021q 2>&1
+check "8021q kernel module is already loaded" 1
+sleep 1
+
+modprobe 8021q 2>&1
+check "insert 8021q kernel module"
+sleep 1
+
+STD_10_0_PHE=1
+
+ifconfig $ETH_VLAN1 up 2>&1
+check "bring NIC $ETH_VLAN1 up"
+sleep 1
+
+STD_10_0_PHE=2
+
+ifconfig $ETH_VLAN2 up 2>&1
+check "bring NIC $ETH_VLAN2 up"
+sleep 1
+
+STD_10_0_PHE=3
+
+vconfig add $ETH_VLAN1 2 2>&1
+check "set $ETH_VLAN1 to vlan2"
+sleep 1
+
+vconfig add $ETH_VLAN1 3 2>&1
+check "set $ETH_VLAN1 to vlan3"
+sleep 1
+
+vconfig add $ETH_VLAN2 2 2>&1
+check "set $ETH_VLAN2 to vlan2"
+sleep 1
+
+cat /proc/net/vlan/config
+cat /proc/net/vlan/$ETH_VLAN1.2
+cat /proc/net/vlan/$ETH_VLAN1.3
+cat /proc/net/vlan/$ETH_VLAN2.2
+
+vconfig rem $ETH_VLAN1.2 2>&1
+check "remove $ETH_VLAN1 to vlan2"
+sleep 1
+
+cat /proc/net/vlan/config
+
+result PASSED
+exit 0
+

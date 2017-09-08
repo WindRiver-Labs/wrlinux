@@ -1,0 +1,92 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : AVL.6.0 Disk Predictive Analysis
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog
+# * 02/04/2015 update the test for systemd
+# -
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+if [ -f /etc/init.d/smartd ]; then
+	SMART_RESTART="/etc/init.d/smartd restart"
+	SMART_STOP="/etc/init.d/smartd stop"
+else
+	SMART_RESTART="systemctl restart smartd"
+	SMART_STOP="systemctl stop smartd"
+fi
+
+clean()
+{
+        echo "Clean System..."
+	rm -rf /tmp/avl.6.0-1.tmp
+	rm -rf /tmp/avl.6.0-2.tmp
+	${SMART_STOP}
+        echo "Finish"
+}
+
+NSMART_SUPPORT="SMART support is:"
+OSMART_SUPPORT="Device supports SMART"
+
+runtest()
+{
+
+echo "******Check whether SMART enabled******"
+grep -e "$OSMART_SUPPORT" -e "$NSMART_SUPPORT" /tmp/avl.6.0-1.tmp | grep Enable
+if [ $? -ne 0 ]
+then
+        smartctl --smart=on --offlineauto=on --saveauto=on $DISK
+        check "Enable smartctl fail"
+fi
+
+echo "******Check SMART Health Status******"
+smartctl -H $DISK | tee /tmp/avl.6.0-2.tmp
+grep "SMART Health Status: OK" /tmp/avl.6.0-2.tmp > /dev/null
+if [ $? -ne 0 ]; then
+  grep 'test result: PASSED' /tmp/avl.6.0-2.tmp > /dev/null
+  check "SMART Health Status not right"
+fi
+
+echo "******Restart smartd service******"
+echo "$DISK -a" >> /etc/smartd.conf
+${SMART_RESTART}
+check "smartd start fail"
+
+result PASSED
+}
+
+
+
+DISKNUM=`fdisk -l | grep Disk | wc -l`
+i=1
+while [ $i -le $DISKNUM ]
+do
+	DISK=`fdisk -l | grep Disk | sed -n ''"$i"'p' | cut -d: -f 1 | cut -d" " -f 2`
+	if [ "$DISK" == "" ]
+	then
+		i=`expr $i + 1`
+	else
+		echo "******Check whether SMART supported by $DISK******"
+		smartctl -i $DISK | tee /tmp/avl.6.0-1.tmp
+		if grep -e "$OSMART_SUPPORT" -e "${NSMART_SUPPORT} Available" \
+		        /tmp/avl.6.0-1.tmp > /dev/null 
+		then
+			runtest
+			exit
+		else
+			i=`expr $i + 1`
+			echo "$DISK does not support SMART"
+		fi
+	fi
+done
+
+if [ $DISKNUM -ne 0 ]
+then
+	error "Did not find a disk that supports SMART, please choose another board" 1
+fi
+
+error "Did not find any disks on target, please choose another board" 1
+

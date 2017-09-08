@@ -1,0 +1,38 @@
+From b3a8b1d59a012f7e0487134b6029bbf353aaf271 Mon Sep 17 00:00:00 2001
+From: Roy.Li <rongqing.li@windriver.com>
+Date: Fri, 28 Sep 2012 13:16:41 +0800
+Subject: [PATCH] support cross build
+
+Upstream-Status: Inappropriate [embedded]
+
+1. Do not include MakeInclude to use environment variables
+2. Never strip the elf file to erase the warning
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+---
+ Makefile |    3 ---
+ 1 files changed, 0 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 23bb374..5a97b4c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,7 +1,5 @@
+ # makefile template
+ 
+-include MakeInclude
+-
+ LDLIBS =  
+ 
+ VLAN_OBJS = vconfig.o
+@@ -21,7 +19,6 @@ vconfig.h: Makefile
+ 
+ $(VCONFIG): $(VLAN_OBJS)
+ 	$(CC) $(CCFLAGS) $(LDFLAGS) -o $(VCONFIG) $(VLAN_OBJS) $(LDLIBS)
+-	$(STRIP) $(VCONFIG)
+ 
+ macvlan_config: macvlan_config.c
+ 	$(CC) $(CCFLAGS) $(LDFLAGS) -o $@ $<
+-- 
+1.7.4.1
+

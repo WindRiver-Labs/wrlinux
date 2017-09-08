@@ -1,0 +1,12 @@
+[Unit]
+Description=Ocfs2 daemon
+Requires=o2cb.service
+
+[Service]
+ExecStart=@DATADIR@/ocfs2/ocfs2 start
+ExecStop=@DATADIR@/ocfs2/ocfs2 stop
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

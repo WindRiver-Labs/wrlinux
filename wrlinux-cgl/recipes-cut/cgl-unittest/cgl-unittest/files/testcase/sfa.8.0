@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : SFA.8.0 Kernel Flat/Graph Execution Profiling
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# The strategy as below:
+# 1. use perf record to start profiler
+# 2. use perf report to generate the report
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+TMP_DIR=`mktemp -d /tmp/sfa.8.0.tmp.XXXXXX`
+
+clean()
+{
+    echo "Clean System..."
+    rm -rf $TMP_DIR
+    echo "Finish"
+}
+
+# start up the profiler
+perf record -a -o $TMP_DIR/sample.txt ifconfig || cutfail
+
+# generate the profile summary
+perf report -i $TMP_DIR/sample.txt >> $TMP_DIR/report.txt || cutfail
+
+# remove the comments in the report
+sed -i /^#/d $TMP_DIR/report.txt
+
+# check the event in report
+grep ifconfig $TMP_DIR/report.txt && cutpass || cutfail

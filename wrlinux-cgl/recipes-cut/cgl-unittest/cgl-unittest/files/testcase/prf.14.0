@@ -1,0 +1,219 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : PRF.14.0 RAID 0 Support
+#              You can execute this scripts directly.
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog
+# *
+# -
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+    echo "Clean System..."
+    if [ -d "/mnt/raid0" ]; then
+        umount /mnt/raid0       
+        rm -rf /mnt/raid0       
+    fi                          
+    if [ -d "/mnt/disk1" ]; then
+        umount /mnt/disk1       
+        rm -rf /mnt/disk1       
+    fi                          
+    if [ -d "/mnt/disk2" ]; then
+        umount /mnt/disk2       
+        rm -rf /mnt/disk2       
+    fi                          
+    echo "Stop the mirrored device"
+    mdadm -Sv /dev/md0
+    echo "Zero-superblock on Disks"
+    mdadm --verbose --zero-superblock $DISK1
+    mdadm --verbose --zero-superblock $DISK2
+    echo "Finish"
+}
+
+
+DISK=`fdisk -l | grep Disk | grep /dev/sd | cut -d: -f 1 | cut -d" " -f 2 | sed -n '1p'`
+BOOTDISK=`cat /proc/cmdline | grep $DISK`                
+                                                         
+if [ "$DISK" == "" ]                                     
+then                                                     
+        echo "****************************************"  
+        echo "Cannot find suitable disks on this target."
+        echo "Disks must match a /dev/sd[a,b,c..]"       
+        echo "Testcase will not be run."                 
+        echo "****************************************"  
+        clean=0                                          
+        cutna "No suitable disks on target"
+fi                                                       
+                                                         
+if [ "$BOOTDISK" != "" ]                                 
+then                                                     
+        echo "****************************************"  
+        echo "Cannot find suitable disks on this target."
+        echo "$DISK is being used as a boot disk"        
+        echo "Testcase will not be run."                 
+        echo "****************************************"  
+        clean=0                                          
+        cutna "No suitable disks on target"
+fi                                                       
+
+DISK1="$DISK"1
+DISK2="$DISK"2
+
+NUMDISKS=`blkid | grep $DISK | wc -l`
+CYLINDERS=`fdisk -l | grep -A 1 $DISK | grep cylinders | cut -d" " -f 5`
+
+if [ "$CYLINDERS" -lt "600" ]
+then
+        echo "****************************************"
+        echo "the disks is too small to create an array."
+        echo "****************************************"
+        cutna "the disks is too small to create an array."
+fi
+
+for i in "$DISK" "$DISK1" "$DISK2"; do                          
+    if [ ! -z `mount | grep $i | cut -d" " -f 1` ]; then
+        umount $i                                       
+        echo "****************************************"   
+        echo "unmount $DISK$i to proceed.             "   
+        echo "****************************************"   
+    fi                                                    
+done                                                      
+
+expect <<- END
+spawn fdisk $DISK
+
+expect {                                                       
+        "*Command (m for help):*"               {send "d\r"}   
+        }                                                      
+                                                               
+expect  {                                                      
+        "*Partition number*"                    {send "1\r"}   
+        "*Command (m for help):*"               {send "\r"}    
+        }                                                      
+                                                               
+expect {                                                       
+        "*Command (m for help):*"               {send "d\r"}   
+        }                                                      
+                                                               
+expect  {                                                      
+        "*Partition number*"                    {send "2\r"}   
+        "*Command (m for help):*"               {send "\r"}    
+        }                                                      
+                                                               
+expect  {                                                      
+        "*Command (m for help):*"               {send "n\r"}   
+        }                                                      
+                                                               
+expect  {                                                      
+        "*Select*"                              {send "p\r"}   
+        }                                                      
+                                                               
+expect  {                                                      
+        "*Partition number*"                    {send "1\r"}   
+        }                                                      
+                                                               
+expect  {                                                      
+        "*First sector*"                        {send "3048\r"}
+        }                                                      
+                                                               
+expect  {                                                      
+        "*Last sector*"                         {send "5048\r"}
+        }                                                      
+                                                               
+expect  {                                                      
+        "*Command (m for help):*"               {send "n\r"}   
+        }                                                      
+                                                               
+expect  {                                                      
+        "*Select*"                              {send "p\r"}   
+        }                                                      
+                                                               
+expect  {                                                      
+        "*Partition number*"                    {send "2\r"}   
+        }                                                      
+                                                               
+expect  {                                                      
+        "*First sector*"                      {send "5049\r"}  
+        }                                                      
+                                                               
+expect  {                                                      
+        "*Last sector*"                       {send "7050\r"}  
+        }                                                      
+                                                               
+expect  {                                                      
+        "*Command (m for help):*"               {send "w\r"}   
+        }                                                      
+
+expect
+exit
+
+END
+
+
+echo "******Format Disks******"
+mke2fs -v $DISK1
+e2fsck -v -y $DISK1
+
+echo "******Format Disks******"
+mke2fs -v $DISK2
+e2fsck -v -y $DISK1
+
+echo "******Create RAID0******"
+expect <<- END
+
+spawn mdadm -Cv --metadata=0.90 /dev/md0 -l0 -n2  $DISK1 $DISK2
+
+expect {
+        "Continue creating array?"               {send "y\r"}
+        }
+
+expect  {
+        eof             {exit 1}
+        "*"
+        }
+
+expect
+exit
+
+END
+
+check "Create RAID0 fail"
+
+echo "******Format md0******"
+mke2fs /dev/md0
+e2fsck -v -y /dev/md0
+
+echo "******Mount RAID0 on /mnt/raid0 and create testfiles******"
+if [ ! -d "/mnt/raid0" ]; then
+    mkdir /mnt/raid0
+fi
+mount -t ext2 /dev/md0 /mnt/raid0
+check "Mount fail"
+echo "windriver test" > /mnt/raid0/testfile.txt
+sleep 5
+
+echo "******Stop RAID0******"
+umount /mnt/raid0
+mdadm -Sv /dev/md0
+check "Stop raid fail"
+
+echo "******Re-start RAID0 and check file******"
+mdadm --verbose -A -R /dev/md0 $DISK1 $DISK2
+echo "Check file..."
+mount -t ext2 /dev/md0 /mnt/raid0
+if [ "`cat /mnt/raid0/testfile.txt`" != "windriver test" ]
+then
+        error "Check file"
+fi
+echo "********Stop RAID0********"
+umount /mnt/raid0
+mdadm --verbose --stop /dev/md0
+check "Stop raid fail"
+
+
+result PASSED

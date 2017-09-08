@@ -1,0 +1,42 @@
+Fix sadb_msg_seq collision
+
+It looks like there's a problem in SADB message sequence number
+handling.  As a temporary measure, initializing sadb_msg_seq with a
+large random number might help.
+
+Signed-off-by: Yong Zhang <yong.zhang@windriver.com>
+
+This patch was carried over from WRL4.3
+
+Signed-of-by: Aws Ismail <aws.ismail@windriver.com>
+
+---
+ iked/ike_pfkey.c |   10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+--- a/iked/ike_pfkey.c
++++ b/iked/ike_pfkey.c
+@@ -131,6 +131,7 @@
+ static int pfkey_socket;
+ static uint32_t sadb_msg_seq = 0x4000000;	/* arbitrary large number to avoid collision with kernel message */
+ 
++static struct sadb_request *sadb_find_by_seq(uint32_t seq);
+ static int sadb_getspi_callback(struct rcpfk_msg *param);
+ static int sadb_update_callback(struct rcpfk_msg *param);
+ static int sadb_get_callback(struct rcpfk_msg *param);
+@@ -207,7 +208,14 @@
+ uint32_t
+ sadb_new_seq(void)
+ {
+-	return ++sadb_msg_seq;
++	while (1) {
++		/* make sure there is no existing request having
++		   the same seq number */
++		if (!sadb_find_by_seq(++sadb_msg_seq))
++			break;
++	}
++
++	return sadb_msg_seq;
+ }
+ 
+ static void

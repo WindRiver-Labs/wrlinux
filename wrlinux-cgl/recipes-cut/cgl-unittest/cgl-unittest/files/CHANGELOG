@@ -1,0 +1,241 @@
+2009-04-30
+UPdate by Xiaofeng
+1.Update cgl_test.sh
+Change "PASSED" to "PASS"
+2.Change name
+  doc/description_of_function  to doc/description_of_function.txt
+  doc/how_to_add_testcase to doc/how_to_add_testcase.txt
+2009-04-29
+Update by Chi Xu
+1.Update cgl_test.sh
+  1) Change "OK" to "PASSED"
+  2) Add parameter -f and -h
+  3) Modify help()
+  4) Delete ". ./config.sh" from this file.
+  5) FIx a bug
+     OLD: COVERED=`cat $DIR/cover.conf | grep $i | cut -d: -f 2`
+     NEW: COVERED=`cat $DIR/cover.conf | grep "$i:" | cut -d: -f 2`
+2.Add directory doc, and add documents in this directory
+  doc/description_of_function
+  doc/how_to_add_testcase  
+  doc/test_case_template
+3.Update README
+  total 66 testcase 
+4.Update avl.21.0, avl.7.1, avl.4.2
+  Add ". ./config.sh" in these files.
+
+2009-04-28
+Update by Chi Xu
+1.Update prf.4.2
+OLD:
+../resource/pktgen_eth_test.sh
+NEW:
+$DIR/resource/pktgen_eth_test.sh
+2.Update avl.6.0
+OLD:
+smartctl --smart=on --offlineauto=on --saveauto=on
+NEW:
+smartctl --smart=on --offlineauto=on --saveauto=on $DISK
+3.Update cgl_test.sh
+Delte std.2.0 from TESTCASE
+4.Update std.16.0
+OLD:
+SMM.11.0 PCI Express
+NEW:
+STD.16.0 PCI Express
+
+2009-04-23
+Update by Chi Xu
+1.Update std.3.1
+  not use ltp-full, change to use lksctp-tool-test
+2.Change name 
+  "cover" to "cover.conf"
+  "cgl_test" to "cgl_test.sh"
+3.Add these line to cover.conf
+avl.7.1:csm.4.0                
+avl.21.0:avl.21.1 ccm.3.0    
+std.2.0:std.2.1 std.2.2 std.2.3
+4.Update cgl_test.sh
+  add these cases name to TESTCASE
+  avl.21.0 std.10.0 cdiag.2.4 std.2.0 avl.3.2 prf.4.2  avl.7.1 smm.3.1 
+  
+  add ". ./config.sh" at the head of cgl_test.
+
+5.Add file config.sh to test suite.
+6.Add thest case shell scripts to testcase dir
+  avl.21.0 ccm.3.0.sh std.10.0 std.2.3 avl.21.1 cdiag.2.4 std.2.0
+  avl.3.2 prf.4.2 std.2.1 avl.7.1 csm.4.0 smm.3.1 std.2.2
+7.Replace resource/pktgen_test.sh with resource/pktgen_eth_test.sh
+  pktgen_eth_test.sh is updated by Xiaofeng.Liu
+8.Update prf.4.2
+  This scripts was rewrote by Xiaofeng.Liu.
+9.Update avl.22.0
+  Remove "umount /mnt/disk1" and "umount /mnt/disk2" from clean(), add them 
+  to the main line of this script.
+10.Update std.3.1
+OLD:
+echo -n "$i pass"
+echo -n "$i fail"
+NEW:
+echo "$i pass"
+echo "$i fail"
+**************************************************************
+2009-04-20
+Update by Chi Xu
+1.Update cgl_test
+OLD:
+CASENAME=`grep description $DIR/$j | cut -d: -f 2`
+NEW:
+CASENAME=`grep description $DIR/testcase/$j | cut -d: -f 2`
+
+OLD:
+$DIR=`pwd`
+NEW
+export $DIR=`pwd`
+
+2.Update prf.1.6
+OLD:
+rb-futex/nptl/$i
+NEW:
+$i
+
+3.Update sec.1.5 , std.3.1 and prf.2.1
+OLD:
+rpm -q ltp-ful
+NEW:
+rpm -q ltp-full
+
+4.Remove cover from cgl_test and creat cover file under network-cgl4
+
+**************************************************************
+2009-04-17
+Update by Chi Xu
+1.Move all test case scripts to dir "testcase"
+2.Move all resource file and package to dir "resource".
+  Include openssl.cnf-test , pci.ids , pktgen_test.sh , rt-tester.tar.bz2 , ssl.ca-0.1.tar.gz
+3.Update sec.4.4
+OLD:
+$DIR/ssl.ca-0.1.tar.gz
+NEW:
+$DIR/resource/ssl.ca-0.1.tar.gz
+4.Update sec.4.6
+OLD:
+$DIR/openssl.cnf-test
+NEW:
+$DIR/resource/openssl.cnf-test
+5.Update pic.1.1
+OLD:
+$DIR/pci.ids
+NEW:
+$DIR/resource/pci.ids
+6.Update prf.4.2
+OLD:
+$DIR/pktgen_test.sh
+NEW:
+$DIR/resource/pktgen_test.sh
+7.Update prf.1.7
+OLD:
+$DIR/rt_tester.tar.bz2
+NEW:
+$DIR/resource/rt_tester.tar.bz2
+8.Update cgl_test
+OLD:
+ls $DIR | grep $i > /dev/null
+NEW:
+ls $DIR/testcase | grep $i > /dev/null
+
+OLD:
+$DIR/$i 1>> $LOGDIR 2>> $LOGDIR
+NEW:
+$DIR/testcase/$i 1>> $LOGDIR 2>> $LOGDIR
+
+**************************************************************
+2009-04-16
+Update by Chi Xu
+1.Add dir rb-futex and files in this dir
+2.Move get_memory.c process.c vul.c to src 
+3.Move Makefile to src
+4.Write new Makefile for network-cgl4
+5.Update sec.7.1
+  change the path of get_memory
+  ./get_memory --> bin/get_memory
+6.Update sec.1.4
+  chenge the path of vul
+  ./vul --> bin/vul
+7.Update cgl_test
+  Add 1 test case run in this script.
+  prf.1.6
+8.Add 1 shell script
+  prf.1.6
+**************************************************************
+2009-04-13
+Update by Chi Xu
+1.Update avl.23.0
+OLD:
+rm -rf /opt/saftest/HPI-B.01.01/log/error_log
+rm -rf /opt/saftest/HPI-B.01.01/log/run_log
+NEW:
+mv /opt/saftest/HPI-B.01.01/log/error_log /opt/saftest/HPI-B.01.01/log/error_log_avl.23.0
+mv /opt/saftest/HPI-B.01.01/log/run_log /opt/saftest/HPI-B.01.01/log/run_log_avl.23.0
+2.Update cgl_test
+  Add 1 test case run in this script.
+  std.8.8
+3.Add 1 shell script
+  std.8.8
+
+2009-04-01
+Update by Chi Xu
+1.Update smm.11.0
+OLD:
+dmesg | grep "PCI Express" | grep "hotplug"
+check "Do not find PCIE hot plug in dmesg"
+NEW:
+dmesg | grep "pciehp"
+check "Do not find pciehp in dmesg"
+
+**************************************************************
+2009-3-31
+Update by Chi Xu
+1.Up date README
+  Add "2.How to add test case to this suite"
+2.Update cgl_test
+  Add 2 test case run in this scripts.
+  smm.11.0
+  std.16.0
+3.Add 2 shell scripts
+  smm.11.0
+  std.16.0
+**************************************************************
+2009-3-30
+Update by Chi Xu
+1.Update cgl_test
+  Add 1 test case run in this scripts.
+  prf.3.2
+2.Add 1 shell scripts
+  prf.3.2
+**************************************************************
+2009-3-23
+Update by Chi Xu
+1.Update cgl_test
+  Add 8 test case run in this scripts. 
+  avl.23.0 
+  avl.24.0 (covered by avl.23.0)
+  prf.1.7
+  prf.1.11 (covered by prf.1.7)
+  sec.7.1
+  smm.7.6
+  sec.1.2
+  smm.13.0
+2.Add 8 shell scripts
+  avl.23.0 av.24.0 prf.1.7 pef.1.11 sec.7.1 smm.7.6 sec.1.2 smm.13.0
+3.Add rt-testet.tar.bz2 for prf.1.7
+**************************************************************
+2009-3-11
+1.Update sec1.4
+  change 'vul' path.
+2.Update README
+  Add 'test case can be run in this suite' 
+**************************************************************
+2009-1-20
+1.Update prf.2.1 sec.1.5 std.3.1 spm.3.0
+2.Add README in package

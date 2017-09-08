@@ -1,0 +1,42 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : SEC.7.3 Process Quotas
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# This case used to test the process quotas. We set the max
+# process number for per user as 30, and then try to create
+# 35 processes. And the process number we try to create
+# exceeds 30, then the case should be FAILED and otherwise it
+# is PASSED.
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+MAX_NUM=30
+export TEST_NUM=35
+DEF_NUM=`ulimit -a|grep "max user processes"|awk '{print $NF}'`
+
+clean()
+{
+    echo "Clean System..."
+    pkill -x process
+    ulimit -u $DEF_NUM
+    userdel pro_test
+    rm -rf /home/pro_test
+    echo "Finish"
+}
+
+ulimit -u $MAX_NUM
+id pro_test > /dev/null 2>&1
+if [ $? != 0 ]; then
+    useradd -d /home/pro_test pro_test
+fi
+su pro_test -c "/opt/cut/bin/process \${TEST_NUM} &> /dev/null"
+if [ $? -eq 0 ]
+then
+    result FAILED
+    exit 0
+fi
+result PASSED 

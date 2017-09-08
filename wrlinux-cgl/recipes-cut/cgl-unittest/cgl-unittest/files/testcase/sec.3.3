@@ -1,0 +1,171 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : SEC.3.3 Periodic Automated Log Analysis
+# 	
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog 
+# * 
+# - 
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+TESTCHAR="windriver tester"
+
+clean()
+{
+	echo "Clean System..."
+	rm -rf /tmp/mail
+	if [ "$config_hacking_exist" = "1" ]; then
+		cp -a /etc/logcheck/logcheck.hacking.bac \
+			/etc/logcheck/logcheck.hacking
+	else
+		rm -f /etc/logcheck/logcheck.hacking
+	fi
+	echo "Finish"
+}
+
+#param1: subject
+#param2: keyword
+#for example: subject="System Events"
+#             keyword="windriver tester"
+#param3:which file
+search_keyword_with_subject() {
+	local subject="$1" keyword="$2" mailfile="$3"
+	local debug=0 j= all_lines= line_numbers=
+	local system_events_line= revert_system_events_line=
+	local start_delete= end_delete=
+
+	while true; do
+		all_lines=$(grep --line-number -B1 '=-=-=-' "$mailfile")
+		if [ "$debug" = "1" ]; then
+			echo "all_lines=$all_lines"
+		fi
+
+		#remove the group seperator and =-=-=-
+		line_numbers=$(echo "$all_lines" | grep -v '\--' | \
+				grep -v '=-=-=-')
+		if [ "$debug" = "1" ]; then
+			echo "line_numbers=$line_numbers"
+		fi
+
+		system_events_line=$(echo "$line_numbers" | grep "$subject" | \
+				cut -d "-" -f1)
+		if [ "$debug" = "1" ]; then
+			echo "system_events is at $system_events_line"
+		fi
+		if [ -z "$system_events_line" ]; then
+			#no subject available
+			return 1	
+		fi
+
+		revert_system_events_line=$(echo "$line_numbers" | \
+				grep -v "$subject" | cut -d "-" -f1)
+		if [ -z "$revert_system_events_line" ]; then
+			#echo "only $subject exists now"
+			#we can check subject and keyword now
+			break
+		fi
+		if [ "$debug" = "1" ]; then
+			echo "revert_system_events is at $revert_system_events_line"
+		fi
+
+		#remove everything before 1st subject
+		set - $system_events_line
+		j="$1"
+		first_events_line=$((j-1))
+		if [ "$first_events_line" -gt "1" ]; then
+			sed -i -e "1,${first_events_line}d" "$mailfile"
+			continue
+		fi
+
+		#find the first non-subject and its follows
+		#find the first following subject, remove between
+		end_delete=
+		set - $revert_system_events_line
+		start_delete="$1"
+		for j in $system_events_line; do
+			if [ "$j" -gt "$start_delete" ]; then
+				end_delete=$((j-1))
+				break
+			fi
+		done
+		if [ -n "$start_delete" ]; then
+			if [ -z "$end_delete" ]; then
+				sed -i -e "${start_delete},\$d" "$mailfile"
+			else
+				sed -i -e "${start_delete},${end_delete}d" \
+					"$mailfile"
+			fi
+		fi
+
+	done
+
+	#we need both in
+	grep -e "$subject" "$mailfile" && grep -e "$keyword" "$mailfile"
+
+	return $?
+}
+
+#set MAIL to /var/spool/mail
+export MAIL=/var/spool/mail/$USER
+#Empty mailbox, in case other mail destroy this test
+expect <<- END
+spawn mailx
+
+expect {
+	eof		{exit 1}
+        "? "            {send "d 1-$\r"}
+        }
+
+expect {
+        "? "            {send "q\r"}
+        }
+
+expect 
+exit
+
+END
+
+sleep 5
+
+#Backup configure file if it exists
+if [ -e "/etc/logcheck/logcheck.hacking" ]; then
+	cp -a /etc/logcheck/logcheck.hacking /etc/logcheck/logcheck.hacking.bac
+	config_hacking_exist=1
+else
+	config_hacking_exist=0
+fi
+echo "$TESTCHAR" >> /etc/logcheck/logcheck.hacking
+logger "$TESTCHAR"
+su -s /bin/bash -c "/usr/sbin/logcheck -m root" logcheck
+
+sleep 5
+
+expect <<- END
+spawn mailx
+
+expect {
+#If no mail in box, exit 1
+	eof		{exit 1}
+	"? "		{send "s 1 /tmp/mail\r"}
+	}
+
+expect {
+	"? "		{send "q\r"}
+	}
+
+expect
+exit
+
+END
+
+#If logcheck.sh didn't send mail, $? will be 1
+check "logcheck.sh didn't send mail"
+
+search_keyword_with_subject "System Events" "$TESTCHAR" /tmp/mail
+check "Cannot find \"$TESTCHAR\" in /root/mbox"
+
+result PASSED

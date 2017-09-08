@@ -1,0 +1,14 @@
+[Unit]
+Description=daemon for the Internet Key Exchange
+After=syslog.target network.target spmd.service
+Requires=spmd.service
+
+[Service]
+Type=forking
+PIDFile=/var/run/iked.pid
+ExecStart=@SBINDIR@/iked
+ExecReload=@BASE_BINDIR@/kill -HUP $MAINPID
+SuccessExitStatus=1
+
+[Install]
+WantedBy=multi-user.target

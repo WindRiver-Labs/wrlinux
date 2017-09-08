@@ -1,0 +1,68 @@
+commit 60800fb6e9bd48a54c52d34fe4f1a4444e2160f7
+Author: Aws Ismail <aws.ismail@windriver.com>
+Date:   Mon Aug 20 13:57:43 2012 -0400
+
+Use correct path for openssl includes
+    
+Originally, if $openssl_libdir is set then
+CFLAGS in will append $openssl_libdir/include
+which does not exist.
+    
+Correct location should be $openssl_libdir/usr/
+include/openssl. Provided that --with-openssl-libdir
+is given bitbake_build/tmp/sysroots/<target>/
+    
+Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+
+diff --git a/aclocal.m4 b/aclocal.m4
+index 2deda2f..91889c5 100644
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -150,7 +150,7 @@ AC_MSG_RESULT($openssl_libdir)
+ if test "$openssl_libdir" != "none" ; then
+ 	if test -f "$openssl_libdir/lib/libcrypto.a"; then
+ 		LDFLAGS="$LDFLAGS -L$openssl_libdir/lib"
+-		CPPFLAGS="$CPPFLAGS -I$openssl_libdir/include"
++		CPPFLAGS="$CPPFLAGS -I$openssl_libdir/usr/include/openssl"
+ 	elif test -f "$openssl_libdir/libcrypto.a"; then
+ 		LDFLAGS="$LDFLAGS -L$openssl_libdir";
+ 		CPPFLAGS="$CPPFLAGS -I$openssl_libdir/include"
+diff --git a/iked/configure b/iked/configure
+index 80ca9a3..f06c310 100755
+--- a/iked/configure
++++ b/iked/configure
+@@ -2143,7 +2143,7 @@ echo "$ac_t""$openssl_libdir" 1>&6
+ if test "$openssl_libdir" != "none" ; then
+ 	if test -f "$openssl_libdir/lib/libcrypto.a"; then
+ 		LDFLAGS="$LDFLAGS -L$openssl_libdir/lib"
+-		CPPFLAGS="$CPPFLAGS -I$openssl_libdir/include"
++		CPPFLAGS="$CPPFLAGS -I$openssl_libdir/usr/include/openssl"
+ 	elif test -f "$openssl_libdir/libcrypto.a"; then
+ 		LDFLAGS="$LDFLAGS -L$openssl_libdir";
+ 		CPPFLAGS="$CPPFLAGS -I$openssl_libdir/include"
+diff --git a/lib/configure b/lib/configure
+index c7d057a..555c35f 100755
+--- a/lib/configure
++++ b/lib/configure
+@@ -2358,7 +2358,7 @@ echo "$ac_t""$openssl_libdir" 1>&6
+ if test "$openssl_libdir" != "none" ; then
+ 	if test -f "$openssl_libdir/lib/libcrypto.a"; then
+ 		LDFLAGS="$LDFLAGS -L$openssl_libdir/lib"
+-		CPPFLAGS="$CPPFLAGS -I$openssl_libdir/include"
++		CPPFLAGS="$CPPFLAGS -I$openssl_libdir/usr/include/openssl"
+ 	elif test -f "$openssl_libdir/libcrypto.a"; then
+ 		LDFLAGS="$LDFLAGS -L$openssl_libdir";
+ 		CPPFLAGS="$CPPFLAGS -I$openssl_libdir/include"
+diff --git a/spmd/configure b/spmd/configure
+index 49d4039..bebb002 100755
+--- a/spmd/configure
++++ b/spmd/configure
+@@ -1963,7 +1963,7 @@ echo "$ac_t""$openssl_libdir" 1>&6
+ if test "$openssl_libdir" != "none" ; then
+ 	if test -f "$openssl_libdir/lib/libcrypto.a"; then
+ 		LDFLAGS="$LDFLAGS -L$openssl_libdir/lib"
+-		CPPFLAGS="$CPPFLAGS -I$openssl_libdir/include"
++		CPPFLAGS="$CPPFLAGS -I$openssl_libdir/usr/include/openssl"
+ 	elif test -f "$openssl_libdir/libcrypto.a"; then
+ 		LDFLAGS="$LDFLAGS -L$openssl_libdir";
+ 		CPPFLAGS="$CPPFLAGS -I$openssl_libdir/include"

@@ -1,0 +1,13 @@
+diff --git a/init/notifyd.in b/init/notifyd.in
+index 84de9ae..9ed7d2d 100755
+--- a/init/notifyd.in
++++ b/init/notifyd.in
+@@ -137,7 +137,7 @@ condrestart|try-restart)
+ 		restart
+ 	fi
+ ;;
+-status)
++  status)
+ 	status $prog
+ 	rtrn=$?
+ ;;

@@ -1,0 +1,199 @@
+Upstream-Status: Inappropriate
+
+* autotools was used for the build process and these macros became
+redundant, so remove them to avoid errors in configure:
+./configure: line 4619: RC_WITH_OPENSSL_LIB: command not found 
+
+* a bash syntax error is also fixed here:
+./configure: line 4636: test: =: unary operator expected
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ configure.in       |    1 -
+ iked/configure.in  |   20 +-------------------
+ kinkd/configure.in |    5 +----
+ lib/configure.in   |   10 +---------
+ spmd/configure.in  |   11 +----------
+ 5 files changed, 4 insertions(+), 43 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 5eaa7c5..e74433e 100644
+--- a/configure.in
++++ b/configure.in
+@@ -10,7 +10,6 @@ AC_CANONICAL_HOST
+ dnl Checks for programs.
+ AC_PROG_INSTALL
+ AC_PROG_MAKE_SET
+-RC_IF_INSTALL_OPTS
+ 
+ dnl XXX see the comment below.
+ dnl AC_CONFIG_SUBDIRS(lib)
+diff --git a/iked/configure.in b/iked/configure.in
+index 031e499..6b9352e 100644
+--- a/iked/configure.in
++++ b/iked/configure.in
+@@ -51,9 +51,6 @@ if test x"$ikev2" = x"yes"; then
+     IKEV2_SRC='$(IKEV2_SRC)'
+ fi
+ 
+-# check --enable-debug
+-RC_IF_BUILD_DEBUG
+-
+ # including pcap if enable_debug is yes
+ if test "$enable_debug" = yes -a "$enable_pcap" = yes ; then
+ 	AC_CHECK_LIB(pcap, pcap_dump,,[AC_MSG_ERROR(failed finding libpcap)])
+@@ -120,9 +117,6 @@ if test "${ikev2_ipsec_window_size+set}" = "set"; then
+ 	AC_DEFINE_UNQUOTED(IKEV2_IPSEC_WINDOW_SIZE, $ikev2_ipsec_window_size, [window size of IPsec SA created by IKEv2])
+ fi
+ 
+-# check for --with-install-opts
+-RC_IF_INSTALL_OPTS
+-
+ # Checks for header files.
+ AC_HEADER_STDC
+ AC_CHECK_HEADERS([limits.h netdb.h netinet/in.h netinet6/ipsec.h netipsec/ipsec.h stdarg.h stddef.h stdlib.h string.h sys/param.h sys/socket.h sys/time.h unistd.h inttypes.h stdint.h])
+@@ -133,8 +127,6 @@ AC_ARG_WITH(kernel_build_dir, [  --with-kernel-build-dir=DIR       specify the d
+ 	[kernel_build_dir=$withval], [kernel_build_dir=no])
+ AC_MSG_RESULT(${kernel_build_dir})
+ 
+-RC_CHECK_PFKEYV2_H
+-RC_IF_NATT_ENABLE
+ if test x"$enable_natt" = x"yes"; then
+   if test x"$ikev1" = x"yes"; then
+ 	IKEV1_SRC="${IKEV1_SRC} \$(IKEV1_NATT_SRC)"
+@@ -195,11 +187,6 @@ AC_TRY_COMPILE([],
+ 	 AC_DEFINE(HAVE_FUNC_MACRO, 1, [define if __func__ macro is available])
+ 	], [AC_MSG_RESULT(no)])
+ 
+-# check for struct sockaddr
+-RC_IF_SA_LEN
+-
+-# check for --enable-ipv6
+-RC_IF_IPV6_ENABLE
+ if test "$ipv6" = "yes"; then
+     AC_MSG_CHECKING(for advanced API support)
+     AC_CACHE_VAL(racoon_cv_advapi, [dnl
+@@ -239,10 +226,6 @@ fi
+ # Look for dlopen (libc in FreeBSD, libdl in Debian)
+ AC_SEARCH_LIBS(dlopen, dl)
+ 
+-# checks for OpenSSL
+-# check for --with-openssl-libdir
+-RC_WITH_OPENSSL_LIB
+-
+ # check Engine interface
+ AC_MSG_CHECKING(--enable-engine)
+ engine='yes'
+@@ -315,9 +298,8 @@ if test x"$sha2" = x"yes"; then
+ 	AC_DEFINE(WITH_SHA2, 1, [define if SHA2 can be used])
+ fi
+ 
+-RC_CHECK_MAKE
+ AC_SUBST(IF_GMAKE)
+-if test $MAKE_TYPE = gmake; then
++if test "$MAKE_TYPE" = "gmake"; then
+ 	IF_GMAKE=''
+ else
+ 	IF_GMAKE='#'
+diff --git a/kinkd/configure.in b/kinkd/configure.in
+index 272c1eb..a332436 100644
+--- a/kinkd/configure.in
++++ b/kinkd/configure.in
+@@ -10,7 +10,6 @@ AC_PROG_CPP
+ AC_PROG_LEX
+ AC_PROG_INSTALL
+ AC_PROG_MAKE_SET
+-RC_PROG_MKDEP
+ 
+ AC_CANONICAL_HOST
+ 
+@@ -263,11 +262,9 @@ sys_queue_ng
+ 	AC_MSG_RESULT(ok)
+ )
+ 
+-RC_IF_INSTALL_OPTS
+ 
+-RC_CHECK_MAKE
+ AC_SUBST(IF_GMAKE)
+-if test $MAKE_TYPE = gmake; then
++if test "$MAKE_TYPE" = "gmake"; then
+ 	IF_GMAKE=''
+ else
+ 	IF_GMAKE='#'
+diff --git a/lib/configure.in b/lib/configure.in
+index 883a28c..414d7b1 100644
+--- a/lib/configure.in
++++ b/lib/configure.in
+@@ -12,7 +12,6 @@ AC_PROG_YACC
+ AC_PROG_RANLIB
+ AC_PROG_INSTALL
+ AC_PROG_MAKE_SET
+-RC_PROG_MKDEP
+ 
+ AC_CANONICAL_HOST
+ 
+@@ -112,9 +111,6 @@ AC_HEADER_STDC
+ AC_HEADER_SYS_WAIT
+ AC_CHECK_HEADERS(sys/time.h net/if_var.h net/ethernet.h limits.h unistd.h stdarg.h varargs.h netinet6/ipsec.h netipsec/ipsec.h)
+ 
+-RC_CHECK_PFKEYV2_H
+-RC_IF_NATT_ENABLE
+-
+ dnl Checks for typedefs, structures, and compiler characteristics.
+ AC_C_CONST
+ AC_TYPE_PID_T
+@@ -198,14 +194,10 @@ AC_TRY_COMPILE([#include <sys/types.h>
+ 	AC_MSG_RESULT(yes),
+ 	AC_MSG_RESULT(no))
+ 
+-dnl --with-openssl-libdir
+-RC_WITH_OPENSSL_LIB
+-
+ AC_CHECK_HEADERS(openssl/evp.h)
+ 
+-RC_CHECK_MAKE
+ AC_SUBST(IF_GMAKE)
+-if test $MAKE_TYPE = gmake; then
++if test "$MAKE_TYPE" = "gmake"; then
+ 	IF_GMAKE=''
+ else
+ 	IF_GMAKE='#'
+diff --git a/spmd/configure.in b/spmd/configure.in
+index c079c56..3858aa1 100644
+--- a/spmd/configure.in
++++ b/spmd/configure.in
+@@ -13,7 +13,6 @@ dnl Checks for programs.
+ AC_PROG_CC
+ AC_PROG_CPP
+ AC_PROG_INSTALL
+-RC_PROG_MKDEP
+ 
+ INSTALL_LIB="\${INSTALL_DATA}"
+ AC_SUBST(INSTALL_LIB)
+@@ -119,22 +118,14 @@ AC_MSG_RESULT($libracoon_path)
+ 	LDFLAGS="$LDFLAGS -L$libracoon_path"
+ 	LIBS="-lracoon $LIBS"
+ 
+-dnl --with-openssl-libdir
+-RC_WITH_OPENSSL_LIB
+-
+ AC_CHECK_HEADER(openssl/evp.h)
+ 
+-RC_CHECK_MAKE
+ AC_SUBST(IF_GMAKE)
+-if test $MAKE_TYPE = gmake; then
++if test "$MAKE_TYPE" = "gmake"; then
+ 	IF_GMAKE=''
+ else
+ 	IF_GMAKE='#'
+ fi
+ 
+-RC_IF_INSTALL_OPTS
+-
+-RC_CHECK_PFKEYV2_H
+-
+ AC_CONFIG_HEADER(config.h)
+ AC_OUTPUT(Makefile)
+-- 
+1.7.9.5
+

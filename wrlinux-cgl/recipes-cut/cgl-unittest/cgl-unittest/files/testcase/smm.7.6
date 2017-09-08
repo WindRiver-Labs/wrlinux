@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : SMM.7.6 CPU Monitoring
+# 		You can execute this scripts directly.
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog
+# *
+# -
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+        echo "Clean System..."
+	rm -rf /tmp/smm.7.6.tmp
+        echo "Finish"
+}
+
+
+echo "execute 'top n 5'"
+top n 5 | tee /tmp/smm.7.6.tmp
+grep Cpu /tmp/smm.7.6.tmp
+check "Cannot get cpu settings and condition from top"
+
+result PASSED

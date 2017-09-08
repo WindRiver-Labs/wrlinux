@@ -1,0 +1,15 @@
+Index: ocfs2-tools-1.6.4/include/ocfs2-kernel/ocfs2_fs.h
+===================================================================
+--- ocfs2-tools-1.6.4.orig/include/ocfs2-kernel/ocfs2_fs.h
++++ ocfs2-tools-1.6.4/include/ocfs2-kernel/ocfs2_fs.h
+@@ -1637,6 +1637,10 @@
+ 	return chars;
+ }
+ 
++#ifndef umode_t
++typedef unsigned short umode_t;
++#endif
++
+ static inline void ocfs2_set_de_type(struct ocfs2_dir_entry *de,
+ 				    umode_t mode)
+ {

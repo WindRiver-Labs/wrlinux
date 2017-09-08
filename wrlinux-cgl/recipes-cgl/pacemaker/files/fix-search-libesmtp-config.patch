@@ -1,0 +1,28 @@
+consider the sysroot when searching libesmtp-config  
+
+Upstream-Status: Inappropriate [embedded specific]
+
+When call AC_PATH_PROGS to check the libesmtp-config path, the sysroot
+should be considered, since we are working on cross-compile environment.
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ configure.ac |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 3d741bd..dab4f77 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1485,7 +1485,7 @@ else
+    fi
+ 
+    if test $SUPPORT_ESMTP != no; then
+-	AC_PATH_PROGS(ESMTPCONFIG, libesmtp-config)
++	AC_PATH_PROGS(ESMTPCONFIG, libesmtp-config, ,$PKG_CONFIG_SYSROOT_DIR)
+ 	if test "X${ESMTPCONFIG}" = "X"; then
+ 		AC_MSG_RESULT(You need the libesmtp development package to continue.)
+ 		SUPPORT_ESMTP=no
+-- 
+1.7.10.4
+

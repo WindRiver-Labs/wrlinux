@@ -1,0 +1,72 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : AVL.28.3 File System Metadata Integrity Checksum
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# This case used to test Filesystem journal feature.
+# The strategy as below:
+# 1, use debugfs to check if the system support journal feature.
+# 2, umount the system when writing and use e2fsck to check the
+# file system and the output should include "recovering journal"
+# and the return value should be 0.
+#
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+TMP_DIR=`mktemp -d /tmp/avl.28.3.tmp.XXXXXX`
+TMP_DIR1=`mktemp -d /tmp/avl.28.3.tmp1.XXXXXX`
+
+clean()
+{
+    echo "Clean System..."
+    # restore the console log level
+    [ -f ${TMP_DIR1}/printk ] && cp ${TMP_DIR1}/printk /proc/sys/kernel/printk
+    umount $TMP_DIR &> /dev/null
+    sleep 1
+    rm -rf $TMP_DIR
+    rm -rf $TMP_DIR1
+    echo "Finish"
+}
+
+prepare_fs()
+{
+    # prepare the file system file
+    dd if=/dev/zero of=$TMP_DIR1/fs.img bs=1M count=600
+    mkfs.ext4 -F $TMP_DIR1/fs.img || mkfs.ext3 -F $TMP_DIR1/fs.img ||cutna "Only ext3 and ext4 support the journal"
+    # customise the console log level only print error message and above
+    # to avoid the noisy info message in test report.
+    cp /proc/sys/kernel/printk $TMP_DIR1
+    echo "3" > /proc/sys/kernel/printk
+    mount $TMP_DIR1/fs.img $TMP_DIR > /dev/null 2>&1 || cutna "Failed to mount the specified ext4(ext3) file system"
+}
+
+prepare_fs
+# check the file system support journal or not
+debugfs -R features $TMP_DIR1/fs.img|grep has_journal
+if [ $? -ne 0 ]
+then
+    cutfail
+fi
+# writing a file
+dd if=/dev/zero of=$TMP_DIR/testfile bs=1024 count=400000 &
+sleep 1
+
+# Force to unmount
+umount -fl $TMP_DIR
+
+# confirm not write
+dd_id=`ps aux | grep dd | grep testfile| awk '{print $2}'`
+if [ ! -z ${dd_id} ]
+then
+    kill -9 $dd_id &> /dev/null
+fi
+# check if support journal when fsck the system
+e2fsck -y $TMP_DIR1/fs.img|grep "recovering journal"
+if [ $? -eq 0 ]
+then
+    cutpass
+fi
+cutfail

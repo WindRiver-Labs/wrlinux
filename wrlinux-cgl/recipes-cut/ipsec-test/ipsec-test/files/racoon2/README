@@ -1,0 +1,208 @@
+ This test requires an additional node to facilitate testing.
+
+ Before running this test on the target, please setup the remote
+ and target as follows:
+
+
+ network topology:
+
+      remote                           target
+    _________________                _________________
+    |                |               |               |
+    |128.224.178.136 |<------------->|128.224.178.221|
+    |________________|               |_______________|
+      192.168.0.1     <=============> 192.168.1.1
+                         Tunnel
+
+ On the remote:
+ 1. Run pskgen to generate spmd.pwd file.
+    For example:
+    pskgen -r -o /etc/racoon2/spmd.pwd
+
+ 2. cd /etc/racoon2
+    cp racoon2.conf.sample racoon2.conf
+    cp default.conf.sample default.conf
+    cp vals.conf.sample vals.conf
+
+ 3. Modify /etc/racoon2/default.conf
+    to this:
+    policy {
+                 ipsec_mode tunnel;
+                 ipsec_level require;
+         };
+ 4. Modify /etc/racoon2/vals.conf
+    For example:
+
+   ### Tunnel Mode Settings ###
+         # Your Network Address or Host Address (host-to-host tunnel mode)
+         MY_NET          "128.224.178.0/24";
+         # Peer's Network Address or Host Address (host-to-host tunnel
+ mode)
+         PEERS_NET       "128.224.178.0/24";
+
+         # Your SGW Address
+         MY_GWADDRESS    "192.168.0.1";
+
+         # Peer's SGW Address
+         # You don't need to specify if you're IKE responder
+         # talking to an IKE initiator behind NAT.
+         PEERS_GWADDRESS "192.168.1.1";
+
+ 5. create a new file in /etc/racoon2/setkey.conf
+
+ #!/usr/sbin/setkey -f
+
+ # Configuration for 192.168.0.1
+
+ # Flush the SAD and SPD
+ flush;
+ spdflush;
+
+ # Attention: Use this keys only for testing purposes!
+ # Generate your own keys!
+
+ # AH SAs using 128 bit long keys
+ add 192.168.0.1 192.168.1.1 ah 0x200 -A hmac-md5
+ 0xc0291ff014dccdd03874d9e8e4cdf3e6;
+ add 192.168.1.1 192.168.0.1 ah 0x300 -A hmac-md5
+ 0x96358c90783bbfa3d7b196ceabe0536b;
+
+ # ESP SAs using 192 bit long keys (168 + 24 parity)
+ add 192.168.0.1 192.168.1.1 esp 0x201 -E 3des-cbc
+ 0x7aeaca3f87d060a12f4a4487d5a5c3355920fae69a96c831;
+ add 192.168.1.1 192.168.0.1 esp 0x301 -E 3des-cbc
+ 0xf6ddb555acfd9d77b03ea3843f2653255afe8eb5573965df;
+
+ # Security policies
+ spdadd 192.168.0.1 192.168.1.1 any -P out ipsec
+            esp/transport//require
+            ah/transport//require;
+
+ spdadd 192.168.1.1 192.168.0.1 any -P in ipsec
+            esp/transport//require
+            ah/transport//require;
+
+ 6. setkey -f /etc/racoon2/setkey.conf. The successful
+ load can be tested by displaying the SAD and the SPD
+
+ setkey -D
+ setkey -DP
+
+ 7. Start the racoon2 daemons
+    > spmd
+    > iked
+ 8. Setup the tunnel
+    > modprobe ipip
+    > modprobe esp4
+    > ip tunnel add tun1 mode ipip remote 128.224.178.221 dev eth0
+    > ifconfig tun1 192.168.0.1 netmask 255.255.255.0
+    > ip route add 192.168.1.1 via 192.168.0.1 dev tun1
+
+ On the target:
+ 1. modify /usr/sbin/pskgen:62
+    insert the path of getopts.pl
+    For example:
+    require '/usr/lib/perl/5.14.2/getopts.pl';
+    then pskgen -r -o /etc/racoon2/spmd.pwd
+
+ 2. cd /etc/racoon2
+    cp racoon2.conf.sample racoon2.conf
+    cp default.conf.sample default.conf
+    cp vals.conf.sample vals.conf
+
+ 3. Modify /etc/racoon2/default.conf
+    to this:
+    policy {
+                 ipsec_mode tunnel;
+                 ipsec_level require;
+         };
+
+ 4. Modify /etc/racoon2/vals.conf
+    For example:
+
+ ### Tunnel Mode Settings ###
+         # Your Network Address or Host Address (host-to-host tunnel mode)
+         MY_NET          "128.224.178.0/24";
+         # Peer's Network Address or Host Address (host-to-host tunnel
+ mode)
+         PEERS_NET       "128.224.178.0/24";
+
+         # Your SGW Address
+         MY_GWADDRESS    "192.168.1.1";
+
+         # Peer's SGW Address
+         # You don't need to specify if you're IKE responder
+         # talking to an IKE initiator behind NAT.
+         PEERS_GWADDRESS "192.168.0.1";
+
+ 5.create a new file in /etc/racoon2/setkey.conf
+
+ #!/usr/sbin/setkey -f
+
+ # Configuration for 192.168.1.1
+
+ # Flush the SAD and SPD
+ flush;
+ spdflush;
+
+ # Attention: Use this keys only for testing purposes!
+ # Generate your own keys!
+
+ # AH SAs using 128 bit long keys
+ add 192.168.0.1 192.168.1.1 ah 0x200 -A hmac-md5
+ 0xc0291ff014dccdd03874d9e8e4cdf3e6;
+ add 192.168.1.1 192.168.0.1 ah 0x300 -A hmac-md5
+ 0x96358c90783bbfa3d7b196ceabe0536b;
+
+ # ESP SAs using 192 bit long keys (168 + 24 parity)
+ add 192.168.0.1 192.168.1.1 esp 0x201 -E 3des-cbc
+ 0x7aeaca3f87d060a12f4a4487d5a5c3355920fae69a96c831;
+ add 192.168.1.1 192.168.0.1 esp 0x301 -E 3des-cbc
+ 0xf6ddb555acfd9d77b03ea3843f2653255afe8eb5573965df;
+
+ # Security policies
+ spdadd 192.168.0.1 192.168.1.1 any -P in ipsec
+            esp/transport//require
+            ah/transport//require;
+
+ spdadd 192.168.1.1 192.168.0.1 any -P out ipsec
+            esp/transport//require
+            ah/transport//require;
+
+ 6. setkey -f /etc/racoon2/setkey.conf. The successful
+ load can be tested by displaying the SAD and the SPD
+
+ setkey -D
+ setkey -DP
+
+ 7. Start the racoon2 daemons
+    > spmd
+    > iked
+ 8. Setup the tunnel
+    > modprobe ipip
+    > modprobe esp4
+    > ip tunnel add tun1 mode ipip remote 128.224.178.136 dev eth0
+    > ifconfig tun1 192.168.1.1 netmask 255.255.255.0
+    > ip route add 192.168.0.1 via 192.168.1.1 dev tun1
+
+
+ Tests:
+
+ On remote:
+ ping 192.168.1.1 -I tun1
+
+ on target:
+ tcpdump -ni eth0 host 128.224.178.136
+
+ root@21102:/etc/racoon2# tcpdump -ni eth0 host 128.224.178.136
+ device eth0 entered promiscuous mode
+ tcpdump: verbose output suppressed, use -v or -vv for full protocol
+ decode
+ listening on eth0, link-type EN10MB (Ethernet), capture size 65535 bytes
+ 17:44:51.820190 IP 128.224.178.136 > 128.224.178.221: IP 192.168.0.1 > 192.168.1.1: AH(spi=0x00000200,seq=0x2d): ESP(spi=0x00000201,seq=0x2d), length 88(ipip-proto-4)
+ 17:44:51.820190 IP 128.224.178.221 > 128.224.178.136: IP 192.168.1.1 > 192.168.0.1: AH(spi=0x00000300,seq=0x2d): ESP(spi=0x00000301,seq=0x2d), length 88 (ipip-proto-4)
+ 17:44:52.820253 IP 128.224.178.136 > 128.224.178.221: IP 192.168.0.1 > 192.168.1.1: AH(spi=0x00000200,seq=0x2e): ESP(spi=0x00000201,seq=0x2e), length 88 (ipip-proto-4)
+ 17:44:52.820253 IP 128.224.178.221 > 128.224.178.136: IP 192.168.1.1 > 192.168.0.1: AH(spi=0x00000300,seq=0x2e): ESP(spi=0x00000301,seq=0x2e), length 88 (ipip-proto-4)
+ 17:44:53.820315 IP 128.224.178.136 > 128.224.178.221: IP 192.168.0.1 > 192.168.1.1: AH(spi=0x00000200,seq=0x2f): ESP(spi=0x00000201,seq=0x2f), length 88 (ipip-proto-4)
+ 17:44:53.820315 IP 128.224.178.221 > 128.224.178.136: IP 192.168.1.1 > 192.168.0.1: AH(spi=0x00000300,seq=0x2f): ESP(spi=0x00000301,seq=0x2f), length 88 (ipip-proto-4)
+

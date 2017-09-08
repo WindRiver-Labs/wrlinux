@@ -1,0 +1,11 @@
+[Unit]
+Description=Common address redundancy protocol daemon
+After=syslog.target network.target
+
+[Service]
+PrivateTmp=true
+Type=forking
+ExecStart=@LIBEXECDIR@/ucarp start
+
+[Install]
+WantedBy=multi-user.target

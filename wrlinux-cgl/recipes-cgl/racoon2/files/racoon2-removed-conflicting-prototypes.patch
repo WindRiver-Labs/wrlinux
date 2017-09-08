@@ -1,0 +1,51 @@
+Upstream-Status: backport
+
+Removed conflicting prototypes
+
+Flex 2.5.36 chaned the prototype of yyget_leng(). Portback upstream
+patch to fix the compiling errors:
+ 
+    <stdout>:1414:11: error: conflicting types for 'yyget_leng'
+    cftoken.l:56:12: note: previous declaration of 'yyget_leng' was \
+    here extern int yyget_leng (void);
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+===================================================================
+RCS file: /RACOON2/anoncvs/racoon2/lib/cftoken.l,v
+retrieving revision 1.53
+retrieving revision 1.54
+diff -c -p -r1.53 -r1.54
+*** racoon2/lib/cftoken.l	2009/03/20 21:57:16	1.53
+--- racoon2/lib/cftoken.l	2013/07/30 07:04:51	1.54
+***************
+*** 1,4 ****
+! /* $Id: cftoken.l,v 1.53 2009/03/20 21:57:16 mk Exp $ */
+  /*
+   * Copyright (C) 2004 WIDE Project.
+   * All rights reserved.
+--- 1,4 ----
+! /* $Id: cftoken.l,v 1.54 2013/07/30 07:04:51 kamada Exp $ */
+  /*
+   * Copyright (C) 2004 WIDE Project.
+   * All rights reserved.
+***************
+*** 50,67 ****
+  
+  #include "safefile.h"
+  
+- extern int yyget_lineno (void);
+- extern FILE *yyget_in (void);
+- extern FILE *yyget_out (void);
+- extern int yyget_leng (void);
+- extern char *yyget_text (void);
+- extern void yyset_lineno (int);
+- extern void yyset_in (FILE *);
+- extern void yyset_out (FILE *);
+- extern int yyget_debug (void);
+- extern void yyset_debug (int);
+- extern int yylex_destroy (void);
+- 
+  	/* avoid gcc error */
+  #define YY_NO_INPUT 1
+  
+--- 50,55 ----

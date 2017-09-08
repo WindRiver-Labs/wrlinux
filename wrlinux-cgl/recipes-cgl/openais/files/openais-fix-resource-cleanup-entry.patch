@@ -1,0 +1,23 @@
+diff -urpN a/services/lck.c b/services/lck.c
+--- a/services/lck.c
++++ b/services/lck.c
+@@ -2304,17 +2304,9 @@ error_exit:
+ 
+ 		if (error == SA_AIS_OK) {
+ 			/*
+-			 * Remove the cleanup entry for this resource.
++			 * cleanup entry for this resource can not be removed.
++			 * This will be done by pacemaker.
+ 			 */
+-			cleanup = lck_resource_cleanup_find (
+-				req_exec_lck_resourceclose->source.conn,
+-				&req_exec_lck_resourceclose->resource_name);
+-
+-			if (cleanup != NULL) {
+-				list_del (&cleanup->cleanup_list);
+-				free (cleanup);
+-			}
+-
+ 			hdb_handle_put (&resource_hdb, req_exec_lck_resourceclose->resource_id);
+ 			hdb_handle_destroy (&resource_hdb, req_exec_lck_resourceclose->resource_id);
+ 		}

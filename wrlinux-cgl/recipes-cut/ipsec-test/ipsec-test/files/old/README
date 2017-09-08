@@ -1,0 +1,39 @@
+How to test:
+
+1)change the related ip address to what you want: psk.txt is the key for each ip, setkey.conf 
+is the ip policy 
+
+2)copy the three files to /etc/racoon/
+
+3)start racoon on both sides(/etc/init.d/racoon start).
+
+4)reload policy use setkey:
+setkey -f /etc/racoon/setkey.conf
+
+5)ping another side(2) from one side(1).
+
+6)on site 2, restart racoon
+/etc/init.d/racoon restart
+
+6)on 1,ping will hang for a moment and recovery again.
+
+
+8) debug:
+	a)check log: tail /var/log/message
+        b)start directly and with debug: 
+            racoon -F -d -f /etc/racoon/racoon.conf
+
+sanity check:
+1) error to parser the config:
+   check the /etc/racoon/setkey.conf, ensure it correct.
+
+2) setup the test bed tips:
+   use your host as one site: config another ip for eth, and use it as ipsec peer.
+   ifcofig eth0:1 192.168.127.3 . with this tips, the host can be pxe boot server
+   and NFS root too.
+
+
+
+   
+
+

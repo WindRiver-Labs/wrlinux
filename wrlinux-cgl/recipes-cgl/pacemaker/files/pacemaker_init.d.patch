@@ -1,0 +1,13 @@
+diff --git a/mcp/pacemaker.in b/mcp/pacemaker.in
+index 25a81c0..e4cd844 100644
+--- a/mcp/pacemaker.in
++++ b/mcp/pacemaker.in
+@@ -133,7 +133,7 @@ condrestart|try-restart)
+ 		restart
+ 	fi
+ ;;
+-status)
++  status)
+ 	status $prog
+ 	rtrn=$?
+ ;;

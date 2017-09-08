@@ -1,0 +1,83 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : SEC.3.5 Log Integrity and Origin Authentication
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# The strategy as below:
+# 1. customise the configuration file /etc/samhainrc
+#    to define the monitoring policy about which files or 
+#    directories should be monitored
+#    (http://la-samhna.de/samhain/manual/filedef.html)
+# 2. Initialize the baseline database
+# 3. Run samhain
+# 4. do some operation to verify the check mechanisms
+
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+TMP_DIR=`mktemp -d /tmp/sec.3.5.tmp.XXXXXX`
+R_FLAG="no"
+
+clean()
+{
+    echo "Clean System..."
+    [ -f /etc/samhainrc.bak ] && mv -f /etc/samhainrc.bak /etc/samhainrc
+    [ -f /bin/arping.bak ] && rm -rf /bin/arping.bak
+    [ $R_FLAG = "yes" ] && pkill -x samhain
+    [ -f /var/lib/samhain/samhain_file ] && rm -rf /var/lib/samhain/samhain_file
+    # restore the console log level
+    [ -f ${TMP_DIR}/printk ] && cp ${TMP_DIR}/printk /proc/sys/kernel/printk
+    echo "Finish"
+}
+
+# backup configuration file
+cp -a /etc/samhainrc /etc/samhainrc.bak
+
+# customize the configuration file
+sed -i '/^SetFileCheckTime/c SetFileCheckTime = 60' /etc/samhainrc
+sed -i '/^SyslogSeverity/c SyslogSeverity = \*' /etc/samhainrc
+
+# update MessageHeader="%S %T %F" in /etc/samhainrc as %F to record
+# the origin of the log and %T as the timestamp to verify not a replay
+sed -i '/^# MessageHeader/c MessageHeader="%S %T %F' /etc/samhainrc
+
+# clear the log to provide clean syslog message env
+echo > /var/log/syslog
+hostname=`hostname`
+
+# customise the console log level only print error message and above
+# to avoid the noisy info message in test report.
+cp /proc/sys/kernel/printk $TMP_DIR
+echo "3" > /proc/sys/kernel/printk
+
+# initialize the baseline database
+# signature database may exist as /var/lib/samhain/samhain_file
+samhain -t init &> /dev/null || samhain -t update &> /dev/null
+
+# run samhain
+ps aux|grep samhain|grep -v grep 
+if [ $? -ne 0 ]
+then
+    R_FLAG="yes"
+    samhain -t check &> /dev/null
+fi
+
+chmod 755 /etc/fstab
+cp /bin/arping /bin/arping.bak
+grep Samhain /var/log/syslog | grep fstab |grep $hostname
+if [ $? -ne 0 ] 
+then
+    sleep 120 
+    grep Samhain /var/log/syslog | grep fstab |grep $hostname || cutfail
+fi
+
+grep Samhain /var/log/syslog | grep arping.bak | grep $hostname
+if [ $? -ne 0 ] 
+then
+    sleep 120 
+    grep Samhain /var/log/syslog | grep arping.bak |grep $hostname || cutfail
+fi
+cutpass

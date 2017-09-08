@@ -1,0 +1,34 @@
+diff --git a/samples/init.d-iked.in b/samples/init.d-iked.in
+index 4e65b94..ff5f355 100644
+--- a/samples/init.d-iked.in
++++ b/samples/init.d-iked.in
+@@ -3,6 +3,9 @@
+ # iked startup script
+ #
+ 
++# Source function library.
++. /etc/init.d/functions
++
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+ 
+@@ -25,6 +28,10 @@ stop)
+ 	read pid junk < $PIDFILE && kill $pid
+ 	echo "."
+ 	;;
++  status)
++	status $DAEMON;
++	exit $?
++	;;
+ restart)
+ 	$0 stop
+ 	$0 start
+@@ -35,7 +42,7 @@ reload)
+ 	echo "."
+ 	;;
+ *)
+-	echo "usage: $0 {start|stop|restart|reload}"
++	echo "usage: $0 {start|stop|status|restart|reload}"
+ 	exit 1
+ 	;;
+ esac

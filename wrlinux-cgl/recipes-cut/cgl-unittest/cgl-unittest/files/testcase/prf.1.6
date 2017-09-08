@@ -1,0 +1,64 @@
+#!/bin/sh
+
+# Copyright (c) 2008 - 2016 Wind River Systems, Inc.
+#
+# description : PRF.1.6 Protecting Against Priority Inversion On Mutex
+#               The test includes two parts:
+#               1) Robust Mutex Tests:
+#                  located in /opt/cut/rb-futex/nptl/
+#               2) Priority Inheritance Mutex Tests:
+#                  located in /opt/open_posix_testsuite/functional/threads/pi_test/
+# 		You can execute this scripts directly.
+#
+# developer : Chi Xu <chi.xu@windriver.com>
+# updated by: Jackie Huang <jackie.huang@windriver.com>
+#
+# changelog
+# * 02/19/2016 add pi tests from open posix testsuite
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+TMPFILE=`mktemp /tmp/prf.1.6.XXXXXX`
+PI_TEST="/opt/open_posix_testsuite/functional/threads/pi_test"
+
+clean()
+{
+        echo "Clean System..."
+	rm -rf ${TMPFILE}
+        echo "Finish"
+}
+
+CASE=`ls $TOPDIR/rb-futex/nptl/tst-robust* ${PI_TEST}/pi_test*`
+touch ${TMPFILE}
+
+OUTPUT=
+
+for i in $CASE
+do
+	echo "running $i"
+	OUTPUT=`$i`
+	if [ $? -eq 0 ]
+	then
+		echo "$i pass" >> ${TMPFILE}
+	else
+		echo "test executable $i failed : $OUTPUT" >> ${TMPFILE}
+	fi
+done
+
+cat ${TMPFILE}
+grep fail ${TMPFILE}
+if [ $? -eq 0 ]
+then
+	echo "****************************************"
+	echo "At least one test failed:"
+	echo "----------------------------------------"
+	grep failed ${TMPFILE}
+	echo "****************************************"
+	result FAILED
+	cutfail
+else
+	result PASSED
+	cutpass
+fi
+exit 0

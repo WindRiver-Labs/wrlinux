@@ -1,0 +1,133 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : AVL.21.0 Ethernet link bonding using IPV4
+#
+# developer : Xiaofeng.Liu  <xiaofeng.liu@windriver.com>
+#
+# changelog 
+# * 
+# - 
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+. $TOPDIR/config.sh
+
+clean()
+{
+	if [ $AVL_21_0_PHE = 1 ] ; then
+		rmmod -f bonding 2>&1
+	fi
+
+        if [ $AVL_21_0_PHE = 2 ] ; then
+		ifconfig bond0 down
+		sleep 1
+		rmmod -f bonding 2>&1
+        fi
+
+	echo "Exit from AVL.21.0 Ethernet link bonding using IPV4"
+
+}
+
+#ETH_BONDING_ADDR=192.168.29.200
+#GATE_BONDING_ADDR=192.168.29.1
+
+ETH_LIST=`ifconfig -a | grep eth | cut -d" " -f1`
+ETH_USED=`ifconfig | grep eth | cut -d" " -f1`
+
+#ETH_LINK_STATE=`ethtool $ETH | grep Link | cut -d : -f2`
+
+ETH_CUT1=0
+ETH_CUT2=0
+
+AVL_21_0_PHE=0
+
+for eth in $ETH_LIST ; do
+
+	if [ "`ethtool $eth | grep Link | cut -d : -f2`" = " yes" ] ; then 
+	echo "$eth is active"
+		if [ "$eth" != "$ETH_USED" ] ; then 	
+			if [ $ETH_CUT1 = 0  ] ; then
+			ETH_CUT1="$eth"
+			continue
+			fi
+
+			if [ $ETH_CUT1 != 0 -a $ETH_CUT2 = 0 ] ; then 
+			ETH_CUT2="$eth"
+			echo "$ETH_CUT1 will be used"
+			echo "$ETH_CUT2 will be used"
+			break
+			fi
+		fi
+        fi
+done
+
+if [ $ETH_CUT1 = 0 -o $ETH_CUT2 = 0 ] ; then
+	echo "****************************************"
+	echo "No enough ethernet NIC devices on this target"
+	echo "----------------------------------------"
+	ifconfig -a
+	echo "****************************************"
+	result NOTRUN
+	exit 1
+fi 
+
+modinfo bonding 2>&1
+if [ ! $? = 0 ]
+then
+	echo "****************************************"
+	echo "Failed to query info about the bonding module"
+	echo "****************************************"
+	cutfail
+fi
+
+modprobe bonding miimon=100 mode=1 2>&1
+if [ ! $? = 0 ]
+then
+	echo "****************************************"
+	echo "Failed to load required module bonding"
+	echo "----------------------------------------"
+	dmesg | tail -n 5
+	echo "****************************************"
+	cutfail
+fi
+
+AVL_21_0_PHE=1
+
+ifconfig bond0 up 2>&1
+check "bonding up"
+sleep 1
+
+ifconfig
+
+AVL_21_0_PHE=2
+
+ifenslave bond0 $ETH_CUT1 $ETH_CUT2 2>&1
+check "bonding ifenslave"
+sleep 1
+
+ifconfig bond0 $ETH_BONDING_ADDR 2>&1
+check "set bonding ip"
+
+cat /proc/net/bonding/bond0
+sleep 1
+
+route add -net default netmask 0.0.0.0 gateway $GATE_BONDING_ADDR bond0 2>&1
+if [ ! $? = 0 ]
+then
+	echo "****************************************"
+	echo "Failed to set a default route for"
+	echo "the bonded interface for address $GATE_BONDING_ADRR"
+	echo "----------------------------------------"
+	route
+	echo "****************************************"
+	cutfail
+fi
+sleep 1
+
+ping -c5 $GATE_BONDING_ADDR -I bond0
+check "bonding ping gateway"
+
+result PASSED
+exit 0
+

@@ -1,0 +1,118 @@
+#!/bin/sh
+
+# Copyright (c) 2017 Wind River Systems, Inc.
+# description : STD.26.1 Layer 2 Tunneling Protocol Support
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# The strategy as below:
+# 1, check openl2tp related kernel config
+# 2. check the openl2tp-testing package avaiable or not
+# 3. start rpcbind service
+# 4. backup below files and customise the config
+#    /opt/openl2tp/test_procs.tcl
+#    /opt/openl2tp/tunnel.test
+#    /opt/openl2tp/session.test
+# 5. load module l2tp_ppp
+# 6. Start openl2tpd
+# 7. Start test
+# 8. check the result, pass if FAILNUM is 0 and PASSNUM not 0.
+#    PASSNUM=`grep PASS $TMP_DIR/results/test-l2tpd.result | wc -l`
+#    FAILNUM=`grep FAIL $TMP_DIR/results/test-l2tpd.result | wc -l`
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+TMP_DIR=`mktemp -d /tmp/std.26.tmp.XXXXXX`
+
+srv_flag=false
+
+clean()
+{
+    echo "Clean System..."
+    pkill openl2tpd
+    sleep 10
+    [ -f /var/run/openl2tpd.pid ] && rm -rf /var/run/openl2tpd.pid
+    lsmod | grep l2tp_ppp
+    if [ $? -eq 0 ]; then
+        rmmod l2tp_ppp
+        rmmod pppox
+        rmmod ppp_generic
+    fi
+    which systemctl && systemctl status rpcbind || service rpcbind status
+    if [ $? -eq 0  ] && [ "$srv_flag" = true ]; then
+        which systemctl && systemctl stop rpcbind || service rpcbind stop
+    fi
+    [ -d /opt/openl2tp/results ] && rm -rf /opt/openl2tp/results
+    [ -f /opt/l2tpconfig ] && rm -rf /opt/l2tpconfig
+    # restore the console log level
+    [ -f ${TMP_DIR}/printk ] && cp ${TMP_DIR}/printk /proc/sys/kernel/printk
+    # restore the backup file
+    for file in test_procs.tcl tunnel.test session.test
+    do
+        if [ -f $TMP_DIR/$file ]; then
+            cp -f $TMP_DIR/$file /opt/openl2tp/
+        fi
+    done
+    rm -rf $TMP_DIR
+    echo "Finish"
+}
+
+# check openl2tp related kernel config
+zcat /proc/config.gz | grep CONFIG_L2TP=y  || cutna "Configure CONFIG_L2TP=y first"
+zcat /proc/config.gz | grep CONFIG_PPPOL2TP=m  || cutna "Configure CONFIG_PPPOL2TP=m first"
+
+# check if openl2tp-testing installed
+rpm -qa | grep openl2tp-testing || cutna "Need to install openl2tp-testing first."
+
+# customise the console log level only print error message and above
+# to avoid the noisy info message in test report.
+cp /proc/sys/kernel/printk $TMP_DIR
+echo "3" > /proc/sys/kernel/printk
+
+# start rpcbind service
+which systemctl && systemctl status rpcbind || service rpcbind status
+if [ $? -ne 0 ]; then
+    which systemctl && systemctl start rpcbind || service rpcbind start
+    srv_flag=true
+fi
+which systemctl && systemctl status rpcbind || service rpcbind status
+[ $? -ne 0 ] && cuterr "Failed to start rpcbind service"
+
+# backup the below files
+cp /opt/openl2tp/test_procs.tcl $TMP_DIR
+cp /opt/openl2tp/tunnel.test $TMP_DIR
+cp /opt/openl2tp/session.test $TMP_DIR
+
+# customise the config
+if [ x"$ETH_TEST" = x ]; then
+	cuterr "Please set ETH_TEST which used to test in /opt/cut/env/runtime_env first"
+fi
+
+sed -i 's/eth2/'\"$ETH_TEST\"'/g' /opt/openl2tp/test_procs.tcl
+test_ip="`ifconfig $ETH_TEST | grep 'inet ' | sed 's/^.*inet addr://g' | \
+    sed 's/ *Mask.*$//g'|sed 's/ *Bcast.*$//g'`"
+sed -i 's/192.168.0.1/'"$test_ip"'/g' /opt/openl2tp/tunnel.test
+
+# load module l2tp_ppp
+modprobe  l2tp_ppp
+lsmod | grep l2tp_ppp || cuterr "Failed to load module l2tp_ppp"
+
+# start openl2tpd
+ppp_path=`rpm -ql openl2tp | grep ppp_null.so`
+/usr/sbin/openl2tpd -d all -D -f -p ${ppp_path} &
+
+# prepare the test env
+mkdir -p /opt/openl2tp/results || cuterr "Failed to mkdir /opt/openl2tp/results"
+cp /usr/bin/l2tpconfig /opt || cuterr "Failed to copy /usr/bin/l2tpconfig to /opt"
+
+# start the test
+cd /opt/openl2tp/ && tclsh all.tcl -preservecore 3 -verbose bps -tmpdir $TMP_DIR/results -outfile test-l2tpd.result -constraints "l2tpdRunning peerProfile tunnelProfile sessionProfile pppProfile system"
+
+# check the result
+PASSNUM=`grep PASS $TMP_DIR/results/test-l2tpd.result | wc -l`
+FAILNUM=`grep FAIL $TMP_DIR/results/test-l2tpd.result | wc -l`
+if [ $PASSNUM -ne 0 ] && [ $FAILNUM -eq 0 ]; then
+    cutpass
+fi
+cutfail

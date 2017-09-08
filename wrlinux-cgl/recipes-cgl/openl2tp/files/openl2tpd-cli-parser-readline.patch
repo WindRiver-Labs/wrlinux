@@ -1,0 +1,30 @@
+commit 500dfb26cd6d893a18af9dcdf2d5fb6a7caecde4
+Author: Aws Ismail <aws.ismail@windriver.com>
+Date:   Tue Sep 11 18:30:55 2012 -0400
+
+    openl2tp readline failed at trail space
+    
+    trail space not a argv
+    
+    This patch was migrated from WRL4.3
+    
+    Signed-off-by: Yongli He <yongli.he@windriver.com>
+    Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+
+diff --git a/cli/cli_readline.c b/cli/cli_readline.c
+index 097ed6a..08e8aad 100644
+--- a/cli/cli_readline.c
++++ b/cli/cli_readline.c
+@@ -234,8 +234,10 @@ int cli_rl_buffer_to_argv(char *start, char *end, char *argv[], int argv_len)
+ 			}
+ 		}
+ 	}
+-	buf[index] = '\0';
+-	argv[argc++] = strdup(buf);
++    if (!in_break) {
++	    buf[index] = '\0';
++	    argv[argc++] = strdup(buf);
++    }
+ 
+ out:
+ 	if (close_char != '\0') {

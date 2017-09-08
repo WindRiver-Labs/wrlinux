@@ -1,0 +1,11 @@
+[Unit]
+Description=Monit daemon for system monitoring and error recovery
+After=syslog.target network.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/monit.pid
+ExecStart=@BINDIR@/monit -c /etc/monitrc
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,86 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : SEC.3.4 Active Log Monitoring
+# 	
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog
+# * 03/17/2015 change the strategy to wait samhain
+#              checking the file system
+# * 02/06/2015 update the test for systemd
+# -
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+if [ -f /etc/init.d/samhain ]; then
+	SAMHAIN_START="/etc/init.d/samhain start"
+	SAMHAIN_STOP="/etc/init.d/samhain stop"
+else
+	SAMHAIN_START="/bin/systemctl start samhain"
+	SAMHAIN_STOP="/bin/systemctl stop samhain"
+fi
+
+clean()
+{
+	echo "Clean System..."
+	${SAMHAIN_STOP}
+	[ -f /var/lib/samhain/samhain_file ] && rm -rf /var/lib/samhain/samhain_file
+	mv /etc/samhainrc.bac /etc/samhainrc
+	chmod 644 /etc/fstab
+	rm -rf /bin/vi.orig
+	rm -rf /sbin/fdisk.orig
+	echo "Finish"
+}
+
+# Empty the log file, in case some other message destory the test
+echo > /var/log/syslog
+
+# Backup the original configure file
+cp -a /etc/samhainrc /etc/samhainrc.bac
+
+# Overall timeout time to wait samhain checking the file system
+OVERALL_TIMEOUT=600
+CHECKTIME=60
+choption /etc/samhainrc  PrintSeverity none
+choption /etc/samhainrc  Daemon yes
+choption /etc/samhainrc  SyslogSeverity crit
+choption /etc/samhainrc  SetFileCheckTime ${CHECKTIME}
+diff -Nru /etc/samhainrc.bac /etc/samhainrc
+
+echo "******Initialize the baseline database******"
+[ -f /run/samhain.pid ] && ${SAMHAIN_STOP}
+samhain -t init
+checkerr "samhain init error"
+
+echo "******Start samhain******"
+${SAMHAIN_START}
+checkerr "samhain start error"
+
+sleep `expr ${CHECKTIME} \* 1`
+
+echo "******Start test******"
+chmod 755 /etc/fstab
+cp -a /bin/vi /bin/vi.orig
+cp -a /sbin/fdisk /sbin/fdisk.orig
+
+# Wait for samhain check the file system
+TIME_WAIT=`expr ${CHECKTIME} \* 1`
+sleep ${TIME_WAIT}
+
+for f in /etc/fstab /bin/vi.orig /sbin/fdisk.orig; do
+    while [ ${TIME_WAIT} -lt ${OVERALL_TIMEOUT} ]; do
+        grep Samhain /var/log/syslog | grep $f
+        RET=$?
+        if [ $RET -eq 0 ]; then
+            echo "Found log about $f after ${TIME_WAIT} seconds."
+            break
+        fi
+        sleep ${CHECKTIME}
+        TIME_WAIT=`expr ${TIME_WAIT} + ${CHECKTIME}`
+    done
+    [ $RET -ne 0 ] && cuterr "Can not find log about $f after ${TIME_WAIT} seconds"
+done
+
+result PASSED

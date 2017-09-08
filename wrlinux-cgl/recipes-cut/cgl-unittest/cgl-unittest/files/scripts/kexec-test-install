@@ -1,0 +1,5 @@
+#!/bin/bash
+echo $1
+echo $2
+kernel=$(find $1 -iname $2)
+cp $kernel .

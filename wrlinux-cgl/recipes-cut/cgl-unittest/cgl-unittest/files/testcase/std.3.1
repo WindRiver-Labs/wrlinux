@@ -1,0 +1,62 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : STD.3.1 SCTP - Base Features
+# 		You'd better download /opt/ltp/output/ltp-std.3.1.out and /opt/ltp/results/ltp-results-std.3.1.txt by TAF
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog
+# *2009-1-20
+# # Add command for checking whether ltp-ful was installed. If not, stop test. 
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+        echo "Clean System..."
+        echo "Finish"
+}
+
+if [ -d /usr/lib64/lksctp-tools/ptest/ ]; then
+        PTEST=/usr/lib64/lksctp-tools/ptest/
+elif [ -d /usr/lib/lksctp-tools/ptest/ ]; then
+        PTEST=/usr/lib/lksctp-tools/ptest/
+else
+       check "The directory /opt/lksctp-tools-test is not installed" 1
+fi
+CASENAME=`cd $PTEST ; ls test_*`
+PASSNUM=0
+FAILNUM=0
+ALLNUM=0
+
+for i in $CASENAME
+do
+	echo "*********Run $i**********"
+	sleep 1
+	${PTEST}/$i
+	if [ $? -eq 0 ]
+	then
+		echo "$i pass"
+		let PASSNUM=PASSNUM+1
+		let ALLNUM=ALLNUM+1
+	else
+		echo "$i fail"
+		let FAILNUM=FAILNUM+1
+		let ALLNUM=ALLNUM+1
+	fi
+done
+
+echo "Test result" 
+echo "Pass number  : $PASSNUM" 
+echo "Fail number  : $FAILNUM" 
+echo "------------"
+echo "Total number : $ALLNUM" 
+
+if [ $FAILNUM -ne 0 ]
+then
+	error "$FAILNUM test case fail"
+fi
+
+result PASSED
+exit 0

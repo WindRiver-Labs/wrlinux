@@ -1,0 +1,69 @@
+Introduction
+------------
+
+This directory contains resources for configuring strongswan in order
+to run the CUT ipsec test (ipsec.sh).  Test configuration is set by
+values in the file ipsec_cut_config.sh.  This file is sourced by ipsec.sh
+and by the script confGen.sh which is used to generate the ipsec.conf file
+needed by strongswan.
+
+The mode for the test is set in ipsec_cut_config.sh.  The default is "skip"
+because to successfully run, we need the local target -- the one on which we
+run the test -- and a remote target.  Both need to be manually configured
+before the test is run.
+
+General Setup
+-------------
+
+We need a local and a remote target.  They need not be on the same subnet,
+but they do need to be visible to each other.  The addresses used by ipsec
+can be on a physical device, like eth0, or addresses on either end of a
+tunnel created by "ip tunnel add...".  We assume physical addresses.  There
+is a script in this directory named makeTunnel.sh which can help you set up
+a tunnel if you want to.
+
+We could generate keys and certificates for each target, but it is not necessary
+and it complicates the configuration, so we will not do it.  strongswan will
+automatically generate and use self-signed certificates for each target.
+
+There will probably be more than one IKE key manager installed on each target.
+We use "systemctl" to make sure only one is active.  If your system is using
+sysvinit, you will have to find and run the appropriate init scripts.
+
+Local Setup
+-----------
+
+The local target should be running a cgl filesystem with the CUT tests included.
+Login, then
+
+lcl> cd /opt/cut/ipsec-strongswan
+lcl> vi ipsec_cut_config.sh         # set IP addresses, etc
+lcl> sh confGen.sh
+lcl> cp ipsec.conf ipsec.secrets /etc
+
+lcl> systemctl stop racoon
+lcl> systemctl stop iked       # this service is for racoon2 and should not exist
+lcl> systemctl stop spmd       # this service is for racoon2 and should not exist
+lcl> systemctl restart strongswan
+
+Remote Setup
+------------
+
+The remote target must have strongswan installed.  Using scp, copy ipsec.conf
+and ipsec.secrets from the local target to /root on the remote target.  Login,
+then
+
+rmt> cp ipsec.conf ipsec.secrets /etc
+
+rmt> systemctl stop racoon
+rmt> systemctl stop iked
+rmt> systemctl stop spmd
+rmt> systemctl restart strongswan
+
+Run The Test
+------------
+
+lcl> ipsec up toRemote    # optional -- this will tell you if the link is established
+lcl> cd /top/cut
+lcl> ./cgl_test -e ipsec.sh
+

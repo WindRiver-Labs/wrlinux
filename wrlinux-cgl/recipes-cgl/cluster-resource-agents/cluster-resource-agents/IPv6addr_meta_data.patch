@@ -1,0 +1,61 @@
+add IPv6addr's meta-data
+
+Got it from IPv6addr.c.
+Build will run IPv6addr meta-data from host to get the meta-data which
+is xml help info.
+
+Add this patch to avoid to run binary from host.
+
+Upstream-Status: Inappropriate [ for cross-compiling ]
+
+diff --git a/doc/man/IPv6addr.meta_data b/doc/man/IPv6addr.meta_data
+new file mode 100644
+index 0000000..6f7c667
+--- /dev/null
++++ b/doc/man/IPv6addr.meta_data
+@@ -0,0 +1,45 @@
++<?xml version="1.0"?>
++<!DOCTYPE resource-agent SYSTEM "ra-api-1.dtd">
++<resource-agent name="IPv6addr">
++  <version>1.0</version>
++  <longdesc lang="en">
++   This script manages IPv6 alias IPv6 addresses,It can add an IP6
++   alias, or remove one.
++  </longdesc>
++  <shortdesc lang="en">Manages IPv6 aliases</shortdesc>
++  <parameters>
++    <parameter name="ipv6addr" unique="0" required="1">
++      <longdesc lang="en">
++       The IPv6 address this RA will manage 
++      </longdesc>
++      <shortdesc lang="en">IPv6 address</shortdesc>
++      <content type="string" default="" />
++    </parameter>
++    <parameter name="cidr_netmask" unique="0">
++      <longdesc lang="en">
++       The netmask for the interface in CIDR format. (ie, 24).
++       The value of this parameter overwrites the value of _prefix_
++       of ipv6addr parameter.
++      </longdesc>
++      <shortdesc lang="en">Netmask</shortdesc>
++      <content type="string" default="" />
++    </parameter>
++    <parameter name="nic" unique="0">
++      <longdesc lang="en">
++       The base network interface on which the IPv6 address will
++       be brought online.
++      </longdesc>
++      <shortdesc lang="en">Network interface</shortdesc>
++      <content type="string" default="" />
++    </parameter>
++  </parameters>
++  <actions>
++    <action name="start"   timeout="15" />
++    <action name="stop"    timeout="15" />
++    <action name="status"  timeout="15" interval="15" />
++    <action name="monitor" timeout="15" interval="15" />
++    <action name="validate-all"  timeout="5" />
++    <action name="meta-data"  timeout="5" />
++  </actions>
++</resource-agent>
++

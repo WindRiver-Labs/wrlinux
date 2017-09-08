@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : STD.8.8 SA Forum HPI
+# 		You can execute this scripts directly.
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog
+# * 02/04/2015 update to remove duplicated codes and call saftest.sh instead.
+# -
+
+TOPDIR=${CUTDIR-/opt/cut/}
+
+${TOPDIR}/script/saftest.sh

@@ -1,0 +1,32 @@
+Add LDFLAGS variable to Makefile so that extra linker flags can be sent via this variable.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+diff --git a/HPI-B.01.01/Makefile b/HPI-B.01.01/Makefile
+index f60c2db..92e9da2 100644
+--- a/HPI-B.01.01/Makefile
++++ b/HPI-B.01.01/Makefile
+@@ -23,7 +23,7 @@ top_builddir = .
+ 
+ LOGFILE = $(top_builddir)/log/build_log
+ 
+-LDFLAGS := $(shell cat LDFLAGS | grep -v \^\#)
++LDFLAGS += $(shell cat LDFLAGS | grep -v \^\#)
+ 
+ BUILD_TESTS := $(shell $(top_builddir)/find-test \
+                --buildable $(top_builddir))
+diff --git a/Makefile b/Makefile
+index 67de9cd..65e35a7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -28,7 +28,7 @@ $(SUB_TARGETS):$(TIMEOUT_CMD)
+ 
+ $(TIMEOUT_CMD):$(TIMEOUT_CMD).c
+ 	@echo Building timeout helper files; \
+-	$(CC) -O2 -o $@ $< ; \
++	$(CC) $(LDFLAGS) -O2 -o $@ $< ; \
+ 
+ 
+ clean:

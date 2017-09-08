@@ -1,0 +1,31 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : SMM.7.5 Network Monitoring
+# 	
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog 
+# * 
+# - 
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+	echo "Clean System..."
+	echo "Finish"
+}
+
+echo "******Run ifconfig******"
+ifconfig -a
+check "Run ifconfig fail"
+echo "******Run route******"
+route
+check "Run route fail"
+echo "******Run netstat******"
+netstat -a 
+check "Run netstat fail"
+
+result PASSED

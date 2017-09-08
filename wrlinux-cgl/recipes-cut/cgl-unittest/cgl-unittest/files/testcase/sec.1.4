@@ -1,0 +1,60 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : SEC.1.4 Buffer Overflow Protection
+# 		Before run this scripts , you should compile vul on host and then copy vul to target /use/bin .
+#		Find vul.c at http://cvs.wrs.com/cvsweb/product_lines/Linux/wrlinux_3.0/Test/Test_design/Networking/WIND00121588-CGL40_Registration/test_cases/?cvsroot=prod_rel_docs		
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog 
+# * 
+# -
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+        echo "Clean System..."
+	rm -rf /tmp/sec.1.4.tmp
+        echo "Finish"
+}
+
+
+ls bin/vul 
+check "Can not find vul" 1
+
+chmod 755 bin/vul
+
+uname -a | grep x86_64
+if [ `echo $?` -ne 0 ]
+then
+	uname -a | grep ppc64
+	if [ `echo $?` -ne 0 ]
+	then
+        	bin/vul 1234567890123456 
+	        if [ `echo $?` -eq 0 ]
+	        then
+        	        result FAILED
+       		else
+             		result PASSED
+        	fi
+	else
+		bin/vul 12345678901234567890123456789012 
+	        if [ `echo $?` -eq 0 ]
+	        then
+        	        result FAILED
+        	else
+                	result PASSED
+        	fi
+	fi
+else
+	bin/vul 12345678901234567890123456789012
+	if [ `echo $?` -eq 0 ]
+	then
+        	result FAILED
+	else
+		result PASSED
+	fi
+fi
+

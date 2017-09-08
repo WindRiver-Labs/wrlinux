@@ -1,0 +1,48 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : STD.6.1 MIPv6 CGL Major Features
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# The strategy as below:
+# 1. configure ipv6 address for the test interface
+# 2. prepare the mip6d.conf
+# 3. start mipv6 daemon and pass if the mipv6 daemon
+#    start successfully
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+	echo "Clean System..."
+	pkill -x mip6d
+	echo "Finish"
+}
+
+if [ x"$ETH_TEST" = x ]; then
+	echo "Error: Empty test interface."
+	echo "Note: This test case requires configuring ipv6 address"
+	echo "on the test interface, please set ETH_TEST which used"
+	echo "to configure ipv6 address in /opt/cut/env/runtime_env"
+	echo "before running the test script, or it will always fail."
+	cutfail
+fi
+
+ifconfig ${ETH_TEST} inet6 add 2001:db8:ffff:0::1000/64
+
+# Generate configure file
+cat > /tmp/mip6d.conf << EOF
+NodeConfig HA;
+DebugLevel 10;
+Interface "${ETH_TEST}";
+UseMnHaIPsec disabled;
+KeyMngMobCapability disabled;
+EOF
+
+mip6d -c /tmp/mip6d.conf &
+
+ps -e | grep mip6d || cutfail
+
+cutpass

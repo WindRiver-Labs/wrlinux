@@ -1,0 +1,48 @@
+#!/bin/sh
+
+# Copyright (c) 2008 - 2016 Wind River Systems, Inc.
+# description : SEC.1.5 Access Control List Support for File Systems 
+# 		You'd better download /opt/ltp/output/ltp-sec.1.5.out and /opt/ltp/results/ltp-results-sec.1.5.txt by TAF
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog
+# * 2009-01-20 Add command for checking whether ltp-ful was installed. If not, stop test.
+# * 2016-02-23 Run acl test only instead of running all FS tests of LTP (There are 61 cases
+#              which are not acl related), and use variables for log files.
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+        echo "Clean System..."
+        echo "Finish"
+}
+
+echo "you should run LTP to cover SEC.1.5"
+
+if [ ! -d /opt/ltp ]; then
+        cuterr "The required package ltp is not installed"
+fi
+
+LTP_RESULT="/opt/ltp/results/ltp-results-sec.1.5.txt"
+LTP_OUTPUT="/opt/ltp/output/ltp-sec.1.5.out"
+LTP_FAIL="/opt/ltp/output/LTP_RUN_ON-ltp-sec.1.5.out.failed"
+rm -rf ${LTP_RESULT} ${LTP_OUTPUT} ${LTP_FAIL}
+
+cd /opt/ltp
+mkdir -p results output
+./runltp -s acl -p -d /opt/ltp -l ${LTP_RESULT} -o ${LTP_OUTPUT}
+
+echo "******ltp.out******"
+cat ${LTP_OUTPUT}
+
+echo "******ltp-results.txt******"
+cat ${LTP_RESULT}
+
+FAILNUM=`grep "Total Failures" ${LTP_RESULT} | awk '{print $3}'`
+if [ $FAILNUM -ne 0 ]; then
+	cuterr "Some failures occured while executing ltp"
+fi
+
+result PASSED

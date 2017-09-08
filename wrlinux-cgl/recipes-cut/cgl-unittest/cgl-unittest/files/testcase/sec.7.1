@@ -1,0 +1,38 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : SEC.7.1 Memory Limits
+# 		You can execute this scripts directly.
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog
+# *
+# -
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+        echo "Clean System..."
+	pkill get_memory
+        echo "Finish"
+}
+ulimit -v 30000
+check "Change Vmsize fail"
+bin/get_memory 40960000
+check "Execute get_memory fail"
+
+PID=`ps -e | grep get_memory | awk '{print $1}'`
+echo "Process ID is $PID"
+MEMSIZE=`cat /proc/$PID/status | grep VmSize | awk '{print $2}'`
+echo "Used memory size is $MEMSIZE"
+if [ $MEMSIZE -gt 30000 ] && [ $MEMSIZE -lt 29000 ]
+then
+	error "Used memory is large than limited"
+fi
+
+result PASSED
+
+
+

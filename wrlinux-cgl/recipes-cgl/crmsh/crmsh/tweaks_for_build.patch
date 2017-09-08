@@ -1,0 +1,36 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+Pass option '--catalogs' to xsltproc via a2x to avoid network access.
+And disble xmllint check by option '-L'.
+
+Add option '--install-lib' of python setup.py to install python libraries to
+right place.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Update for CGP9:
+Update option '--install-lib' that $(DESTDIR) is redundant.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/Makefile.am b/Makefile.am
+index d89affb..0f2361f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -47,7 +47,7 @@ endif
+ 	$(ASCIIDOC) --unsafe --backend=xhtml11 $<
+ 
+ %.8: %.8.adoc
+-	a2x -f manpage $<
++	a2x --xsltproc-opts=--catalogs -L -f manpage $<
+ 
+ # Shared data files
+ install-data-hook:
+@@ -79,6 +79,7 @@ install-exec-local:
+ 	-mkdir -p $(DESTDIR)$(pkgpythondir)
+ 	$(PYTHON) $(srcdir)/setup.py install \
+ 		$(python_prefix) \
++		--install-lib $(pythondir) \
+ 		--record $(DESTDIR)$(pkgpythondir)/install_files.txt \
+ 		--verbose
+ 	$(INSTALL) -d -m 770 $(DESTDIR)/$(CRM_CACHE_DIR)

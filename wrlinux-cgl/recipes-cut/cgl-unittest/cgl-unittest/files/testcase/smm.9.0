@@ -1,0 +1,155 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : SMM.9.0 Disk and Volume Management
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog
+# * 12/03/2015 update the test to use loop devices
+#              instead of requiring 3 disks.
+# -
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+tmp_dir=`mktemp -d /tmp/smm.9.0.tmp.XXXXXX`
+DISK0="/dev/loop0"
+DISK1="/dev/loop1"
+DISK2="/dev/loop2"
+
+clean()
+{
+	echo "Clean System..."
+	umount ${tmp_dir}/lv
+	lvremove  -f /dev/vg_test/lv_test1
+	vgremove vg_test
+	for i in 0 1 2; do
+		pvremove /dev/loop$i
+		losetup -d /dev/loop$i
+	done
+	rm -rf ${tmp_dir}
+	echo "Finish"
+}
+
+if [ ! -e /dev/loop0 ]; then
+	echo "load module loop"
+	modprobe loop
+	checkerr "load loop module fail"
+fi
+
+for i in 0 1 2; do
+	FILE="${tmp_dir}/p$i"
+	DISK="/dev/loop$i"
+
+	echo -e "\n*****create ${FILE}*****"
+	dd if=/dev/zero of=${FILE} bs=1M count=100
+	checkerr "fail to create ${FILE}"
+
+	echo -e "\n*****losetup ${FILE} to ${DISK}*****"
+	losetup ${DISK} ${FILE}
+	checkerr "fail to losetup ${FILE}"
+
+	echo -e "\n*****Create physical volume with ${DISK}*****"
+	pvcreate ${DISK} -ff
+	checkerr "Create physical volume with ${DISK} fail"
+done
+
+echo -e "\n******Create Volume Group with ${DISK0} and ${DISK1}, named as vg_test******"
+vgcreate vg_test ${DISK0} ${DISK1}
+checkerr "Create VG fail"
+
+echo -e "\n******Check vg info******"
+vgdisplay -v vg_test
+checkerr "check vg info fail"
+
+echo -e "\n******Activate Volume Group******"
+vgchange -a y vg_test
+checkerr "Activate VG fail"
+
+echo -e "\n******Add new physical volume to Volime Group******"
+vgextend vg_test ${DISK2}
+checkerr "Extend VG fail"
+
+echo -e "\n******Delete a physical volume from Volime Group******"
+vgreduce vg_test ${DISK0}
+checkerr "Reduce VG fail"
+
+echo -e "\n*****Check vg info to confirm ${DISK0} is deleted from vg*****"
+vgdisplay -v vg_test
+checkerr "pv ${DISK0} is not deleted from vg"
+
+echo -e "\n******Create logical volume on vg_test, size is 50M******"
+lvcreate -L 50 -n lv_test1 vg_test
+checkerr "Create LV fail"
+
+echo -e "\n******Create filesystem and use this logical volume******"
+mke2fs /dev/vg_test/lv_test1
+checkerr "Create filesystem fail"
+
+echo -e "\n*****Mount lv_test1 to ${tmp_dir}/lv*****"
+mkdir -p ${tmp_dir}/lv
+mount /dev/vg_test/lv_test1 ${tmp_dir}/lv
+checkerr "Mount lv_test1 fail"
+
+echo -e "\n*****Check the size of lv_test1, should be 50M*****"
+df -h | grep ${tmp_dir}/lv | tee ${tmp_dir}/smm.9.0.log
+lv_size=`grep ${tmp_dir}/lv ${tmp_dir}/smm.9.0.log | sed 's/^\/[^ ]*//' | awk '{print $1}' | sed 's/[KM]//'`
+if [ ${lv_size} -lt 50 ]; then
+	cuterr "The size of new LV is not 50M"
+fi
+
+echo -e "\n*****Write something to lv_test1*****"
+echo "windriver test" > ${tmp_dir}/lv/test
+checkerr "write operation fail"
+
+echo -e "\n******Enlarge the size of logical volume to 70M******"
+umount ${tmp_dir}/lv
+lvextend -L+20M /dev/vg_test/lv_test1
+checkerr "execute lvextend fail"
+
+echo -e "\n*****Run e2fsck on lv_test1*****"
+e2fsck  -f -y /dev/vg_test/lv_test1
+checkerr "execute e2fsck fail"
+
+echo -e "\n*****Run resize2fs on lv_test1*****"
+resize2fs -f /dev/vg_test/lv_test1
+checkerr "execute resize2fs fail"
+
+echo -e "\nMount lv_test1 and check the size changed to 70M"
+mount /dev/vg_test/lv_test1 ${tmp_dir}/lv
+df -h | grep ${tmp_dir}/lv | tee ${tmp_dir}/smm.9.0.log
+lv_size=`grep ${tmp_dir}/lv ${tmp_dir}/smm.9.0.log | sed 's/^\/[^ ]*//' | awk '{print $1}' | sed 's/[KM]//'`
+if [ ${lv_size} -lt 70 ]; then
+        cuterr "The size of new LV is not 70M"
+fi
+
+echo -e "\n******Check test file ${tmp_dir}/lv/test is not changed******"
+if [ "`cat ${tmp_dir}/lv/test`" != "windriver test" ]; then
+	cuterr "test file ${tmp_dir}/lv/test is destroyed"
+fi
+
+echo -e "\n******Reduce the size of logical volume to 20M******"
+umount ${tmp_dir}/lv
+resize2fs -f /dev/vg_test/lv_test1 20M
+checkerr "execute resize2fs fail"
+lvreduce -f -L-50M /dev/vg_test/lv_test1
+checkerr "execute lvreduce fail"
+
+echo -e "\n*****Run e2fsck on lv_test1*****"
+e2fsck  -f -y /dev/vg_test/lv_test1
+checkerr "execute e2fsck fail"
+
+echo -e "\n*****Mount lv_test1 and check the size changed to 20M*****"
+mount /dev/vg_test/lv_test1 ${tmp_dir}/lv
+df -h | grep ${tmp_dir}/lv | tee ${tmp_dir}/smm.9.0.log
+lv_size=`grep ${tmp_dir}/lv ${tmp_dir}/smm.9.0.log | sed 's/^\/[^ ]*//' | awk '{print $1}' | sed 's/[KM]//'`
+if [ ${lv_size} -lt 20 ]; then
+        cuterr "The size of new LV is not 20M"
+fi
+
+echo -e "\n******Check test file ${tmp_dir}/lv/test is not changed******"
+if [ "`cat ${tmp_dir}/lv/test`" != "windriver test" ]; then
+        cuterr "test file ${tmp_dir}/lv/test destroyed"
+fi
+
+result PASSED

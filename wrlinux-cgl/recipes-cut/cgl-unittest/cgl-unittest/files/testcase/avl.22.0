@@ -1,0 +1,250 @@
+#!/bin/sh
+
+# Copyright (c) 2012 Wind River Systems, Inc.
+# description : AVL.22.0 Software RAID 1 support
+# 		You can execute this scripts directly.
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog
+# * Fixed the testcase for WRL5.0 CGP
+# -
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+    echo "Clean System..."
+	if [ -d "/mnt/raid1" ]; then
+        umount /mnt/raid1
+        rm -rf /mnt/raid1
+    fi
+    if [ -d "/mnt/disk1" ]; then
+        umount /mnt/disk1
+        rm -rf /mnt/disk1
+    fi
+    if [ -d "/mnt/disk2" ]; then
+        umount /mnt/disk2
+        rm -rf /mnt/disk2
+    fi
+    echo "Stop the mirrored device"
+	mdadm -Sv /dev/md1
+    mdadm -Sv /dev/md11
+    mdadm -Sv /dev/md12
+	echo "Zero-superblock on Disks"
+	mdadm --verbose --zero-superblock $DISK1
+	mdadm --verbose --zero-superblock $DISK2
+	echo "Finish"
+}
+
+DISK=`fdisk -l | grep Disk | grep /dev/sd | cut -d: -f 1 | cut -d" " -f 2 | sed -n '1p'`
+BOOTDISK=`cat /proc/cmdline | grep $DISK`                
+                                                         
+if [ "$DISK" == "" ]                                     
+then                                                     
+        echo "****************************************"  
+        echo "Cannot find suitable disks on this target."
+        echo "Disks must match a /dev/sd[a,b,c..]"       
+        echo "Testcase will not be run."                 
+        echo "****************************************"  
+        clean=0                                          
+        cutna "No suitable disks on target"
+fi                                                       
+                                                         
+if [ "$BOOTDISK" != "" ]                                 
+then                                                     
+        echo "****************************************"  
+        echo "Cannot find suitable disks on this target."
+        echo "$DISK is being used as a boot disk"        
+        echo "Testcase will not be run."                 
+        echo "****************************************"  
+        clean=0                                          
+        cutna "No suitable disks on target"
+fi                                                       
+
+DISK1="$DISK"1
+DISK2="$DISK"2
+
+NUMDISKS=`blkid | grep $DISK | wc -l`
+CYLINDERS=`fdisk -l | grep -A 1 $DISK | grep cylinders | cut -d" " -f 5`
+
+if [ "$CYLINDERS" -lt "600" ]
+then
+        echo "****************************************"
+        echo "The disks is too small to create an array."
+        echo "****************************************"
+        cutna "The disks is too small to create an array."
+fi
+
+for i in "$DISK" "$DISK1" "$DISK2"; do                          
+    if [ ! -z `mount | grep $i | cut -d" " -f 1` ]; then
+        umount $i                                       
+        echo "****************************************"
+        echo "unmount $DISK$i to proceed.             "
+        echo "****************************************"
+    fi                                                     
+done 
+
+
+expect <<- END
+spawn fdisk $DISK
+
+expect {
+        "*Command (m for help):*"               {send "d\r"}
+        }
+
+expect  {
+        "*Partition number*"                    {send "1\r"}
+        "*Command (m for help):*"               {send "\r"}
+        }
+
+expect {
+        "*Command (m for help):*"               {send "d\r"}
+        }
+
+expect  {
+        "*Partition number*"                    {send "2\r"}
+        "*Command (m for help):*"               {send "\r"}
+        }
+
+expect  {
+        "*Command (m for help):*"               {send "n\r"}
+        }
+
+expect  {
+        "*Select*"                              {send "p\r"}
+        }
+
+expect  {
+        "*Partition number*"                    {send "1\r"}
+        }
+
+expect  {
+        "*First sector*"                        {send "2048\r"}
+        }
+
+expect  {
+        "*Last sector*"                         {send "2348\r"}
+        }
+
+expect  {
+        "*Command (m for help):*"               {send "n\r"}
+        }
+
+expect  {
+        "*Select*"                              {send "p\r"}
+        }
+
+expect  {
+        "*Partition number*"                    {send "2\r"}
+        }
+
+expect  {
+        "*First sector*"                      {send "2349\r"}
+        }
+
+expect  {
+        "*Last sector*"                       {send "2649\r"}
+        }
+
+expect  {
+        "*Command (m for help):*"               {send "w\r"}
+        }
+
+expect
+exit
+
+END
+
+echo "*******Format Disks****"
+mke2fs -v $DISK1
+e2fsck -v -y $DISK1
+
+echo "*******Format Disks****"
+mke2fs -v $DISK2
+e2fsck -v -y $DISK2
+
+echo "******Create RAID1*****"
+expect <<- END
+spawn mdadm -Cv /dev/md1 -l1 -n2 $DISK1 $DISK2
+
+expect  {
+        "Continue creating array?"               {send "y\r"}
+        }
+
+expect  {
+	eof		{exit 1}
+	"*"		
+	    }
+
+expect
+exit
+
+END
+
+check "Create RAID1 fail"
+
+echo "******Format md1******"
+mke2fs -v /dev/md1
+e2fsck -v -y /dev/md1
+
+echo "******Mount RAID1 on /mnt/raid1 and create testfiles******"
+
+if [ ! -d "/mnt/raid1" ]; then
+	mkdir /mnt/raid1
+fi
+
+mount -v -t ext2 /dev/md1 /mnt/raid1
+check "Mount fail"
+echo "windriver test" > /mnt/raid1/testfile.txt
+sleep 5
+echo "******Unmount /mnt/raid1**********"
+umount /mnt/raid1
+
+echo "******Remount RAID1 and check contents******"
+mount -v -t ext2 /dev/md1 /mnt/raid1
+check "Mount fail"
+if [ "`cat /mnt/raid1/testfile.txt`" != "windriver test" ];
+then
+	error "test file not sync"
+fi
+mdadm -Ev $DISK1
+mdadm -Ev $DISK2
+umount /mnt/raid1
+mdadm -Sv /dev/md1
+check "Stop raid fail"
+
+echo "******Check the sync contents on disk1******"
+echo "check $DISK1..."
+mdadm -A -R /dev/md11 $DISK1
+if [ ! -d "/mnt/disk1" ]; then
+	mkdir /mnt/disk1
+fi
+mount -v -t ext2 /dev/md11 /mnt/disk1
+check "Mount fail"
+if [ "`cat /mnt/disk1/testfile.txt`" != "windriver test" ]
+then
+	error "test file not sync"
+fi
+umount /mnt/disk1
+mdadm -Sv /dev/md11
+check "Stop raid fail"
+
+echo "******Check the sync contents on disk2******"
+echo "check $DISK2..."
+mdadm -A -R /dev/md12 $DISK2
+if [ ! -d "/mnt/disk2" ]; then
+	mkdir /mnt/disk2
+fi
+mount -v -t ext2 -s -r /dev/md12 /mnt/disk2
+check "Mount fail"
+if [ "`cat /mnt/disk2/testfile.txt`" != "windriver test" ]
+then
+	error "test file not sync"
+fi
+umount /mnt/disk2
+mdadm -Sv /dev/md12
+check "Stop raid fail"
+
+result PASSED
+

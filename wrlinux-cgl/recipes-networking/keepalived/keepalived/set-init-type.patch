@@ -1,0 +1,30 @@
+Add an option to specify init type.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/configure.ac b/configure.ac
+index d4e9994..334b3e2 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1031,7 +1031,10 @@ fi
+ AM_CONDITIONAL([PROFILE], [test $WITH_PROFILING = Yes])
+ 
+ dnl ----[ Determine system init type]----
+-INIT_TYPE=
++AC_ARG_WITH(init-type,
++  [AS_HELP_STRING([--with-init-type=INIT_TYPE], [specify init type upstart, systemd or SYSV])],
++  [INIT_TYPE="$withval"], [INIT_TYPE=""])
++if test -z $INIT_TYPE; then
+ /sbin/init --version 2>/dev/null | grep -q upstart
+ if test $? -eq 0; then
+         INIT_TYPE=upstart
+@@ -1048,6 +1051,7 @@ else
+ 	fi
+ fi
+ if test -z $INIT_TYPE; then INIT_TYPE=undetected; fi
++fi
+ AM_CONDITIONAL([INIT_UPSTART], [test $INIT_TYPE = upstart])
+ AM_CONDITIONAL([INIT_SYSTEMD], [test $INIT_TYPE = systemd])
+ AM_CONDITIONAL([INIT_SYSV], [test $INIT_TYPE = SYSV])

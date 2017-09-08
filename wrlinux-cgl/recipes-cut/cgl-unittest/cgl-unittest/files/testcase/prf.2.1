@@ -1,0 +1,49 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : PRF.2.1 Enabling Process Affinity 
+# 		You can execute this scripts directly.
+# 		You'd better download /opt/ltp/output/ltp-prf.2.1.out and /opt/ltp/results/ltp-results-prf.2.1.txt by TAF
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog
+# *2009-1-20
+# Add command for checking whether ltp-ful was installed. If not, stop test. 
+# 
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+        echo "Clean System..."
+        echo "Finish"
+}
+
+rpm -q ltp
+check "The required package ltp is not installed" 1
+
+rm -rf /opt/ltp/results/ltp-results-prf.2.1.txt
+rm -rf /opt/ltp/output/ltp-prf.2.1.out
+rm -rf /opt/ltp/output/LTP_RUN_ON-ltp-prf.2.1.out.failed
+
+if [ `uname -m|grep -v "[x3-6]86"` ];then
+	result PASSED && exit 0
+fi
+
+cd /opt/ltp
+./runltp -f hyperthreading -p -q -d /opt/ltp  -l ltp-results-prf.2.1.txt  -o ltp-prf.2.1.out
+
+echo "******ltp.out******"
+cat /opt/ltp/output/ltp-prf.2.1.out
+
+echo "******ltp-results.txt******"
+cat /opt/ltp/results/ltp-results-prf.2.1.txt
+
+FAILNUM=`grep "Total Failures" /opt/ltp/results/ltp-results-prf.2.1.txt | awk '{print $3}'`
+if [ $FAILNUM -ne 0 ]
+then
+	error "Some failures occured when running ltp" 
+fi
+
+result PASSED

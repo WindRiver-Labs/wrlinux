@@ -1,0 +1,60 @@
+From cddb9b757bdcd60c58d6320479d572ebdd15b449 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Sun, 8 Jun 2014 06:37:01 -0700
+Subject: [PATCH] spmd/configure.in: add description for AC_DEFINE
+
+The autoheader now requires the AC_DEFINE to have a description,
+otherewise it would fail.
+
+See oe-core's dd9c3d7bc946ff44e0ca90f4e345711d6ad21728
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ spmd/configure.in |   10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/spmd/configure.in b/spmd/configure.in
+index 3858aa1..e3e8650 100644
+--- a/spmd/configure.in
++++ b/spmd/configure.in
+@@ -74,18 +74,18 @@ int main(void)
+ 	exit(0);
+ }
+ ],
+-AC_DEFINE(HAVE_SA_LEN)
++AC_DEFINE([HAVE_SA_LEN], [1], [Define if have sa_len])
+ AC_MSG_RESULT(yes),
+ AC_MSG_RESULT(no),:)
+ 
+ echo $ac_n "checking for architecture""... $ac_c" 1>&6
+ case "$target" in
+ 	*freebsd4*)
+-		AC_DEFINE(HAVE_HOST_CONF)
++		AC_DEFINE([HAVE_HOST_CONF], [1], [Define if have host.conf])
+ 		AC_MSG_RESULT(use /etc/host.conf)
+ 		;;
+ 	*openbsd*)
+-		AC_DEFINE(HAVE_LOOKUP_IN_RESOLV_CONF)
++		AC_DEFINE([HAVE_LOOKUP_IN_RESOLV_CONF], [1], [Define if have lookup in resolv.conf])
+ 		AC_MSG_RESULT(use lookup in /etc/resolv.conf)
+ 		;;
+ 	*)      
+@@ -97,11 +97,11 @@ esac
+ echo $ac_n "checking for SPDUPDATE BUG""... $ac_c" 1>&6
+ case $host_os in
+ 	*netbsd*)
+-		AC_DEFINE(HAVE_SPDUPDATE_BUG)
++		AC_DEFINE([HAVE_SPDUPDATE_BUG], [1], [Define if have spdupdate_bug])
+ 		AC_MSG_RESULT(yes)
+ 		;;
+ 	*freebsd*)
+-		AC_DEFINE(HAVE_SPDUPDATE_BUG)
++		AC_DEFINE([HAVE_SPDUPDATE_BUG], [1], [Define if have spdupdate_bug])
+ 		AC_MSG_RESULT(yes)
+ 		;;
+ 	*)
+-- 
+1.7.9.5
+

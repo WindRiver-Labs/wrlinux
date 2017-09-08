@@ -1,0 +1,34 @@
+diff --git a/samples/init.d-kinkd.in b/samples/init.d-kinkd.in
+index 1813b39..71d0855 100644
+--- a/samples/init.d-kinkd.in
++++ b/samples/init.d-kinkd.in
+@@ -3,6 +3,9 @@
+ # kinkd start up script
+ #
+ 
++# Source function library.
++. /etc/init.d/functions
++
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+ 
+@@ -25,6 +28,10 @@ stop)
+ 	read pid junk < $PIDFILE && kill $pid
+ 	echo "."
+ 	;;
++  status)
++	status $DAEMON;
++	exit $?
++	;;
+ restart)
+ 	$0 stop
+ 	$0 start
+@@ -35,7 +42,7 @@ reload)
+ 	echo "."
+ 	;;
+ *)
+-	echo "usage: $0 {start|stop|restart|reload}"
++	echo "usage: $0 {start|stop|status|restart|reload}"
+ 	exit 1
+ 	;;
+ esac

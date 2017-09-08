@@ -1,0 +1,49 @@
+commit 7dc1dc1025a05cffa374d54231e48dba66ae36d3
+Author: Aws Ismail <aws.ismail@windriver.com>
+Date:   Thu Sep 13 17:22:41 2012 -0400
+
+    Don't treat warnings as errors
+    
+    Similar to a pedantic configuration option
+    
+    Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+
+diff --git a/Makefile b/Makefile
+index 4aaa448..412cf4d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -154,7 +154,7 @@ endif
+ 
+ CPPFLAGS=		$(CPPFLAGS.l2tptest) $(CPPFLAGS-y)
+ CFLAGS=			-I. -Iusl -Icli -isystem include \
+-				-MMD -Wall -Werror -Wno-strict-aliasing \
++				-MMD -Wall -Wno-strict-aliasing \
+ 				$(CPPFLAGS) $(CPPFLAGS.dmalloc) \
+ 				-DSYS_LIBDIR=$(SYS_LIBDIR)
+ LDFLAGS.l2tpd=		-Wl,-E -L. -Lusl -lusl -ldl $(LIBS.dmalloc) -lc
+diff --git a/cli/Makefile b/cli/Makefile
+index 22e4cbc..a9719e1 100644
+--- a/cli/Makefile
++++ b/cli/Makefile
+@@ -7,7 +7,7 @@ CLI_SRCS_TEST.o=	$(CLI_SRCS_TEST.c:%.c=%.o)
+ 
+ LDFLAGS.cli_test=	-L.. -L. $(READLINE_LDFLAGS) -lcli -lusl -lreadline -lcurses -lc
+ 
+-CFLAGS=			$(CFLAGS.optimize) -MMD -Wall -Werror -I.. $(READLINE_CFLAGS)
++CFLAGS=			$(CFLAGS.optimize) -MMD -Wall -I.. $(READLINE_CFLAGS)
+ 
+ .PHONY:			all test clean
+ 
+diff --git a/usl/Makefile b/usl/Makefile
+index 5aef0a6..a62c80f 100644
+--- a/usl/Makefile
++++ b/usl/Makefile
+@@ -14,7 +14,7 @@ LIBS.dmalloc=		-ldmalloc
+ endif
+ 
+ CPPFLAGS+=		$(CFLAGS.optimize) -g
+-CFLAGS=			-I. -MMD -Wall -Werror -Wno-strict-aliasing $(CPPFLAGS) $(CPPFLAGS.dmalloc)
++CFLAGS=			-I. -MMD -Wall -Wno-strict-aliasing $(CPPFLAGS) $(CPPFLAGS.dmalloc)
+ 
+ .PHONY:			all test clean
+ 

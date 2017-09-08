@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : SPM.2.1 No System Reboot for Application Package Update
+# 	
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog 
+# * 
+# - 
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+	echo "Clean System..."
+	rm -rf lsb-test-pam-2.0-2.src.rpm
+	echo "Finish"
+}
+
+echo "******Install RPM******"
+rpm -ivh $TOPDIR/resource/lsb-test-pam-2.0-2.src.rpm
+check "lsb-test-pam-2.0-2.src.rpm can not be installed"
+
+echo "******Update RPM******"
+rpm -Uvh $TOPDIR/resource/lsb-test-pam-2.0-2.src.rpm
+check "lsb-test-pam-2.0-2.src.rpm update fail"
+
+result PASSED

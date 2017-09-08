@@ -1,0 +1,16 @@
+Add option '-L' for command a2x to disable validate the output with xmllint.
+
+Upstream-Status: Inappropriate [Workaround]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+--- Reusable-Cluster-Components-glue--glue-1.0.12/doc/Makefile.am.orig	2014-12-25 15:31:24.110036876 +0800
++++ Reusable-Cluster-Components-glue--glue-1.0.12/doc/Makefile.am	2014-12-25 15:31:33.494037131 +0800
+@@ -48,6 +48,6 @@
+ 	$(MANPAGES_STYLESHEET) $<
+ 
+ hb_report.8: hb_report.8.txt
+-	a2x -f manpage $<
++	a2x -L -f manpage $<
+ 
+ endif

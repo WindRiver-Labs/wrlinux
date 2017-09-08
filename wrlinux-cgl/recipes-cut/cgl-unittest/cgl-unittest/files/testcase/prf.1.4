@@ -1,0 +1,68 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : PRF.1.4 High-Resolution Timers
+# 		You can execute this scripts directly.
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog
+# *
+# 04/05/2016 remove deprecated prf.1.1 case
+# -
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+	echo "Clean System..."
+	rm -rf /tmp/tempfile
+	rm -rf /tmp/prf.1.4.log
+	echo "Finish"
+}
+
+
+
+dmesg | grep -i qemu && cutna "This case cannot run in qemu env"
+
+# Step 1
+zcat /proc/config.gz | grep CONFIG_HIGH_RES_TIMERS=y || cutna "Set CONFIG_HIGH_RES_TIMERS=y in your kernel config first"
+
+# Step 2
+# hrtimer_interrupt may be hided by GRKERNSEC_HIDESYM
+# if it is enabled then skip this check
+if ! zcat /proc/config.gz | grep CONFIG_GRKERNSEC_HIDESYM=y 1>/dev/null ; then
+
+	if [ "`uname -m`" = "ppc64" ] ; then
+		cat /proc/timer_list | grep event_handler
+	else
+		cat /proc/timer_list | grep event_handler | grep hrtimer_interrupt
+	fi
+	check "Did not find \"event_handler:  hrtimer_interrupt\" in /proc/time_list"
+fi
+
+# Step 3
+for i in `dmesg | grep "high resolution" | grep CPU | awk '{print $NF}'`
+do
+	TIMEUNIT=`cat /proc/timer_list | grep -A 5 "cpu: $i" | grep resolution | awk '{print $3}'`
+	if [ "$TIMEUNIT" != "nsecs" ]
+	then
+		error "CPU $i time unit is not \"nsecs\""
+	fi
+done
+
+cat /proc/timer_list | grep hres_active | tee /tmp/tempfile
+
+if [ "`cat /tmp/tempfile | awk '{print $3}' | sed -n '1p'`" -ne 1 ]
+then
+	error "hres_active is not 1"
+fi
+
+$TOPDIR/script/cyclic-test | tee /tmp/prf.1.4.log
+
+FAILNUM=`cat /tmp/prf.1.4.log | grep  FAIL | wc -l`
+if [ $FAILNUM -ne 0 ]
+then
+	error "runtest.sh"
+fi
+result PASSED

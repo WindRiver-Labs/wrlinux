@@ -1,0 +1,17 @@
+Add rpath to find mysql lib at runtime
+
+Signed-off-by: Julia Karastoianova <Julia.Karastoianova@windriver.com>
+---
+diff --git a/apps/Makefile.in b/apps/Makefile.in
+index 77404dd..2ce9beb 100644
+--- a/apps/Makefile.in
++++ b/apps/Makefile.in
+@@ -170,7 +170,7 @@ snmptest$(EXEEXT):    snmptest.$(OSUFFIX) $(USELIBS)
+ 	$(LINK) ${CFLAGS} -o $@ snmptest.$(OSUFFIX) ${LDFLAGS} ${LIBS}
+ 
+ snmptrapd$(EXEEXT):    $(TRAPD_OBJECTS) $(USETRAPLIBS) $(INSTALLLIBS)
+-	$(LINK) ${CFLAGS} -o $@ $(TRAPD_OBJECTS) $(INSTALLLIBS) ${LDFLAGS} ${TRAPLIBS}
++	$(LINK) ${CFLAGS} -o $@ $(TRAPD_OBJECTS) $(INSTALLLIBS) ${LDFLAGS} ${net_snmp_MYSQL_LDFLAGS} ${TRAPLIBS}
+ 
+ snmptrap$(EXEEXT):    snmptrap.$(OSUFFIX) $(USELIBS)
+ 	$(LINK) ${CFLAGS} -o $@ snmptrap.$(OSUFFIX) ${LDFLAGS} ${LIBS}

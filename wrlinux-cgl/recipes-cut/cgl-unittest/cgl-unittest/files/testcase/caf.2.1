@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : CAF.2.1 Ethernet MAC Address Takeover
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+
+# The test strategy:
+# 1. prepare two nodes to setup cluster
+#    1) set up auto ssh
+#    2) customize /etc/hosts and /etc/corosync/corosync.conf both
+#       on local target and client
+#    3) start corosync and pacemaker both on local target 
+#       and client
+# 2. configure ClusterIP and WebSite resources
+# 3. Passed if the target and client can perform failover service
+
+. /opt/cut/scripts/cluster.sh
+main_fun mac

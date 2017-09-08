@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# Copyright (c) 2015 - 2016 Wind River Systems, Inc.
+# description : SEC.1.1 Dynamic Kernel Security Module Mechanism
+# 		Examine if selinux is enabled in kernel.
+#               You can execute this scripts directly.
+# developer : He Zhe <zhe.he@windriver.com>
+#
+# changelog
+# *
+# - 02/24/2016 Replace the function 'check' with 'checkerr'
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+	echo "Clean System..."
+}
+
+if [ -r /proc/config.gz ];then
+	zcat /proc/config.gz|grep "CONFIG_SECURITY_SELINUX=y"
+	checkerr "selinux was built into the kernel"
+else
+	echo "/proc/config.gz is missing or cannot be read"
+fi
+
+find /lib* -name libselinux.so*
+checkerr "libselinux is missing"
+
+sestatus|grep "SELinux status:\s*enabled"
+checkerr "selinux is not enabled"
+
+sestatus|grep "Loaded policy name:\s*wr-.\+"
+checkerr "selinux policy is missing"
+
+result PASSED

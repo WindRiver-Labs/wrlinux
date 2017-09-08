@@ -1,0 +1,42 @@
+commit 367f4ab0b67266e07ffedcae2df74f2576ea2aeb
+Author: Aws Ismail <aws.ismail@windriver.com>
+Date:   Thu Jan 24 12:36:48 2013 -0500
+
+    openais: correct the use of proc name in init script
+    
+    openais actually runs on top of corosync. The init
+    script was checking for the pid of "openais"
+    rather than checking for corosync's pid.
+    
+    Upstream-Status: Pending
+
+    Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+
+diff --git a/init/generic.in b/init/generic.in
+index ac63a5f..e8efbb3 100644
+--- a/init/generic.in
++++ b/init/generic.in
+@@ -46,7 +46,7 @@ status()
+ 	if [ $rtrn -ne 0 ]; then
+ 		echo "$1 is stopped"
+ 	else
+-		echo "$1 (pid $pid) is running..."
++		echo "$1 ($proc with pid $pid) is running..."
+ 	fi
+ 	return $rtrn
+ }
+@@ -130,12 +130,12 @@ restart|reload|force-reload)
+ 	restart
+ ;;
+ condrestart|try-restart)
+-	if status $prog > /dev/null 2>&1; then
++	if status $proc > /dev/null 2>&1; then
+ 		restart
+ 	fi
+ ;;
+ status)
+-	status $prog
++	status $proc
+ 	rtrn=$?
+ ;;
+ stop)

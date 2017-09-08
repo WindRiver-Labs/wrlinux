@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : SFA.10.0 Kernel Dump:Configurable Destinations 
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# The strategy as below:
+# 1. customise KDUMP_VMCORE_PATH in /etc/sysconfig/kdump.conf
+#    to define the destination where to store vmcore
+# 2. verify the vmcore on the remote
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/scripts/kdump.sh
+
+[ -f $flag_file ] && test_step=`cat $flag_file` || test_step=0 
+export test_step
+
+main_fun sfa.10.0

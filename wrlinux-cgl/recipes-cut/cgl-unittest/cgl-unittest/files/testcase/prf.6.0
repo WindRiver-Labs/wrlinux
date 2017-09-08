@@ -1,0 +1,45 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : PRF.6.0 Managing Transient Data
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# The strategy as below:
+# 1. check the free memory size as freeM.
+# 2. mount a tmpfs with size freeM/4 and write some data
+#    as size freeM/4, failed if cannot write successfully
+#    and try to write some data as size freeM/3, failed
+#    if can write successfully. 
+# 3. remount the tmpfs to resize the tmpfs as size freeM/3 
+#    and write some data as size freeM/3, pass if can write
+#    successfully.
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+TMP_DIR=`mktemp -d /tmp/prf.6.0.tmp.XXXXXX`
+
+clean()
+{
+	echo "Clean System..."
+	mount | grep $TMP_DIR && umount $TMP_DIR
+	rm -rf $TMP_DIR
+	echo "Finish"
+}
+
+# check the total free memory
+freeM=`cat /proc/meminfo|grep "MemFree:"|awk '{print $2}'`
+
+size1=`expr $(($freeM/4))`
+size2=`expr $(($freeM/3))`
+
+mount -t tmpfs -o size=${size1}k tmpfs $TMP_DIR || cutfail 
+dd if=/dev/zero of=$TMP_DIR/test bs=1k count=$size1 || cutfail
+dd if=/dev/zero of=$TMP_DIR/test bs=1k count=$size2 && cutfail
+
+# resize the tmpfs
+mount -t tmpfs -o remount,size=${size2}k tmpfs $TMP_DIR || cutfail
+dd if=/dev/zero of=$TMP_DIR/test bs=1k count=$size2 || cutfail
+
+cutpass

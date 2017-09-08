@@ -1,0 +1,73 @@
+#!/bin/sh
+
+# Copyright (c) 2017 Wind River Systems, Inc.
+# description : SMM.18 API for Non-Uniform Memory Architectures
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# The strategy as below:
+# 1, check if numa aware system, if not then NA
+# 2, check the node number, if only 1, then NA
+# 3, check basic info, check if the number of cpu match
+# and if the number of node match
+# 4, specify the memory allocation policy
+# 1) set on specified node
+# 2) set on the local
+# 3) set with interleaved
+#    try 10 times and the value should not be all the same, if all the same,
+#    then case failed
+
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+    echo "Clean System..."
+    echo "Finish"
+}
+
+# check if numa aware kernel
+numactl --hardware || cutna "No NUMA available on this system"
+
+# check the node number, if only 1, then NA
+node_num=`numactl --hardware | awk '/^available/ { print $2 }'`
+[ $node_num -lt 2 ] && cutna "Need to support at least 2 nodes"
+
+# check the basic info
+# number of cpu if match
+cpu1=`grep -c processor /proc/cpuinfo`
+cpu2=`numactl --hardware | grep cpus | sed 's/node.*cpus://' | wc -w`
+if [ "$cpu1" != "$cpu2" ]; then
+    cutfail
+fi
+
+# number of node if match
+node1=`ls -1d /sys/devices/system/node/node[0-9]* | wc -l`
+node2=`numactl --hardware | grep -c 'node.*size'`
+if [ "$node1" != "$node2" ]; then
+    cutfail
+fi
+
+# specify the memory allocation policy
+# set on specified node
+numactl --preferred=1 numactl --show|grep "preferred node: 1" || cutfail
+# set on the local
+numactl --localalloc numactl --show|grep "preferred node"|grep current || cutfail
+# set with interleaved
+# try 10 times and the value should not be all the same, if all the same,
+# then case failed
+try_time=10
+ini_node=`numactl --interleave=all numactl --show | grep "preferred node" | awk '{print $3}'`
+try_time=`expr $try_time - 1`
+while [ $try_time -ne 0 ]
+do
+    ini_node1=`numactl --interleave=all numactl --show | grep "preferred node" | awk '{print $3}'`
+    if [ "$ini_node" != "$ini_node1" ]; then
+        cutpass
+    fi
+    sleep 1
+    try_time=`expr $try_time - 1`
+done
+
+cutfail

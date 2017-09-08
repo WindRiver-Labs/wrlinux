@@ -1,0 +1,46 @@
+#!/bin/sh
+
+# Copyright (c) 2017 Wind River Systems, Inc.
+# description : PRF.5.0 Efficient Low-Level Asynchronous Events 
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# The strategy as below:
+# 1. check if install libevent-testing
+# 2. cd /opt/cut/bin/libevent/ && sed -i 's/^TEST_DIR=.*/TEST_DIR=.libs/g' test.sh
+# 3. ./test.sh > test.log
+# 4. num_pass=$(grep -c OKAY$ test.log)
+#    num_fail=$(grep -c FAILED$ test.log)
+#    if [[ "${num_fail}" -eq 0 ]] && [[ "${num_pass}" -ne 0 ]]; then
+#        pass
+#    fi
+
+ 
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+TMP_DIR=`mktemp -d /tmp/prf.5.0.tmp.XXXXXX`
+
+clean()
+{
+    echo "Clean System..."
+    rm -rf $TMP_DIR
+    echo "Finish"
+}
+
+rpm -qa | grep libevent-testing || cutna "Need to install libevent-testing first." 
+
+cd /opt/cut/bin/libevent/ && sed -i 's/^TEST_DIR=.*/TEST_DIR=.libs/g' test.sh
+if [ $? -ne 0 ]; then
+    cutfail
+fi
+
+./test.sh > $TMP_DIR/test.log
+
+num_pass=$(grep -c OKAY$ $TMP_DIR/test.log)
+num_fail=$(grep -c FAILED$ $TMP_DIR/test.log)
+if [[ "${num_fail}" -eq 0 ]] && [[ "${num_pass}" -ne 0 ]]; then
+    cutpass
+else
+    cutfail
+fi

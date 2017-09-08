@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : SEC.2.1 Generic Authentication Modules
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog 
+# * 
+# - 
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+	echo "Clean System..."
+	echo "******change password to root again******"
+	changepasswd root root
+	echo "Finish"
+}
+
+echo "******Change password test******"
+changepasswd root 1234
+check "passwd execute error"
+
+result PASSED

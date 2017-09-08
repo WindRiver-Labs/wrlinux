@@ -1,0 +1,126 @@
+# $Id: racoon2.conf.in,v 1.14 2006/01/26 08:48:12 kamada Exp $
+
+setval {
+        PSKDIR  "/etc/psk";
+        CERTDIR "/etc/cert";
+};
+
+# interface info
+interface
+{
+        ike {
+                MY_IP;
+        };
+        kink {
+                MY_IP;
+        };
+        spmd {
+                unix "/var/run/racoon2/spmif";
+        };
+        spmd_password "/etc/racoon2/spmd.pwd";
+};
+
+# resolver info
+resolver
+{
+        resolver off;
+};
+
+#
+# default section
+#
+default
+{
+        remote {
+                ikev2 {
+                        logmode normal;
+                        kmp_sa_lifetime_time infinite;
+                        kmp_sa_lifetime_byte infinite;
+                        max_retry_to_send 3;
+                        interval_to_send 10 sec;
+                        times_per_send 1;
+                        kmp_sa_nego_time_limit 60 sec;
+                        ipsec_sa_nego_time_limit 40 sec;
+                        kmp_enc_alg { aes256_cbc; 3des_cbc; };
+                        kmp_hash_alg { hmac_sha1; hmac_md5; };
+                        kmp_auth_method { dss; };
+                        kmp_dh_group { modp1024; modp1536; modp2048; modp3072; };
+                        random_pad_content on;
+                        random_padlen on;
+                        max_padlen 50 bytes;
+                };
+        };
+
+        policy {
+                ipsec_mode transport;
+                ipsec_level require;
+        };
+
+        ipsec {
+                ipsec_sa_lifetime_time infinite;
+                ipsec_sa_lifetime_byte infinite;
+        };
+
+        sa {
+                esp_enc_alg { aes128_cbc; 3des_cbc; };
+                esp_auth_alg { hmac_sha1; hmac_md5; };
+        };
+};
+
+remote pc {
+        acceptable_kmp { ikev2; };
+        ikev2 {
+                my_id fqdn "root";
+                peers_id fqdn "root";
+                peers_ipaddr "128.224.149.100";
+                kmp_enc_alg { aes192_cbc; 3des_cbc; };
+                kmp_prf_alg { hmac_md5; hmac_sha1; aes_xcbc; };
+                kmp_hash_alg { hmac_sha1; };
+                kmp_dh_group { modp2048; };
+                kmp_auth_method { psk; };
+                pre_shared_key "${PSKDIR}/test.psk";
+        };
+        selector_index pc_out;
+};
+selector pc_out {
+        direction outbound;
+        src "192.168.42.0/24";
+        dst "192.168.100.0/24";
+        upper_layer_protocol "any";
+        policy_index pc;
+};
+selector pc_in {
+        direction inbound;
+        src "192.168.100.0/24";
+        dst "192.168.42.0/24";
+        upper_layer_protocol "any";
+        policy_index pc;
+};
+policy pc {
+        action auto_ipsec;
+        remote_index pc;
+        ipsec_mode tunnel;
+        ipsec_index { ipsec_esp; };
+        ipsec_level require;
+        peers_sa_ipaddr "128.224.149.100";
+        my_sa_ipaddr "128.224.149.42";
+};
+
+ipsec ipsec_ah_esp {
+        ipsec_sa_lifetime_time 28800 sec;
+        sa_index { ah_01; esp_01; };
+};
+ipsec ipsec_esp {
+        ipsec_sa_lifetime_time 28800 sec;
+        sa_index esp_01;
+};
+
+sa ah_01 {
+        sa_protocol ah;
+        ah_auth_alg { hmac_sha1; hmac_md5; };
+};
+sa esp_01 {
+        sa_protocol esp;
+        esp_enc_alg { aes128_cbc; 3des_cbc; };
+        esp_auth_alg { hmac_sha1; hmac_md5; };
+};

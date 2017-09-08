@@ -1,0 +1,151 @@
+#!/bin/bash
+# Copyright (c) 2008 - 2016 Wind River Systems, Inc.
+# description : STD.4.1 IPv6 Base Features
+#
+# developer :
+#      09/6/2      Yongli He  <yongli.he@windriver.com>
+#    03/01 Robbie Williamson (robbiew@us.ibm.com)
+#		-Ported
+#	 10/21/2008 Liang Li (Liang.Li@windriver.com)
+#	   -Modified
+#
+# changelog
+# * 2016/06/06 Mingli Yu Improve to add ipv6 module check and 
+#   use the link ipv6 address to do ping6 check
+# -
+#SETUP: If "RHOST" is not exported, then the local hostname is used.
+#***********************************************************************
+# The test strategy as below:
+# 1. check if ipv6 module is enabled or not
+# 2. check the local interface if configured with ipv6 address
+# 3. ping6 the ipv6 multicast address to get all the link ipv6 address
+#    on the same subnet
+# 4. ping6 all the ipv6 address on the same subnet and check the ping6 
+#    result, pass if all ping6 succeed 
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+
+
+TC=ping6
+
+
+COUNT=${COUNT:-4}
+SLEEPTIME=${SLEEPTIME:-1}
+PACKETSIZES=${PACKETSIZES:-"8 16 32 64 128 256 512 1024 2048 4064"}
+
+NIC=""
+
+clean()
+{
+    echo "Clean System..."
+    lsmod | grep ipv6 && modprobe -r ipv6
+    echo  "Finish"
+}
+
+# check ipv6 module is enabled or not
+if [ ! -f /proc/net/if_inet6 ]; then
+    modprobe ipv6 || cuterr "Load ipv6 module fail"
+fi
+
+if [ x"$LOCAL_ETH" = x ]; then
+    echo "Error: Empty local interface."
+    echo "Note: This test case requires configuring ipv6 address"
+    echo "on local interface, please set LOCAL_ETH which used to"
+    echo "configure ipv6 address in /opt/cut/env/runtime_env"
+    echo "before running the test script, or it will always fail."
+    cutfail
+fi
+
+# check if configure ipv6 address locally
+v6addr=`ifconfig $LOCAL_ETH | grep 'inet6 addr:' | awk '{ print $3}'`
+if [ "X$v6addr" = "X" ]; then
+    cuterr "Invalid ipv6 address"
+fi
+
+#find a v6 host
+all_host=$(localhostv6 $LOCAL_ETH)
+all_host+=" $HOST_V6_ADDRESS "
+
+if [ "X$all_host" = "X" ]; then
+    echo "IPv6 address for host not identified"
+    echo "please export HOST_V6_ADDRESS=[the v6 address in same subnet, which begin with: fe80::... ]"
+    cutfail
+else
+    echo "$all_host"
+fi
+
+
+#find a up interface with ipv6 enabled
+if_all=$(ifconfig | grep "eth" |  grep "Link encap" | awk '{print $1}')
+for  if  in $if_all
+do
+    ip_t=$(ifconfig $if | grep 'inet6 addr: fe80::')
+    if [  "X$ip_t" =  "X" ]; then  # no ip address
+        continue
+    else # with avaliable ip address
+        NIC=$if
+    fi
+done
+
+if  [ "X$NIC" = "X" ]; then
+    echo "there is no avaliable IPV6 enabled interface, please check your kernel config!"
+    cutfail
+fi
+
+echo "find NIC: $NIC"
+
+#-----------------------------------------------------------------------
+#
+# FUNCTION:  do_test
+# PURPOSE:   Executes the testcases.
+#
+#-----------------------------------------------------------------------
+
+do_test()
+{
+    echo "$all_host"
+    for RHOST in $all_host
+    do
+        for packetsize in $PACKETSIZES
+        do
+            ping6  -c $COUNT -s $packetsize -I $NIC $RHOST
+            [ $? -eq 0 ] || end_testcase "ping6 -c $COUNT -s $packetsize -I $NIC $RHOST"
+            sleep $SLEEPTIME
+        done
+        break
+    done
+}
+
+#=============================================================================
+# FUNCTION NAME:        end_testcase
+#
+# FUNCTION DESCRIPTION: Clean up
+#
+# PARAMETERS:           string, IF AND ONLY IF the testcase fails
+#
+# RETURNS:              None.
+#=============================================================================
+
+end_testcase()
+{
+    if ! [ $# -eq 0 ] ; then
+        echo "Testing IPV6 base features:......Fail!"
+        echo -e "Failed run test command:\n\t$@"
+        cutfail
+    else
+        echo "Testing IPV6 base features:......Pass."
+        echo "Succeed run test command:"
+        echo -e "\tping6 -c $COUNT -s $packetsize -I $NIC $RHOST"
+        cutpass
+    fi
+}
+
+#*******************************************************************************
+#
+# FUNCTION:  MAIN
+#
+#*******************************************************************************
+do_test
+end_testcase

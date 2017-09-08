@@ -1,0 +1,57 @@
+configure.ac: fix install-sh not found
+
+Fix configure.ac to cope with new autoconf.
+Recent autoconfs generate a bad configure when AM_INIT_AUTOMAKE is
+called as late as it was, ending up thinking that the am_aux_dir is pwd
+at the start of the build. Move it up to under AC_INIT to fix that.
+
+Upstream-Status: backport
+
+http://us.generation-nt.com/answer/bug-724116-resource-agents-ftbfs-bin-bash-install-sh-no-such-file-directory-help-213376842.html
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index e8e2a7b..f3c8b9f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -23,13 +23,20 @@ AC_INIT([resource-agents],
+ 	m4_esyscmd([make/git-version-gen .tarball-version]),
+ 	[to_be_defined@foobar.org])
+ 
++AC_CONFIG_AUX_DIR(.)
++
++dnl
++dnl AM_INIT_AUTOMAKE([1.11.1 foreign dist-bzip2 dist-xz])
++dnl
++
++AM_INIT_AUTOMAKE([1.10.1 foreign dist-bzip2])
++
+ AC_USE_SYSTEM_EXTENSIONS
+ 
+ CRM_DTD_VERSION="1.0"
+ 
+ PKG_FEATURES=""
+ 
+-AC_CONFIG_AUX_DIR(.)
+ AC_CANONICAL_HOST
+ 
+ dnl Where #defines go (e.g. `AC_CHECK_HEADERS' below)
+@@ -56,12 +63,6 @@ AC_ARG_WITH(pkg-name,
+     [  --with-pkg-name=name     Override package name (if you're a packager needing to pretend) ],
+     [ PACKAGE_NAME="$withval" ])
+ 
+-dnl 
+-dnl AM_INIT_AUTOMAKE([1.11.1 foreign dist-bzip2 dist-xz])
+-dnl
+-
+-AM_INIT_AUTOMAKE([1.10.1 foreign dist-bzip2])
+-
+ AC_DEFINE_UNQUOTED(AGENTS_VERSION, "$PACKAGE_VERSION", Current agents version)
+ 
+ CC_IN_CONFIGURE=yes
+-- 
+1.8.1.2
+

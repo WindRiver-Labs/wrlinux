@@ -1,0 +1,19 @@
+potential double free. netsnmp_register_mib_table_row calls 
+netsnmp_handler_registration_free() to free the reginfo in case
+netsnmp_register_handler_nocallback() gets back error. but 
+netsnmp_register_handler_nocallback() calls netsnmp_register_mib() 
+which frees anyway in case of failure.
+---
+ net-snmp-5.6.1/agent/helpers/old_api.c |    1 -
+ 1 file changed, 1 deletion(-)
+
+--- a/agent/helpers/old_api.c
++++ b/agent/helpers/old_api.c
+@@ -206,7 +206,6 @@ netsnmp_register_mib_table_row(const cha
+             MIB_REGISTERED_OK) {
+             DEBUGMSGTL(("netsnmp_register_mib_table_row",
+                         "register failed %d\n", rc));
+-            netsnmp_handler_registration_free(r);
+             break;
+         }
+ 

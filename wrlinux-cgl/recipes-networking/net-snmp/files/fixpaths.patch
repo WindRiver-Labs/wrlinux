@@ -1,0 +1,63 @@
+fix include and link paths to use cross-compile environment
+---
+ net-snmp-5.7.1/net-snmp-config.in |   14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+--- a/net-snmp-config.in
++++ b/net-snmp-config.in
+@@ -54,7 +54,7 @@ NSC_LAGENTLIBS="@LAGENTLIBS@ @PERLLDOPTS
+ NSC_LMIBLIBS="@LMIBLIBS@"
+ 
+ NSC_INCLUDEDIR=${includedir}
+-NSC_LIBDIR=-L${libdir}
++NSC_LIBDIR=-L=${libdir}
+ 
+ NSC_SNMPLIBS="-lnetsnmp ${NSC_LNETSNMPLIBS}"
+ NSC_SUBAGENTLIBS="-lnetsnmpagent ${NSC_LAGENTLIBS} ${NSC_SNMPLIBS}"
+@@ -91,13 +91,13 @@ else
+       prefix=$optarg
+       NSC_PREFIX=${prefix}
+       NSC_INCLUDEDIR=${prefix}/include
+-      NSC_LIBDIR=-L${prefix}/lib
++      NSC_LIBDIR=-L=${prefix}/lib
+       ;;
+ 
+     --exec-prefix=*)
+       exec_prefix=$optarg
+       NSC_EXEC_PREFIX=${exec_prefix}
+-      NSC_LIBDIR=-L${exec_prefix}/lib
++      NSC_LIBDIR=-L=${exec_prefix}/lib
+       ;;
+ 
+     --debug-tokens|--deb*|--dbg*)
+@@ -138,10 +138,10 @@ else
+       ;;
+     #################################################### compile
+     --base-cflags)
+-      echo @CFLAGS@ @CPPFLAGS@ -I${NSC_INCLUDEDIR}
++      echo @CFLAGS@ @CPPFLAGS@ -I=${NSC_INCLUDEDIR}
+       ;;
+     --cflags|--cf*)
+-      echo @CFLAGS@ @DEVFLAGS@ @CPPFLAGS@ -I. -I${NSC_INCLUDEDIR}
++      echo @CFLAGS@ @DEVFLAGS@ @CPPFLAGS@ -I. -I=${NSC_INCLUDEDIR}
+       ;;
+     --srcdir)
+       echo $NSC_SRCDIR
+@@ -178,7 +178,7 @@ else
+       result="-I$build_dir/include"
+       if test "$build_dir" != "$NSC_SRCDIR" -a "$NSC_SRCDIR" != "NET-SNMP-SOURCE-DIR"
+       then
+-          result="$result -I$NSC_SRCDIR/include"
++          result="$result -I=$NSC_SRCDIR/include"
+       fi
+       echo $result
+       ;;
+@@ -599,7 +599,7 @@ EOF
+         echo "Ack.  Can't create $tmpfile."
+ 	exit 1
+       fi
+-      cmd="@CC@ $cflags @CFLAGS@ @DEVFLAGS@ -I. -I${NSC_INCLUDEDIR} -o $outname $tmpfile $cfiles $NSC_LDFLAGS $NSC_LIBDIR $NSC_BASE_AGENT_LIBS $NSC_AGENTLIBS $ldflags"
++      cmd="@CC@ $cflags @CFLAGS@ @DEVFLAGS@ -I. -I=${NSC_INCLUDEDIR} -o $outname $tmpfile $cfiles $NSC_LDFLAGS $NSC_LIBDIR $NSC_BASE_AGENT_LIBS $NSC_AGENTLIBS $ldflags"
+       echo "running: $cmd"
+       `$cmd`
+       if test "x$norm" != "x1" ; then

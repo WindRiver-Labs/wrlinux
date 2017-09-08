@@ -1,0 +1,54 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : AVL.28.2 Multi-Architecture File System Support
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# The case strategy as below:
+# 1. check the file system image file which used to verify
+#   dumpinfo is available or not
+#   The file system image file generated in our build env as below
+#   and will deploy to our target under /opt/cut/resource
+#   Note: the img file avl.28.2.img which deploy to our target
+#   actually generated under x86-64 system. So this case actually
+#   only is reasonable under the target which is not x86-64 when
+#   run this case
+#   dd if=/dev/zero of=/opt/cut/resource/avl.28.2.img bs=1M count=5
+#   mkfs.ext4 /opt/cut/resource/avl.28.2.img
+# 2. check the original dumpinfo file of the file system image
+#   is available or not
+#   The original dumpinfo file generated in our build env as below
+#   and will deploy to our target under /opt/cut/resource
+#   dumpe2fs /opt/cut/resource/avl.28.2.img &> \
+#   /opt/cut/resource/avl.28.2.img_info
+# 3. run dumpe2fs to check the shipped file system image file
+#   and compare with the original dumpinfo, failed if the
+#   infomation not the same
+
+# Changelog
+# 2016/04/20 reviewed with Roy Li and Jackie Huang
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+    echo "Clean System..."
+    echo "Finish"
+}
+
+[ -f /opt/cut/resource/avl.28.2.img ] || cutna "No original file system image file"
+[ -f /opt/cut/resource/avl.28.2.img_info ] || cutna "No original file system image metadata file"
+
+run_ino=`dumpe2fs /opt/cut/resource/avl.28.2.img 2> /dev/null|awk '/Inode count:/ {print $3}'`
+run_blo=`dumpe2fs /opt/cut/resource/avl.28.2.img 2> /dev/null|awk '/Block count:/ {print $3}'`
+file_ino=`cat /opt/cut/resource/avl.28.2.img_info |grep "Inode count:"|awk '{print $3}'`
+file_blo=`cat /opt/cut/resource/avl.28.2.img_info |grep "Block count:"|awk '{print $3}'`
+
+if [ $run_ino = $file_ino ] && [ $run_blo = $file_blo ]
+then
+    cutpass
+else
+    cutfail
+fi

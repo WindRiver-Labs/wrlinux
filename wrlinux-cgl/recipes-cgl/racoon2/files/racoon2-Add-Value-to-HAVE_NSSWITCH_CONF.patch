@@ -1,0 +1,30 @@
+From 2ad8c9b2e99be296fc7c7bf94161a53aa3984b24 Mon Sep 17 00:00:00 2001
+From: Aws Ismail <aws.ismail@windriver.com>
+Date: Tue, 23 Oct 2012 18:07:23 -0400
+Subject: [PATCH 2/3] Add Value to HAVE_NSSWITCH_CONF
+
+Use a more verbose form of AC_DEFINE
+to force value of "1" to
+HAVE_NSSWITCH_CONF macro.
+
+Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+---
+ spmd/configure.in |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/spmd/configure.in b/spmd/configure.in
+index c149c2d..c079c56 100644
+--- a/spmd/configure.in
++++ b/spmd/configure.in
+@@ -91,7 +91,7 @@ case "$target" in
+ 		;;
+ 	*)      
+ 		AC_MSG_RESULT(use /etc/nsswitch.conf)
+-		AC_DEFINE(HAVE_NSSWITCH_CONF)
++		AC_DEFINE(HAVE_NSSWITCH_CONF, [1], [Define if nsswitch conf file exists])
+ 		;;
+ esac
+ 
+-- 
+1.7.0.4
+

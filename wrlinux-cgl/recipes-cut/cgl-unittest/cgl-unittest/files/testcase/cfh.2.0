@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : CFH.2.0 Prevent Failed Node From Corrupting Shared Resources
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# Actually test node fencing feature
+# There are two kinds of fencing: resource level and node level.
+# 1. prepare two nodes to setup cluster
+#    1) set up auto ssh
+#    2) customize /etc/hosts and /etc/corosync/corosync.conf both
+#       on local target and client
+#    3) start corosync and pacemaker both on local target and client
+# 2. enable stonith attribute
+# 3. pick a fencing device for the node level fencing, use
+#    "stonith -L" to check the list of stonith devices 
+#    which are supported
+# 4. configure the stonith resource
+# 5. issue stonith operation
+# 6. check the fencing operation, pass if the client reboots
+
+. /opt/cut/scripts/cluster.sh
+
+main_fun fencing

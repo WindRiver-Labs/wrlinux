@@ -1,0 +1,21 @@
+--- vblade-14/makefile.orig	2006-09-21 08:29:27.000000000 -0500
++++ vblade-14/makefile	2007-03-30 12:27:26.000000000 -0500
+@@ -3,7 +3,7 @@
+ # see README for others
+ PLATFORM=linux
+ 
+-prefix = /usr
++prefix = ${DESTDIR}/usr
+ sbindir = ${prefix}/sbin
+ sharedir = ${prefix}/share
+ mandir = ${sharedir}/man
+@@ -35,6 +35,6 @@
+ 	rm -f $O vblade
+ 
+ install : vblade vbladed
+-	install vblade ${sbindir}/
+-	install vbladed ${sbindir}/
+-	install vblade.8 ${mandir}/man8/
++	install -D -m 755 vblade ${sbindir}/vblade
++	install -D -m 755 vbladed ${sbindir}/vbladed
++	install -D -m 644 vblade.8 ${mandir}/man8/vblade.8

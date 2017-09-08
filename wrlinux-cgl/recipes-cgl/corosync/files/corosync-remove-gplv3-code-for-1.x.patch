@@ -1,0 +1,17 @@
+build-aux/git-version-gen is GPLv3 licensed, so remove it.
+
+Upstream-Status: Inappropriate [License Issue]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+--- corosync-1.4.7/configure.ac.orig	2014-12-29 17:25:32.179641860 +0800
++++ corosync-1.4.7/configure.ac	2014-12-29 17:25:55.263642489 +0800
+@@ -5,7 +5,7 @@
+ AC_PREREQ([2.61])
+ 
+ AC_INIT([corosync],
+-	m4_esyscmd([build-aux/git-version-gen .tarball-version]),
++	1.4.7,
+ 	[openais@lists.osdl.org])
+ 
+ AM_INIT_AUTOMAKE([-Wno-portability])

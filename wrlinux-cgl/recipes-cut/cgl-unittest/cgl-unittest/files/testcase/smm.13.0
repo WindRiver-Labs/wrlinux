@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : SMM.13.0 Diskless Systems (was PMS.4.0) 
+# 		If system can boot up , we can take it as PASSED
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog
+# *
+# -
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+        echo "Clean System..."
+        echo "Finish"
+}
+
+echo "System can boot up by nfs,pass"
+result PASSED

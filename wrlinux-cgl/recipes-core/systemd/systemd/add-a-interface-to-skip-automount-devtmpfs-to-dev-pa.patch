@@ -1,0 +1,59 @@
+[PATCH] add a interface to skip automount devtmpfs to /dev/ path
+
+Upstream-Status: Inappropriate [other]
+
+systemd will automount devtmpfs to /dev/, but when run VRF, it will
+cause problem;
+
+VRF used lxc to create a container; to log on the container by
+(lxc-connect), the /dev/tty1 and /dev/pts/1 must be created, and be
+bound when start a container by lxc-start.
+
+but the bound tty device will be overwritten when systemd start since
+system will remount /dev/.
+
+Add a interface, which is to check if /.skip_mount_devtmpfs_on_dev
+exist, to skip mount devtmpfs to /dev/ path
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ src/core/mount-setup.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/src/core/mount-setup.c b/src/core/mount-setup.c
+index 1782d40..29d8d97 100644
+--- a/src/core/mount-setup.c
++++ b/src/core/mount-setup.c
+@@ -68,13 +68,15 @@ typedef struct MountPoint {
+ #define N_EARLY_MOUNT 4
+ #endif
+ 
++bool skip_mount_dev();
++
+ static const MountPoint mount_table[] = {
+         { "sysfs",       "/sys",                      "sysfs",      NULL,                      MS_NOSUID|MS_NOEXEC|MS_NODEV,
+           NULL,          MNT_FATAL|MNT_IN_CONTAINER },
+         { "proc",        "/proc",                     "proc",       NULL,                      MS_NOSUID|MS_NOEXEC|MS_NODEV,
+           NULL,          MNT_FATAL|MNT_IN_CONTAINER },
+         { "devtmpfs",    "/dev",                      "devtmpfs",   "mode=755",                MS_NOSUID|MS_STRICTATIME,
+-          NULL,          MNT_FATAL|MNT_IN_CONTAINER },
++          skip_mount_dev,          MNT_FATAL|MNT_IN_CONTAINER },
+         { "securityfs",  "/sys/kernel/security",      "securityfs", NULL,                      MS_NOSUID|MS_NOEXEC|MS_NODEV,
+           NULL,          MNT_NONE                   },
+ #ifdef HAVE_SMACK
+@@ -133,6 +135,12 @@ bool mount_point_is_api(const char *path) {
+         return path_startswith(path, "/sys/fs/cgroup/");
+ }
+ 
++bool skip_mount_dev() {
++       struct stat buf;
++
++       return stat("/.skip_mount_devtmpfs_on_dev", &buf) == -1;
++}
++
+ bool mount_point_ignore(const char *path) {
+         const char *i;
+ 
+-- 
+1.9.1
+

@@ -1,0 +1,13 @@
+diff --git a/init/generic.in b/init/generic.in
+index 9164754..402d941 100644
+--- a/init/generic.in
++++ b/init/generic.in
+@@ -116,7 +116,7 @@ condrestart|try-restart)
+ 		restart
+ 	fi
+ ;;
+-status)
++  status)
+ 	status $proc
+ 	rtrn=$?
+ ;;

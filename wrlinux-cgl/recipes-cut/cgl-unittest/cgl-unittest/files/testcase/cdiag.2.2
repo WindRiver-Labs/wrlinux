@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : CDIAG.2.2 Cluster-Wide Kernel Crash Dump 
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# The strategy as below:
+# 1. check if kernel support kdump
+# 2. prepare the crash kernel
+# 3. load the crash kernel
+# 4. trigger a kernel panic
+# 5. copy dumped kernel and reboot to the normal kernel
+# 6. run crash to analyze the dumped kernel
+# 7. check the crash output if contains the correct nodename
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/scripts/kdump.sh
+
+[ -f $flag_file ] && test_step=`cat $flag_file` || test_step=1 
+export test_step
+
+main_fun cdiag.2.2

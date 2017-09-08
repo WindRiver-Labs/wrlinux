@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : SMM.4.0 Persistent Device Naming
+# 	
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog 
+# * 
+# - 
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+	echo "Clean System..."
+	echo "Finish"
+}
+
+echo "******Check the udev db******"
+#make sure udevinfo, udevtest exists, or use udevadm info
+if which udevinfo 2>&1 > /dev/null && \
+   which udevtest 2>&1 > /dev/null
+then
+  udevinfo="udevinfo"
+  udevtest="udevtest"
+elif which udevadm 2>&1 > /dev/null; then
+  udevinfo="udevadm info"
+  udevtest="udevadm test"
+fi
+
+$udevinfo --export-db
+check "execute udevinfo fail"
+
+DEVICE=`$udevinfo --export-db | grep P: | grep tty | sed -n '1p' | cut -d" " -f 2`
+echo "******Test $DEVICE name******"
+$udevtest $DEVICE
+check "execute udevtest fail"
+
+result PASSED

@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# client_ip used to test the case which needs two target
+# together to finish the test, such as csm.1.0
+CLIENT_IP=""
+
+# when test case which need at least two targets, the
+# LOCAL_ETH used to specify the local eth device used
+# to connect to other target
+LOCAL_ETH=""
+
+# set the test interface for the case which needs special
+# setting for the interface such as needs to set ipv6 address
+ETH_TEST=""
+
+# provide the cluster ip when setup a cluster
+# Note the CLUSTER_IP is an address not used
+# by other real interface, and the CLUSTER_IP should be in
+# the same netmask with CLIENT_IP
+CLUSTER_IP=""

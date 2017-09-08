@@ -1,0 +1,74 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : SEC.7.2 File System Quotas
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# The case strategy as below:
+# Note: the quotas only apply for normal user.
+# We cannot set the quotas for root user.
+# 1, add user and set user quotas
+# 2, try to write a file exceeds the quotas, if the write
+# fails, then our case passed. Otherwise it fails.
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+TMP_DIR=`mktemp -d /tmp/avl.28.1.tmp.XXXXXX`
+
+clean()
+{
+    echo "Clean System..."
+    # restore the console log level
+    [ -f ${TMP_DIR}/printk ] && cp ${TMP_DIR}/printk /proc/sys/kernel/printk
+    # delete the test user
+    userdel quota_test &> /dev/null
+    rm -rf /home/quota_test
+    umount /home
+    losetup -d /dev/loop0
+    sleep 1
+    rm -rf $TMP_DIR
+    echo "Finish"
+}
+
+prepare_fs()
+{
+    test -a /dev/loop0||modprobe loop
+    # generate the file system for test
+    dd if=/dev/zero of=$TMP_DIR/fs_file bs=1M count=600 &> /dev/null
+    if [ $? -ne 0 ]
+    then
+        result FAILED
+	exit 0
+    fi
+    losetup /dev/loop0 $TMP_DIR/fs_file
+    mkfs.ext4 /dev/loop0  &> /dev/null
+    if [ $? -ne 0 ]
+    then
+        mkfs.ext3 /dev/loop0 &> /dev/null 
+    fi
+    [ -d /home ] || mkdir -p /home
+    # customise the console log level as err to avoid noisy message
+    cp /proc/sys/kernel/printk $TMP_DIR
+    echo "3" > /proc/sys/kernel/printk
+    mount -o usrquota /dev/loop0 /home > /dev/null 2>&1
+}
+
+prepare_fs
+# add the user for test
+useradd quota_test
+# check the file system quotas
+quotacheck -vug /home | > /dev/null 2>&1|| result FAILED
+ls -d /home/a*
+# turn on the quotas
+quotaon -uv /home
+setquota -u quota_test 100M 120M 0 0 /home
+# try to write a file exceeds the quotas
+RETVAL=$(su quota_test -c "dd if=/dev/zero of=/home/quota_test/test_file bs=1M count=150; echo \$?")
+if [ $RETVAL -eq 0 ]
+then
+    result FAILED
+    exit 0
+fi
+result PASSED

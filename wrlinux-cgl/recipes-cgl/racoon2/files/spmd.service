@@ -1,0 +1,12 @@
+[Unit]
+Description=Manages IPsec Security Policy for racoon2
+After=syslog.target network.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/spmd.pid
+ExecStart=@SBINDIR@/spmd
+ExecStop=@SBINDIR@/spmd -k
+
+[Install]
+WantedBy=multi-user.target

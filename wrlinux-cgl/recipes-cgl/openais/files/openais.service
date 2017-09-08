@@ -1,0 +1,14 @@
+[Unit]
+Description=OpenAIS Cluster Framework
+ConditionKernelCommandLine=!nocluster
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+ExecStart=@DATADIR@/openais/openais start
+ExecStop=@DATADIR@/openais/openais stop
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

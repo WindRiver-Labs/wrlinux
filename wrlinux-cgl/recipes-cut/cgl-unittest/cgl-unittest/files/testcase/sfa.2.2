@@ -1,0 +1,50 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : SFA.2.2 Dynamic Probe Insertion
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# The strategy as below:
+# 1. check the kprobes related kernel configuration
+# 2. dynamically load the kprobe test module which
+#    defines the "symbol_name" field of struct kprobe
+#    as do_fork
+# 3. check the registered probes if exists on the system,
+#    pass if the probe is inserted successfully
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+	echo "Clean System..."
+	lsmod | grep kprobe_example && modprobe -r kprobe_example
+	echo "Finish"
+}
+
+# check the kernel configuration
+zcat /proc/config.gz | grep -q CONFIG_KPROBES=y || cuterr "kprobes is not configured!"
+zcat /proc/config.gz | grep -q CONFIG_MODULES=y || cuterr "CONFIG_MODULES not configured!"
+zcat /proc/config.gz | grep -q CONFIG_MODULE_UNLOAD=y || cuterr "CONFIG_MODULE_UNLOAD not configured!"
+
+# since kallsyms_lookup_name() is used by the in-kernel
+# kprobe address resolution code.
+zcat /proc/config.gz | grep -q CONFIG_KALLSYMS=y || cuterr "CONFIG_KALLSYMS not configured!"
+zcat /proc/config.gz | grep -q CONFIG_KALLSYMS_ALL=y || cuterr "CONFIG_KALLSYMS_ALL not configured!"
+
+# when need to insert a probe in the middle of a function
+# so you can use "objdump -d -l vmlinux" to see the 
+# source-to-object code mapping.
+zcat /proc/config.gz | grep -q CONFIG_DEBUG_INFO=y || cuterr "CONFIG_DEBUG_INFO not configured!"
+
+# check the registered probes on the system
+num1=`cat /sys/kernel/debug/kprobes/list | wc -l`
+
+modprobe kprobe_example || cuterr "Failed to load the kprobe test module"
+
+num2=`cat /sys/kernel/debug/kprobes/list | wc -l`
+if [ $num2 -gt $num1 ]; then
+	cat /sys/kernel/debug/kprobes/list | grep do_fork  && cutpass
+fi
+cuterr "Failed to register kprobes"

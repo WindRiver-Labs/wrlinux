@@ -1,0 +1,65 @@
+Simple description about function.sh
+
+   1) check()
+      This function is used for check the return value of commands. When use this, 
+      two parameters are needed. 
+      
+      First parameter is simple description for error, if return value is not 0, test 
+      case will exit and print out FAILED or NOTRUN , and write the simple description 
+      to testlog.
+      
+      Second parameter is a flag, if return value is not 0, but this fail is caused by 
+      not support hardware or not support software, you can set this parameter as 1, 
+      then the print out is NOTRUN.
+
+      If the return value is 0, script will go no runing.
+
+   2) error()
+      In some test case, pass or fail is not depend on return value of commands, so 
+      check() is not useful, you can use error() directly. this function need tow 
+      parameters, same with check().
+      
+   3) result()
+      If all commands execute successfully, use this function.
+      e.g 
+	result PASSED
+	exit 0
+
+   4) getip()
+      Get the IP address of designated net card.
+      e.g
+	gitip eth0
+
+   5) getmac()
+      Get the MAC address of designated net card.
+      e.g
+	getmac eth0
+
+   6) getmask()
+      Get the Mask of designated net card.
+      e.g
+	getmask eth0
+
+   7) getgateway()
+      Get the gatewat of target. Do not need parameter
+      
+   8) getbcast()
+      Get the Bcase of designated net card.
+      e.g
+	getbcast eth0
+
+   9) changepasswd()
+      Need two parameters. $1 is user name, $2 is new password
+      e.g
+	changepasswd windriver 123456
+
+   10) choption()
+      Need three parameters.
+      $1 is the path of configure file
+      $2 is the option whitch need be changeed
+      $3 is the new value of option
+      e.g
+	choption /etc/sysconfig/ipmi IPMI_WATCHDOG yes
+
+      Note: Not all configuer file can use this function.This function need to be update.
+

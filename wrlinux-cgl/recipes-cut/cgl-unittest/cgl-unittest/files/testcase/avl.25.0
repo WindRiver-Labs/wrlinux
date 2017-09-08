@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : AVL.25.0 Application Heartbeat Monitor 
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+
+# The test strategy:
+# 1. prepare two nodes to setup cluster
+#    1) set up auto ssh
+#    2) customize /etc/hosts and /etc/corosync/corosync.conf both
+#       on local and remote target
+#    3) start corosync and pacemaker both on local and 
+#       remote target
+# 2. configure the WebSite resource with two monitor parameters
+# 3. stop the web service and check if the monitor reports the
+#    service stop event, pass if it reports
+
+. /opt/cut/scripts/cluster.sh
+main_fun mon
+

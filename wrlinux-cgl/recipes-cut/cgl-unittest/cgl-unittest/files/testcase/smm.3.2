@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : SMM.3.2 Network Console Operation
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# The strategy as below:
+# 1. check if the sshd service avaiable
+# 2. connect localhost via ssh
+
+# Changelog
+# 2016/04/20 reviewed with Roy Li and Jackie Huang
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+    echo "Clean System..."
+    echo "Finish"
+}
+
+ps aux|grep sshd|grep -v grep || cutna "The sshd service not active"
+nc -zv 127.0.0.1 22 && cutpass || cutfail
+

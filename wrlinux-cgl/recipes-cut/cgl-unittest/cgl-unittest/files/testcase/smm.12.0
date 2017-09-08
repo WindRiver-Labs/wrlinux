@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : SMM.12.0 Remote Boot Support (was PMT.2.0)
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# The strategy as below:
+# If the system boot up via nfs, then the test pass
+# For system not boot up via nfs
+# N/A
+
+# Changelog
+# 2016/04/20 reviewed with Roy Li and Jackie Huang
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+    echo "Clean System..."
+    echo "Finish"
+}
+
+df -hT|grep /|grep nfs && cutpass || cutna "No nfs root file system"

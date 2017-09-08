@@ -1,0 +1,81 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : AVL.7.1 Multi-Path Access to Storage
+# 		
+# developer : Xiaofeng.Liu  <xiaofeng.liu@windriver.com>
+#
+# changelog 
+# * 
+# - 
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+. $TOPDIR/config.sh
+
+clean()
+{
+	if [ $AVL_7_1_PHE = 1 ] ; then
+	        dmsetup remove_all 2>&1
+	fi
+
+        if [ $AVL_7_1_PHE = 2 ] ; then
+	     	umount /mnt 2>&1
+		sleep 1
+	        dmsetup remove_all 2>&1
+        fi
+	echo "Exit from AVL.7.1 Multi-Path Access to Storage"
+
+}
+
+#FC_DISK_DEV_NUM1=8:32
+#FC_DISK_DEV_NUM2=8:48
+
+AVL_7_1_PHE=0 
+
+cat /proc/cmdline | grep 15565
+check "check target is cp3220-3_dc" 1
+
+dmsetup targets | grep multipath 2>&1
+check "multi path driver is built" 1
+
+echo "0 167772160 multipath 0 0 2 1 round-robin 0 1 1 $FC_DISK_DEV_NUM1 1000 round-robin 0 1 1 $FC_DISK_DEV_NUM2 1000" > dm.config
+
+AVL_7_1_PHE=1
+
+dmsetup create dm1 dm.config 2>&1
+check "create dm"
+
+sleep 1
+
+ls /dev/mapper | grep dm1 
+check "check dm"
+
+multipath -ll | grep round-robin 2>&1
+check "use multipath tools check dm"
+
+sleep 1
+mkfs.ext3 /dev/dm-1
+check "format dm"
+
+sleep 1
+
+mount -t ext3 /dev/dm-1 /mnt 2>&1
+check "mount dm"
+
+sleep 1
+
+AVL_7_1_PHE=2
+
+dd if=/dev/zero of=/mnt/testfile bs=1M count=100 2>&1
+check "create testfile"
+
+iostat
+#umount /mnt 2>&1
+#check umount_dm
+#dmsetup remove_all 2>&1
+#check dm_remove
+
+result PASSED
+exit 0
+

@@ -1,0 +1,101 @@
+#!/bin/sh
+
+# Copyright (c) 2008 - 2016 Wind River Systems, Inc.
+# description : STD.9.0 IPMI
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog
+#
+# * 02/04/2015 update the test for systemd
+# * 02/25/2016 skip test for unsupported arch or target boards
+# * 04/05/2016 remove the deprecated case pmt.1.1 and pmt.1.3
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+if [ -f /etc/init.d/ipmi ]; then
+        IPMI_START="/etc/init.d/ipmi start"
+        IPMI_STOP="/etc/init.d/ipmi stop-all"
+else
+        IPMI_START="/bin/systemctl start ipmi"
+        IPMI_STOP="/bin/systemctl stop ipmi"
+fi
+
+clean()
+{
+	echo "Clean System..."
+	${IPMI_STOP}
+	mv /etc/sysconfig/ipmi.bac /etc/sysconfig/ipmi
+	echo "Finish"
+}
+
+# check unsupported arch
+which_arch=`arch`
+if [ "x$which_arch" = "xmips64" ] ; then
+	cutna "IPMI not supported on mips64"
+fi
+
+# check if there is any supported hardware
+modprobe ipmi_si > /dev/null 2>&1
+grep 'ipmi_si: Unable to find any System Interface' /var/log/messages
+if  [ $? = 0 ]; then
+	cutna "No supported hardware"
+fi
+
+# ensure the /etc/sysconfig/ipmi file is present
+if [ ! -e /etc/sysconfig/ipmi ]; then
+	echo "****************************************"
+	echo "The file /etc/sysconfig/ipmi is missing"
+	echo "Please ensure that the following packages are"
+	echo "installed correctly:"
+	echo "OpenIPMI"
+	echo "cut-all"
+	echo "****************************************"
+	cutfail
+fi
+
+echo "******Modify configure file /etc/sysconfig/ipmi******"
+cp -a /etc/sysconfig/ipmi /etc/sysconfig/ipmi.bac
+choption /etc/sysconfig/ipmi IPMI_WATCHDOG yes
+choption /etc/sysconfig/ipmi IPMI_POWEROFF yes
+choption /etc/sysconfig/ipmi IPMI_POWERCYCLE yes
+check "Failed to set IPMI options"
+
+diff -Nru /etc/sysconfig/ipmi.bac /etc/sysconfig/ipmi
+
+echo "******Start ipmi******"
+${IPMI_START}
+if [ ! $? = 0 ]; then
+	echo "****************************************"
+	echo "Failed to start ipmi service"
+	echo "----------------------------------------"
+	tail -n 20 /var/log/messages
+	echo "****************************************"
+	cutfail
+fi
+
+lsmod | grep ipmi
+if [ ! $? = 0 ]; then
+	echo "****************************************"
+	echo "Failed to load ipmi kernel modules"
+	echo "----------------------------------------"
+	lsmod
+	echo "----------------------------------------"
+	dmesg | tail -n 20
+	echo "****************************************"
+	cutfail
+fi
+
+echo "******Check status by ipmitool******"
+ipmitool -I open sensor list
+checkerr "Failed to execute ipmitool"
+
+echo "******Check basic health of the IPMI BMC******"
+ipmitool mc watchdog get
+checkerr "Failed to execute ipmitool check watchdog settings"
+
+echo "*****Print Sensor Data Repository entries and readings****"
+ipmitool -I open sdr list
+checkerr "Failed to print Sensor Data Repository entries"
+
+result PASSED

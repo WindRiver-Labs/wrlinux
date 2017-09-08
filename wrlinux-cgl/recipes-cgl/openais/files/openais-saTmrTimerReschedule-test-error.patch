@@ -1,0 +1,27 @@
+diff -urpN a/services/tmr.c b/services/tmr.c
+--- a/services/tmr.c
++++ b/services/tmr.c
+@@ -442,7 +442,8 @@ static void message_handler_req_lib_tmr_
+ 
+ 	current_time = (SaTimeT)(api->timer_time_get());
+ 
+-	if (current_time > req_lib_tmr_timerreschedule->timer_attributes.initialExpirationTime) {
++	if ((SA_TIME_ABSOLUTE == req_lib_tmr_timerreschedule->timer_attributes.type) &&
++		(current_time > req_lib_tmr_timerreschedule->timer_attributes.initialExpirationTime)) {
+ 		error = SA_AIS_ERR_INVALID_PARAM;
+ 		goto error_put;
+ 	}
+diff -urpN a/test/testtmr.c b/test/testtmr.c
+--- a/test/testtmr.c
++++ b/test/testtmr.c
+@@ -86,8 +86,8 @@ int main (void)
+ 	SaTmrHandleT handle;
+ 	SaSelectionObjectT select_obj;
+ 	SaTmrTimerAttributesT attrs;
+-	SaTmrTimerAttributesT attrs_a = { SA_TIME_DURATION, TMR_30_SECONDS, 0 };
+-	SaTmrTimerAttributesT attrs_b = { SA_TIME_DURATION, TMR_30_SECONDS, 0 };
++	SaTmrTimerAttributesT attrs_a = { SA_TIME_DURATION, TMR_30_SECONDS, TMR_30_SECONDS };
++	SaTmrTimerAttributesT attrs_b = { SA_TIME_DURATION, TMR_30_SECONDS, TMR_30_SECONDS };
+ 	SaTmrTimerAttributesT new_attrs_a = { SA_TIME_DURATION, TMR_10_SECONDS, TMR_10_SECONDS };
+ 	SaTmrTimerAttributesT new_attrs_b = { SA_TIME_DURATION, TMR_20_SECONDS, TMR_20_SECONDS };
+ 	SaTmrTimerIdT id_a;

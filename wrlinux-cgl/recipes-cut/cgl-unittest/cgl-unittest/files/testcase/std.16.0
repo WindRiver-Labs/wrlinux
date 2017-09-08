@@ -1,0 +1,47 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : STD.16.0 PCI Express
+# 		You can execute this scripts directly.
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog
+# *
+# -
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+        echo "Clean System..."
+	rm -rf /tmp/config.gz
+	rm -rf /tmp/config
+        echo "Finish"
+}
+
+rm -rf /tmp/config.gz
+rm -rf /tmp/config
+cp /proc/config.gz /tmp
+gunzip /tmp/config.gz 
+grep CONFIG_PCIEPORTBUS=y /tmp/config
+check "Kernel does not support PCI Express" 1
+
+#make sure there is PCI Express hardware
+lspci | grep "PCI Express"
+if [ $? -ne 0 ]; then
+  error "No PCI Express hardware on this board" 1
+fi
+
+dmesg | grep "PCI Express"
+if [ ! $? = 0 ]
+then
+	echo "Did not find PCIE in dmesg, try kern.log"
+        grep "PCI Express" /var/log/kern.log 
+	if [ ! $? = 0 ]; then
+	  cutfail
+	fi
+fi
+
+result PASSED
+exit 0

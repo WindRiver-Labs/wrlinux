@@ -1,0 +1,125 @@
+#!/bin/bash
+# Copyright (c) 2008 - 2016 Wind River Systems, Inc.
+# description : SFA.2.1 Live Kernel Remote Debugger
+#
+# developer : kexin Hao <kenxin.hao@windriver.com>
+#            Yongli He  <yongli.he@windriver.com>
+#
+# changelog
+# 2016/05/31 Mingli Yu Enable CONFIG_KGDB_TESTS to use
+# internal kgdb test suite.
+# -
+
+# The test strategy:
+# 1. check kernel config CONFIG_KGDB, CONFIG_KGDB_SERIAL_CONSOLE
+#    and CONFIG_KGDB_TESTS.
+# 2. use kgdbts to run the tests
+#    1) set the test types and generate do_fork break points.
+#    2) check if do_fork occurs in dmesg, pass if it occurs.
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+# store the previous kgdbts configuration
+kgdb_ts=""
+
+clean()
+{
+	lsmod|grep kgdboc
+	if [ $? -eq 0 ];then
+		modprobe -r kgdboc
+	fi
+
+	# check if all the test finish
+	zcat /proc/config.gz | grep "CONFIG_KGDB_TESTS=y"
+	if [ $? -eq 0 ]; then
+		while true; do
+			dmesg | tail | grep  "KGDB: Unregistered I/O driver kgdbts, debugger disabled"
+			if [ $? -eq 0 ]; then
+				# restore kgdbts configuration
+				echo $kgdb_ts > /sys/module/kgdbts/parameters/kgdbts
+				break
+			else
+				continue
+			fi
+		done
+	fi
+
+	# kill the background process which used to
+	# generate break points at do_fork
+	test=`jobs | grep "Running" | grep "while" | awk '{print $1}'`
+	if [ x"$test" != x ]; then
+		test_id=`echo ${test:1:1}`
+		kill %${test_id}
+		sleep 5
+	fi
+	echo  "Finish"
+}
+
+check_kgdbts()
+{
+	zcat /proc/config.gz | grep "CONFIG_KGDB_TESTS=y"
+	if [ $? -ne 0 ]; then
+		echo "kernel option CONFIG_KGDB_TESTS is not enabled"
+		cutfail
+	fi
+
+	# generate break points on do_fork
+	while [ 1 ] ; do date > /dev/null ; done &
+
+	# invoke kgdbts at run time
+	# When using the "kgdbts=" you only choose one of the following core
+	# test types:
+	# A = Run all the core tests silently
+	# V1 = Run all the core tests with minimal output
+	# V2 = Run all the core tests in debug mode
+	# You can also specify optional tests:
+	# N## = Go to sleep with interrupts of for ## seconds
+	# to test the HW NMI watchdog
+	# F## = Break at do_fork for ## iterations
+	# S## = Break at sys_open for ## iterations
+	# I## = Run the single step test ## iterations
+	# NOTE: the do_fork and sys_open tests are mutually exclusive.
+	kgdb_ts=`cat /sys/module/kgdbts/parameters/kgdbts`
+	echo kgdbts=V1F100 > /sys/module/kgdbts/parameters/kgdbts
+
+	# check the test result
+	dmesg | tail | grep do_fork |grep 100 && cutpass || cutfail
+}
+
+if [ -r /proc/config.gz ];then
+	zcat /proc/config.gz|grep "CONFIG_KGDB=y"
+	if [ $? -ne 0 ];then
+		echo "kernel option CONFIG_KGDB is not enabled"
+		cutfail
+	fi
+
+	STATUS=`zcat /proc/config.gz|grep "CONFIG_KGDB_SERIAL_CONSOLE"|cut -d "=" -f 2`
+	if [ -z $STATUS ];then
+		echo "kernel option CONFIG_KGDB_SERIAL_CONSOLE is missing"
+		cutfail
+	elif [ $STATUS == "m" ];then
+		CONSOLE_PARA=`cat /proc/cmdline|grep -o "console=[^ ]\+"|cut -d "=" -f 2`
+		modprobe kgdboc kgdboc=$CONSOLE_PARA
+		if [ $? -eq 0 ];then
+			cutpass
+		else
+			echo "****************************************"
+			echo "Kgdb unit test"
+			echo "----------------------------------------"
+			dmesg | tail -n 20
+			echo "****************************************"
+			cutfail
+		fi
+	elif [ $STATUS == "y" ];then
+		check_kgdbts
+	elif [ $STATUS == "n" ];then
+		echo "kernel option CONFIG_KGDB_SERIAL_CONSOLE is disabled"
+		cutfail
+	else
+		echo "kernel option CONFIG_KGDB_SERIAL_CONSOLE is unknown: $STATUS"
+	fi
+else
+	echo "/proc/config.gz is missing or cannot be read"
+	cutfail
+fi

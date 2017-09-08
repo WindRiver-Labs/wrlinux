@@ -1,0 +1,40 @@
+diff -urpN a/init/generic.in b/init/generic.in
+--- a/init/generic.in
++++ b/init/generic.in
+@@ -39,18 +39,6 @@ failure()
+ 	echo -ne "[FAILED]\r"
+ }
+ 
+-status()
+-{
+-	pid=$(pidof $1 2>/dev/null)
+-	rtrn=$?
+-	if [ $rtrn -ne 0 ]; then
+-		echo "$1 is stopped"
+-	else
+-		echo "$1 ($proc with pid $pid) is running..."
+-	fi
+-	return $rtrn
+-}
+-
+ # rpm based distros
+ if [ -d @SYSCONFDIR@/sysconfig ]; then
+ 	[ -f @INITDDIR@/functions ] && . @INITDDIR@/functions
+@@ -98,16 +86,10 @@ stop()
+ 	! status $proc > /dev/null 2>&1 && return
+ 
+ 	echo -n "Signaling $desc ($prog) to terminate: "
+-	kill -TERM $(pidof $proc) > /dev/null 2>&1
++	echo -n "Please stop corosync using /etc/init.d/corosync-daemon stop"
+ 	success
+ 	echo
+ 
+-	echo -n "Waiting for $prog services to unload:"
+-	while status $proc > /dev/null 2>&1; do
+-		sleep 1
+-		echo -n "."
+-	done
+-
+ 	rm -f $LOCK_FILE
+ 	rm -f @LOCALSTATEDIR@/run/$prog.pid
+ 	success

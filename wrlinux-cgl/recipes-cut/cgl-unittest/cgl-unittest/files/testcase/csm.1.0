@@ -1,0 +1,247 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : CSM.1.0 Storage Network Replication
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+
+# The test strategy:
+# 1. check drbd module available or not on target and client
+# 2. customize the /etc/hosts and /etc/drbd.conf
+#    files both on target and client
+# 3. create r0 and set target as primary
+# 4. create r0 on the client and confirm drbd run on the client
+# 5. format /dev/drbd1 on the target and write something to
+#    generate md5
+# 6. wait for data sync to secondary
+# 7. change target to secondary and setup client as primary
+# 8. check the file md5 on client
+# 9. compare md5 on client and target, pass if they are same
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+HOSTNAME1=""
+HOSTNAME2=""
+TARGET_IP=""
+LOCAL_LOOP=""
+REMOTE_LOOP=""
+TMP_DIR=`mktemp -d /tmp/csm.1.0.tmp.XXXXXX`
+TMP_DIR1=`mktemp -d /tmp/csm.1.0.tmp1.XXXXXX`
+
+# ip_flag used to mark the client is valid or not
+# we only need to clean setting on client when ip_flag=true
+ip_flag=false
+
+clean()
+{
+    echo "Clean System..."
+    [ -f /etc/init.d/drbd ] && service drbd stop || systemctl stop drbd
+    [ -f /etc/hosts.bak ] && mv /etc/hosts.bak /etc/hosts
+    [ -f /etc/drbd.conf.bak ] && mv /etc/drbd.conf.bak /etc/drbd.conf
+    [ ! -z $LOCAL_LOOP ] && losetup -d $LOCAL_LOOP
+    rm -rf $TMP_DIR
+    rm -rf $TMP_DIR1
+    if [ "$ip_flag" = true ]; then
+        ssh root@$CLIENT_IP -- "[ -f /etc/init.d/drbd ] && service drbd stop || \
+		systemctl stop drbd"
+        ssh root@$CLIENT_IP -- "[ -f /etc/hosts.bak ] && mv /etc/hosts.bak /etc/hosts"
+        ssh root@$CLIENT_IP -- "[ -f /etc/drbd.conf.bak ] && mv /etc/drbd.conf.bak /etc/drbd.conf"
+        ssh root@$CLIENT_IP -- "[ ! -z $REMOTE_LOOP ] && losetup -d $REMOTE_LOOP"
+        ssh root@$CLIENT_IP -- rm -rf $TMP_DIR
+        ssh root@$CLIENT_IP -- rm -rf $TMP_DIR1
+    fi
+    echo "Finish"
+}
+
+# check CLIENT_IP
+valid_clientip()
+{
+    # Hint: you may need to configure CLIENT_IP under
+    # /opt/cut/env/runtime_env
+    if [ x"$CLIENT_IP" = x ]; then
+        echo "Error: Empty client ip."
+        echo "Note: This test case requires two targets,"
+        echo "please prepare another target as client and set"
+        echo "CLIENT_IP in /opt/cut/env/runtime_env"
+        echo "before running the test script, or it will always fail."
+        cutfail
+    fi
+    n_ip=`echo $CLIENT_IP | awk -F . '{print NF}'`
+    if [ $n_ip -ne 4 ]; then
+        cuterr "Invalid client ip"
+    fi
+
+    if expr "$CLIENT_IP" : '[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$'; then
+        :
+    else
+        cuterr "Invalid client ip"
+    fi
+    ip1=`echo $CLIENT_IP | awk -F . '{print $1}'`
+    ip2=`echo $CLIENT_IP | awk -F . '{print $2}'`
+    ip3=`echo $CLIENT_IP | awk -F . '{print $3}'`
+    ip4=`echo $CLIENT_IP | awk -F . '{print $4}'`
+    for testip in $ip1 $ip2 $ip3 $ip4
+    do
+        if [ $testip -ge 255 ] || [ $testip -le 1 ]; then
+            cuterr "Invalid client ip"
+        fi
+    done
+
+    # check basic connectivity
+    ping -c 3 $CLIENT_IP || cuterr "client ip unreachable"
+
+    # only need to clean client when ip_flag is true
+    ip_flag=true
+}
+
+check_drbd()
+{
+    # check drbd module available or not on target and client
+    if [ $# -eq 1 ]; then
+        mod_type=`ssh root@$CLIENT_IP -- zcat /proc/config.gz | grep CONFIG_BLK_DEV_DRBD | awk -F= '{print $NF}'`
+    else
+        mod_type=`zcat /proc/config.gz | grep CONFIG_BLK_DEV_DRBD | awk -F= '{print $NF}'`
+    fi
+    if [ "${mod_type}" = m ]; then
+        if [ $# -eq 1 ]; then
+            ssh root@$CLIENT_IP -- modprobe drbd
+        else
+            modprobe drbd
+        fi
+    elif [ "${mod_type}" = y ]; then
+        :
+    else
+        if [ $# -eq 1 ]; then
+            cuterr "The kernel module drbd is not available on the client"
+        else
+            cuterr "The kernel module drbd is not available on the target"
+        fi
+    fi
+}
+
+cus_drbd_conf()
+{
+    cp /etc/drbd.conf /etc/drbd.conf.bak
+    dd if=/dev/zero of=$TMP_DIR/csm.1.0.img bs=1M count=5 || \
+    cuterr "Failed to generate file system file on target"
+
+    # to get first unused loopback device
+    LOCAL_LOOP=`losetup -f`
+    losetup $LOCAL_LOOP $TMP_DIR/csm.1.0.img || \
+    cuterr "Failed to setup loop device on target"
+
+    ssh root@$CLIENT_IP -- "mkdir $TMP_DIR \
+	    && dd if=/dev/zero of=$TMP_DIR/csm.1.0.img bs=1M count=5" \
+    || cuterr "Failed to generate file system file on client"
+    REMOTE_LOOP=`ssh root@$CLIENT_IP -- losetup -f`
+    ssh root@$CLIENT_IP -- losetup $REMOTE_LOOP $TMP_DIR/csm.1.0.img || \
+    cuterr "Failed to setup loop device on client"
+    rm -rf /etc/drbd.conf
+    # customize /etc/drbd.conf
+cat >> /etc/drbd.conf << EOF
+global {
+usage-count yes;
+}
+common {
+syncer { rate 40M;}
+protocol C;
+}
+resource r0 {
+startup {
+wfc-timeout 5;
+outdated-wfc-timeout 3;
+degr-wfc-timeout 5;
+}
+on $HOSTNAME1 {
+device    /dev/drbd1;
+disk      $LOCAL_LOOP;
+address   ${TARGET_IP}:7789;
+meta-disk internal;
+}
+on $HOSTNAME2 {
+device    /dev/drbd1;
+disk      $REMOTE_LOOP;
+address   ${CLIENT_IP}:7789;
+meta-disk internal;
+}
+}
+EOF
+
+    # customize /etc/drbd.conf on client
+    ssh root@$CLIENT_IP -- cp /etc/drbd.conf /etc/drbd.conf.bak
+    scp /etc/drbd.conf root@$CLIENT_IP:/etc
+}
+
+valid_clientip
+autossh $CLIENT_IP
+# check drbd module available or not on local target
+check_drbd
+
+# check drbd module available or not on client target
+check_drbd $CLIENT_IP
+
+# customize the hosts file
+HOSTNAME1=`hostname`
+HOSTNAME2=`ssh root@$CLIENT_IP -- hostname`
+# add get_targetip line to double check if LOCAL_ETH set in /opt/cut/env/runtime_env
+get_targetip
+TARGET_IP=`get_targetip`
+cus_hosts $HOSTNAME1 $TARGET_IP $HOSTNAME2 $CLIENT_IP
+cus_drbd_conf
+
+# create r0
+drbdadm create-md r0
+# start drbd
+[ -f /etc/init.d/drbd ] && service drbd start || systemctl start drbd
+# Setup target as primary
+drbdadm primary --force r0
+# create r0 on the client
+ssh root@${CLIENT_IP} -- drbdadm create-md r0
+
+# start drbd on the client
+ssh root@${CLIENT_IP} -- "[ -f /etc/init.d/drbd ] && service drbd start || systemctl start drbd"
+# confirm drbd run on the client
+ssh root@${CLIENT_IP} -- ps -e | grep drbd
+
+# check drbd status
+drbd-overview | grep "Connected Primary/Secondary" || cutfail
+
+# format /dev/drbd1 on the target
+mkfs.ext4 /dev/drbd1
+
+# Mount /dev/drbd1
+mount /dev/drbd1 $TMP_DIR1
+
+# write something and generate md5
+echo "drbd test"  > $TMP_DIR1/test.txt
+md5_target=`md5sum $TMP_DIR1/test.txt`
+
+# wait for data sync to secondary
+sleep 10
+
+umount /dev/drbd1
+
+# change target to secondary
+drbdadm secondary r0
+
+# check drbd status
+drbd-overview|grep "Connected Secondary/Secondary" || cutfail
+
+# Setup client as primary
+ssh root@${CLIENT_IP} -- drbdadm primary --force r0
+
+# check drbd status
+drbd-overview | grep "Connected Secondary/Primary" || cutfail
+
+# check the file md5 on client
+ssh root@${CLIENT_IP}  -- "mkdir -p $TMP_DIR1 && mount /dev/drbd1 $TMP_DIR1"
+md5_client=`ssh root@${CLIENT_IP} -- md5sum $TMP_DIR1/test.txt`
+ssh root@${CLIENT_IP} -- umount /dev/drbd1
+
+# compare md5_client and md5_target, pass if they are the same
+if [ "${md5_target}" = "${md5_client}" ]; then
+    cutpass
+fi
+cutfail

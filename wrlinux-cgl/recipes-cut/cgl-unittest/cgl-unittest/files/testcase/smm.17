@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : SMM.17 Discovery of Platform CPU Architecture
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# The strategy as below:
+# 1. check the number of processors which corresponding to
+#    the number of L1 and L2 caches
+# 2. check each cache size
+
+# Changelog
+# 2016/04/20 reviewed with Roy Li and Jackie Huang
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+    echo "Clean System..."
+    echo "Finish"
+}
+
+caches_num=`cat /proc/cpuinfo|grep processor|wc -l`
+if [ $caches_num -eq 0 ]
+then
+    cutfail
+fi
+for i in `cat /proc/cpuinfo|grep "cache size"|awk '{print $4}'`
+do
+    if [ $i -eq 0 ]
+    then
+        cutfail
+    fi
+done
+cutpass

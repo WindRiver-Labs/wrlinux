@@ -1,0 +1,184 @@
+CGL Unit Test Suite HOWTO
+
+(c) 2010 Wind River Systems
+
+Contents
+--------
+- introduction
+- how to use
+- file structure of the test suite
+- testcases included with the test suite
+
+Note:
+---------------
+When you run kdump cases such as sfa.1.0, sfa.3.0, sfa.4.0, sfa.10.0
+and cdiag.2.2, you need to boot your system with additional boot 
+parameter crashkernel such as crashkernel=378M@64M and also need to 
+put this parameter as the last boot parameter.
+
+A. Introduction
+---------------
+The CGL Unit Test Suite (CUT) provides a framework and set of tests that
+are used to validate whether a target meets the requirements to be
+considered CGL compliant.  In the cases where deficiencies are found, 
+data is captured for analysis in addressing the problems.
+
+B. How To Use the Test Suite
+----------------------------
+The CGL Unit Test Suite is managed through the cgl_test.sh script, in
+the /opt/cut directory.  The test suite is executed as follows.
+
+   a) to run all testcases in the suite
+
+      > cd /opt/cut
+      > ./cgl_test.sh
+
+      This is the default mode of operation
+
+   b) to run a subset of testcases in the suite
+
+      > cd /opt/cut
+      > ./cgl_test.sh -e <testcase names>
+
+      for example:
+      > ./cgl_test -e prf.2.1
+      > ./cgl_test -e prd.2.1 sec.1.5 avl.6.0
+
+   c) to run a subset of testcases in the suite, where the list of
+      testcases is in a file:
+
+      > cd /opt/cut
+      > ./cgl_test.sh -f <file>
+
+      where the file <file> contains a list of testcase names (see (b))
+
+   d) to run a group of testcases in the suite,
+
+      > cd /opt/cut
+      > ./cgl_test.sh --with-config <group>
+
+      where <group> is one of 
+         kernel rootfs reboot all
+
+During the testcase execution, the name of the testcase being run is 
+displayed, as well as the result (one of PASS, FAIL, or N/A).  These
+results are also output to the file /opt/cut/testresult.
+
+Detailed output from the test results are output to the 
+file /opt/cut/testlog.  This file is especially useful in understanding
+testcase failures.  In some cases, possible corrective actions and/or
+helpful notes are given.
+
+
+C. File Structure of the Test Suite
+-----------------------------------
+The CGL Unit Test Suite is installed in the directory /opt/cut.  Within
+this directory are all of the necessary files and directories allowing
+the test suite to execute.  Some directories of note are as follows.
+
+   /opt/cut/testcase
+      Contains the actual testcases being executed by the test suite.
+      The testcases are named according to the CGL4.0 requirement that
+      they validate.
+
+   /opt/cut/rb-futext
+      Contains the opensource test suite for prf.1.6.
+
+   /opt/cut/src
+      Contains testcase sources that can be added by the user to be
+      included in and executed by the testsuite.  To add a testcase
+      compile any binaries or utilities and place them in this directory.
+      You will also need to add a script in the /opt/cut/testcase directory
+      to execute them
+
+   /opt/cut/resource
+      Contains config files or other supporting files necessary to execute
+      testcases.  If testcases are added to the testsuite, any supporting
+      files may be placed here.
+
+   /opt/cut/doc
+      Contains documents relevant to the testsuite.
+
+   /opt/cut/config.sh
+      Contains parameters that are used in testcases.
+
+   /opt/cut/function.sh
+      Contains supporting functions for the test suite.
+
+
+D. Testcases Included with the Test Suite
+-----------------------------------------
+The following testcases are included with the test suite.  The 
+name of each corresponds to the CGL4.0 requirement that they
+validate.
+
+For more information refer to:
+http://www.linuxfoundation.org/collaborate/workgroups/cgl
+
+ AVL.21.0 Ethernet link bonding using IPV4
+ AVL.21.1 Ethernet link bonding using IPV6
+ AVL.22.0 Software RAID 1 support
+ AVL.23.0 Watchdog Timer Pre-Timeout Interrupt
+ AVL.24.0 Watchdog Timer Interface Requirements
+ AVL.26.0 Resilient File System Support
+ AVL.3.2 Forced Un-mount
+ AVL.4.1 VM Strict Over-Commit
+ AVL.5.3 Process-Level Non-Intrusive Application Monitor
+ AVL.6.0 Disk Predictive Analysis
+ AVL.7.1 Multi-Path Access to Storage
+ CCM.3.0 Redundant Cluster Communication Path
+ CDIAG.2.2 Cluster-Wide Kernel Crash Dump
+ CDIAG.2.3 Cluster Wide Log Collection
+ CDIAG.2.4 Synchronized/Atomic Time Across Cluster
+ CSM.4.0 Redundant Cluster Storage Path
+ PMT.1.1 IPMI support
+ PMT.1.3 IPMI Accessibility
+ PRF.1.11 Implementing Priority Inheritance Inside API 
+ PRF.1.4 High-Resolution Timers
+ PRF.14.0 RAID 0 Support
+ PRF.1.6 Protecting Against Priority Inversion On Mutex
+ PRF.1.7 Handling Interrupts As Threads
+ PRF.2.1 Enabling Process Affinity 
+ PRF.2.2 Enabling Interrupt CPU Affinity
+ PRF.2.3 (Hyper-Threading) Optimized SMT Support
+ PRF.4.2 Support of Gigabit Ethernet Jumbo MTU
+ PRF.7.0 Interruptless Ethernet Delivery
+ SEC.1.1 Dynamic Kernel Security Module Mechanism
+ SEC.1.2 Process Containment using File System Restrictions 
+ SEC.1.4 Buffer Overflow Protection
+ SEC.1.5 Access Control List Support for File Systems 
+ SEC.2.1 Generic Authentication Modules
+ SEC.2.2 Password Integrity Checking 
+ SEC.3.1 Auditing
+ SEC.3.3 Periodic Automated Log Analysis
+ SEC.3.4 Active Log Monitoring
+ SEC.4.4 PKI Support for Applications 
+ SEC.4.5 SSL/TLS Support for Applications
+ SEC.4.6 PKI Certificate Authority (CA) 
+ SEC.5.1 Periodic User-Level File Integrity Checking
+ SEC.7.1 Memory Limits
+ SFA.1.0 Kernel Panic Handler Enhancements
+ SFA.3.0 Kernel Dump: Analysis
+ SFA.4.0 Kernel Dump: Limit Scope
+ SFA.10.0 Kernel Dump: Configurable Destinations
+ SMM.11.0 PCI Express Device Hot Plug (was PIC.1.3)
+ SMM.13.0 Diskless Systems (was PMS.4.0) 
+ SMM.3.1 Serial Console Operation
+ SMM.4.0 Persistent Device Naming
+ SMM.7.1 Temperature Monitoring
+ SMM.7.2 Fan Monitoring
+ SMM.7.3 Power Monitoring
+ SMM.7.4 Media Monitoring
+ SMM.7.5 Network Monitoring
+ SMM.7.6 CPU Monitoring
+ SMM.7.7 Memory Monitoring
+ SMM.8.1 Kernel Message Structuring
+ SMM.9.0 Disk and Volume Management 
+ SPM.1.0 Remote Package Update and Installation
+ SPM.2.1 No System Reboot for Application Package Update
+ SPM.3.0 Version and Dependency Checking via Package Management
+ STD.10.0 802.1Q VLAN Endpoint
+ STD.16.0 PCI Express
+ STD.3.1 SCTP - Base Features
+ STD.8.8 SA Forum HPI
+ STD.9.0 IPMI

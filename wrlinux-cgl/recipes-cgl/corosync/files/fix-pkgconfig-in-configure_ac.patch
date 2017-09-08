@@ -1,0 +1,11 @@
+--- corosync-1.4.6/configure.ac	2013-12-30 14:37:17.852310073 +0800
++++ corosync-1.4.6/configure.ac.new	2013-12-30 14:39:40.474346082 +0800
+@@ -61,7 +61,7 @@
+ AC_PROG_MAKE_SET
+ AC_PROG_RANLIB
+ AC_CHECK_PROGS([GROFF], [groff])
+-AC_CHECK_PROGS([PKGCONFIG], [pkg-config])
++AC_CHECK_PROGS([PKG_CONFIG], [pkg-config])
+ 
+ # Checks for libraries.
+ AC_CHECK_LIB([dl], [dlopen])

@@ -1,0 +1,187 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : SEC.4.4 PKI Support for Applications 
+# 		This script need package ssl.ca-0.1.tar.gz, you can download it from Twiki
+#		http://cvs.wrs.com/cvsweb/product_lines/Linux/wrlinux_3.0/Test/Test_design/Networking/WIND00121588-CGL40_Registration/test_cases/?cvsroot=prod_rel_docs
+#		Put this package under $CUTDIR on target , same dir with test scripts.
+#
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog
+# *
+# -
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+
+clean()
+{
+	echo "Clean System..."
+	rm -rf $TOPDIR/ssl.ca-0.1
+	echo "Finish"
+}
+
+tar xvf $TOPDIR/resource/ssl.ca-0.1.tar.gz
+check "There is no ssl.ca-0.1.tar.gz" 1
+
+cd ssl.ca-0.1
+echo "******Create the self-signed Root CA key******"
+expect <<- END
+spawn $TOPDIR/ssl.ca-0.1/new-root-ca.sh
+
+expect  {
+	"*Enter pass phrase for ca.key*"	{send "1111\r"}
+	}
+
+expect  {
+        "*Enter pass phrase for ca.key*"        {send "1111\r"}
+        }
+
+expect  {
+        "*Enter pass phrase for ca.key*"        {send "1111\r"}
+        }
+
+expect  {
+	"*Country Name*"		{send "CN\r"}
+	}
+
+expect	{
+	"*State or Province Name*"	{send "Beijing\r"}
+	}
+
+expect	{
+	"*Locality Name*"		{send "Beijing\r"}
+	}
+
+expect  {
+	"*Organization Name*"		{send "testing\r"}
+	}
+
+expect  {
+	"*Organizational Unit Name*"	{send "Windriver\r"}
+	}
+
+expect  {
+	"*Common Name*"			{send "Chi\r"}
+	}
+
+expect  {
+	"*Email Address*"		{send "chi.xu@windriver.com\r"}
+	}
+expect 
+exit
+END
+
+check "Create the self-signed Root CA key fail"
+
+echo
+echo "******Create the server cert******"
+expect <<- END
+spawn $TOPDIR/ssl.ca-0.1/new-server-cert.sh server
+
+expect  {
+        "*Country Name*"                {send "CN\r"}
+        }
+
+expect  {
+        "*State or Province Name*"      {send "Beijing\r"}
+        }
+
+expect  {
+        "*Locality Name*"               {send "Beijing\r"}
+        }
+
+expect  {
+        "*Organization Name*"           {send "testing\r"}
+        }
+
+expect  {
+        "*Organizational Unit Name*"    {send "Windriver\r"}
+        }
+
+expect  {
+        "*Common Name*"                 {send "localhost\r"}
+        }
+
+expect  {
+        "*Email Address*"               {send "chi.xu@windriver.com\r"}
+        }
+expect 
+exit
+END
+
+check "Create the server cert fail"
+
+echo
+echo "******Sign the server cert******"
+
+expect <<- END
+spawn $TOPDIR/ssl.ca-0.1/sign-server-cert.sh server
+
+expect  {
+        "*Enter pass phrase*"                {send "1111\r"}
+        }
+
+expect  {
+	"*Sign the certificate*"		{send "y\r"}
+	}
+
+expect  {
+	"*1 out of 1 certificate requests certified*"	{send "y\r"}
+	}
+
+expect 
+exit
+END
+
+check "Sign the server cert fail"
+
+echo
+echo "******Create the user cert******"
+expect <<- END
+spawn $TOPDIR/ssl.ca-0.1/new-user-cert.sh user
+
+expect  {
+        "*Common Name*"             	{send "Chi Xu\r"}
+        }
+
+expect  {
+        "*Email Address*"                {send "xuchiznw@163.com\r"}
+        }
+expect 
+exit
+END
+
+check "Create the user cert fail"
+
+echo
+echo "******Sign the user cert******"
+
+expect <<- END
+spawn $TOPDIR/ssl.ca-0.1/sign-user-cert.sh user
+
+expect  {
+        "*Enter pass phrase*"                {send "1111\r"}
+        }
+
+expect  {
+        "*Sign the certificate*"                {send "y\r"}
+        }
+
+expect  {
+        "*1 out of 1 certificate requests certified*"   {send "y\r"}
+        }
+
+expect
+exit
+END
+
+check "Sign the user cert fail"
+
+echo
+result PASSED
+
+
+

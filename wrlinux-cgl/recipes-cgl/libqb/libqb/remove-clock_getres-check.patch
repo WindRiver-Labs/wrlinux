@@ -1,0 +1,47 @@
+clock_getres check in configure.ac was added to enable GNU Hurd support.
+See: https://github.com/ClusterLabs/libqb/commit/6bd3f08
+
+But it doesn't work for cross compile:
+
+| checking for a working clock_getres(CLOCK_MONOTONIC, &ts)...
+| configure: error: in `.../tmp/work/core2-64-poky-linux/libqb/1.0.1-r0/build':
+| configure: error: cannot run test program while cross compiling
+| See `config.log' for more details
+
+Remove the check and set HAVE_CLOCK_GETRES_MONOTONIC directly. That
+works same as without the commit which enable Hurd support.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ configure.ac | 13 +------------
+ 1 file changed, 1 insertion(+), 12 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 560b330..2ee0621 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -178,18 +178,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+                     ]
+                  )
+ 
+-AC_MSG_CHECKING(for a working clock_getres(CLOCK_MONOTONIC, &ts))
+-AC_RUN_IFELSE([AC_LANG_PROGRAM(
+-[[#include <time.h>]],
+-[[struct timespec ts; if(clock_getres(CLOCK_MONOTONIC, &ts)) return -1;]])],
+-                    [
+-                      AC_MSG_RESULT([yes])
+-                      AC_DEFINE_UNQUOTED([HAVE_CLOCK_GETRES_MONOTONIC], 1, [Define to 1 if clock_getres(CLOCK_MONOTONIC, &ts) works])
+-                    ],
+-                    [
+-                      AC_MSG_RESULT([no])
+-                    ]
+-                 )
++AC_DEFINE_UNQUOTED([HAVE_CLOCK_GETRES_MONOTONIC], 1, [Define to 1 if clock_getres(CLOCK_MONOTONIC, &ts) works])
+ 
+ 
+ # Checks for library functions
+-- 
+2.10.1
+

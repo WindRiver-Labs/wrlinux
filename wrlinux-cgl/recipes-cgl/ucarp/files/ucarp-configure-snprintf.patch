@@ -1,0 +1,60 @@
+commit 763671276bff0b32bd7f9024ec88b7ee1bc576c8
+Author: Aws Ismail <aws.ismail@windriver.com>
+Date:   Wed Sep 5 11:56:49 2012 -0400
+
+    Configure snprintf option properly
+    
+    Work around a cross-compiling configuration problem by
+    defaulting the CONF_SNPRINTF_TYPE option in the top-level
+    Makefile, as opposed through configure.
+    
+    This patch was migrated from WRL4.3
+    
+    Signed-off-by: Greff Moffatt <gregg.moffatt@windriver.com>
+    
+    Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+
+diff --git a/configure.ac b/configure.ac
+index 3978c43..da18a62 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -199,39 +199,6 @@ if test -r /dev/random; then
+   AC_DEFINE(HAVE_DEV_RANDOM,,[Define if you have /dev/random])
+ fi
+ 
+-AC_MSG_CHECKING(whether snprintf is C99 conformant)
+-AC_RUN_IFELSE([AC_LANG_SOURCE([[
+-#include <stdio.h>
+-#ifdef STDC_HEADERS
+-# include <stdlib.h>
+-# include <stddef.h>
+-#else
+-# if HAVE_STDLIB_H
+-#  include <stdlib.h>
+-# endif
+-#endif
+-#ifdef HAVE_UNISTD_H
+-# include <unistd.h>
+-#endif
+-
+-int main(void)
+-{
+-    char buf[4];
+-    
+-    (void) fprintf(fopen("conftestval", "w"), "%d\n",
+-        (int) snprintf(buf, sizeof buf, "12345678"));
+-    return 0;
+-}
+-]])],[CONF_SNPRINTF_TYPE=`cat conftestval`
+-],[],[])
+-AC_MSG_RESULT(done)
+-if test "x$CONF_SNPRINTF_TYPE" = "x" ; then
+-  AC_MSG_WARN(your operating system doesn't implement snprintf)
+-else
+-  AC_DEFINE_UNQUOTED(CONF_SNPRINTF_TYPE, $CONF_SNPRINTF_TYPE,
+-                     [return value of an overflowed snprintf])
+-fi
+-
+ AC_MSG_CHECKING([whether syslog names are available])
+ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+ #define SYSLOG_NAMES 1

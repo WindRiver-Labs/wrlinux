@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : SMM.8.2 Platform Signal Handler
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# The strategy as below:
+# Use opensource SAF Test(http://saftest.sourceforge.net/)
+# which is opensource test suites cover the HPI specification.
+# Note: The last update for SAF Test is on Apr 31, 2006 and
+# the latest SAF Test only cover HPI B.01.01.
+# cd /opt/saftest/HPI-B.01.01
+# run_tests.sh src/eventlog
+
+# Changelog
+# 2016/04/20 reviewed with Roy Li and Jackie Huang
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+    echo "Clean System..."
+    echo "Finish"
+}
+
+cd /opt/saftest/HPI-B.01.01
+./run_tests.sh src/eventlog && cutpass || cutfail
+

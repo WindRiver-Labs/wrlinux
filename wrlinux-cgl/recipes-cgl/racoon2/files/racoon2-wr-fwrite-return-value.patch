@@ -1,0 +1,35 @@
+racoon2: fix compile error for MIPS
+
+Correct compile error with fortify-source.
+When compiling with FORTIFY_SOURCE specified,
+the racoon2 package fails.  The root cause is a 
+macro introduces a call to fwrite() where the return code
+isn't checked.  This patch moves the macro to an earlier
+spot where this problem is corrected.
+
+Signed-off-by: Greg Moffatt <greg.moffatt@windriver.com>
+
+This patch was carried over from WRL4.3
+
+Signed-of-by: Aws Ismail <aws.ismail@windriver.com>
+
+---
+ cftoken.l |    7 +++++++
+ 1 file changed, 7 insertions(+)
+
+--- a/lib/cftoken.l
++++ b/lib/cftoken.l
+@@ -84,6 +84,13 @@
+ #define DP
+ #endif
+ 
++#ifndef ECHO
++/* This used to be an fputs(), but since the string might contain NUL's,
++ * we now use fwrite().
++ */
++#define ECHO do { if (fwrite( yytext, yyleng, 1, yyout )) {} } while (0)
++#endif
++
+ 	/* the include files stack */
+ #define CF_INCLUDE_DEPTH 10
+ static struct rcf_include_stack {

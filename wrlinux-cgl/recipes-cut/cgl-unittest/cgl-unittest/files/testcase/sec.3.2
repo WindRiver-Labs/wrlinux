@@ -1,0 +1,74 @@
+#!/bin/sh
+
+# Copyright (c) 2017 Wind River Systems, Inc.
+# description : SEC.3.2 Secure Transport of Log Information
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# The strategy as below:
+#-------------------------------------------------------
+# 1, configure rsyslog client
+# 2, configure rsyslog server
+# 3, generate log message at rsyslog client
+# 4, check the log message at the server
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+# only clean client setting when ip_flag is true
+ip_flag=false
+
+clean()
+{
+    echo "Clean System..."
+    [ -f /etc/rsyslog.conf.bak ] && mv /etc/rsyslog.conf.bak /etc/rsyslog.conf
+    [ -f /tmp/rsyslog.conf ] && rm -f /tmp/rsyslog.conf
+    if [ "$ip_flag" = true ]; then
+        ssh root@$CLIENT_IP -- "[ -f /etc/rsyslog.conf.bak ] && mv /etc/rsyslog.conf.bak /etc/rsyslog.conf"
+    fi
+    echo "Finish"
+}
+
+# check if install rsyslog
+rpm -q rsyslog || cutna "Need to install rsyslog first"
+
+cp /etc/rsyslog.conf /etc/rsyslog.conf.bak || cuterr "Failed to backup rsyslog.conf"
+
+# need two targets, need the rsyslog client identified as CLIENT_IP
+valid_clientip
+ip_flag=true
+
+autossh $CLIENT_IP
+
+ssh root@$CLIENT_IP -- cp /etc/rsyslog.conf /etc/rsyslog.conf.bak || \
+    cuterr "Failed to backup rsyslog.conf on client"
+
+cp -f /etc/rsyslog.conf.bak /tmp/rsyslog.conf || cuterr "Failed to prepare rsyslog.conf for client"
+
+
+TARGET_IP=`get_targetip`
+
+echo "*.*   @$TARGET_IP:514" >> /tmp/rsyslog.conf
+grep "^*.*   @${TARGET_IP}:514" /tmp/rsyslog.conf || \
+    cuterr "Failed to add *.*   @$TARGET_IP:514 for rsyslog.conf"
+
+scp /tmp/rsyslog.conf root@$CLIENT_IP:/etc/ || cuterr "Failed to transfer rsyslog.conf for client"
+ssh root@$CLIENT_IP -- "which systemctl && systemctl restart rsyslog || service rsyslog restart" || \
+    cuterr "Failed to restart rsyslog on client"
+
+echo "\$ModLoad imudp.so" >> /etc/rsyslog.conf
+echo "\$UDPServerRun 514" >> /etc/rsyslog.conf
+
+grep "^\$ModLoad imudp.so" /etc/rsyslog.conf || cuterr "Failed to add \$ModLoad imudp.so for rsyslog.conf"
+grep "^\$UDPServerRun 514" /etc/rsyslog.conf || cuterr "Failed to add \$UDPServerRun 514 for rsyslog.conf"
+which systemctl && systemctl restart rsyslog || service rsyslog restart
+[ $? -ne 0 ] && cuterr "Failed to restart rsyslog locally"
+
+# generate log message at rsyslog client
+currentTime=`date "+%Y-%m-%d %H:%M:%S"`
+currentTimeStamp=`date -d "$currentTime" +%s`
+ssh root@$CLIENT_IP -- logger "TESTTEST${currentTimeStamp}"
+# check the log message at the server
+grep "TESTTEST${currentTimeStamp}" /var/log/syslog || cutfail
+
+cutpass

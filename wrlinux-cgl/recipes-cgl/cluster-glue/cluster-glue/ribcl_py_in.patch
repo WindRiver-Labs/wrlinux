@@ -1,0 +1,8 @@
+--- a/lib/plugins/stonith/ribcl.py.in
++++ b/lib/plugins/stonith/ribcl.py.in
+@@ -1,4 +1,4 @@
+-#!@PYTHON@
++#!/usr/bin/python
+ 
+ 
+ #

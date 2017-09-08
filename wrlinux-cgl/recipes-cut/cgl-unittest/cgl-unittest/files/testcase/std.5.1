@@ -1,0 +1,84 @@
+#!/bin/sh
+
+# Copyright (c) 2016 Wind River Systems, Inc.
+# description : STD.5.1 IPSec Major CGL Features
+#
+# developer : Mingli Yu  <mingli.yu@windriver.com>
+#
+# The strategy as below:
+# 1. prepare the test environment in /opt/cut/ipsec-strongswan\
+#    /ipsec_cut_config.sh
+# 2. generate ipsec configuration both on local target and remote
+#    target
+# 3. stop racoon service and restart strongswan service both on
+#    local target and remote target
+# 4. establish the ipsec link and ping from local to remote and
+#    check if generate some ESP packets.
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+clean()
+{
+	[ -f /opt/cut/ipsec-strongswan/ipsec_cut_config.sh.bak ] && \
+ 		mv /opt/cut/ipsec-strongswan/ipsec_cut_config.sh.bak \
+		/opt/cut/ipsec-strongswan/ipsec_cut_config.sh
+	echo "Finish"
+}
+
+valid_clientip
+
+targetip=`get_targetip`
+
+# prepare run env
+if [ -f /opt/cut/ipsec-strongswan/ipsec_cut_config.sh ]; then
+	cp /opt/cut/ipsec-strongswan/ipsec_cut_config.sh \
+		/opt/cut/ipsec-strongswan/ipsec_cut_config.sh.bak
+    
+	# open the run flag
+	sed -i 's/IPSEC_CUT_MODE="skip"/#IPSEC_CUT_MODE="skip"/g' \
+		/opt/cut/ipsec-strongswan/ipsec_cut_config.sh || \
+		cuterr "Failed to open run flag"
+	sed -i 's/#IPSEC_CUT_MODE="run"/IPSEC_CUT_MODE="run"/g' \
+		/opt/cut/ipsec-strongswan/ipsec_cut_config.sh || \
+		cuterr "Failed to open run flag"
+
+	# configure the local target ip and remote target ip
+	sed -i "s;lclIP=.*;lclIP=$targetip;g" \
+		/opt/cut/ipsec-strongswan/ipsec_cut_config.sh || \
+		cuterr "Failed to set local target address"
+	sed -i "s;rmtIP=.*;rmtIP=$CLIENT_IP;g" \
+		/opt/cut/ipsec-strongswan/ipsec_cut_config.sh || \
+		cuterr "Failed to set remote target address"
+else
+	cuterr "Not install ipsec-test package correctly"
+fi 
+
+autossh $CLIENT_IP
+
+# genarate ipsec config
+cd /opt/cut/ipsec-strongswan
+sh confGen.sh
+cp ipsec.conf ipsec.secrets /etc
+
+which systemctl
+if [ $? -eq 0 ]; then
+	systemctl stop racoon || cuterr "Failed to stop racoon on local target"
+	systemctl restart strongswan || cuterr "Failed to restart strongswan on local target"
+else
+	service stop racoon || cuterr "Failed to stop racoon on local target"
+	service restart strongswan || cuterr "Failed to restart strongswan on local target"
+fi
+
+scp /opt/cut/ipsec-strongswan/ipsec.* root@$CLIENT_IP:/etc || 
+	cuterr "Failed to customize ipsec configuration on remote target"
+
+ssh root@$CLIENT_IP -- "which systemctl && systemctl stop racoon || service stop racoon" \
+	cuterr "Failed to stop racoon on remote target"
+ssh root@$CLIENT_IP -- "which systemctl && systemctl restart strongswan || service restart strongswan" \
+	cuterr "Failed to restart strongswan on remote target"
+
+# establish the link
+ipsec up toRemote
+
+sh /opt/cut/scripts/ipsec.sh

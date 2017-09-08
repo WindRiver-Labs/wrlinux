@@ -1,0 +1,50 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : SMM.7.1 Temperature Monitoring
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog 
+# * 02/04/2015 update the test for systemd
+# - 
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+if [ -f /etc/init.d/ipmi ]; then
+	IPMI_START="/etc/init.d/ipmi start"
+	IPMI_STOP="/etc/init.d/ipmi stop-all"
+else
+	IPMI_START="/bin/systemctl start ipmi"
+	IPMI_STOP="/bin/systemctl stop ipmi"
+fi
+
+clean()
+{
+	echo "Clean System..."
+	${IPMI_STOP}
+	echo "Finish"
+}
+
+
+# check unsupported arch
+which_arch=`arch`
+if [ "x$which_arch" = "xmips64" ] ; then
+	echo "IPMI not supported on mips64"
+	exit 1
+fi
+
+echo "******Start ipmi******"
+${IPMI_START}
+check "ipmi start fail" 1
+
+lsmod | grep ipmi
+check "ipmi start fail" 
+
+echo "******Check status by ipmitool******"
+ipmitool sensor
+check "execute ipmitool fail"
+ipmitool sdr
+check "execute ipmitool fail"
+
+result PASSED

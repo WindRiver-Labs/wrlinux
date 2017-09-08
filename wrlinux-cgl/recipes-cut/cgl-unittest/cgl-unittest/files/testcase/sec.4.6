@@ -1,0 +1,248 @@
+#!/bin/sh
+
+# Copyright (c) 2008 Wind River Systems, Inc.
+# description : SEC.4.6	PKI Certificate Authority (CA) 
+# 		This script need package configure file, you can download openssl.cnf-test from Twiki
+#		http://cvs.wrs.com/cvsweb/product_lines/Linux/wrlinux_3.0/Test/Test_design/Networking/WIND00121588-CGL40_Registration/test_cases/?cvsroot=prod_rel_docs
+#		Put this file under $CUTDIR on target , same dir with test scripts.
+#
+# developer : Chi Xu <chi.xu@windriver.com>
+#
+# changelog
+# *
+# -
+
+TOPDIR=${CUTDIR-/opt/cut/}
+. $TOPDIR/function.sh
+
+DIR=`pwd`
+
+clean()
+{
+	echo "Clean System..."
+	rm -rf $TOPDIR/ssl-ca	
+	echo "Finish"
+}
+
+mkdir $TOPDIR/ssl-ca
+cd $TOPDIR/ssl-ca
+cp -a $TOPDIR/resource/openssl.cnf-test openssl.cnf
+check "The required file $TOPDIR/resource/openssl.cnf-test is missing" 1
+
+
+echo "******Creat CA key and enter pass phrase for ca.key******"
+expect <<- END
+spawn openssl genrsa -des3 -out ca.key 1024
+
+expect  {
+	eof		 {exit 1}
+	"*Enter pass phrase for ca.key*"	{send "1111\r"}
+	}
+
+expect  {
+        "*Enter pass phrase for ca.key*"        {send "1111\r"}
+        }
+
+expect
+exit
+
+END
+check "Creak CA key fail"
+
+chmod 400 ca.key
+check "Can not find ca.key"
+echo "******Check ca.key******"
+expect <<- END
+spawn openssl rsa -noout -text -in ca.key
+expect  {
+	eof 		{exit 1}
+        "*Enter pass phrase for ca.key*"        {send "1111\r"}
+        }
+
+expect
+exit
+
+END
+check "Check ca.key fail"
+
+echo "******Self sing the CA key******"
+expect <<- END
+spawn openssl req -config openssl.cnf -new -x509 -days 3650 -key ca.key -out ca.crt
+expect  {
+	eof 		{exit 1}
+        "*Enter pass phrase for ca.key*"        {send "1111\r"}
+        }
+
+expect
+exit
+
+END
+check "Self sign fail"
+
+chmod 400 ca.crt
+check "Can not find ca.crt"
+
+echo "******Check ca.crt******"
+openssl x509 -noout -text -in ca.crt
+check "Check ca.crt fail"
+
+echo "******Create server key******"
+expect <<- END
+spawn openssl genrsa -des3 -out server.key 1024
+
+expect  {
+        eof              {exit 1}
+        "*Enter pass phrase for server.key*"        {send "1111\r"}
+        }
+
+expect  {
+        "*Enter pass phrase for server.key*"        {send "1111\r"}
+        }
+
+expect
+exit
+
+END
+check "Create server key fail"
+
+chmod 400 server.key
+check "Cannot find server.key"
+echo "******Check server.key******"
+expect <<- END
+spawn openssl rsa -noout -text -in server.key
+expect  {
+        eof             {exit 1}
+        "*Enter pass phrase for server.key*"        {send "1111\r"}
+        }
+
+expect
+exit
+
+END
+check "Check server.key fail"
+
+echo "******Creat certificate signing requests use server.key******"
+expect <<- END
+spawn openssl req -config openssl.cnf -new -key server.key -out  server.csr
+expect  {
+        eof             {exit 1}
+        "*Enter pass phrase for server.key*"        {send "1111\r"}
+        }
+
+expect
+exit
+
+END
+check "Create csr fail"
+
+echo "******check server.csr******"
+openssl req -noout -text -in server.csr
+check "check server.csr fail"
+
+
+echo "******Create the file and dir described in openssl.cnf******"
+mkdir newcerts
+mkdir crl
+touch index
+echo 01 > serial
+
+echo "******Sign the certificate server.csr******"
+expect <<- END
+spawn openssl ca -config openssl.cnf -keyfile ca.key -cert ca.crt -in server.csr -out server.pem -days 1095
+expect  {
+        eof             {exit 1}
+        "*Enter pass phrase for ca.key*"        {send "1111\r"}
+        }
+
+expect  {
+	eof		{exit 1}
+	"*Sign the certificate*"			{send "y\r"}
+	}
+
+expect  {
+	eof		{exit 1}
+	"*1 out of 1 certificate requests certified*"	{send "y\r"}
+	}
+
+expect
+exit
+
+END
+check "Sign server.csr fail"
+
+
+echo "******change the format to PKCS12 of server.csr******"
+expect <<- END
+spawn openssl pkcs12 -export -in server.pem -inkey server.key -out server.pfx
+expect  {
+        eof             {exit 1}
+        "*Enter pass phrase for server.key*"        {send "1111\r"}
+        }
+
+expect  {
+        eof             {exit 1}
+        "*Enter Export Password*"                        {send "2222\r"}
+        }
+
+expect  {
+        eof             {exit 1}
+        "*Enter Export Password*"  			 {send "2222\r"}
+        }
+
+expect
+exit
+
+END
+check "Change format fail"
+
+echo "******Create crl******"
+expect <<- END
+spawn openssl ca -config openssl.cnf -gencrl -keyfile ca.key -cert ca.crt -out crl/test.crl
+expect  {
+	eof 		{exit 1}
+	"*Enter pass phrase for ca.key*"		{send "1111\r"}
+	}
+
+expect
+exit
+
+END
+
+echo "******Check test.crl******"
+openssl crl -noout -text -in crl/test.crl
+check "Check test.crl fail"
+
+echo "******Revoke certificate******"
+expect <<- END
+spawn openssl ca -config openssl.cnf -keyfile ca.key -cert ca.crt -revoke server.pem
+expect  {
+        eof             {exit 1}
+        "*Enter pass phrase for ca.key*"                {send "1111\r"}
+        }
+
+expect
+exit
+
+END
+check "Revoke certificate fail"
+
+echo "******Update test.crl******"
+expect <<- END
+spawn openssl ca -config openssl.cnf -gencrl -keyfile ca.key -cert ca.crt -out crl/test.crl
+expect  {
+        eof             {exit 1}
+        "*Enter pass phrase for ca.key*"                {send "1111\r"}
+        }
+
+expect
+exit
+
+END
+check "Update fail"
+
+echo "******Check test.crl******"
+openssl crl -noout -text -in crl/test.crl
+check "Check test.crl fail"
+
+
+result PASSED
