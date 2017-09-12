@@ -1,0 +1,108 @@
+        QEMU-x86 Board Support Package
+
+1. About this document
+======================
+
+This document describes the hardware specific information. Please refer
+to README for common and non-hardware specific information.
+
+
+2. Overview
+===========
+
+This BSP supports simulated QEMU targets:
+
+	* qemu-system-x86
+
+
+3. Hardware Boards
+==================
+
+The features listed below are taken from the QEMU user's manual.
+
+3.1 Simulated QEMU machine
+==========================
+
+The simulated x86-32 QEMU machine has the following features.
+
+3.1.1 Board features
+--------------------
+
+	* SMP is supported with up to 255 CPUs.
+	* i440FX host PCI bridge and PIIX3 PCI to ISA bridge
+	* Cirrus CLGD 5446 PCI VGA card or dummy VGA card with Bochs
+	  VESA extensions (hardware level, including all non standard modes).
+	* PS/2 mouse and keyboard
+	* 2 PCI IDE interfaces with hard disk and CD-ROM support
+	* Floppy disk
+	* PCI and ISA network adapters
+	* Serial ports
+	* Creative SoundBlaster 16 sound card
+	* ENSONIQ AudioPCI ES1370 sound card
+	* Intel 82801AA AC97 Audio compatible sound card
+	* Intel HD Audio Controller and HDA codec
+	* Adlib (OPL2) - Yamaha YM3812 compatible chip
+	* Gravis Ultrasound GF1 sound card
+	* CS4231A compatible sound card
+	* PCI UHCI USB controller and a virtual USB hub.
+	* RTC
+
+
+3.1.2 Supported Features
+------------------------
+
+	+ SMP is supported with up to 255 CPUs.
+	+ i440FX host PCI bridge and PIIX3 PCI to ISA bridge
+	+ Cirrus CLGD 5446 PCI VGA card or dummy VGA card with Bochs
+	  VESA extensions (hardware level, including all non standard modes).
+	+ PS/2 mouse and keyboard
+	+ 2 PCI IDE interfaces with hard disk and CD-ROM support
+	+ Floppy disk
+	+ PCI and ISA network adapters
+	+ Serial ports
+	+ RTC
+
+
+3.1.3 Unsupported Features:
+---------------------------
+
+	x Creative SoundBlaster 16 sound card
+	x ENSONIQ AudioPCI ES1370 sound card
+	x Intel 82801AA AC97 Audio compatible sound card
+	x Intel HD Audio Controller and HDA codec
+	x Adlib (OPL2) - Yamaha YM3812 compatible chip
+	x Gravis Ultrasound GF1 sound card
+	x CS4231A compatible sound card
+	x PCI UHCI USB controller and a virtual USB hub.
+
+3.1.4 Hardware Description
+--------------------------
+
+For more hardware details please consider this online documentation:
+
+http://qemu.weilnetz.de/qemu-doc.html#QEMU-PC-System-emulator
+http://wiki.qemu.org/Documentation/HardwareManuals
+
+
+3.1.5 Target Notes
+------------------
+
+The simulated x86 target is provided by qemu-system-x86. For
+detailed features that are simulated by qemu, check QEMU's user
+manual:
+
+http://wiki.qemu.org/Manual
+
+3.1.6 Ethernet notes
+--------------------
+
+QEMU has implemented several NIC models, use the command below to
+obtain the list:
+
+$ ...qemu-system-x86 -net nic,model=\?
+
+ne2k_pci,i82551,i82557b,i82559er,rtl8139,e1000,pcnet,virtio
+
+The default model is: i82557b.
+
+Use appropriate NIC model as preferred.

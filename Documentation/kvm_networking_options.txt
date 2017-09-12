@@ -1,0 +1,364 @@
+				KVM Networking Options
+				----------------------
+
+1. User Mode Networking
+-----------------------
+The default virtual network configuration is known as Usermode Networking.
+Traffic is NATed through the host interface to the outside network.
+
+Simply run your guest with "-net nic -net user", e-g: 
+
+qemu-system-x86_64 -hda /path/to/hda.img -net nic -net user
+
+In the default configuration, the guest operating system will have access to
+network services, but will not be visible to other machines on the network.
+
+By default, the guest OS will get an IP address in the 10.0.2.0/24 address
+space and the host OS will be reachable at 10.0.2.2.
+
+You can still access one specific port on the guest using the "hostfwd" option.
+This means e.g. if you want to transport a file with scp from host to guest,
+start the guest with "-net nic -net user,hostfwd=tcp::5555-:22".
+
+Now you are forwarding the host port 5555 to the guest port 22. After starting
+up the guest, you can transport a file with:
+"scp -P 5555 file.txt root@localhost:/tmp"
+from host to guest.
+
+For transferring a file from guest to host, you can simply run below commandline:
+scp file.txt root@10.0.2.2:/tmp
+
+Notes:
+
+   - User networking may not support a number of networking features like ICMP.
+   - Certain applications may not function properly.
+
+
+2. PCI Pass-through
+-------------------
+With PCI pass-through, you can assign a PCI device directly to one guest
+operating system. You do not need to emulate a network device.
+
+When you use PCI pass-through, the PCI device becomes unavailable to the host
+and to all other guest operating systems. Ideally you need one networking device
+for each guest operating system and one networking device for the host. If you
+do not have enough networking devices, then you must choose which guest operating
+systems use PCI pass-through and which do not.
+
+Ensure the host supports Intel VT-d or AMD IOMMU.
+
+Then, verify that this support is enabled in both the machine BIOS and the
+Linux kernel.
+
+For host kernel, please make sure below kernel configs are enabled (For exapmle
+on Intel platform):
+CONFIG_DMAR_TABLE=y
+CONFIG_INTEL_IOMMU=y
+
+They are enabled by default in feature/kvm template.
+
+Optional:
+CONFIG_IRQ_REMAP=y
+
+If CONFIG_INTEL_IOMMU_DEFAULT_ON is not enabled, please make sure to pass parameter
+"intel_iommu=on" to host kernel.
+
+2.1 PCI Pass-through (Without SR-IOV)
+-------------------------------------
+To set up PCI pass-through, complete the following steps:
+
+a. Run "modprobe pci-stub" to load pci-stub kernel module
+
+b. Identify the ID and other slot information that is associated with the PCI
+   device by typing the following command:
+
+   lspci -nn
+
+   Your output might include a line like the following line, which identifies the
+   network adapter:
+
+   00:15.0 Ethernet controller [0200]: Intel Corporation 82599EB 10-Gigabit Network \
+   Connection [8086:10fb] (rev 01)
+
+c. Unbind the device from the host by using the echo command. For example:
+
+   echo "8086 10fb" > /sys/bus/pci/drivers/pci-stub/new_id
+   echo "0000:00:15.0" > /sys/bus/pci/devices/0000:00:15.0/driver/unbind
+   echo "0000:00:15.0" > /sys/bus/pci/drivers/pci-stub/bind
+
+d. Load kvm and kvm-intel modules.
+   modprobe kvm allow_unsafe_assigned_interrupts=1
+   modprobe kvm-intel
+
+e. Assign the device to the guest operating system by using the -device qemu-kvm
+   option. For example:
+
+   -device pci-assign,host=00:15.0
+   
+f. Start the guest.
+
+g. PCI pass-through can be setup via libvirt as well.
+
+   For how to setup libvirt xml config file, please refer to Documentation/kernel/libvirt.txt
+   
+   Add below section into libvirt xml config file <devices> section:
+   
+   <devices>
+     ...
+     <hostdev mode='subsystem' type='pci' managed='yes'>
+       <source>
+         <address domain='0x0000' bus='0x00' slot='0x0f' function='0x0'/>
+       </source>
+     </hostdev>
+   </devices>
+   
+   Running with this config, libvirt will setup the host networking.
+
+Notes:
+
+   - When launching qemu from the command line, "--enable-kvm" must be
+     explicitly passed.
+   - In libvirt config, the numbers of domain, bus, slot and function must be
+     hexdecimal.
+
+2.2 SR-IOV
+----------
+SR-IOV enables a Single Root Function (for example, a single Ethernet port), to
+appear as multiple, separate, physical devices. A physical device with SR-IOV
+capabilities can be configured to appear in the PCI configuration space as
+multiple functions.
+
+Each Virtual Function can only be mapped to a single guest at a time, as Virtual
+Functions require real hardware resources. A virtualized guest can have multiple
+Virtual Functions. A Virtual Function appears as a network card in the same way
+as a normal network card would appear to an operating system.
+
+Make sure CONFIG_PCI_IOV and CONFIG_PCI_MMCONFIG are eanbled on host kernel,
+CONFIG_IGBVF is enabled on guest kernel.
+
+They are selected in feature/kvm template and guest x86 BSPs kernel configs
+by default respectively.
+
+a. Verify if the PCI device with SR-IOV capabilities are detected.
+
+   Run "lspci -vv" to check if the PCI ethernet device has SR-IOV capability
+
+b. Load IGB driver kernel module
+
+   modprobe igb max_vfs=<number>
+
+   Here "number" is the number of virtual functions, the valid range is 0 to 7.
+
+c. Identify the ID and other slot information that is associated with the PCI
+   device by typing the following command:
+
+   lspci -nn
+
+   Your output might include a line like the following line, which identifies the
+   network adapter:
+
+   09:00.0 Ethernet controller [0200]: Intel Corporation I350 Gigabit Network Connection [8086:1521] (rev 01)
+   09:00.1 Ethernet controller [0200]: Intel Corporation I350 Gigabit Network Connection [8086:1521] (rev 01)
+   09:00.2 Ethernet controller [0200]: Intel Corporation I350 Gigabit Network Connection [8086:1521] (rev 01)
+   09:00.3 Ethernet controller [0200]: Intel Corporation I350 Gigabit Network Connection [8086:1521] (rev 01)
+
+d. Unbind the device from the host by using the virsh command. For example:
+
+   ~# virsh nodedev-list|grep 09
+   pci_0000_09_00_0
+   pci_0000_09_00_1
+   pci_0000_09_00_2
+   pci_0000_09_00_3
+   ~#
+
+   ~# virsh nodedev-detach pci_0000_09_00_2
+   igb 0000:09:00.2: removed PHC on eth3
+   pci-stub 0000:09:00.2: claimed by stub
+   Device pci_0000_09_00_2 detached
+
+   ~#
+
+e. Add below section into libvirt xml config file <devices> section:
+
+   <hostdev mode='subsystem' type='pci' managed='yes'>
+      <source>
+        <address bus='0x09' slot='0x00' function='0x01'/>
+      </source>
+   </hostdev>
+
+Notes:
+
+   - Here the function number is virtual function assigned to the guest.
+
+f. Start the guest.
+
+
+3. Bridged Networking
+---------------------
+Make sure bridge-utils is built in the host rootfs.
+
+a. Setup an ethernet device for the guest
+   ifconfig eth0 192.168.0.6 netmask 255.255.255.0 up
+
+b. Start guest with
+
+   -net nic,macaddr=$macaddr -net tap
+   
+   You can either create a system-wide qemu-ifup in /etc/qemu-ifup or use another one.
+   In the latter case, start guest with
+   
+   -net nic,macaddr=$macaddr -net tap,script=/path/to/qemu-ifup
+
+Notes:
+
+   - Each guest on the network must have a different MAC address. So, please pass
+     different "macaddr=$macaddr" for each guest.
+   - The guest ethernet device will get ip address via local dhcp server.
+
+
+4. Virtio Networking
+--------------------
+Make sure bridge-utils package is included in the host rootfs and virtio
+dirver is enabled.
+
+a. Setup ethernet device on host
+   ifconfig eth0 192.168.0.6 netmask 255.255.255.0 up
+
+b. Start guest with
+
+   -net nic,macaddr=$macaddr,model=virtio -net tap
+   
+   You can either create a system-wide qemu-ifup in /etc/qemu-ifup or use another one.
+   In the latter case, start guest with
+   
+   -net nic,macaddr=$macaddr,model=virtio -net tap,script=/path/to/qemu-ifup
+
+Notes:
+
+   - Each guest on the network must have a different MAC address. So, please pass
+     different "macaddr=$macaddr" for each guest.
+   - The guest ethernet device will get ip address via local dhcp server.
+
+
+5. MacVTap
+-----------
+Make sure CONFIG_MACVLAN and CONFIG_MACVTAP are enabled in host kernel. If
+they are modules, please load them.
+
+They are selected as kernel modules by default in feature/kvm template.
+
+5.1 Setup via commandline
+-------------------------   
+a. Run below command lines to setup macvtap
+   $ ip link add link eth0 name macvtap0 type macvtap mode bridge
+   $ ip link set macvtap0 address 1a:46:0b:ca:bc:7b up
+   $ ip link show macvtap0
+ 8: macvtap0@eth0: <BROADCAST,MULTICAST,UP,M-DOWN> mtu 1500 qdisc pfifo_fast state UNKNOWN mode DEFAULT qlen 500
+    link/ether 1a:46:0b:ca:bc:7b brd ff:ff:ff:ff:ff:ff
+
+b. Start guest with
+
+   -net nic,macaddr=1a:46:0b:ca:bc:7b,model=virtio -net tap,fd=3 3<>/dev/tap8
+
+5.2 Setup via libvirt
+---------------------
+a. For how to setup libvirt xml config file, please refer to Documentation/kernel/libvirt.txt
+
+b. Add below section into libvirt xml config file <devices> section:
+    <devices>
+      <interface type='direct'>
+        <mac address='00:15:17:A6:BC:C9' />
+        <source dev='eth0' mode='bridge' />
+        <model type='virtio' />
+      </interface>
+      <!-- More devices here... -->
+    </devices>
+
+c. Running with this config, libvirt will setup the host networking.
+
+
+6. Vhostnet
+------------
+Make sure bridge-utils is built in the host rootfs and virtio dirver is enabled.
+
+Make sure CONFIG_VHOST_NET is enabled in host kernel. If it is module,
+load it.
+
+It's selected as kernel module by default in feature/kvm template.
+
+6.1 Setup via commandline
+-------------------------
+a. Setup ethernet device on host
+   ifconfig eth0 192.168.0.6 netmask 255.255.255.0 up
+
+b. Start guest with
+
+   -net nic,macaddr=$macaddr,model=virtio -net tap,vhost=on
+
+   You can either create a system-wide qemu-ifup in /etc/qemu-ifup or use another one.
+   In the latter case, start guest with
+   
+   -net nic,macaddr=$macaddr,model=virtio -net tap,script=/path/to/qemu-ifup,vhost=on
+
+Notes:
+
+   - Each guest on the network must have a different MAC address. So, please pass
+     different "macaddr=$macaddr" for each guest.
+   - The guest ethernet device will get ip address via local dhcp server.
+
+6.2 Setup via libvirt
+---------------------
+a. For how to setup libvirt xml config file, please refer to Documentation/kernel/libvirt.txt
+
+b. Run "/etc/qemu-ifup eth1" to setup bridge
+
+c. Add below section into libvirt xml config file <devices> section:
+    <devices>
+      <interface type='bridge'>
+        <mac address='00:01:02:03:04:05'/>
+        <source bridge='br0'/>
+        <model type='virtio'/>
+        <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+      </interface>
+      <!-- More devices here... -->
+    </devices>
+
+d.  Running with this config, libvirt will setup the host networking.
+
+
+7. Trouble Shooting
+-------------------
+
+7.1 VT is not enabled in BIOS
+-----------------------------
+If VT is not enabled in BIOS, when you load kvm-intel kernel module, you will
+get below error information:
+
+kvm: disabled by bios
+
+7.2 PCI Pass-through
+--------------------
+If the platform doesn't support VT-d or IOMMU is not enabled in kernel, when
+starting guest with PCI pass-through, you will get below error:
+
+No IOMMU found.  Unable to assign device "(null)"
+
+If "allow_unsafe_assigned_interrupts=1" is not passed to kvm module, when
+starting guest with PCI pass-through, you will get below error:
+
+kvm_iommu_map_guest: No interrupt remapping support, disallowing device assignment. \
+Re-enble with "allow_unsafe_assigned_interrupts=1" module option.
+
+7.3 Macvtap kernel module is not loaded
+---------------------------------------
+If macvtap kernel module is not loaded, when setup macvtap, you will get below
+error information:
+
+RTNETLINK answers: Operation not supported
+
+7.4 Vhostnet kernel module is not loaded
+----------------------------------------
+If vhost_net kernel module is not loaded, when starting guest with "vhost=on"
+,you will get below error information:
+
+Device 'tap' could not be initialized

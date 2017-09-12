@@ -1,0 +1,80 @@
+	Checkpoint Restore in Userspace
+	===============================
+
+1. Introduction
+---------------
+
+Checkpoint/Restore In Userspace, or CRIU, is a software tool for Linux
+operating system. Using this tool, you can freeze a running application
+(or part of it) and checkpoint it to a hard drive as a collection of files.
+You can then use the files to restore and run the application from the point
+it was frozen at. The distinctive feature of the CRIU project is that it is
+mainly implemented in user space.
+
+
+2. Simple loop test
+-------------------
+
+a. Configure project with "--template feature/criu". The template will
+   include criu userspace utility to build and enable related kernel configs.
+   
+b. Write the below test script (refer to http://www.criu.org/Simple_loop)
+   #!/bin/sh
+   while :; do
+       sleep 1
+       date
+   done
+
+   # chmod +x test.sh
+
+c. Run the test script in background
+   ./test.sh  < /dev/null &> test.log &
+
+d. Lookup the PID with "ps" command
+
+e. Check test log, the test is running:
+   # tail -f test.log
+   Tue Aug 26 18:20:20 UTC 2014
+   Tue Aug 26 18:20:21 UTC 2014
+   Tue Aug 26 18:20:22 UTC 2014
+   Tue Aug 26 18:20:23 UTC 2014
+
+f. Dump it with criu tool. The command will dump the process into
+   "checkpoint" dir.
+   # criu dump -D checkpoint/ -t 724 --shell-job
+   [1]+  Killed                     ./test.sh 0</dev/null 1>&test.log
+
+g. Check the test log, it is stopped. "ps" shows the process it not there anymore
+   # tail -f test.log
+   Tue Aug 26 18:21:20 UTC 2014
+   Tue Aug 26 18:21:21 UTC 2014
+   Tue Aug 26 18:21:23 UTC 2014
+   Tue Aug 26 18:21:24 UTC 2014
+   Tue Aug 26 18:21:25 UTC 2014
+
+   The test log stops growing.
+
+h. Check checkpoint dir dumpped files
+
+i. Restore it. "ps" shows the process is back again.
+   # criu restore -d -D checkpoint/
+
+j. Check the test log, it is growing again.
+   # tail -f test.log
+   Tue Aug 26 18:21:23 UTC 2014
+   Tue Aug 26 18:21:24 UTC 2014
+   Tue Aug 26 18:21:25 UTC 2014
+   Tue Aug 26 18:21:54 UTC 2014
+   Tue Aug 26 18:21:55 UTC 2014
+   Tue Aug 26 18:21:56 UTC 2014
+   Tue Aug 26 18:21:57 UTC 2014
+   Tue Aug 26 18:21:58 UTC 2014
+
+
+3. Supported software
+---------------------
+
+Not all software is supported by CRIU, please refer to below link for
+supported software:
+
+http://www.criu.org/What_software_is_supported

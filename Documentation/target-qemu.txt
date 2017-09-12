@@ -1,0 +1,99 @@
+                           Running QEMU on the Target
+                          ----------------------------
+
+Introduction
+-------------
+
+QEMU offers many command line options allowing for flexibility in how the guest
+is configured including options for configuring device passthrough, network
+setup, display options, etc.. Although we recommend users consult the QEMU
+documentation and online resources for how to start QEMU to suite your needs we
+will cover some of the basic options in this document to get people new to QEMU
+started.
+
+This document focuses on using Wind River Linux guest(s).
+
+
+Guest Rootfs and Kernel
+------------------------
+
+Before using QEMU you will want to build a guest kernel and root file-system. You
+can accomplish this in several ways.
+
+*) Wind River offers a single-build mechanism which can be employed to build a
+guest kernel and root file-system as part of your platform project. Consult the
+kvm-build-multiple-guests.txt located in this directory for details on
+single-build.
+
+*) Use an existing platform project build. Copy the kernel directly from the
+build to your target. Use 'make usb-image' to create a root file-system which is
+usable by QEMU.
+
+
+Booting the Guest
+------------------
+
+The following are examples of frequently used command lines used to boot a guest
+on the intel-xeon-core BSP configured with to include the 'kvm' feature
+template. The guest was created using the x86-64-kvm-guest BSP, the root
+file-system was creating using 'make usb-image'.
+
+qemu-system-x86_64 -kernel bzImage-x86-64-kvm-guest.bin \
+   -hda usb.img \
+   -nographic \
+   -append "root=/dev/hda2 rw console=ttyS0"
+
+This will start a non-accelerated guest with the output going to stdout. If you
+do get errors indicating the rootfs was not found scroll through the system log
+to ensure you are attempting to use the right device.
+
+If your host supports KVM a slight variation to the above will enable
+acceleration:
+
+qemu-system-x86_64 -kernel bzImage-x86-64-kvm-guest.bin \
+   -machine accel=kvm
+   -hda usb.img \
+   -nographic \
+   -append "root=/dev/hda2 rw console=ttyS0"
+
+To validate that acceleration has been enabled you can switch to the qemu
+console (ctrl+a c) and use the 'info kvm' command to determine acceleration status
+(switch back to the guest console using ctrl+a c).
+
+
+Additional QEMU Options
+------------------------
+
+Alongside this document you will find other KVM/QEMU documents covering other
+useful command line options to QEMU. At the moment kernel-kvm-virtio-usecase.txt
+covers enabling and using various virtio devices and kvm_networking_options.txt
+outlines several common network configurations to enable for example
+host<->guest, guest<->guest communications.
+
+
+Using CGL as a QEMU Host
+-------------------------
+
+You may use a CGL system as a QEMU host but due to the additional security
+measures provided by GRSec you will need to run paxctl on the QEMU
+binary. Attempting to run qemu-system-x86_64 on intel-xeon-core for example
+generates the following error:
+
+"denied RWX mmap of..."
+
+In order to work around this we need to allow the application to open the
+mprotect hole in the system. Use the following command to accomplish this:
+
+paxctl -c /usr/bin/qemu-system-x86_64
+paxctl -m /usr/bin/qemu-system-x86_64
+
+
+Additional Resources
+---------------------
+
+The QEMU documentation available online is the best resource for becoming
+familiar with the options available on the QEMU command line, it can be found at
+http://en.wikibooks.org/wiki/QEMU
+
+Information regarding each command line option is available by passing the '-h'
+option to the QEMU executable.

@@ -1,0 +1,56 @@
+        QEMU-ppc Board Support Package
+
+Table of Contents
+=================
+
+1. Supported Boards
+2. Change History
+3. BSP Features
+4. BSP Notes
+
+1. Supported Boards
+===================
+
+This BSP supports simulated QEMU targets. The simulated machine/board
+type by QEMU is:
+
+  + qemu-system-ppc -M ma99
+
+
+2. Change History
+=================
+
+  - 2012/12 (00360960): Initial WRL 5.0 BSP
+
+3. BSP Features
+===============
+
+3.1 Supported Features
+======================
+
+	+ NE2000 PCI adapters
+	+ UniNorth or Grackle PCI Bridge
+	+ VIA-CUDA with ADB keyboard and mouse.
+
+3.2 Unsupported Features
+========================
+
+	x Non Volatile RAM
+	x PCI VGA compatible card with VESA Bochs Extensions
+	x 2 PMAC IDE interfaces with hard disk and CD-ROM support
+
+Maybe some other simulated devices is not covered for now.
+
+4. BSP Notes
+============
+
+For more hardware details please consider this online documentation:
+
+http://qemu.weilnetz.de/qemu-doc.html
+http://wiki.qemu.org/Documentation/HardwareManuals
+
+The simulated target is provided by qemu-system-ppc. For detailed
+features that are simulated by qemu, check QEMU's user manual:
+
+http://wiki.qemu.org/Manual
+

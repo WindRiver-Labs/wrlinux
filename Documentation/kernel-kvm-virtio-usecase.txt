@@ -1,0 +1,237 @@
+Using virtio in KVM 
+
+Files index:
+   kernel-kvm-virtio-usecase.txt
+	- this file
+
+Summary
+   This usecase is intended to provide a simple demo how to use virtio
+   for KVM in Wind River Linux. It also includes virtio networking
+   examples.
+
+Terminology:
+
+   In a system where code is running in multiple OS environments, it
+   is easy to get confused about what we are building and running
+   on. To minimize this confusion, this document specifically refers
+   to 3 general environments: 
+
+     BUILD HOST: The computer/OS where all code is compiled. 
+
+     KVM HOST: This is the primary OS running on the target
+     machine, whether it is actual hardware or a QEMU emulation. 
+
+     KVM GUEST: This is the OS that is running in (in the case of
+     this example) a QEMU emulation running on the KVM HOST. 
+
+Scenarios
+   virtio is a series of efficient, well-maintained Linux drivers which can
+   be adapted for various different hypervisor implementations using a shim
+   layer. This includes a simple extensible feature mechanism for each driver.
+   it also provides an obvious ring buffer transport implementation called
+   vring, etc.
+
+   This demonstration builds a KVM HOST kernel (on the BUILD HOST)
+   that runs on physical hardware. The KVM GUEST kernel is built (on
+   the BUILD HOST) and started in a QEMU emulation on the KVM
+   HOST. Finally, the various features of the virtio demonstration are
+   exercised between the KVM HOST and KVM GUEST. The 'netperf'
+   application is used to demonstrate the data transfer rate via the
+   virtio device driver. Macvtap and vhostnet are used here for virtio
+   networking.  
+
+Preconditions and Assumptions
+
+   - Wind River Linux 10.0 or newer
+
+   - BSPs built with the configurations shown.
+ 
+   - This example uses two separate Operating Systems running on the
+     same target hardware. These systems are referred to as the Host
+     and Guest OS. The Host environment is assumed to be implemented
+     as a 64-bit BSP. The Guest can be either 32- or 64-bit, but for
+     this example we will use a 64-bit BSP.
+
+   - It is necessary for the user to acknowledge the non-free license
+     associated with the 'netperf'. The mechanism for doing this is
+     described below.
+
+   - Since the 'netperf' application must be downloaded, adding the
+     netperf package overrides the setting of BB_NO_NETWORK in the
+     local.conf file.
+     
+Normal Execution Flow
+
+KVM HOST preparation
+
+   1. On the BUILD HOST, create a BSP project for the KVM HOST. 
+      Use either the intel-x86-64 or qemux86-64 BSP:
+    
+	  wrlinux-x/setup.sh --kernel=standard \
+	  --machines=qemux86-64 --templates=feature/kvm \
+	  --dl-layers 
+
+	  $ . ./environment-setup-x86_64-wrlinuxsdk-linux
+	  $ . ./oe-init-build-env <build dir>
+
+   2. Acknowledge the non-free license status of the 'netperf' package.
+
+      Add the setting of the LICENSE_FLAGS variable in the netperf
+      bitbake recipe at:
+
+       meta-openembedded/meta-networking/recipes-support/netperf/netperf_2.6.0.bb
+
+      to the LICENSE_FLAGS_WHITELIST variable in the local.conf file.
+
+      For example, if LICENSE_FLAGS = "non-commercial", set
+
+       LICENSE_FLAGS_WHITELIST += "non-commercial"
+
+      in the local.conf file.
+
+   3. Add the following packages to the BSP:
+
+      netperf (provided by the netperf layer)
+      bridge-utils
+      wrs-kvm-helper
+
+      This can be done by editing conf/local.conf
+      directly to add:
+
+      IMAGE_INSTALL_append += "netperf"
+      IMAGE_INSTALL_append += "bridge-utils"
+      IMAGE_INSTALL_append += "wrs-kvm-helper"
+
+   4. Turn on CONFIG_MACVLAN and CONFIG_MACVTAP
+      To use MacVTap for networking. Make sure these two options are 
+      enabled in host kernel. If they are modules, please load them.
+
+   5. Build the KVM HOST bsp:
+
+      $ bitbake wrlinux-image-glibc-std
+
+   6. Deploy the kernel and rootfs to your target.
+
+      Details of this process will depend on the particular target
+      hardware and network configuration and are beyond the scope of
+      this document.
+
+KVM GUEST preparation
+
+   1. On the BUILD HOST, create a BSP project for the KVM GUEST. 
+      Use the x86-64-kvm-guest BSP:
+    
+	  wrlinux-x/setup.sh --kernel=standard \
+	  --machines=x86-64-kvm-guest --dl-layers
+
+	  $ . ./environment-setup-x86_64-wrlinuxsdk-linux
+	  $ . ./oe-init-build-env <build dir>
+
+   2. Acknowledge the non-free license status of the 'netperf' package.
+
+      Add the setting of the LICENSE_FLAGS variable in the netperf
+      bitbake recipe at:
+
+      meta-openembedded/meta-networking/recipes-support/netperf/netperf_2.6.0.bb
+
+      to the LICENSE_FLAGS_WHITELIST variable in the local.conf file.
+
+      For example, if LICENSE_FLAGS = "non-commercial", set
+
+       LICENSE_FLAGS_WHITELIST += "non-commercial"
+
+      in the local.conf file.
+
+   3. Add the following package to the BSP:
+
+      netperf (provided by the netperf layer)
+
+      This can be done by editing conf/local.conf
+      directly to add:
+
+      IMAGE_INSTALL_append += "netperf"
+
+   4. Build the KVM GUEST bsp:
+
+      $ bitbake wrlinux-image-glibc-std
+
+   5. Copy bzImage and wrlinux-image-glibc-std-x86-64-kvm-guest.ext4
+      to /root directory on the KVM HOST.
+
+Demonstration
+
+   1. Boot the KVM HOST. On the booted KVM HOST:
+
+      root@wrlinux:~# modprobe kvm
+      root@wrlinux:~# modprobe kvm-intel
+
+   2. Configure the macvtap interface:
+
+      root@wrlinux:~# ip link add link eth0 name macvtap0 type macvtap
+      root@wrlinux:~# ip link set macvtap0 address 1a:46:0b:ca:bc:7b up
+      root@wrlinux:~# ip link show macvtap0
+      7: macvtap0@eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 \
+      qdisc pfifo_fast state UNKNOWN mode DEFAULT qlen 500 link/ether \
+      1a:46:0b:ca:bc:7b brd ff:ff:ff:ff:ff:ff
+
+   3. Verify that the macvtap driver is included in the KVM HOST
+      kernel and the tap device is available:
+
+      root@wrlinux:~# dmesg | grep macv
+      macvtap0: no IPv6 routers present
+
+      root@wrlinux:~# ls /dev/tap*
+      /dev/tap7
+
+   4. On KVM HOST, run netperf program before booting KVM GUEST
+      It is located at /etc/init.d/netperf
+
+      root@wrlinux:~# /etc/init.d/netperf start
+
+   5. On the KVM HOST, boot the KVM GUEST with the following
+      command:
+
+      root@wrlinux:~# qemu-system-x86_64 -nographic -k en-us -m 1024 \
+      -net user,hostname="kvm-guest" \
+      -net nic,macaddr=1a:46:0b:ca:bc:7b,model=virtio \
+      -net tap,fd=3 3<>/dev/tap7 \
+      -drive file=wrlinux-image-glibc-std-x86-64-kvm-guest.ext4,if=virtio,format=raw \
+      -kernel bzImage \
+      -append "root=/dev/vda rw console=ttyS0,115200"
+
+   6. Start the guest network interface with:
+
+      root@localhost:~# ifconfig eth0 10.0.2.15
+
+   7. Running netperf:
+        
+      On the KVM GUEST, run netperf using 10.0.2.2. as the host IP.      
+
+      root@kvm-guest:~# netperf -H 10.0.2.2 -l 60
+
+      TCP STREAM TEST from 0.0.0.0 (0.0.0.0) port 0 AF_INET to host_ip port 0 AF_INET
+      Recv   Send    Send                          
+      Socket Socket  Message  Elapsed              
+      Size   Size    Size     Time     Throughput  
+      bytes  bytes   bytes    secs.    10^6bits/sec  
+
+      87380  16384  16384    60.08      31.20
+
+
+Resources and notes:
+http://www.linux-kvm.org/page/Boot_from_virtio_block_device
+http://www.linux-kvm.org/page/Virtio
+http://www.linux-kvm.org/page/VhostNet
+
+
+Notes:
+
+   1. This example uses a 'glibc_std' root filesystem and has not been
+   tested on 'glibc_small'. The base configuration of 'glibc_small' is
+   lacking a number of necessary components. It may be possible to
+   include the necessary components by reconfiguring 'busybox', but
+   this is not supported.
+
+   2. Please refer to README that accompanies the netperf download for
+   more information about the design and use of netperf.
+

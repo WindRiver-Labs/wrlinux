@@ -1,0 +1,58 @@
+        QEMU-ARM Board Support Package
+
+Table of Contents
+=================
+
+1. Supported Boards
+2. Change History
+3. BSP Features
+4. BSP Notes
+
+1. Supported Boards
+===================
+
+This BSP supports simulated QEMU targets. The simulated machine/board
+type by QEMU is:
+
+  + qemu-system-arm -M versatilepb
+
+2. Change History
+=================
+
+3. BSP Features
+===============
+
+3.1 Supported Features
+======================
+  o General Platform
+        + ARM926EJ-S 
+
+  o Bus
+        + PCI Host Bridge 
+
+  o Network
+        + SMC91C11 Ethernet 
+
+  o Misc Devices
+        + AMBA PL011 UART device
+	+ AMBAKMI keyboard and mouse.
+
+3.2 Unsupported Features
+========================
+
+	x Hard disk 
+
+
+4. BSP Notes
+============
+
+For more hardware details please consider this online documentation:
+
+http://qemu.weilnetz.de/qemu-doc.html
+http://wiki.qemu.org/Documentation/HardwareManuals
+
+The simulated target is provided by qemu-system-arm. For detailed
+features that are simulated by qemu, check QEMU's user manual:
+
+http://wiki.qemu.org/Manual
+

@@ -1,0 +1,124 @@
+	Forced Threaded IRQs (so called preempt-irq)
+
+Threadirqs cause hard IRQs and soft IRQs to be run in kernel threads. All soft IRQs
+are run by ksoftirqd kernel thread, each hard IRQ has its own dedicated kernel
+thread.
+
+When threadirqs are enabled on a machine the "ps" command shows a result
+similar to the following:
+
+root@common-pc-64:~# ps
+  PID USER       VSZ STAT COMMAND
+    1 root      4196 S    init [5]
+    2 root         0 SW   [kthreadd]
+    3 root         0 SW   [ksoftirqd/0]
+    6 root         0 SW   [migration/0]
+    7 root         0 SW   [migration/1]
+    9 root         0 SW   [ksoftirqd/1]
+   10 root         0 SW   [kworker/0:1]
+   11 root         0 SW   [migration/2]
+   12 root         0 SW   [kworker/2:0]
+   13 root         0 SW   [ksoftirqd/2]
+   14 root         0 SW   [migration/3]
+   16 root         0 SW   [ksoftirqd/3]
+   17 root         0 SW<  [cpuset]
+   18 root         0 SW<  [khelper]
+   19 root         0 SW   [kdevtmpfs]
+   20 root         0 SW<  [netns]
+   21 root         0 SW   [sync_supers]
+   22 root         0 SW   [bdi-default]
+   23 root         0 SW<  [kblockd]
+   24 root         0 SW   [irq/9-acpi]
+   25 root         0 SW<  [ata_sff]
+   26 root         0 SW   [khubd]
+   27 root         0 SW<  [md]
+   28 root         0 SW<  [rpciod]
+   29 root         0 SW   [kswapd0]
+   30 root         0 SW   [fsnotify_mark]
+   31 root         0 SW<  [unionfs_siod]
+   32 root         0 SW<  [nfsiod]
+   33 root         0 SW<  [crypto]
+   52 root         0 SW   [irq/19-ata_piix]
+   53 root         0 SW   [scsi_eh_0]
+   54 root         0 SW   [scsi_eh_1]
+   57 root         0 SW   [irq/16-ata_piix]
+   58 root         0 SW   [scsi_eh_2]
+   59 root         0 SW   [scsi_eh_3]
+   60 root         0 SW   [kworker/u:3]
+   62 root         0 SW   [irq/16-ehci_hcd]
+   63 root         0 SW   [irq/23-ehci_hcd]
+   64 root         0 SW   [irq/12-i8042]
+   65 root         0 SW   [irq/1-i8042]
+   66 root         0 SW   [kworker/1:1]
+   67 root         0 SW   [kworker/3:1]
+   68 root         0 SW<  [kpsmoused]
+   69 root         0 SW   [irq/8-rtc0]
+   71 root         0 SW<  [deferwq]
+   72 root         0 SW   [kworker/u:5]
+   75 root         0 SW   [irq/40-eth0]
+  734 root         0 SW   [irq/4-serial]
+
+Threadirqs core support is already builtin the kernel since IRQ_FORCED_THREADING
+is selected by default. To enable threadirqs, pass "threadirqs" kernel
+commandline parameter when booting the kernel.
+
+Latency test is run on x86/PPC/ARM machine to compare the result between
+non-threadirqs and threadirqs. Below is the test result.
+
+X86 (Emerson Matxm)
+non threadirqs
+root@common-pc-64:~# cyclictest -t1 -p 80 -n -i 10000 -l 10000
+# /dev/cpu_dma_latency set to 0us
+policy: fifo: loadavg: 0.07 0.07 0.03 1/65 793          
+
+T: 0 (  793) P:80 I:10000 C:  10000 Min:      2 Act:    5 Avg:    4 Max:      48
+
+threadirqs
+root@common-pc-64:~# cyclictest -t1 -p 80 -n -i 10000 -l 10000
+# /dev/cpu_dma_latency set to 0us
+policy: fifo: loadavg: 0.22 0.12 0.05 1/75 738          
+
+T: 0 (  738) P:80 I:10000 C:  10000 Min:      3 Act:    5 Avg:    5 Max:       8
+
+
+PPC (P4080 Rev2)
+non threadirqs 
+root@fsl-p4080:~# cyclictest -t1 -p 80 -n -i 50000 -l 50000
+# /dev/cpu_dma_latency set to 0us
+policy: fifo: loadavg: 0.00 0.01 0.05 1/78 1054          
+
+T: 0 ( 1054) P:80 I:50000 C:  50000 Min:      7 Act:    7 Avg:    7 Max:      18
+
+threadirqs
+root@fsl-p4080:~# cyclictest -t1 -p 80 -n -i 50000 -l 50000
+# /dev/cpu_dma_latency set to 0us
+policy: fifo: loadavg: 0.00 0.01 0.05 1/126 1122          
+
+T: 0 ( 1122) P:80 I:50000 C:  50000 Min:      7 Act:    7 Avg:    7 Max:      14
+
+
+ARM (OMAP3530EVM)
+non threadirqs 
+root@ti-omap3:~# cyclictest -t1 -p 80 -n -i 10000 -l 10000
+# /dev/cpu_dma_latency set to 0us
+policy: fifo: loadavg: 0.27 0.36 0.16 1/51 669          
+
+T: 0 (  669) P:80 I:10000 C:  10000 Min:     35 Act:  457 Avg:  383 Max:     526
+
+threadirqs
+root@ti-omap3:~# cyclictest -t1 -p 80 -n -i 10000 -l 10000
+# /dev/cpu_dma_latency set to 0us
+policy: fifo: loadavg: 0.36 0.33 0.16 1/66 554          
+
+T: 0 (  554) P:80 I:10000 C:   9981 Min:     34 Act:  455 Avg:  385 Max:     499
+
+
+Notes:
+------
+1. Individual boards and drivers must be validated with threaded IRQs.
+   Not all drivers work with forced threaded, and may need to be
+   modified.
+
+2. To enable forced threaded IRQs by default, the BSP developer must
+   arrange to have the bootloader pass "threadirqs" in the kernel boot
+   line.

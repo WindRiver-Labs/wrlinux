@@ -1,0 +1,29 @@
+Kernel Type: Preempt-rt
+-----------------------
+
+1. Notes
+--------
+
+1.1 HIGHMEM limitation
+----------------------
+
+On preempt-rt kernels, the total memory reported by tools such as top
+and free may be less than what is actually present for a 32-bit target
+machine.  CONFIG_HIGHMEM is disabled on preempt-rt since work is
+ongoing in the community to make this feature work well in upcoming
+releases. So the preempt-rt kernel will not use the full amount of ram
+on the 32-bit target.
+
+For example, on an fsl-e500mc target (P2041_RDB, P3041_DS, P4080_DS)
+with 4gb ram running preempt-rt kernel, the memory displayed by free
+is 682mb.
+
+There is no work-around.
+
+64-bit targets are not affected.
+
+1.1.1 HIGHMEM Support (32-bit)
+---------------------
+
+HIGHMEM is supported on x86 and ARM.  It is not supported on powerpc and
+mips.

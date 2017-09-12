@@ -1,0 +1,186 @@
+Dynamic probes with ftrace
+
+There are five sections in this use case:
+
+  Overview
+  Parameters definition
+  The lifecycle of a kprobe
+  Examples
+  Resources
+
+Overview
+========
+Dynamic probes with ftrace, which is a probes-based event tracer, aims
+to turn the insertion of dynamic probes into something close to a
+command-line operation. Currently x86 is the only platform supported,
+and they are instruction-dependent. (For more information about
+supported instructions, please refer to the document
+arch/x86/lib/x86-opcode-map.txt)
+
+Unlike the function tracer, this tracer can probe instructions inside
+kernel functions. It allows you to check which instruction has been
+executed. Unlike the tracepoint based events tracer, this tracer can
+add new probe points on the fly.
+
+Typically, the required kernel configs are enabled by default, but
+check to see if your build has it configured:
+
+From your BSP build directory:
+  bitbake linux-windriver -c menuconfig
+  Kernel Hacking -> Tracers -> [*]   Kernel Function Tracer
+  Kernel Hacking -> Tracers -> [*]   Enable kprobes-based dynamic events
+
+These are the two kconfigs that are set:
+  CONFIG_KPROBE_EVENT
+  CONFIG_DYNAMIC_FTRACE
+
+Since the parameters line has a somewhat complex format, the next
+section will introduce them.
+
+Parameters definition
+=====================
+
+  p[:[GRP/]EVENT] SYMBOL[+offs]|MEMADDR [FETCHARGS]	: Set a probe
+  r[:[GRP/]EVENT] SYMBOL[+0] [FETCHARGS]		: Set a return probe
+  -:[GRP/]EVENT						: Clear a probe
+
+ GRP		: Group name. If omitted, use "kprobes" for it.
+ EVENT		: Event name. If omitted, the event name is generated
+		  based on SYMBOL+offs or MEMADDR.
+ SYMBOL[+offs]	: Symbol+offset where the probe is inserted.
+ MEMADDR	: Address where the probe is inserted.
+
+ FETCHARGS	: Arguments. Each probe can have up to 128 args.
+  %REG		: Fetch register REG
+  @ADDR		: Fetch memory at ADDR (ADDR should be in kernel)
+  @SYM[+|-offs]	: Fetch memory at SYM +|- offs (SYM should be a data symbol)
+  $stackN	: Fetch Nth entry of stack (N >= 0)
+  $stack	: Fetch stack address.
+  $retval	: Fetch return value.(*)
+  +|-offs(FETCHARG) : Fetch memory at FETCHARG +|- offs address.(**)
+  NAME=FETCHARG: Set NAME as the argument name of FETCHARG.
+
+  (*) only for return probe.
+  (**) this is useful for fetching a field of data structures.
+
+Notes: ADDR should be in text.
+
+The lifecycle of a kprobe
+=========================
+
+Step 1: prepare
+---------------
+Ftrace uses the debugfs file system to hold the control files
+as well as the files to display output. So if debugfs is not already
+mounted:
+
+  mount -t debugfs nodev /sys/kernel/debug
+
+Check if /proc/sys/kernel/ftrace_enabled has been enabled:
+  cat /proc/sys/kernel/ftrace_enabled
+   1
+Typically, it is set to 1 by default.  If not you can enable it via proc:
+
+  echo 1 > /proc/sys/kernel/ftrace_enabled
+
+Zero the trace:
+  echo > /sys/kernel/debug/tracing/trace 
+
+Step 2: setup a kprobe
+----------------------
+
+1) set probe points via /sys/kernel/debug/tracing/kprobe_events
+
+
+  echo 'p:doforkprobe _do_fork clone_flags=%ax stack_start=%dx \
+        regs=%cx parent_tidptr=+4($stack) child_tidptr=+8($stack)' \
+        >> /sys/kernel/debug/tracing/kprobe_events
+
+This sets a kprobe on the top of _do_fork() function with recording 1st to
+5th arguments as "doforkprobe" event. Note, %ax, %dx, %cx correspond
+to the ABI specific register/stack entry for function parameters.
+
+Then a new probe is inserted by appending a line to the following:
+  /sys/kernel/debug/tracing/kprobe_events. 
+
+root@d610> cat /sys/kernel/debug/tracing/kprobe_events 
+p:kprobes/doforkprobe 0xc102bac0 clone_flags=%ax stack_start=%dx \
+regs=%cx parent_tidptr=+4($stack) child_tidptr=+8($stack)
+
+The kprobes event name "doforkprobe" will be stored in:
+  /sys/kernel/debug/tracing/events.
+
+root@d610> ls -l /sys/kernel/debug/tracing/events/kprobes/
+total 0
+drwxr-xr-x 2 root root 0 May 26 13:44 doforkprobe
+-rw-r--r-- 1 root root 0 May 26 13:44 enable
+-rw-r--r-- 1 root root 0 May 26 13:44 filter
+
+root@d610> ls -l /sys/kernel/debug/tracing/events/kprobes/doforkprobe/
+total 0
+-rw-r--r-- 1 root root 0 May 26 13:45 enable
+-rw-r--r-- 1 root root 0 May 26 13:44 filter
+-r--r--r-- 1 root root 0 May 26 13:44 format
+-r--r--r-- 1 root root 0 May 26 13:44 id
+
+Step 3: enable a kprobe
+-----------------------
+By default /sys/kernel/debug/tracing/events/kprobes/doforkprobe/enable should be disabled(0),
+so you need to enable it first.
+  echo 1 > /sys/kernel/debug/tracing/events/kprobes/doforkprobe/enable
+
+After having done this, there will be a capture count in
+/sys/kernel/debug/tracing/kprobe_profile:
+
+root@d610> cat /sys/kernel/debug/tracing/kprobe_profile 
+  doforkprobe           26               0
+
+Enable tracing:
+
+   echo 1 > /sys/kernel/debug/tracing/tracing_on
+
+Dump the trace log:
+root@d610> cat /sys/kernel/debug/tracing/trace
+# tracer: nop
+#
+# entries-in-buffer/entries-written: 3/3   #P:1
+#
+#                              _-----=> irqs-off
+#                             / _----=> need-resched
+#                            | / _---=> hardirq/softirq
+#                            || / _--=> preempt-depth
+#                            ||| /     delay
+#           TASK-PID   CPU#  ||||    TIMESTAMP  FUNCTION
+#              | |       |   ||||       |         |
+    kworker/u2:0-6     [000] d..1  7411.940658: doforkprobe: (_do_fork+0x0/0x3c0) clone_flags=0xffffffff8106c470 stack_start=0xffff88000b5668a0 regs=0x0 parent_tidptr=0xed9be20ffffffff child_tidptr=0xffff88000ed9be20
+         systemd-1     [000] d..1  7412.110407: doforkprobe: (_do_fork+0x0/0x3c0) clone_flags=0xffffffff810577a0 stack_start=0x0 regs=0x0 parent_tidptr=0xecd7f48ffffffff child_tidptr=0xffff88000ecd7f48
+              sh-227   [000] d..1  7415.234693: doforkprobe: (_do_fork+0x0/0x3c0) clone_flags=0xffffffff810577a0 stack_start=0x0 regs=0x0 parent_tidptr=0xdf87f48ffffffff child_tidptr=0xffff88000df87f48
+
+Step 4: disable a kprobe
+------------------------
+  echo 0 > /sys/kernel/debug/tracing/events/kprobes/doforkprobe/enable
+  echo 0 > /sys/kernel/debug/tracing/tracing_on
+  echo > /sys/kernel/debug/tracing/kprobe_events
+Or just remove a particular probe:
+  echo > '-:doforkprobe' >> /sys/kernel/debug/tracing/kprobe_events
+
+Then doforkprobe will be removed from kprobe_events, kprobe_profile,
+and events/kprobes. 
+
+If there is no kprobe in kprobe_events, events/kprobes will be deleted
+too.
+
+Examples
+========
+  1. Check four parameters of do_sys_open
+  echo 'p:myprobe do_sys_open dfd=%ax filename=%dx flags=%cx mode=+4($stack)' > /sys/kernel/debug/tracing/kprobe_events
+  2. Check the return value of do_sys_open, do_dentry_open, and _do_fork
+  echo 'r:myretprobe do_sys_open $retval' >> /sys/kernel/debug/tracing/kprobe_events
+  echo 'r:fork_retprobe _do_fork $retval' >> /sys/kernel/debug/tracing/kprobe_events
+  echo 'r:do_dentry_openprobe do_dentry_open $retval' >> /sys/kernel/debug/tracing/kprobe_events
+
+Resoures
+========
+Documentation/trace/kprobetrace.txt
+Documentation/trace/ftrace.txt
+http://lwn.net/Articles/343766/

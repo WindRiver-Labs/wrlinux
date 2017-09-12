@@ -1,0 +1,148 @@
+
+                                   libvirt
+                                  ---------
+
+1) QEMU/KVM guest configuration XML samples
+--------------------------------------------
+
+The following sections will provide you with XML configuration file
+contents examples which you can use with virsh to launch guest
+VMs. Modifications will be required to match your architecture and
+paths.
+
+
+a) basic guest
+
+The following configuration will allow you to start a basic
+KVM guest with no network support.
+
+----kvm_simple.xml----
+<domain type='kvm'>
+  <name>kvm_simple</name>
+  <memory>1024000</memory>
+  <currentMemory>512000</currentMemory>
+  <vcpu>1</vcpu>
+  <os>
+    <type arch='x86_64' machine='pc'>hvm</type>
+    <boot dev='hd' />
+    <kernel>/opt/libvirt/bzImage</kernel>
+    <cmdline>console=ttyS0 root=/dev/hda rw</cmdline>
+  </os>
+  <devices>
+    <disk type='file' device='disk'>
+      <source file='/opt/libvirt/rootfs.img' />
+      <target dev='hda' bus='ide' />
+    </disk>
+    <serial type='pty'>
+      <target port='0'/>
+    </serial>
+    <console type='pty'>
+      <target type='serial' port='0'/>
+    </console>
+  </devices>
+</domain>
+----snip----
+
+Typically you would start this guest using the following commands
+
+# virsh define kvm_simple.xml
+# virsh start kvm_simple
+# virsh console kvm_simple
+
+
+b) guest with virtio console support
+
+The following configuration will allow you to start a KVM guest which
+you can connect to via a virtio console. You will need to update your
+init to create a tty on the virtio console device or manually start
+one after login on via the serial console.
+
+----vio_console.xml----
+<domain type='kvm'>
+  <name>vio_console</name>
+  <memory>1024000</memory>
+  <currentMemory>512000</currentMemory>
+  <vcpu>1</vcpu>
+  <os>
+    <type arch='x86_64' machine='pc'>hvm</type>
+    <boot dev='hd' />
+    <kernel>/opt/libvirt/bzImage</kernel>
+    <cmdline>console=ttyS0 root=/dev/hda rw</cmdline>
+  </os>
+  <devices>
+    <disk type='file' device='disk'>
+      <source file='/opt/libvirt/rootfs.img' />
+      <target dev='hda' bus='ide' />
+    </disk>
+    <serial type='pty'>
+      <target port='0'/>
+    </serial>
+    <console type='pty'>
+      <target type='serial' port='0'/>
+    </console>
+    <console type='pty'>
+      <target type='virtio'/>
+    </console>
+    <console type='pty'>
+      <target type='virtio'/>
+    </console>
+  </devices>
+</domain>
+----snip----
+
+Once you have a tty enabled on the '/dev/hvcXX' device you can
+use the console from the host:
+
+# virsh console --devname console1 vio_console
+
+(when using virsh console the default is console0 which in this case
+ is the serial console, console1 and console2 are the virtio consoles)
+
+
+c) guest with MacVTap networking support
+
+The following configuration will allow you to start a KVM guest which
+will have MacVTap networking support. You will be able to access the
+outside network, however, if you want to network with the host you
+will need to configure a bridge.
+
+----macvtap.xml----
+<domain type='kvm'>
+  <name>macvtap</name>
+  <memory>1024000</memory>
+  <currentMemory>512000</currentMemory>
+  <vcpu>1</vcpu>
+  <os>
+    <type arch='x86_64' machine='pc'>hvm</type>
+    <boot dev='hd' />
+    <kernel>/opt/libvirt/bzImage</kernel>
+    <cmdline>console=ttyS0 root=/dev/hda rw ip=dhcp</cmdline>
+  </os>
+  <network>
+    <name>direct-macvtap</name>
+    <forward mode='bridge'>
+      <interface dev='eth0' />
+    </forward>
+  </network>
+  <devices>
+    <disk type='file' device='disk'>
+      <source file='/opt/libvirt/rootfs.img' />
+      <target dev='hda' bus='ide' />
+    </disk>
+    <serial type='pty'>
+      <target port='0'/>
+    </serial>
+    <console type='pty'>
+      <target type='serial' port='0'/>
+    </console>
+    <interface type='direct'>
+      <mac address='00:15:17:A6:BC:C9' />
+      <source dev='eth0' mode='bridge' /> 
+      <model type='virtio' />
+    </interface>
+  </devices>
+</domain>
+----snip----
+
+Running with this config, libvirt will setup the host networking, you
+will be required to setup the guest networking configuration.

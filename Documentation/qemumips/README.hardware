@@ -1,0 +1,63 @@
+        QEMU-mips Board Support Package
+
+Table of Contents
+=================
+
+1. Supported Boards
+2. Change History
+3. BSP Features
+4. BSP Notes
+
+1. Supported Boards
+===================
+
+This BSP supports the following boards:
+
+    + qemu-system-mips -M malta
+
+2. Change History
+=================
+
+    - 2012/12 (00325655): Initial WRL 5.0 BSP
+
+
+3. BSP Features
+===============
+
+3.1 Supported Features
+======================
+
+This BSP supports the following features on various boards (NOTE: NOT each
+feature can work on ALL boards).
+
+  o General Platform
+	+ Core board with MIPS 24Kf(24kc) CPU and Galileo system controller
+
+  o Bus
+	+ PIIX4 PCI/USB/SMbus controller
+
+  o Network
+	+ PCI network cards (PCnet32 and others)
+
+  o Misc Devices
+	+ Malta FPGA serial device
+	+ The Multi-I/O chip's serial device
+
+3.2 Unsupported Features
+========================
+
+	x Cirrus (default) or any other PCI VGA graphics card
+
+
+4. BSP Notes
+============
+
+For more hardware details please consider this online documentation:
+
+http://qemu.weilnetz.de/qemu-doc.html
+http://wiki.qemu.org/Documentation/HardwareManuals
+
+The simulated target is provided by qemu-system-mips. For detailed
+features that are simulated by qemu. Check QEMU's user manual:
+
+http://wiki.qemu.org/Manual

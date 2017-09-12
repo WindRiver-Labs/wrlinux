@@ -1,0 +1,116 @@
+        QEMU-ARM Board Support Package
+
+1. About this document
+======================
+
+This document contains common and non-hardware specific information.
+Please refer to README.hardware for hardware specific information.
+
+Dependencies
+------------
+This layer depends on the oe-core version supplied with Wind River
+Linux and the wr-kernel layer.
+
+
+Maintenance
+-----------
+This layer is maintained by Wind River Systems, Inc.
+Contact <support@windriver.com> or your support representative for more
+information on submitting changes.
+
+
+Building the qemuarm layer
+--------------------------
+This layer and the wr-kernel layer should be added to bblayers.conf. This
+is done automatically when using the Wind River configure wrapper.
+
+
+License
+-------
+Copyright (C) 2013-2016 Wind River Systems, Inc.
+
+Source code included in the tree for individual recipes is under the LICENSE
+stated in the associated recipe (.bb file) unless otherwise stated.
+
+The metadata is under the following license unless otherwise stated.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+
+2. Board Specific Patches
+=========================
+
+To get a list of patches applied to the kernel specific to this BSP,
+along with patch descriptions, use git to see what changed on the default
+kernel (git whatchanged <kernel_type>..<bsp_name>). For example:
+
+  # cd tmp/work-shared/<machine>/kernel-source
+  # git whatchanged standard/base..HEAD
+
+
+3. Boot Instructions
+====================
+
+Since this BSP is targeted at a QEMU simulated board, run the command
+"runqemu qemuarm slirp nographic" to load the BSP on top of QEMU.
+
+3.1 Ext4 Root File System
+------------------------
+
+By default, the guest system running in QEMU uses Ext4 rootfs.
+
+3.2 NFS Root File System
+
+When compiling copmpletely, run the command below in the project directory
+to load the BSP on top of QEMU:
+
+$  bitbake meta-ide-support
+$  runqemu qemuarm slirp nographic nfs
+
+3.2 RAM Root File System (initramfs)
+---------------------------------
+
+3.2.1 Create the initrd image
+-----------------------------
+
+Build the gzip'd initramfs image with:
+
+$ bitbake wrlinux-image-initramfs
+
+The resulting file can be found at 
+tmp/deploy/images/qemuarm/wrlinux-image-initramfs-<machine>.cpio.gz
+
+3.2.2 Deployment
+----------------
+
+After compiling copmpletely, using the command: 
+
+$  runqemu qemuarm slirp nographic cpio.gz
+
+to boot it from initramfs.
+
+4. Target Notes
+===============
+
+4.1 OProfile
+============
+This BSP does not have a usable implementation of hardware performance
+counters, so OProfile must be used in timer mode. If you are
+using OProfile you need to add "oprofile.timer=1" to your kernel boot
+options.
