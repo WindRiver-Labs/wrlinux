@@ -22,7 +22,7 @@ SRC_URI[sha256sum] = "8b268d250c97851775abe162f46f64724f95f367d752ae4630280cc5d3
 
 S = "${WORKDIR}/${SRCNAME}-${PV}"
 
-inherit autotools-brokensep update-rc.d useradd systemd
+inherit autotools-brokensep update-rc.d systemd
 
 DEPENDS = "gd"
 
@@ -141,11 +141,9 @@ SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} = "nagios-core.service"
 SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 
-USERADD_PACKAGES = "${SRCNAME}-base ${PN}"
+USERADD_PACKAGES += "${SRCNAME}-base"
 GROUPADD_PARAM_${SRCNAME}-base = "-r ${NAGIOS_GROUP}"
 USERADD_PARAM_${SRCNAME}-base = "-r -M -g ${NAGIOS_GROUP} ${NAGIOS_USER}"
-GROUPADD_PARAM_${PN} = "-r nagcmd"
-GROUPMEMS_PARAM_${PN} = "-a daemon -g nagcmd; -a ${NAGIOS_USER} -g nagcmd"
 
 INITSCRIPT_NAME = "nagios"
 INITSCRIPT_PARAMS = "defaults"

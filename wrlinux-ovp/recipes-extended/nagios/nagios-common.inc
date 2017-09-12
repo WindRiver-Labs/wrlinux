@@ -16,3 +16,11 @@ FILES_${PN}-dbg += "${NAGIOS_PLUGIN_DIR}/.debug"
 DEPENDS = "nagios-core"
 
 COMPATIBLE_HOST_aarch64 = "null"
+
+inherit useradd
+
+USERADD_PACKAGES = "${PN}"
+GROUPADD_PARAM_${PN} = "-r ${NAGIOS_GROUP}; -r nagcmd"
+USERADD_PARAM_${PN} = "-r -M -g ${NAGIOS_GROUP} ${NAGIOS_USER}"
+
+FILESYSTEM_PERMS_TABLES_append = " files/fs-perms-nagios.txt"

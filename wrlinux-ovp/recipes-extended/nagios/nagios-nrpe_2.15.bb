@@ -39,7 +39,7 @@ PACKAGECONFIG[ssl] = "${EXTRA_OECONF_SSL},--disable-ssl,openssl,"
 PACKAGECONFIG[cmdargs] = "--enable-command-args,--disable-command-args,,"
 PACKAGECONFIG[bashcomp] = "--enable-bash-command-substitution,--disable-bash-command-substitution,,"
 
-PACKAGECONFIG ??= "ssl cmdargs bashcomp"
+PACKAGECONFIG ??= "cmdargs bashcomp"
 
 do_configure() {
     oe_runconf || die "make failed"
