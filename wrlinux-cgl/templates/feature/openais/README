@@ -1,8 +1,0 @@
-This template sets PREFERRED_VERSION of corosync and adds
-a new distro feature 'openais'.
-
-To use, add
-
---with-template=feature/openais
-
-as a configure option.

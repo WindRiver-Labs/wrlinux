@@ -79,7 +79,6 @@ ROOTFS_TESTCASE="\
 	scripts/gdb.sh \
 	scripts/perf.sh \
 	scripts/saftest.sh \
-	scripts/openais.sh \
 	scripts/selinux.sh \
 	"
 

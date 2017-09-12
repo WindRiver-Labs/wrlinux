@@ -163,7 +163,6 @@ SRC_URI = "\
 	file://files/scripts/iscsi.sh \
 	file://files/scripts/saftest.sh \
 	file://files/scripts/coredump_test.sh \
-	file://files/scripts/openais.sh \
 	file://files/scripts/kexec-test-install \
 	file://files/scripts/selinux.sh \
 	file://files/scripts/reboot.sh \

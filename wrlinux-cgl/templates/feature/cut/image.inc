@@ -3,9 +3,6 @@
 # and multithreaded debugging needs libc-dbg
 IMAGE_INSTALL += "gdb glibc-dbg"
 
-# openais testcase needs the -testing package split
-IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'openais', 'openais-testing', '', d)}"
-
 IMAGE_INSTALL += "lksctp-tools-ptest"
 
 # the iscsi testcase needs iscsitarget
