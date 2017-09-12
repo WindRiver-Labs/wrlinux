@@ -1,2 +1,0 @@
-d root root 0755 /var/log/cluster none
-d coroqnetd coroqnetd 0770 /var/run/corosync-qnetd none
