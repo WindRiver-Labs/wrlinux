@@ -9,9 +9,14 @@ SRC_URI_append_wrlinux-ovp = " \
             file://power.sh \
            "
 
-PACKAGES_append_wrlinux-ovp = " ${PN}-default-scripts"
+# reorder to prevent ${PN} from picking up -default-scripts files
+PACKAGES_wrlinux-ovp = "${PN}-dbg ${PN}-staticdev ${PN}-dev ${PN}-doc ${PN}-locale ${PN}-default-scripts ${PN}"
+
 RDEPENDS_${PN}-default-scripts += "${BPN}"
-FILES_${PN}-default-scripts = "${sysconfdir}/acpi/events/* ${sysconfdir}/acpi/actions/*"
+FILES_${PN}-default-scripts = " \
+    ${sysconfdir}/acpi/events/powerbtn \
+    ${sysconfdir}/acpi/actions/power.sh \
+    "
 
 do_install_append_wrlinux-ovp () {
 	install -d ${D}${sysconfdir}/acpi/events
