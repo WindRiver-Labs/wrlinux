@@ -19,15 +19,16 @@
 # PNWHITELIST_REASON_layername = "not supported by ${DISTRO}"
 
 python() {
-    layer = bb.utils.get_file_layer(d.getVar('FILE', True), d)
+    layer = bb.utils.get_file_layer(d.getVar('FILE'), d)
     if layer:
-        layers = (d.getVar('PNWHITELIST_LAYERS', True) or '').split()
+        layers = (d.getVar('PNWHITELIST_LAYERS') or '').split()
         if layer in layers:
+            machine = d.getVar('MACHINE') or ''
             localdata = bb.data.createCopy(d)
-            localdata.setVar('OVERRIDES', layer)
-            whitelist = (localdata.getVar('PNWHITELIST', True) or '').split()
-            if not (d.getVar('PN', True) in whitelist or d.getVar('BPN', True) in whitelist):
-                reason = localdata.getVar('PNWHITELIST_REASON', True)
+            localdata.setVar('OVERRIDES', layer + ':' + machine)
+            whitelist = (localdata.getVar('PNWHITELIST') or '').split()
+            if not (d.getVar('PN') in whitelist or d.getVar('BPN') in whitelist):
+                reason = localdata.getVar('PNWHITELIST_REASON')
                 if not reason:
                     reason = 'not in PNWHITELIST for layer %s' % layer
                 raise bb.parse.SkipRecipe(reason)
