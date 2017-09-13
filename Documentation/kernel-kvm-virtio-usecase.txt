@@ -64,15 +64,9 @@ Normal Execution Flow
 
 KVM HOST preparation
 
-   1. On the BUILD HOST, create a BSP project for the KVM HOST. 
-      Use either the intel-x86-64 or qemux86-64 BSP:
-    
-	  wrlinux-x/setup.sh --kernel=standard \
-	  --machines=qemux86-64 --templates=feature/kvm \
-	  --dl-layers 
-
-	  $ . ./environment-setup-x86_64-wrlinuxsdk-linux
-	  $ . ./oe-init-build-env <build dir>
+   1. Setup your a new build project by selecting either intel-x86-64 or qemux86-64
+   BSP, also enable the template feature/kvm.  See the product documentation for
+   the steps to do this.
 
    2. Acknowledge the non-free license status of the 'netperf' package.
 
@@ -89,28 +83,15 @@ KVM HOST preparation
 
       in the local.conf file.
 
-   3. Add the following packages to the BSP:
-
-      netperf (provided by the netperf layer)
-      bridge-utils
-      wrs-kvm-helper
-
-      This can be done by editing conf/local.conf
-      directly to add:
-
-      IMAGE_INSTALL_append += "netperf"
-      IMAGE_INSTALL_append += "bridge-utils"
-      IMAGE_INSTALL_append += "wrs-kvm-helper"
-
-   4. Turn on CONFIG_MACVLAN and CONFIG_MACVTAP
+   3. Turn on CONFIG_MACVLAN and CONFIG_MACVTAP
       To use MacVTap for networking. Make sure these two options are 
       enabled in host kernel. If they are modules, please load them.
 
-   5. Build the KVM HOST bsp:
+   4. Build the KVM HOST bsp:
 
       $ bitbake wrlinux-image-glibc-std
 
-   6. Deploy the kernel and rootfs to your target.
+   5. Deploy the kernel and rootfs to your target.
 
       Details of this process will depend on the particular target
       hardware and network configuration and are beyond the scope of
@@ -118,14 +99,9 @@ KVM HOST preparation
 
 KVM GUEST preparation
 
-   1. On the BUILD HOST, create a BSP project for the KVM GUEST. 
-      Use the x86-64-kvm-guest BSP:
-    
-	  wrlinux-x/setup.sh --kernel=standard \
-	  --machines=x86-64-kvm-guest --dl-layers
-
-	  $ . ./environment-setup-x86_64-wrlinuxsdk-linux
-	  $ . ./oe-init-build-env <build dir>
+   1. Setup your a new build project by selecting intel-x86-64 BSP, also 
+   enable the template feature/kvm.  See the product documentation for
+   the steps to do this.
 
    2. Acknowledge the non-free license status of the 'netperf' package.
 
@@ -144,12 +120,13 @@ KVM GUEST preparation
 
    3. Add the following package to the BSP:
 
-      netperf (provided by the netperf layer)
+      netperf (provided by the meta-networking layer)
 
       This can be done by editing conf/local.conf
       directly to add:
 
-      IMAGE_INSTALL_append += "netperf"
+	  IMAGE_INSTALL += "netperf"
+	  PNWHITELIST_networking-layer_append = " netperf "
 
    4. Build the KVM GUEST bsp:
 

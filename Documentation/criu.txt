@@ -15,9 +15,14 @@ mainly implemented in user space.
 2. Simple loop test
 -------------------
 
-a. Configure project with "--template feature/criu". The template will
-   include criu userspace utility to build and enable related kernel configs.
-   
+a. Configure your project with the 'feature/criu' template. See the product
+   documentation on adding a template to your project.
+
+   This template will include the criu userspace utility and will enable related
+   kernel configurations.
+
+   Any other references to --template should be adjusted similarly.
+
 b. Write the below test script (refer to http://www.criu.org/Simple_loop)
    #!/bin/sh
    while :; do

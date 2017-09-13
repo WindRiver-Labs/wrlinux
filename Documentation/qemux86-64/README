@@ -8,8 +8,7 @@ Please refer to README.hardware for hardware specific information.
 
 Dependencies
 ------------
-This layer depends on the oe-core version supplied with Wind River
-Linux and the wr-kernel layer.
+This layer depends on the oe-core version.
 
 
 Maintenance
@@ -19,15 +18,9 @@ Contact <support@windriver.com> or your support representative for more
 information on submitting changes.
 
 
-Building the qemux86-64 layer
------------------------------
-This layer and the wr-kernel layer should be added to bblayers.conf. This
-is done automatically when using the Wind River configure wrapper.
-
-
 License
 -------
-Copyright (C) 2012-2016 Wind River Systems, Inc.
+Copyright (C) 2012-2017 Wind River Systems, Inc.
 
 Source code included in the tree for individual recipes is under the LICENSE
 stated in the associated recipe (.bb file) unless otherwise stated.
@@ -60,7 +53,7 @@ To get a list of patches applied to the kernel specific to this BSP,
 along with patch descriptions, use git to see what changed on the default
 kernel (git whatchanged <kernel_type>..<bsp_name>). For example:
 
-  # cd tmp/work-shared/<machine>/kernel-source
+  # cd tmp-glibc/work-shared/<machine>/kernel-source
   # git whatchanged standard/base..HEAD
 
 
@@ -94,7 +87,7 @@ Build the gzip'ed initramfs image with:
 $ bitbake wrlinux-image-initramfs
 
 The resulting file can be found at 
-tmp/deploy/images/qemux86-64/wrlinux-image-initramfs-<machine>.cpio.gz
+tmp-glibc/deploy/images/qemux86-64/wrlinux-image-initramfs-<machine>.cpio.gz
 
 3.2.2 Deployment
 ----------------
@@ -135,10 +128,10 @@ User can refer to the below URL to get more WIC details:
 http://www.yoctoproject.org/docs/2.2/mega-manual/mega-manual.html#creating-partitioned-images
 
 After build the project, user will get a WIC image under the directory
-tmp/deploy/images/<bsp name>/ ,such as:
+tmp-glibc/deploy/images/<bsp name>/ ,such as:
 
-tmp/deploy/images/qemux86-64/wrlinux-image-glibc-small-qemux86-64.wic
+tmp-glibc/deploy/images/qemux86-64/wrlinux-image-glibc-small-qemux86-64.wic
 
 Then user can use the below command to boot this image:
 
-$ runqemu qemux86-64 tmp/deploy/images/qemux86-64/wrlinux-image-glibc-small-qemux86-64.wic
+$ runqemu qemux86-64 tmp-glibc/deploy/images/qemux86-64/wrlinux-image-glibc-small-qemux86-64.wic
