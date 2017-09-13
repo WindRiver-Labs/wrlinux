@@ -1,1 +1,1 @@
-IMAGE_INSTALL += "mipv6-daemon-umip"
+IMAGE_INSTALL += "umip"
