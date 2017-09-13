@@ -7,13 +7,13 @@
 # LSB compliance.
 
 # Add wr-lsbtest task from the the new glibc-std task lists
-IMAGE_INSTALL += "wr-lsbtest"
+IMAGE_FEATURES += "wr-lsbtest"
 
 # Add image features from oe-core that are related to LSB
 # Note: those have now been renamed to wr-core-* instead
 # of core-*
 
-IMAGE_INSTALL += "wr-core-lsb-more wr-core-lsb-graphics-plus"
+IMAGE_FEATURES += "wr-core-lsb-more wr-core-lsb-graphics-plus"
 
 # add missing packages into build as required by LSB
 
@@ -43,7 +43,6 @@ IMAGE_INSTALL += "fontconfig-utils"
 # packages that were dropped from the old glibc-std.
 # We need them here to preserve LSB testing sanity.
 IMAGE_INSTALL += "binutils"
-IMAGE_INSTALL += "byacc"
 IMAGE_INSTALL += "chkconfig"
 IMAGE_INSTALL += "gettext"
 IMAGE_INSTALL += "libaio"
@@ -73,7 +72,6 @@ IMAGE_INSTALL += "perl-module-encode-kr"
 IMAGE_INSTALL += "python-dbus"
 IMAGE_INSTALL += "rpcbind"
 IMAGE_INSTALL += "rpm-build"
-IMAGE_INSTALL += "rpm-common"
 IMAGE_INSTALL += "sudo"
 IMAGE_INSTALL += "tcp-wrappers"
 IMAGE_INSTALL += "util-linux-uuidgen"
