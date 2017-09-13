@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016 Wind River Systems, Inc.
+# Copyright (C) 2016, 2017 Wind River Systems, Inc.
 #
 
-IMAGE_INSTALL += "mtree"
+IMAGE_INSTALL += "packagegroup-ids"
