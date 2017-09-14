@@ -47,6 +47,7 @@ PNWHITELIST_openembedded-layer += " \
 	phoronix-test-suite \
 	php \
 	pmtools \
+	postgresql \
 	rfkill \
 	sdparm \
 	sg3-utils \
@@ -97,4 +98,6 @@ PNWHITELIST_security += " \
 # Workaround for nmap possibly requiring python-pygtk which is not available
 PACKAGECONFIG_remove_pn-nmap = "zenmap"
 	
-PNWHITELIST_selinux += ""
+PNWHITELIST_selinux += " \
+	audit \
+	"
