@@ -89,6 +89,9 @@ PNWHITELIST_security += " \
 	libgssglue \
 	libmhash \
 	nmap \
+	samhain-client \
+	samhain-server \
+	samhain-standalone \
 	xmlsec1 \
 	"
 # Workaround for nmap possibly requiring python-pygtk which is not available
