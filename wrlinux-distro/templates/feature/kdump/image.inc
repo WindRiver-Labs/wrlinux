@@ -1,0 +1,2 @@
+IMAGE_INSTALL += "${VIRTUAL-RUNTIME_kdump_tools}"
+IMAGE_INSTALL += " ${VIRTUAL-RUNTIME_crash}"

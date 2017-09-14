@@ -1,0 +1,18 @@
+
+                         Berkeley Packet Filter (BPF)
+                         ----------------------------
+
+1. Introduction
+----------------
+
+Enable BPF and related syscalls and JIT
+
+If you need more details, Please see linux/Documnetation/networking/filter.txt
+
+2. Usage
+--------
+
+Add this template using the following configure script option.
+i.e.: --templates feature/bpf
+
+This will ensure the required kernel config values are set. 

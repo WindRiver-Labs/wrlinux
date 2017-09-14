@@ -1,0 +1,18 @@
+
+                                   full_nohz
+                                  -----------
+
+1. Introduction
+----------------
+
+Enable full dynticks system for nohz.
+
+If you need more details, Please see linux/Documnetation/timers/NO_HZ.txt.
+
+2. Usage
+--------
+
+Add this template using the following configure script option.
+i.e.: --templates feature/full_nohz
+
+This will ensure the required kernel config values are set. 

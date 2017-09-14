@@ -1,0 +1,28 @@
+                                  CRIU 
+                                  ----
+
+1. Introduction
+----------------
+
+The criu template enables CRIU (Checkpoint Restore in Userspace) support in
+the kernel and adds the criu package to the image.
+
+Note that the criu package supports x86_64 only so far due to an upstream
+limitation.
+
+2. Usage
+--------
+
+The recipe will throw warning info about supported architectures, if it is being
+built on supported arch, just ignore the warning.
+
+Add this template to your configure line:
+ --templates feature/criu
+
+This will ensure the required kernel config values are set.
+
+3. Installation
+----------------
+
+This template will include criu in the root filesystem. No additional installation
+steps are required.

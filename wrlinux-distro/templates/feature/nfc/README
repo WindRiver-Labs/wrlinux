@@ -1,0 +1,72 @@
+
+Near field communication (NFC) is a set of standards for smartphones and
+similar devices to establish wireless communication with each other by
+putting them together or bringing them into close proximity, no more than
+a few inches. And expected applications include contactless transactions,
+data exchange among NFC devices, or an unpowered NFC chip, called a "tag".
+
+The WRLinux Near Field Communication (NFC) feature is required to integrate
+userspace daemon(neard) and nfc kernel features, and provide a convenience
+way to develop, test and validate NFC device drivers in WRLinux platform.
+
+This document only covers the following information:
+
+	- How to build WRLinux kernel and filesystem with NFC feature
+	- How to use NFC daemon
+
+please refer to Documentation/networking/nfc.txt, NFC website, and iso
+website for more information about architecture overview, device driver
+interface description, and protocols:
+
+	- https://01.org/linux-nfc/documentation
+
+1. How to build WRLinux kernel and filesystem with NFC feature
+--------------------------------------------------------------
+
+The following command would start a project intel-x86-64 with NFC supported
+on Shark Bay Ultrabook:
+
+	# path_to_wrlinux-x/wrlinux/configure \
+	  --enable-kernel=standard  \
+	  --enable-rootfs=glibc_std+nfc \
+	  --enable-board=intel-x86-64 \
+
+	# make fs
+
+2. How to use NFC daemon
+
+	- Check if neard daemon launched as follows:
+
+        # /etc/init.d/neard restart
+
+	- nfctool can list, check, and sniff NFC devcies:
+
+	# nfctool -l
+
+	nfc0:
+          Tags: [ ]
+          Devices: [ ]
+          Protocols: [ Felica MIFARE Jewel ISO-DEP NFC-DEP ]
+          Powered: no
+          RF Mode: None
+          lto: 150
+          rw: 15
+          miux: 2047
+
+	# nfctool -1 -d nfc0
+          ...
+	  Powered: yes
+
+	- start to sniff
+
+	# nfctool -n -p both 1 -d nfc0
+	Start polling on nfc0 as both initiator and target
+
+	Targets found for nfc0
+	  Tags: [ ]
+	  Devices: [ device1 ]
+
+	 >> nfc0: local:0x01 remote:0x20
+	    Connect (CONNECT)
+	    Service Name: urn:nfc:xsn:samsung.com:band
+	Target mode activated

@@ -1,0 +1,27 @@
+
+                                   nfsd 
+                                  ------
+
+1. Introduction
+----------------
+
+The nfsd template provides a mechanism to build a NSFD kernel module for
+NFS server capability on the target.
+
+
+2. Usage
+--------
+
+Add this template using the following configure script option.
+ie.: --templates feature/nfsd
+
+This will ensure the required kernel config values are set. 
+
+
+3. Installation
+----------------
+
+This template will include the nfsd kernel module in the root filesystem.
+No additional installation steps are required. You will find the
+kernel modules installed in /lib/modules/<kernel-version>/kernel/fs/nfsd
+in the root filesystem.

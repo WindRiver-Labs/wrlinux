@@ -1,0 +1,28 @@
+                                   libhugetlbfs
+                                  --------------
+
+1. Introduction
+----------------
+
+The libhugetlbfs template enables Huge TLB support in the kernel and adds the
+libhugetlbfs package to the image.
+
+Note that the libhugetlbfs package only supports x86, x86_64, powerpc and powerpc_64
+architectures.
+
+The necessary kernel support will be enabled although some BSPs may already
+turn it on.
+
+2. Usage
+-------
+
+Add this template to your configure line:
+ --templates feature/libhugetlbfs
+
+This will ensure the required kernel config values are set.
+
+3. Installation
+----------------
+
+This template will include libhugetlbfs in the root filesystem. No additional 
+installation steps are required.

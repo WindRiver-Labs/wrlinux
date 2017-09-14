@@ -1,0 +1,120 @@
+	LXC Startup
+	===========
+
+1. On the target, extract the rootfs image anyplace. The default
+   path is /var/lib/lxc/<container_name>/rootfs.
+
+2. Mount the cgroup filesystem (if it was not mounted at boot).
+
+   Run the following command to mount it:
+   mount -t cgroup cgroup /sys/fs/cgroup
+
+3. Run the lxc template WRLinux script to configure the container as follows:
+
+   cd /usr/share/lxc/template
+   ./lxc-wrlinux --name=<container_name> --path=<rootfs_path> --init=<init_method>
+
+   Note: The container name must have rootfs path as optional.
+         The default rootfs path is /var/lib/lxc/<container_name>/rootfs
+
+         If sysvinit guest is used, "-i sysvinit" need to be passed. The
+         default init is systemd.
+
+   For example, if the container name is "wrlinux", the rootfs is extracted to
+   "/var/lib/lxc/wrlinux/rootfs", and systemd is used by the guest.
+   Then run the template script with:
+   ./lxc-wrlinux --name=wrlinux
+
+   "./lxc-wrlinux --help" can show the usage info.
+
+4. Run "lxc-checkconfig". It should show the following messages:
+
+   root@localhost:~# lxc-checkconfig
+   --- Namespaces ---
+   Namespaces: enabled
+   Utsname namespace: enabled
+   Ipc namespace: enabled
+   Pid namespace: enabled
+   User namespace: enabled
+   Network namespace: enabled
+   Multiple /dev/pts instances: enabled
+
+   --- Control groups ---
+   Cgroup: enabled
+   Cgroup clone_children flag: enabled
+   Cgroup device: enabled
+   Cgroup sched: enabled
+   Cgroup cpu account: enabled
+   Cgroup memory controller: enabled
+   Cgroup cpuset: enabled
+
+   --- Misc ---
+   Veth pair device: enabled
+   Macvlan: missing
+   Vlan: enabled
+   File capabilities: enabled
+
+   Note : Before booting a new kernel, you can check its configuration
+   Usage : CONFIG=/path/to/config /usr/bin/lxc-checkconfig
+
+5. Run "lxc-start" to start the container as follows:
+
+   lxc-start -n <container_name> -f <path/to/config>
+
+   As in the example above, the container name is "wrlinux" and the default rootfs
+   path is used, then the command should look like:
+
+   lxc-start -n wrlinux -f /var/lib/lxc/wrlinux/config
+
+   You should then see the login prompt.
+
+Notes:
+   When running lxc on QEMU, the lxc hot keys may have conflict with QEMU.
+
+	LXC Networking
+	==============
+
+1. Bridging
+Share host network link via host bridge
+
+1.1 Add bridge and interfaces
+brctl addbr lxcbr0
+brctl addif lxcbr0 eth0
+
+1.2 Bring up interfaces
+ip addr flush eth0
+ifconfig eth0 up
+brctl show
+bridge name     bridge id               STP enabled     interfaces
+lxcbr0          8000.001aa010c3b7       no              eth0
+                                                        vethPPTQR6
+1.3 Config lxc
+Append the following configurations to container config file, e.g. /var/lib/lxc/wrlinux_lxc/config.
+lxc.cgroup.cpu.shares=512
+lxc.cgroup.cpuset.cpus=1
+lxc.network.type=veth
+lxc.network.link=lxcbr0
+lxc.network.flags=up
+lxc.network.name=eth0
+
+LXC will use dhcp to obtain IP. We can also statically set here:
+lxc.network.ipv4=xxx.xxx.xxx.xxx
+
+1.4 Start LXC
+lxc-start -n $CONTAINER -f $LXC_CONFIG -d
+lxc-attach -n $CONTAINER
+
+2. Physical
+Incorporate host interfaces into container
+
+2.1 Config lxc
+Append the following configurations to container config file, e.g. /var/lib/lxc/wrlinux_lxc/config.
+lxc.cgroup.cpu.shares=512
+lxc.cgroup.cpuset.cpus=1
+lxc.network.type=phys
+lxc.network.name=eth0
+lxc.network.link=eth0
+
+2.2 Start lxc
+lxc-start -n $CONTAINER -f $LXC_CONFIG -d
+lxc-attach -n $CONTAINER
