@@ -1,3 +1,4 @@
+IMAGE_INSTALL += "lttng-modules"
 IMAGE_INSTALL += "lttng-tools"
 IMAGE_INSTALL += "lttng-ust"
 IMAGE_INSTALL += "babeltrace"
