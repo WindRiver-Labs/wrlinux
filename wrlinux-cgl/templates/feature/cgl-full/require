@@ -1,3 +1,5 @@
+feature/edac
+feature/kexec
 feature/protocols
 feature/selinux
 feature/aoe
