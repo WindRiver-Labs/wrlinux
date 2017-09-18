@@ -18,7 +18,7 @@ IMAGE_INSTALL += "packagegroup-wr-core-networking"
 IMAGE_INSTALL += "packagegroup-wr-core-cgl"
 
 #  All CGL configurations include SELinux
-IMAGE_INSTALL += "packagegroup-wr-core-selinux"
+IMAGE_INSTALL += "packagegroup-core-selinux"
 
 #  Security common packages
 IMAGE_INSTALL += "packagegroup-wr-core-security"
