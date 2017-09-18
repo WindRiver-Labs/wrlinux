@@ -9,5 +9,5 @@ EXTRA_OECONF_class-nativesdk +="no-md2 no-ec no-ecdh no-ecdsa no-mdc2 "
 Important notes
 ===============
 If this feature is enabled, the application package which depends on openssl
-may fail to build for some source codes are not handled well, for example,the
+may fail to build for some source codes are not handled well, for example, the
 DES related codes are not wrapped in "#ifndef OPENSSL_NO_DES" and "#endif".
