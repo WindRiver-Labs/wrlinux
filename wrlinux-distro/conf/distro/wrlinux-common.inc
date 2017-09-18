@@ -116,6 +116,10 @@ require conf/distro/include/wrlinux-lsb-distro-adjust.inc
 
 DISTRO_FEATURES_BACKFILL_CONSIDERED += " pulseaudio"
 
+# Make sure that ldconfig is only enabled when the user has added ldconfig
+# to the DISTRO_FEATURES
+DISTRO_FEATURES_BACKFILL_CONSIDERED += "ldconfig"
+
 # Multilib configuration
 MULTILIBS ?= ""
 require conf/multilib.conf

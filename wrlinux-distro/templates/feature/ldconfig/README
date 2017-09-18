@@ -1,0 +1,8 @@
+Enable ldconfig processing within the packages produced by this configuration.
+
+When enabled, the packages that provide libraries will automatically run
+'ldconfig' when installed.  This creates the ld.so.cache file, which the
+dynamic loader uses to more quickly find the libraries to load.
+
+The dynamic loader does NOT require ld.so.cache to run, and will
+automatically follow the search paths for the libraries.
