@@ -8,4 +8,4 @@ Wind River Linux Integration notes.
 To add valgrind, add feature/valgrind to your setup line,
 	--templates feature/valgrind
 or with another template, for example, the system-stats template:
-	--with-templates feature/system-stats feature/valgrind.
+	--templates feature/system-stats feature/valgrind.
