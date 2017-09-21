@@ -12,6 +12,9 @@ do_install_append() {
 
     # Set the default theme
     sed -i -e "s,^theme=.*,theme=${DEFAULT_LXDM_THEME}," ${D}${sysconfdir}/lxdm/lxdm.conf
+
+    # Set the default session to xfce4
+    sed -i -e "s,.*session=.*,session=${bindir}/startxfce4," ${D}${sysconfdir}/lxdm/lxdm.conf
 }
 
 RDEPENS_${PN} += "${@bb.utils.contains('DEFAULT_LXDM_THEME', 'Windriver', 'wr-themes-lxdm', '',d)}"
