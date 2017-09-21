@@ -25,5 +25,5 @@ RDEPENDS_${PN} = " \
     openssh-sftp-server \
     ppp \
     tcpdump \
-    wget \
+    ${@bb.utils.contains('INCOMPATIBLE_LICENSE', 'GPLv3', '', 'wget', d)} \
     "

@@ -21,8 +21,8 @@ RDEPENDS_${PN} = " \
     man-pages \
     minicom \
     ncurses-tools \
-    screen \
     vim \
     vim-common \
     vim-syntax \
+    ${@bb.utils.contains('INCOMPATIBLE_LICENSE', 'GPLv3+', '', 'screen', d)} \
     "

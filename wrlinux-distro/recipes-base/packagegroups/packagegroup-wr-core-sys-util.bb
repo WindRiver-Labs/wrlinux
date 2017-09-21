@@ -31,7 +31,6 @@ RDEPENDS_${PN} = " \
     mdadm \
     mtd-utils \
     pam-plugin-wheel \
-    parted \
     quota \
     sdparm \
     setserial \
@@ -39,6 +38,7 @@ RDEPENDS_${PN} = " \
     tcf-agent \
     usbutils \
     watchdog \
+    ${@bb.utils.contains('INCOMPATIBLE_LICENSE', 'GPLv3+', '', 'parted', d)} \
     "
 RRECOMMENDS_${PN} = " \
     mtd-utils-jffs2 \
