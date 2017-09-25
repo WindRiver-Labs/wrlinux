@@ -1,2 +1,0 @@
-
-DEPENDS += "crash-native"
