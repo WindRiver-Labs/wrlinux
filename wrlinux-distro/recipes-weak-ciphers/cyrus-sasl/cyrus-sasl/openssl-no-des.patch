@@ -1,0 +1,21 @@
+Upstream-Status: Pending
+
+Include 'openssl/des.h' conditionally in case openssl des is disabled.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/saslauthd/lak.c b/saslauthd/lak.c
+index 419a658..9a93f5c 100644
+--- a/saslauthd/lak.c
++++ b/saslauthd/lak.c
+@@ -52,8 +52,10 @@
+ #define OPENSSL_DISABLE_OLD_DES_SUPPORT
+ #endif
+ #include <openssl/evp.h>
++#ifndef OPENSSL_NO_DES
+ #include <openssl/des.h>
+ #endif
++#endif
+ 
+ #define LDAP_DEPRECATED 1
+ #include <ldap.h>
