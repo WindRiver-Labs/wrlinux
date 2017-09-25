@@ -12,7 +12,7 @@ IMAGE_INSTALL += "iscsitarget"
 IMAGE_INSTALL += "libevent-testing"
 
 # the openl2tp testcase needs openl2tp-testing
-IMAGE_INSTALL += "openl2tp-testing"
+#IMAGE_INSTALL += "openl2tp-testing"
 
 # kdump CUT cases needs /boot/vmlinux
 IMAGE_INSTALL += "kernel-vmlinux"
