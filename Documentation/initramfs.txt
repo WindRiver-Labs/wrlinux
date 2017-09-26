@@ -1,0 +1,122 @@
+                                   initramfs
+                                  -----------
+
+Introduction
+-------------
+
+Wind River Linux expands on the initramfs support found in Open-Embedded / Yocto
+by providing the ability to specify the contents of the image and by providing a
+mechanism to bundle the image with the kernel image. This document outlines how
+to make use of the existing and extended initramfs support.
+
+Please read the entire contents of this file before you attempt to make use of
+the initramfs features. There are several considerations that must be taken into
+account before using this feature. This should be seen as an advanced feature
+and needs to be used with care.
+
+
+initramfs image creation
+-------------------------
+
+To have the build system create an initramfs image you must set the
+INITRAMFS_IMAGE variable. You may set the variable to any valid image name (See
+NOTES). You would normally define this variable in your local.conf. After the
+build is complete your image will be available in the images directory
+(tmp/deploy/images). For example:
+
+wrlinux-image-initramfs-x86-64-kvm-guest.cpio.gz
+
+NOTES:
+1) ** The image must not have a dependency on the kernel. This would create a circular
+   dependency, the kernel waiting for the image and vice versa. **
+
+2) This is a stand alone image which you can include in your rootfs and use during
+   boot via the initrd parameter passed on the kernel command line.
+
+Instead of requiring you to edit your local.conf file, Wind River Linux includes
+an 'initramfs' feature template which will set INITRAMFS_IMAGE to use the
+'wrlinux-image-initramfs' image. This image contains base-files, busybox and a
+handful of other basic tools, examine wrlinux-image-initramfs.bb and
+packagegroup-core-boot-wrs.bb for details.
+
+To create a build which will create an initramfs image include the 'initramfs'
+feature template by adding '--templates feature/initramfs' to your configure
+line.
+
+
+initramfs image bundling
+-------------------------
+
+As noted above the initramfs image defaults to being built as a standalone image
+and is not bundled with the kernel image. If you want to integrate the initramfs
+with the kernel you can do this easily by setting the INITRAMFS_IMAGE_BUNDLE
+variable to 1. Wind River Linux includes an 'initramfs-integrated' feature
+template which will set INITRAMFS_IMAGE to use the 'wrlinux-image-initramfs'
+image and bundle this image in your kernel.
+
+To create a build which will create and integrate an initramfs in your kernel
+image include the 'initramfs-integrated' feature template by adding
+'--templates feature/initramfs-integrated' to your configure line.
+
+You will still have access to the cpio image in the images directory, but now
+the image will be built into your kernel, allowing you to boot without a
+rootfs. After building you will find in the images directory both a kernel image
+with the initramfs and one without. For example,
+
+bzImage-initramfs-x86-64-kvm-guest.bin
+bzImage-x86-64-kvm-guest.bin
+
+NOTES:
+1) Keep an eye on size. Bundling the initramfs may cause boot issues if
+   the image size becomes too large.
+
+
+Adding packages to the initramfs
+---------------------------------
+
+If you are making use of the wrlinux-image-initramfs image we recommend that you
+use the conf/local.conf file to add packages to the image. For each package you 
+would add a line such as the following:
+
+IMAGE_INSTALL_INITRAMFS_append = " dosfstools"
+IMAGE_INSTALL_INITRAMFS_append = " file"
+
+NOTES:
+1) Keep an eye on size. Adding packages to the initramfs may cause it to become
+   to large to allow it to function on your hardware.
+2) 'packagegroup-core-boot-wrs', used by 'wrlinux-image-initramfs' to create the initramfs
+   image varies from 'packagegroup-core-boot' in that it doesn't recognize packages
+   included via MACHINE_ESSENTIAL_EXTRA_R* variables. If you have a package which
+   is required to boot a target it must be added using the above technique.
+3) If you want to add a kernel module into the initramfs, you must add the
+   dependency of that kernel module also.
+   For example, if you want module ip_tables which depends on x_tables,
+   then x_tables must be added in:
+   IMAGE_INSTALL_INITRAMFS_append = " kernel-module-ip-tables"
+   IMAGE_INSTALL_INITRAMFS_append = " kernel-module-x-tables"
+4) For a package which creates out-of-tree module, if you want the module
+   to be in the initramfs, you must also need to add the package into initramfs
+   because of dependency that this out-of-tree module sometimes depends on the component
+   provided by the package(such as server module and userspace client).
+   For example: package_xxx includes xxx module and xxx binary file
+   IMAGE_INSTALL_INITRAMFS_append = " pacakge_xxx"
+
+Caveats
+--------
+
+1) Circular dependencies may not be immediately visible due to dependency
+   chains. Make use of 'bitbake -g <target>' and
+   'bitbake -g -u depexp <target>' to examine dependencies and chase down
+   circular dependencies between the kernel and initramfs image.
+
+2) Use the techniques in 1) to identify package dependencies which
+   indirectly result in a large number of additional packages being
+   added to the initramfs, thus causing size limitations issues.
+
+
+Files of interest
+------------------
+bitbake_build/conf/local.conf
+layers/wr-kernel/recipes-core/images/wrlinux-image-initramfs.bb
+layers/wr-kernel/recipes-core/tasks/packagegroup-core-boot-wrs.bb
+export/images/wrlinux-image-initramfs*
