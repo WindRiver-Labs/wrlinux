@@ -40,7 +40,7 @@ RDEPENDS_${PN} = "\
         "
 
 RDEPENDS_${PN}-utils = "\
-	${@bb.utils.contains('BBFILE_COLLECTIONS', 'security', 'keyutils', '', d)} \
+	${@bb.utils.contains('BBFILE_COLLECTIONS', 'integrity', 'keyutils', '', d)} \
 	nspr \
 	${@bb.utils.contains('BBFILE_COLLECTIONS', 'security', 'xmlsec1', '', d)} \
         "

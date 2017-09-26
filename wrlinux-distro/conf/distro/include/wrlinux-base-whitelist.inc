@@ -86,7 +86,6 @@ PNWHITELIST_xfce-layer += ""
 PNWHITELIST_security += " \
 	ecryptfs-utils \
 	keynote \
-	keyutils \
 	libgssglue \
 	libmhash \
 	nmap \
@@ -95,6 +94,11 @@ PNWHITELIST_security += " \
 	samhain-standalone \
 	xmlsec1 \
 	"
+
+PNWHITELIST_integrity += " \
+	keyutils \
+	"
+
 # Workaround for nmap possibly requiring python-pygtk which is not available
 PACKAGECONFIG_remove_pn-nmap = "zenmap"
 	
