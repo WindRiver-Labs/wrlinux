@@ -4,4 +4,4 @@
 
 Configure the build to create an initramfs image. For additional
 information, please review the initramfs.txt document found in the
-layers/wr-kernel/Documentation directory.
+layers/wrlinux/Documentation directory.

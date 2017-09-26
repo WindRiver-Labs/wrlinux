@@ -4,7 +4,7 @@
 Introduction
 -------------
 
-Wind River Linux expands on the initramfs support found in Open-Embedded / Yocto
+Wind River Linux makes available the initramfs support found in Open-Embedded / Yocto
 by providing the ability to specify the contents of the image and by providing a
 mechanism to bundle the image with the kernel image. This document outlines how
 to make use of the existing and extended initramfs support.
@@ -116,7 +116,7 @@ Caveats
 
 Files of interest
 ------------------
-bitbake_build/conf/local.conf
-layers/wr-kernel/recipes-core/images/wrlinux-image-initramfs.bb
-layers/wr-kernel/recipes-core/tasks/packagegroup-core-boot-wrs.bb
-export/images/wrlinux-image-initramfs*
+conf/local.conf
+layers/wrlinux/wrlinux-distro/recipes-core/images/wrlinux-image-initramfs.bb
+layers/wrlinux/wrlinux-distro/recipes-core/packagegroups/packagegroup-core-boot-wrs.bb
+tmp-glibc/deploy/images/<BSP_Name>/wrlinux-image-initramfs*
