@@ -24,5 +24,3 @@ export IMAGE_BASENAME = "wrlinux-image-initramfs"
 PACKAGE_INSTALL = "${IMAGE_INSTALL_INITRAMFS}"
 
 USE_DEVFS = "0"
-
-do_image_complete[depends] += "grub-efi:do_populate_lic"
