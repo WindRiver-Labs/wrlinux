@@ -7,9 +7,9 @@ Intel Data Plane Development Kit (DPDK) presents a solution for fast-path
 network processing. DPDK allows you to make use of packet processing features
 available on the latest Intel processors.
 
-This README documents the use of DPDK 16.11 feature. We do not provide
-a detailed description or usage details for DPDK, the Intel DPDK documentation
-should be reviewed for this purpose.
+This README documents the use of DPDK feature. We do not provide a
+detailed description or usage details for DPDK, the Intel DPDK
+documentation should be reviewed for this purpose.
 
 2. Build Configuration
 ======================
@@ -23,10 +23,10 @@ The DPDK feature will make the following changes to the target:
  worth noting that DPDK feature will always prepare the target for linuxapp
  support regardless if you plan on using it or not)
 
-In order to use DPDK feature you must include the feature in your
-configure line like this:
+In order to use DPDK feature you must include the feature and meta-dpdk
+layer in your call to setup.sh
 
-   --layer wr-dpdk
+   --templates=feature/dpdk --layers=meta-dpdk
 
 Once the DPDK feature is included you can proceed with your normal build.
 
