@@ -130,6 +130,13 @@ PACKAGECONFIG_pn-sysstat = "lm-sensors"
 # is GPLv3, so need this check to switch to openssl if GLPv3 is blacklisted.
 PACKAGECONFIG_pn-wpa-supplicant = "${@bb.utils.contains('INCOMPATIBLE_LICENSE', 'GPLv3', 'openssl', 'gnutls', d)}"
 
+# dnsmasq and named (provided by bind) use the same default port 53:
+# | dnsmasq: failed to create listening socket for port 53: Address already in use
+# So disable the service by default, and if the user want to use both of them,
+# it need to be set to a different port in dnsmasq.conf before starting the service.
+INITSCRIPT_PARAMS_pn-dnsmasq = "disabled"
+SYSTEMD_AUTO_ENABLE_pn-dnsmasq = "disable"
+
 require conf/distro/include/wrlinux-distro-settings.conf
 
 require conf/distro/include/wrlinux-uninative.inc
