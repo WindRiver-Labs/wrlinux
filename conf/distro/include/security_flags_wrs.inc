@@ -162,6 +162,7 @@ SECURITY_LDFLAGS_remove_pn-dpdk = "-fstack-protector-strong"
 SECURITY_LDFLAGS_remove_pn-libsign = "-fstack-protector-strong"
 
 SECURITY_LDFLAGS_pn-netmap-modules_mips64 = " -z,relro,-z,now"
+SECURITY_LDFLAGS_pn-cryptfs-tpm2 = ""
 
 # Recipes which fail to compile when elevating -Wformat-security to an error
 SECURITY_STRINGFORMAT_pn-boost = "${@bb.utils.contains('DISTRO_FEATURES', 'ptest', '', '-Wformat -Wformat-security -Werror=format-security', d)}"
