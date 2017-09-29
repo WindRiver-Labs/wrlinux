@@ -1,0 +1,139 @@
+
+	Intel Data Plane Development Kit (DPDK)
+
+1. Overview
+===========
+Intel Data Plane Development Kit (DPDK) presents a solution for fast-path
+network processing. DPDK allows you to make use of packet processing features
+available on the latest Intel processors.
+
+This README documents the use of the DPDK feature. We do not provide a
+detailed description or usage details for DPDK, the Intel DPDK
+documentation should be reviewed for this purpose. (http://dpdk.org/doc)
+
+2. Build Configuration
+======================
+When the DPDK feature is included in your build, either via setup or
+by editing local.conf, the resulting images will be configured to
+support DPDK and include the DPDK userspace applications.
+
+The DPDK feature will make the following changes to the target:
+   * Target kernel configuration updates to support PCI MSI, HugeTLB and UIO
+   * Target configuration updates to mount HugeTLB
+(At the time of writing DPDK *only* supports 'linuxapp', no baremetal, it is
+ worth noting that the DPDK feature will always prepare the target for
+ 'linuxapp' support regardless if you plan on using it or not)
+
+In order to use the DPDK feature you must include the feature and meta-dpdk
+layer in your call to setup.sh
+
+   --templates=feature/dpdk --layers=meta-dpdk
+
+(for an existing build you can add the DPDK feature by adding the template and layer
+ to the build's local.conf and bblayers.conf, respectively)
+
+Once the DPDK feature is included you can proceed with your normal build.
+
+Note:
+DPDK requires to walk through its process' address space via /proc/self/pagemap
+to get its usage of physical memory. That exposes its process' address space and
+its physical memory location to a kernel exploitation. Please review your
+security policies to ensure this risk is mitigated if needed.
+
+3. DPDK Linuxapp Setup
+======================
+The build produces a kernel module named igb_uio.ko that must be inserted on
+the target prior to executing DPDK processes:
+
+	# modprobe igb_uio
+
+Bind Intel devices to igb_uio:
+
+	# ifconfig ethX down
+	# /opt/dpdk/sbin/dpdk-devbind --bind=igb_uio 07:00.0
+
+NOTE: This test method need two intel ethernet (e1000e/igb/ixgbe) ports,
+please do this step on each port.
+07:00.0 is the PCI address, use lspci to get the real address.
+
+Reserve huge pages memory:
+
+	# mkdir -p /mnt/huge
+	# mount -t hugetlbfs nodev /mnt/huge
+	# echo 64 > /proc/sys/vm/nr_hugepages
+
+Note the default number of huge pages for DPDK is 64, which may
+be not enough for the tests related to memory. In this case, cat 1024
+to /proc/sys/vm/nr_hugepages.
+
+(you will most likely want to update your system configs to automate this
+ to avoid the need to manually insert the module on each reboot)
+
+The environment can be tested with:
+
+       # /opt/dpdk/app/test -c 0xffff -n 1
+
+Alternatively you may run test with no options to get information on
+available command line options. This will start a RTE shell which you
+can then use the following commands to initiate the tests:
+
+memory_autotest
+per_lcore_autotest
+spinlock_autotest
+rwlock_autotest
+atomic_autotest
+byteorder_autotest
+prefetch_autotest
+cycles_autotest
+logs_autotest
+memzone_autotest
+ring_autotest
+mempool_autotest
+mbuf_autotest
+timer_autotest
+malloc_autotest
+
+You may choose to run 'all_autotests' in the RTE shell to run all the
+autotests. Note that it may be required to increase the value of
+/proc/sys/vm/nr_hugepages to complete these tests. Additionally,
+eal_flags_autotest requires -m parameter with a correct value.
+
+4. Building DPDK applications
+=============================
+Since we cross build the DPDK you will need to use a cross build environment
+to build DPDK applications such as the examples shipped with the DPDK. The
+DPDK feature will place the required static libraries, header files, Makefiles
+etc. required for building in the sysroot.
+
+Building the helloworld example:
+        %> export PATH=${PATH}:<build_dir>/bitbake_build/tmp/sysroots/<arch>-linux/usr/bin/toolchain
+        %> export RTE_SDK=<build_dir>/bitbake_build/tmp/work/<bsp>-wrs-linux/dpdk/<version>/image/opt/dpdk
+        %> cd <build_dir>/build/dpdk/git/examples/helloworld
+        %> make CROSS=<tool_prefix> RTE_TARGET=<rte_target>
+
+  Where:
+        tool_prefix can be found by looking in
+        <build_dir>/bitbake_build/tmp/sysroots/<arch>-linux/usr/bin/i686-wrs-linux/i686-wrs-linux-(32bit),
+	<build_dir>/bitbake_build/tmp/sysroots/<arch>-linux/usr/bin/x86_64-wrs-linux/x86_64-wrs-linux-(64bit).
+
+        rte_target will be x86_64-native-linuxapp-gcc for 64bit target or
+        i686-native-linuxapp-gcc for 32bit target. You can verify your choice
+        by looking in ./build.
+
+If you decide not to use the DPDK make system you may use the normal
+toolchain wrapper along with the standard sysroot options.
+
+5. DPDK compilation with optimization
+=====================================
+DPDK supports compilation with optimization for a specific machine. For
+best usage, please change the definition of DPDK_TARGET_MACHINE
+at <path_to_wr-intel-support>/recipes-dpdk/dpdk/dpdk.inc. The available
+machines are native(guessing current machine), atm(Intel Atom Processor),
+nhm(Intel Nehalem Processor), wsm(Intel Westmere Processor),
+snb(Intel Sandy Bridge Processor) and ivb(Intel Ivy Bridge Processor).
+It is not recommended to use "native" because it will guess the host
+machine via /proc/cpuinfo against the real target machine.
+
+7. Additional documentation
+===========================
+Additional READMEs relating to the DPDK can be found in the dpdk/docs directory.
