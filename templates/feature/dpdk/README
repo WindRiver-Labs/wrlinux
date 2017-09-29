@@ -7,42 +7,40 @@ Intel Data Plane Development Kit (DPDK) presents a solution for fast-path
 network processing. DPDK allows you to make use of packet processing features
 available on the latest Intel processors.
 
-This README documents the use of DPDK feature. We do not provide a
+This README documents the use of the DPDK feature. We do not provide a
 detailed description or usage details for DPDK, the Intel DPDK
-documentation should be reviewed for this purpose.
+documentation should be reviewed for this purpose. (http://dpdk.org/doc)
 
 2. Build Configuration
 ======================
-Including the DPDK feature when configuring your build will do all the
-necessary setup required to make DPDK available on your target.
+When the DPDK feature is included in your build, either via setup or
+by editing local.conf, the resulting images will be configured to
+support DPDK and include the DPDK userspace applications.
 
 The DPDK feature will make the following changes to the target:
    * Target kernel configuration updates to support PCI MSI, HugeTLB and UIO
    * Target configuration updates to mount HugeTLB
-(At the time of writing DPDK *only* supports linuxapp, no baremetal, it is
- worth noting that DPDK feature will always prepare the target for linuxapp
- support regardless if you plan on using it or not)
+(At the time of writing DPDK *only* supports 'linuxapp', no baremetal, it is
+ worth noting that the DPDK feature will always prepare the target for
+ 'linuxapp' support regardless if you plan on using it or not)
 
-In order to use DPDK feature you must include the feature and meta-dpdk
+In order to use the DPDK feature you must include the feature and meta-dpdk
 layer in your call to setup.sh
 
    --templates=feature/dpdk --layers=meta-dpdk
 
+(for an existing build you can add the DPDK feature by adding the template and layer
+ to the build's local.conf and bblayers.conf, respectively)
+
 Once the DPDK feature is included you can proceed with your normal build.
 
 Note:
-DPDK requires to walk through process's address space via /proc/self/pagemap
-to get the usage of physical memory. That exposes process's address space and
-its physical memory location to a kernel exploitation. Please ensure your
-security protection taken by a proper security assist against the potential
-risk introduced by that exposure.
+DPDK requires to walk through its process' address space via /proc/self/pagemap
+to get its usage of physical memory. That exposes its process' address space and
+its physical memory location to a kernel exploitation. Please review your
+security policies to ensure this risk is mitigated if needed.
 
-3. Locating the DPDK
-====================
-The DPDK feature will place DPDK on the target root filesystem, this can be
-found at '/opt/dpdk'.
-
-4. DPDK Linuxapp Setup
+3. DPDK Linuxapp Setup
 ======================
 The build produces a kernel module named igb_uio.ko that must be inserted on
 the target prior to executing DPDK processes:
@@ -64,8 +62,8 @@ Reserve huge pages memory:
 	# mount -t hugetlbfs nodev /mnt/huge
 	# echo 64 > /proc/sys/vm/nr_hugepages
 
-Note the default number of huge page for DPDK is 64, which may
-be not enough for the tests related to memory. In this case, set 1024
+Note the default number of huge pages for DPDK is 64, which may
+be not enough for the tests related to memory. In this case, cat 1024
 to /proc/sys/vm/nr_hugepages.
 
 (you will most likely want to update your system configs to automate this
@@ -96,12 +94,11 @@ timer_autotest
 malloc_autotest
 
 You may choose to run 'all_autotests' in the RTE shell to run all the
-autotests. Note the default number of huge page for DPDK is 64, which may
-be not enough for the tests related to memory. In this case, set a proper
-value to /proc/sys/vm/nr_hugepages. Additionally, eal_flags_autotest requires
--m parameter with a proper value.
+autotests. Note that it may be required to increase the value of
+/proc/sys/vm/nr_hugepages to complete these tests. Additionally,
+eal_flags_autotest requires -m parameter with a correct value.
 
-5. Building DPDK applications
+4. Building DPDK applications
 =============================
 Since we cross build the DPDK you will need to use a cross build environment
 to build DPDK applications such as the examples shipped with the DPDK. The
@@ -126,9 +123,9 @@ Building the helloworld example:
 If you decide not to use the DPDK make system you may use the normal
 toolchain wrapper along with the standard sysroot options.
 
-6. DPDK compilation with optimazation
+5. DPDK compilation with optimization
 =====================================
-DPDK supports compilation with optimazation for a specific machine. For
+DPDK supports compilation with optimization for a specific machine. For
 best usage, please change the definition of DPDK_TARGET_MACHINE
 at <path_to_wr-intel-support>/recipes-dpdk/dpdk/dpdk.inc. The available
 machines are native(guessing current machine), atm(Intel Atom Processor),
