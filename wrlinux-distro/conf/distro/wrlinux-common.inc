@@ -143,3 +143,8 @@ require conf/distro/include/wrlinux-uninative.inc
 
 # Exclude download layers from eSDK.
 SDK_LAYERS_EXCLUDE_PATTERN ?= ".*-dl$ .*-dl-2.2$"
+
+
+# Packages blacklisted by default for wrlinux.
+PNBLACKLIST[musl] ?= "only glibc is supported for wrlinux"
+
