@@ -1,10 +1,13 @@
-This template adds binutils, gcc, and the core development
-libraries (libc-dev, libgcc-dev).
-
-It is supported for x86 and x86-64 targets only.
+This template enables on-target software development.  Software such as
+autoconf, automake, binutils, gcc, make, libtool and pkgconfig will be
+added to the target software image.
 
 To use, add
 
 --templates feature/target-toolchain
 
 as a setup option.
+
+#@TYPE: Wrtemplate
+#@NAME: target-toolchain
+#@DESCRIPTION: Enable on-target software development
