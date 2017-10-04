@@ -1,0 +1,144 @@
+This README is not a replacement for the BSP guides for Wind River Linux and
+the Yocto project. It is assumed that all relevant product and upstream
+documentation has been read for the rest of this README.
+
+BSP prototyping:
+================
+
+It is common that a BSP prototype, or proof of concept, begins out of tree
+and without a formal BSP layer. To support this model, and build a given BSP
+against the Wind River kernel, the following must be true:
+
+  1) The BSP is known to the Yocto base buildsystem and hence defines a
+     proper oe-core MACHINE with associated tuning and options. If a Wind
+     River or Yocto project BSP is being extended, this condition is always
+     true. See the relevant BSP guides for detailed information on defining
+     and adding a BSP to the build system.
+
+  2) The BSP is declared compatible with the linux-yocto kernel. If the
+     wrlinux-kernel-dev layer is included in a build, this compatibility is
+     always set.
+
+  3) The BSP has a "BSP kernel description" that defines which branch,
+     configuration (inherited and board specific) and patches to use when
+     building the BSP. It is up to the BSP developer (or extender) to ensure
+     that their kernel configuration is correct to produce a bootable image.
+
+  4) Considerations such as valid userspace images, startup, device discovery
+     via udev, etc have been resolved. These areas are out of the scope of
+     this README.
+
+Out of the four items listed above, when the kernel-dev layer is used, only
+#3 must be implemented and passed to the build system to get a proof of
+concept BSP building.
+
+To implement item #3, the following are required:
+
+  - A layer containing the .bbappend and .scc files
+  - The board description (.scc) file
+  - (optional) kernel configuration fragments
+
+Example: extending a BSP to support the standard kernel
+==================================================
+
+Create the following layer, and configure it into the build (or add it
+to conf/bblayers.conf):
+
+   my-qemuarma9/
+   ├── conf
+   │   └── layer.conf
+   └── recipes-kernel
+       └── linux
+	   ├── linux-yocto
+	   │   └── myqemuarma9.scc
+	   └── linux-yocto_4.12.bbappend
+
+The contents of layer.conf are:
+
+   #
+   # Copyright (C) 2013 Wind River Systems, Inc.
+   #
+   BBPATH ?= ""
+   # We have a conf and classes directory, add to BBPATH
+   BBPATH := "${LAYERDIR}:${BBPATH}"
+
+   # We have a packages directory, add to BBFILES
+   BBFILES := "${BBFILES} ${LAYERDIR}/recipes-*/*/*.bb \
+	   ${LAYERDIR}/recipes-*/*/*.bbappend \
+	   ${LAYERDIR}/classes/*.bbclass"
+
+   BBFILE_COLLECTIONS += "myqemuarm"
+   BBFILE_PATTERN_myqemuarm := "^${LAYERDIR}/"
+   BBFILE_PRIORITY_myqemuarm = "7"
+
+   # This should only be incremented on significant changes that will
+   # cause compatibility issues with other layers
+   LAYERVERSION_myqemuarm = "1"
+
+   LAYERDEPENDS_myqemuarm = "normal"
+
+And the contents of linux-yocto_4.12.bbappend are:
+
+   FILESEXTRAPATHS := "${THISDIR}/${PN}"
+
+   SRC_URI += "file://myqemuarma9.scc"
+
+And finally, the contents of myqemuarma9.scc are:
+
+   define KMACHINE qemuarma9
+   define KTYPE standard
+   define KARCH arm
+
+   include ktypes/standard/standard.scc
+   branch myqemuarma9
+
+   kconf hardware bsp/qemuarma9/qemuarma9.cfg
+
+The first two files are build system constructs, while the final file is
+a top level board definition that will be found during the the kernel
+patch and configuration phases to fully describe the kernel type extension.
+
+The first block of lines:
+
+   define KMACHINE qemuarma9
+   define KTYPE standard
+   define KARCH arm
+
+Are use by the build system to identify the .scc file as describing a standard
+definition for the qemuarma9 board, and is a mandatory part of any board
+description.
+
+The second block of lines:
+
+   include ktypes/standard/standard.scc
+   branch myqemuarma9
+
+Includes the base kernel type and creates a new board specific branch.
+
+The third block:
+
+   kconf hardware bsp/qemuarma9/qemuarma9.cfg
+
+includes the base BSP configuration and applies it after the kernel type
+configuration options.
+
+Notes: 
+
+ - If an existing BSP is not being extended, then a board specific fragment
+   must be created from scratch, or a similar board's fragment modified to 
+   suit the new hardware. As described in the BSP manuals from [1] [2] [3]
+
+ - To enable board specific features only available in the newly extended
+   kernel type a new <board>-<kernel type> fragment should be created and
+   included in the .scc file.
+
+ - When the base BSP is included in the new kernel type, it is possible that
+   patches will fail to apply due to context differences. It is up to the
+   developer prototyping the new kernel support to resolve these failures.
+
+References:
+===========
+
+[1] http://www.yoctoproject.org/docs/1.4/kernel-dev/kernel-dev.html
+[2] http://www.yoctoproject.org/docs/current/bsp-guide/bsp-guide.html
+[3] http://www.windriver.com/support

@@ -1,0 +1,28 @@
+Notes and Limitations:
+======================
+
+When the linux-libc-headers-windriver package is enabled, it adds the ability
+to use the linux-windriver kernel as the source for libc-headers. When
+enabling this feature, the user is knowingly clobbering the supported and
+tested toolchain headers and does so at their own risk.
+    
+This functionality is provided to support rapid development of kernel changes
+that have coupled user space visible header files. Per-package additions to
+the sysroot with selected / captured kernel headers is a more precise option
+once active development has completed.
+    
+By default the standard/base branch of the kernel repository is used for the
+exported headers. Additional layers can change this default.
+    
+Patching is explicitly disabled in this recipe, since header changes must be
+coordinated with the running kernel and hence must be sourced from the same
+repository to ensure they are in sync. Modifications should be pushed to the
+master repository and the AUTOREV of the recipe will automatically pick up
+changes.
+    
+The exported headers are used for both sysroot and SDK population and are
+generated from the kernel's "headers_install" target.
+
+Add the lines to local.conf to enable it:
+PREFERRED_PROVIDER_linux-libc-headers = "linux-libc-headers-windriver"
+PREFERRED_PROVIDER_nativesdk-linux-libc-headers = "nativesdk-linux-libc-headers-windriver"

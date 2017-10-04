@@ -1,13 +1,16 @@
-wrlinux
-=======
+wrlinux-kernel-dev layer
+----------------
 
-This layer provides many of the base components for Wind River Linux.  It
-is required by most other layers provided by Wind River.
+This layer should be used when working with a local clone
+of the kernel tree in the git subdirectory. It should be added 
+explicitly to your bblayers.conf and the bbappend updated with the
+path to the local clone of choice.
 
 
 Dependencies
 ------------
-This layer depends on the openembedded-core and wr-templates layers.
+This layer depends on the oe-core version supplied with Wind River Linux.  It
+also assumes you are building a supported BSP layer.
 
 
 Maintenance
@@ -17,21 +20,31 @@ Contact <support@windriver.com> or your support representative for more
 information on submitting changes.
 
 
-Building the wrlinux layer
------------------------------------
-This layer should be added to the bblayers.conf file.
+Building with the wrlinux-kernel-dev layer
+-----------------------------
+1. Add this layer and a corresponding BSP layer to your build's
+   conf/bblayers.conf file
+   
+2. Add the desired feature templates to your conf/local.conf file
+   WRTEMPLATE variable.
 
+   * feature/kernel-dev : include kernel-dev and kernel-devsrc in SDK
 
-Notes
------------
-It is recommended that you follow the instructions found in the header
-of recipes-extended/gawk/gawk_4.1.4.bbappend when using a custom kernel
-repo.
+   * feature/kernfeatures-clear : sets KERNEL_FEATURES=""
+     (usually wanted for custom kernels)
+
+   * feature/custom-kernel: use linux-yocto-custom.bb
+
+NOTE: This layer is not indexed and therefor not available using
+Wind River Linux's setup.sh.
+
+NOTE: Wind River doesn't support enabling of external kernel
+features when building with this layer.
 
 
 License
 -------
-Copyright (C) 2012-2017 Wind River Systems, Inc.
+Copyright (C) 2012-2013,2017 Wind River Systems, Inc.
 
 Source code included in the tree for individual recipes is under the LICENSE
 stated in the associated recipe (.bb file) unless otherwise stated.
@@ -55,4 +68,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-
