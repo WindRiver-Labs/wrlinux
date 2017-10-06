@@ -1,0 +1,2 @@
+This template adds krb5 daemons and utilities to an image.  It also sets the krb5 DISTRO_FEATURE
+which several recipes check to enable krb5 functionality.
