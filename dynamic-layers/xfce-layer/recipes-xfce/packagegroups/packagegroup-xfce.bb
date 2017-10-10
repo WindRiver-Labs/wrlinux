@@ -5,6 +5,8 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 inherit packagegroup distro_features_check
 
+LICENSE_FLAGS = "commercial_windriver"
+
 # rdpends on xfce packages that need x11
 REQUIRED_DISTRO_FEATURES = "x11"
 
