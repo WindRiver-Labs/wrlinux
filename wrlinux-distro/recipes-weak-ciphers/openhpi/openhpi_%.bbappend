@@ -2,6 +2,6 @@
 # Copyright (C) 2017 Wind River Systems, Inc.
 #
 
-inherit distro_features_check
+PACKAGECONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'openssl-no-weak-ciphers', 'no-weak-ciphers', '', d)}"
 
-CONFLICT_DISTRO_FEATURES_append = " openssl-no-weak-ciphers"
+PACKAGECONFIG[no-weak-ciphers] = "--disable-snmp_bc,--enable-snmp_bc"
