@@ -1,0 +1,5 @@
+Enable cluster support for lvm2
+
+#@TYPE: Wrtemplate
+#@NAME: clvm
+#@DESCRIPTION: Enable cluster support for lvm2

@@ -1,0 +1,6 @@
+Enable and include OpenLDAP support
+
+#@TYPE: Wrtemplate
+#@NAME: ldap
+#@DESCRIPTION: Enable ldap
+

@@ -1,0 +1,6 @@
+Enable the libcap-ng library, and enable the DISTRO_FEATURE
+
+#@TYPE: Wrtemplate
+#@NAME: libcap-ng
+#@DESCRIPTION: Enable libcap-ng
+
