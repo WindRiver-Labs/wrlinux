@@ -7,8 +7,8 @@
 The libhugetlbfs template enables Huge TLB support in the kernel and adds the
 libhugetlbfs package to the image.
 
-Note that the libhugetlbfs package only supports x86, x86_64, powerpc and powerpc_64
-architectures.
+Note that the libhugetlbfs package only supports x86, x86_64, powerpc, powerpc_64,
+arm and aarch64 architectures.
 
 The necessary kernel support will be enabled although some BSPs may already
 turn it on.
