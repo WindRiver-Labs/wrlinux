@@ -6,3 +6,9 @@ To use, add
 --templates feature/package-management
 
 as a setup option.
+
+
+#@TYPE: Wrtemplate
+#@NAME: package-management
+#@DESCRIPTION: Add on-target package management to image
+

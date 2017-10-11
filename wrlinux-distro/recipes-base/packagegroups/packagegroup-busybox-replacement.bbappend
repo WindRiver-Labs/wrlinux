@@ -2,7 +2,7 @@
 # Copyright (C) 2016 Wind River Systems Inc.
 #
 
-BUSYBOX_REPLACE_PACKAGES ?= "\
+BUSYBOX_REPLACE_PACKAGES_osv-wrlinux ?= "\
     bc \
     bzip2 \
     coreutils \

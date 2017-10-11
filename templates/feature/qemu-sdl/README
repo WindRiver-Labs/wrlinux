@@ -14,3 +14,9 @@ we would have errors like below.
 
 /usr/lib64/libxcb-xlib.so.0: undefined reference to `_xcb_unlock_io'
 /usr/lib64/libxcb-xlib.so.0: undefined reference to `_xcb_lock_io'
+
+
+#@TYPE: Wrtemplate
+#@NAME: qemu-sdl
+#@DESCRIPTION: Enable qemu to use native SDL libraries
+

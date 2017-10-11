@@ -1,0 +1,6 @@
+Enable disk quota support
+
+#@TYPE: Wrtemplate
+#@NAME: quote
+#@DESCRIPTION: Enable disk quota support
+

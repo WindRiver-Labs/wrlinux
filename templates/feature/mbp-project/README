@@ -1,0 +1,23 @@
+  Managed Build Project
+
+The Managed Build Project is a set of proceses and procedures that define
+how to create, manage, update and deploy package level updates in a custom
+defined distribution.
+
+See the guide on the knowledge library for creating a managed build project.
+
+The template enables some common steps that help limit the 'hash value'
+changes that the build system normally detects.  It changes settings such as
+definiting a generic version for the toolchain items.  This prevents a
+mandatory rebuild whent he product version has been updated.
+
+It also skips some rebuilds when certain recipes change.  This is because it
+is known that when the recipes change, their dependencies rarely require a
+rebuild.  Things like busybox would fall under this.  See the template.conf
+file for a full list of excluded items.
+
+
+#@TYPE: Wrtemplate
+#@NAME: mbp-project
+#@DESCRIPTION: Enable common Managed Build Project (mbp) settings
+

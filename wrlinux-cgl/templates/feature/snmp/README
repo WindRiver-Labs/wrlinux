@@ -1,0 +1,6 @@
+Enable net-snmp support
+
+#@TYPE: Wrtemplate
+#@NAME: snmp
+#@DESCRIPTION: Enable net-snmp-support
+

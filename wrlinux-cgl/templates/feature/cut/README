@@ -1,0 +1,5 @@
+Install and configure the items necessary for the CGL Unit Tests.
+
+#@TYPE: Wrtemplate
+#@NAME: cut
+#@DESCRIPTION: Enable the CGL Unit Tests

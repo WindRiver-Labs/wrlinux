@@ -11,3 +11,8 @@ To use, add
 
 as a setup option.
 
+
+#@TYPE: Wrtemplate
+#@NAME: readonly-root
+#@DESCRIPTION: Enable readonly-root filesystem
+

@@ -9,3 +9,7 @@ To use, add
 --templates feature/self-hosted
 
 as a setup option.
+
+#@TYPE: Wrtemplate
+#@NAME: self-hosted
+#@DESCRIPTION: Add packagegroup-self-hosted to the image

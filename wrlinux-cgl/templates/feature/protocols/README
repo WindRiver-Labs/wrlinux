@@ -1,0 +1,6 @@
+Enable the various CGL protocol templates with a single template.
+
+#@TYPE: Wrtemplate
+#@NAME: protocols
+#@DESCRIPTION: Enable the various CGL protocol templates
+

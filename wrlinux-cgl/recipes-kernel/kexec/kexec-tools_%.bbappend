@@ -1,1 +1,1 @@
-RRECOMMENDS_${PN} = "kexec"
+RRECOMMENDS_${PN}_wrlinux-cgl = "kexec"

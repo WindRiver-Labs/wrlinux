@@ -7,3 +7,8 @@ To use, add
 --templates feature/dev-pkgs
 
 as a setup option.
+
+#@TYPE: Wrtemplate
+#@NAME: dev-pkgs
+#@DESCRIPTION: Add dev packages to image
+

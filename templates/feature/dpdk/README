@@ -137,3 +137,9 @@ machine via /proc/cpuinfo against the real target machine.
 7. Additional documentation
 ===========================
 Additional READMEs relating to the DPDK can be found in the dpdk/docs directory.
+
+
+#@TYPE: Wrtemplate
+#@NAME: dpdk
+#@DESCRIPTION: Enable Data Plane Development Kit (DPDK)
+

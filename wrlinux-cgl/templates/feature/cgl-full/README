@@ -1,0 +1,5 @@
+A single template that will enable all CGL related templates.
+
+#@TYPE: Wrtemplate
+#@NAME: cgl-full
+#@DESCRIPTION: Enable all CGL related templates

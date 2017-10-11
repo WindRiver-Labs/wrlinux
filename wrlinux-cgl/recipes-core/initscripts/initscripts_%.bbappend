@@ -5,4 +5,4 @@
 #
 
 # systemd: don't mask /etc/init.d/hostname.sh
-MASKED_SCRIPTS_remove = "hostname"
+MASKED_SCRIPTS_remove_wrlinux-cgl = "hostname"
