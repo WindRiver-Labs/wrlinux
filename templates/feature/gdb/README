@@ -1,2 +1,7 @@
 This template is for the sole purpose of ensuring that gdb is
 installed on the target filesystem.
+
+#@TYPE: Wrtemplate
+#@NAME: gdb
+#@DESCRIPTION: Add gdb and gdbserver to image
+

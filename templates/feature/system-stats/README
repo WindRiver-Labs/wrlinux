@@ -10,3 +10,7 @@ To use it, add
 as a setup.sh option.
 
 See the template configuration file for the list of packages included with this feature.
+
+#@TYPE: Wrtemplate
+#@NAME: system-stats
+#@DESCRIPTION: Add system and process monitoring utilities to the image

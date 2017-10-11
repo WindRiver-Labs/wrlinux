@@ -1,1 +1,5 @@
 This template enables an sftp-server to be included with the image.
+
+#@TYPE: Wrtemplate
+#@NAME: sftp-server
+#@DESCRIPTION: Add sftp-server to the image

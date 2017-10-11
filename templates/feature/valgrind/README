@@ -9,3 +9,7 @@ To add valgrind, add feature/valgrind to your setup line,
 	--templates feature/valgrind
 or with another template, for example, the system-stats template:
 	--templates feature/system-stats feature/valgrind.
+
+#@TYPE: Wrtemplate
+#@NAME: valgrind
+#@DESCRIPTION: Add valgrind to the image

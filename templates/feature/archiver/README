@@ -72,3 +72,6 @@ drwxrwxr-x 3 jiahongxu jiahongxu    4096 May 19 10:04 ..
 -rw-rw-r-- 2 jiahongxu jiahongxu 7902096 May 19 10:05 bash-4.2-r7-configured.tar.gz
 -rw-rw-r-- 2 jiahongxu jiahongxu    5411 May 19 10:04 bash-4.2-r7-diff.gz
 
+#@TYPE: Wrtemplate
+#@NAME: archiver
+#@DESCRIPTION: Enable archiver class and original src mode

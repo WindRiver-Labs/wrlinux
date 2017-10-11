@@ -8,3 +8,8 @@ To use, add
 --templates feature/gcc-sanitizers
 
 as a setup option.
+
+#@TYPE: Wrtemplate
+#@NAME: gcc-sanitizers
+#@DESCRIPTION: Add gcc-sanitizers to image
+

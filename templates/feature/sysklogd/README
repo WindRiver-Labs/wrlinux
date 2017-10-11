@@ -5,3 +5,7 @@ To use, add
 --templates feature/sysklogd
 
 as a setup option.
+
+#@TYPE: Wrtemplate
+#@NAME: sysklogd
+#@DESCRIPTION: Set the default syslog to sysklogd
