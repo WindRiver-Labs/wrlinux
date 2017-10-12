@@ -1,25 +1,28 @@
-wr-cgl
+wrlinux-cgl
 ======
 
-This layer provides the Carrier Grade components for Wind River Linux.  It
-requires the wr-base layer, provided by Wind River. Additionally, it requires
-the wr-security layer packaged in the addons tree.
+This layer provides the Carrier Grade components for Wind River Linux.
 
 
 Dependencies
 ------------
 This layer depends on the following layers:
-  openembedded-core
+  meta-cgl-common
   meta-networking
+  meta-oe
+  meta-perl
+  meta-python
+  meta-security
   meta-selinux
-  wr-base
-  wr-kernel
-  wr-security
+  meta-webserver
+  openembedded-core
+  wrlinux
+  wrlinux-distro
+  wr-template
   wr-template
 
 The layer also recommends the following layers:
-  wrlinux
-  wr-cgl-dl
+  wrlinux-cgl-dl
 
 Maintenance
 -----------
@@ -28,15 +31,22 @@ Contact <support@windriver.com> or your support representative for more
 information on submitting changes.
 
 
-Building the wr-cgl layer
+Building the wrlinux-cgl layer
 -------------------------
-This layer should be added to the bblayers.conf file.  This is done
-automatically when using the Wind River configure wrapper.
+This layer should be added to the bblayers.conf file, as well as any required layers.
+
+To enable the 'wrlinux-cgl' distribution, you will need to setup with:
+
+--distro wrlinux-cgl
+
+or set the following in local.conf file:
+
+DISTRO = "wrlinux-cgl"
 
 
 License
 -------
-Copyright (C) 2012-2013 Wind River Systems, Inc.
+Copyright (C) 2012-2017 Wind River Systems, Inc.
 
 The right to copy, distribute or otherwise make use of this software may
 be licensed only pursuant to the terms of an applicable Wind River license
