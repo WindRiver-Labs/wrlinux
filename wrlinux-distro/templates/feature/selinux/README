@@ -1,12 +1,13 @@
 This template will enable selinux in a given distribution.  For full use
 you will need to provide a proper reference policy for selinux.
 
-The standard meta-selinux providers are refpolicy-mcs, refpolicy-mls,
+The reference policy providers are refpolicy-mcs, refpolicy-mls,
 refpolicy-standard, refpolicy-minimum, refpolicy-targeted.
 
-Note these standard policies will still require modification to function
-properly in your configuration.w
+Note these reference policies will still require modification to
+function properly in your configuration.
 
 In your local.conf file you need to set the preferred policy, such as:
   PREFERRED_PROVIDER_virtual/refpolicy = "refpolicy-standard"
 
+By default, the refpolicy-mls will be used.
