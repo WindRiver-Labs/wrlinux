@@ -29,34 +29,35 @@ Example:
 $ wrlinux-x/setup.sh --machine qemux86-64 \
  --kernel standard \
  --templates feature/archiver
-$ add PARALLEL_MAKE = "-j 8" to local.conf
 
 2. Build a package, such as 'bash':
 $ bitbake bash
 
-3. The result is copyed to export/sources or tmp/deploy/sources dir:
-$ ls export/sources/x86_64-wrs-linux/bash-4.2-r7/ -al
-total 6928
-drwxrwxr-x 2 jiahongxu jiahongxu    4096 May 18 18:34 .
-drwxrwxr-x 3 jiahongxu jiahongxu    4096 May 18 18:34 ..
--rw-rw-r-- 2 jiahongxu jiahongxu    2944 May 18 18:34 bash42-001
--rw-rw-r-- 2 jiahongxu jiahongxu    1780 May 18 18:34 bash42-002
--rw-rw-r-- 2 jiahongxu jiahongxu    6896 May 18 18:34 bash42-003
--rw-rw-r-- 2 jiahongxu jiahongxu    1686 May 18 18:34 bash42-004
--rw-rw-r-- 2 jiahongxu jiahongxu    3424 May 18 18:34 bash42-005
--rw-rw-r-- 2 jiahongxu jiahongxu    1187 May 18 18:34 bash42-006
--rw-rw-r-- 2 jiahongxu jiahongxu    1394 May 18 18:34 bash42-007
--rw-rw-r-- 2 jiahongxu jiahongxu    2164 May 18 18:34 bash42-008
--rw-rw-r-- 2 jiahongxu jiahongxu    2384 May 18 18:34 bash42-009
--rw-rw-r-- 2 jiahongxu jiahongxu    1818 May 18 18:34 bash42-010
--rw-rw-r-- 2 jiahongxu jiahongxu 7009201 May 18 18:34 bash-4.2.tar.gz
--rw-rw-r-- 2 jiahongxu jiahongxu    1331 May 18 18:34 bash-fix-error-path-of-getc_with_restart.patch
--rw-rw-r-- 2 jiahongxu jiahongxu    1557 May 18 18:34 build-tests.patch
--rw-rw-r-- 2 jiahongxu jiahongxu     656 May 18 18:34 execute_cmd.patch
--rw-rw-r-- 2 jiahongxu jiahongxu     958 May 18 18:34 mkbuiltins_have_stringize.patch
--rw-rw-r-- 2 jiahongxu jiahongxu      56 May 18 18:34 run-ptest
--rw-rw-r-- 2 jiahongxu jiahongxu     303 May 18 18:34 series
--rw-rw-r-- 2 jiahongxu jiahongxu     594 May 18 18:34 test-output.patch
+3. The result is copyed to tmp-glibc/deploy/sources:
+$ ls tmp-glibc/deploy/sources/x86_64-wrs-linux/bash-4.4-r0/ -1
+0001-help-fix-printf-format-security-warning.patch
+bash44-001
+bash44-002
+bash44-003
+bash44-004
+bash44-005
+bash44-006
+bash44-007
+bash44-008
+bash44-009
+bash44-010
+bash44-011
+bash44-012
+bash-4.4.tar.gz
+bash-memleak-bug-fix-for-builtin-command-read.patch
+build-tests.patch
+execute_cmd.patch
+fix-run-builtins.patch
+fix-run-coproc-run-heredoc-run-execscript-run-test-f.patch
+mkbuiltins_have_stringize.patch
+run-ptest
+series
+test-output.patch
 
 4. Append ARCHIVER_MODE[src] = "configured" and
    ARCHIVER_MODE[diff] = "1" to local.conf
@@ -65,12 +66,9 @@ drwxrwxr-x 3 jiahongxu jiahongxu    4096 May 18 18:34 ..
 $ bitbake bash -ccleansstate && bitbake bash
 
 6. Check result:
-$ ls export/sources/x86_64-wrs-linux/bash-4.2-r7/ -al
-total 7736
-drwxrwxr-x 2 jiahongxu jiahongxu    4096 May 19 10:05 .
-drwxrwxr-x 3 jiahongxu jiahongxu    4096 May 19 10:04 ..
--rw-rw-r-- 2 jiahongxu jiahongxu 7902096 May 19 10:05 bash-4.2-r7-configured.tar.gz
--rw-rw-r-- 2 jiahongxu jiahongxu    5411 May 19 10:04 bash-4.2-r7-diff.gz
+$ ls tmp-glibc/deploy/sources/x86_64-wrs-linux/bash-4.4-r0/ -1
+bash-4.4-r0-configured.tar.gz
+bash-4.4-r0-diff.gz
 
 #@TYPE: Wrtemplate
 #@NAME: archiver
