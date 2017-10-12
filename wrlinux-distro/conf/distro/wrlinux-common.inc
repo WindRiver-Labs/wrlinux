@@ -142,7 +142,7 @@ require conf/distro/include/wrlinux-distro-settings.conf
 require conf/distro/include/wrlinux-uninative.inc
 
 # Exclude download layers from eSDK.
-SDK_LAYERS_EXCLUDE_PATTERN ?= ".*-dl$ .*-dl-2.2$"
+SDK_LAYERS_EXCLUDE_PATTERN ?= ".*-dl$ .*-dl-2.4$"
 
 
 # Packages blacklisted by default for wrlinux.
