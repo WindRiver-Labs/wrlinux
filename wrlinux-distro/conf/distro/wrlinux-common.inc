@@ -6,6 +6,10 @@
 
 require conf/distro/include/wrlinux-base-whitelist.inc
 
+# Provide a way to override default machine behavior for all WRLinux distros
+# We need this to add multilib support to the built-in QEMU BSPs
+include conf/distro/include/wrlinux-bsp-${MACHINE}.inc
+
 MAINTAINER = "Wind River <info@windriver.com>"
 
 DISTRO_NAME ?= "${WRLINUX_BRANDING}${WRLINUX_VARIANT} ${WRLINUX_BRANCH}"
