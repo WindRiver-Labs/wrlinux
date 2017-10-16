@@ -9,5 +9,5 @@ do_install_append_wrlinux-cgl() {
 	install -m 0755 ${B}/test/.libs/* ${D}/opt/cut/bin/libevent/.libs
 }
 
-PACKAGES_append_wrlinux_cgl = " ${PN}-testing"
+PACKAGES_append_wrlinux-cgl = " ${PN}-testing"
 FILES_${PN}-testing += "/opt/cut/bin"
