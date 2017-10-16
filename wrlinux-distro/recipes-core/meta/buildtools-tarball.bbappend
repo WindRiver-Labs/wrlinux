@@ -8,6 +8,7 @@ TOOLCHAIN_HOST_TASK_append_osv-wrlinux = " \
       nativesdk-python3-numbers nativesdk-python3-email \
       nativesdk-python3-html nativesdk-python3-resource \
       nativesdk-python3-debugger \
+      nativesdk-python3-pytz nativesdk-python3-beautifulsoup4 \
       nativesdk-libgcc \
      "
 
