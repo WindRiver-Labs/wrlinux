@@ -8,9 +8,6 @@ Test steps:
 
 $ bitbake wrlinux-image-glibc-std
 
-After building, lmbench binaries will be installed in ${prjdir}/export/dist/usr/bin
-and the test scripts will be installed in ${prjdir}/export/dist/opt/benchmark/os/wr-lmbench directory.
-
 2) boot target
 Roofs on local storage (such as harddisk) is strongly recommended for benchmark test.
 
