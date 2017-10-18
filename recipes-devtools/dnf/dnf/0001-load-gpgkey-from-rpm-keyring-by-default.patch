@@ -1,0 +1,43 @@
+From d48ba88ed1f7293206dc4e1e4fe182e2314ca4fd Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 17 Oct 2017 16:50:34 +0800
+Subject: [PATCH 1/2] load gpgkey from rpm keyring by default
+
+If gpgkey not set, load it from rpm keyring in /etc/rpm/keys.
+This matches the corresponding patch for rpm.
+
+Upstream-Status: Inappropriate [wrlinux specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ dnf/conf/config.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/dnf/conf/config.py b/dnf/conf/config.py
+index 6be3871..3b0435f 100644
+--- a/dnf/conf/config.py
++++ b/dnf/conf/config.py
+@@ -25,6 +25,7 @@ from dnf.i18n import ucd, _
+ from dnf.pycomp import basestring
+ from iniparse.compat import ParsingError, RawConfigParser as ConfigParser
+ 
++import glob
+ import copy
+ import dnf.conf.parser
+ import dnf.conf.substitutions
+@@ -960,7 +961,11 @@ class RepoConf(BaseConfig):
+         self._add_option('metalink', UrlOption()) # :api
+         self._add_option('type', Option())
+         self._add_option('mediaid', Option())
+-        self._add_option('gpgkey', UrlListOption())
++
++        gpgkeys = []
++        for pubkey in glob.glob("/etc/rpm/keys" + '/*'):
++            gpgkeys.append("file://" + pubkey)
++        self._add_option('gpgkey', UrlListOption(gpgkeys))
+         self._add_option('excludepkgs', ListAppendOption())
+         self._add_option('includepkgs', ListAppendOption())
+         self._add_option('exclude', self._get_option('excludepkgs'))
+-- 
+1.8.3.1
+
