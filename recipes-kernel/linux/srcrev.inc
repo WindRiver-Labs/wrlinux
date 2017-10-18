@@ -28,6 +28,6 @@ SRCREV_machine_kb-standard-tiny-common-pc ?= "16de0149674ed12d983b77a453852ac2e6
 SRCREV_machine_kb-standard-wr-base ?= "16de0149674ed12d983b77a453852ac2e64584b4"
 
 # yocto-kernel-cache branch entry
-SRCREV_meta = "73365069d89a8423a6f9f4b5560ee6bfdfc0b3d1"
+SRCREV_meta = "daacede608e07d391229ba0a6d74d6e082bead5f"
 
-LINUX_VERSION = "4.12.12"
+LINUX_VERSION = "4.12.14"
