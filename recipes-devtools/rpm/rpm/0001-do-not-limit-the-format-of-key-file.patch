@@ -1,0 +1,28 @@
+From 9260303388bc7bb5366754be3732b2d759da770b Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 18 Oct 2017 10:14:17 +0800
+Subject: [PATCH 1/2] do not limit the format of key file
+
+Upstream-Status: Inappropriate [wrlinux specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ lib/rpmts.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/rpmts.c b/lib/rpmts.c
+index c07f15d..ca8585a 100644
+--- a/lib/rpmts.c
++++ b/lib/rpmts.c
+@@ -266,7 +266,7 @@ static int loadKeyringFromFiles(rpmts ts)
+ {
+     ARGV_t files = NULL;
+     /* XXX TODO: deal with chroot path issues */
+-    char *pkpath = rpmGetPath(ts->rootDir, "%{_keyringpath}/*.key", NULL);
++    char *pkpath = rpmGetPath(ts->rootDir, "%{_keyringpath}/*", NULL);
+     int nkeys = 0;
+ 
+     rpmlog(RPMLOG_DEBUG, "loading keyring from pubkeys in %s\n", pkpath);
+-- 
+1.8.3.1
+
