@@ -4,8 +4,8 @@ FILESPATH_append := ":${@base_set_filespath(['${THISDIR}'], d)}/${BPN}"
 # /etc/rpm/keys/
 # (this only works for 'rpm' repositories)
 PACKAGECONFIG[keyringpath] = ",,,"
-OVERRIDES .= "${@['', ':RPM-KEYRING-PATH']['keyringpath' in d.getVar('PACKAGECONFIG', True).split()]}"
-SRC_URI_append_RPM-KEYRING-PATH = " \
+OVERRIDES .= "${@['', ':rpm-keyring-path']['keyringpath' in d.getVar('PACKAGECONFIG', True).split()]}"
+SRC_URI_append_rpm-keyring-path = " \
     file://0001-load-gpgkey-from-rpm-keyring-by-default.patch \
 "
 
