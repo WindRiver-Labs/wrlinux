@@ -11,4 +11,4 @@ def lcl_x11_check(d):
 
 
 
-RRECOMMENDS_${PN}_class-target += "${@lcl_x11_check(d)}"
+RRECOMMENDS_${PN}_append_class-target = " ${@lcl_x11_check(d)}"
