@@ -31,4 +31,5 @@ IMAGE_FEATURES += " \
     wr-core-sys-util \
     wr-core-util \
     wr-core-mail \
+    wr-bsps \
     "

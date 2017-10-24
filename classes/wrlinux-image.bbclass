@@ -23,6 +23,7 @@ FEATURE_PACKAGES_wr-core-mail = "packagegroup-wr-core-mail"
 FEATURE_PACKAGES_wr-lsbtest = "packagegroup-wr-lsbtest"
 FEATURE_PACKAGES_ssh-sftp-servers ??= ""
 FEATURE_PACKAGES_wr-core-cut = "packagegroup-wr-core-cut"
+FEATURE_PACKAGES_wr-bsps = "packagegroup-wr-bsps"
 
 # ensure we have password and group files before we do_rootfs
 check_for_passwd_group() {
