@@ -20,12 +20,12 @@ SRCREV_machine_kb-standard-mti-malta64 ?= "d481a271022e211857045b48d595826d8df05
 SRCREV_machine_kb-standard-preempt-rt-base ?= "1348b764f8ca8803b6b833c69f5cb795fddf24b8"
 SRCREV_machine_kb-standard-preempt-rt-intel ?= "1348b764f8ca8803b6b833c69f5cb795fddf24b8"
 SRCREV_machine_kb-standard-preempt-rt-rebase ?= "5e69631e37265cb476821bb5da84b32c4a95feb5"
-SRCREV_machine_kb-standard-preempt-rt-wr-base ?= "16de0149674ed12d983b77a453852ac2e64584b4"
+SRCREV_machine_kb-standard-preempt-rt-wr-base ?= "1348b764f8ca8803b6b833c69f5cb795fddf24b8"
 SRCREV_machine_kb-standard-qemuarm64 ?= "1348b764f8ca8803b6b833c69f5cb795fddf24b8"
 SRCREV_machine_kb-standard-qemuppc ?= "1348b764f8ca8803b6b833c69f5cb795fddf24b8"
 SRCREV_machine_kb-standard-tiny-base ?= "1348b764f8ca8803b6b833c69f5cb795fddf24b8"
 SRCREV_machine_kb-standard-tiny-common-pc ?= "1348b764f8ca8803b6b833c69f5cb795fddf24b8"
-SRCREV_machine_kb-standard-wr-base ?= "16de0149674ed12d983b77a453852ac2e64584b4"
+SRCREV_machine_kb-standard-wr-base ?= "1348b764f8ca8803b6b833c69f5cb795fddf24b8"
 
 # yocto-kernel-cache branch entry
 SRCREV_meta = "daacede608e07d391229ba0a6d74d6e082bead5f"
