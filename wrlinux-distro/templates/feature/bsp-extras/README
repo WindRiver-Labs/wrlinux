@@ -1,0 +1,25 @@
+                                  bsp-extras
+                                  ----------
+
+1. Introduction
+----------------
+
+The bsp-extras template will install some useful but not always
+required tools define by BSP_EXTRA_PACKAGES in bsp layer.
+
+2. Usage
+--------
+
+Add this template to your configure line to enable it:
+ --templates feature/bsp-extras
+
+3. Installation
+----------------
+
+This template will include some useful tools in the root filesystem.
+You can get the extra tools list in variable BSP_EXTRAS_PACKAGES
+by looking at the output of the bitbake -e command.
+
+#@TYPE: Wrtemplate
+#@NAME: bsp-extras
+#@DESCRIPTION: Enable BSP extras packages support
