@@ -41,3 +41,5 @@ python linux_yocto_rewrite_uri() {
 
     d.setVar("SRC_URI", src_uri)
 }
+
+LINUX_VERSION = "4.12.14"
