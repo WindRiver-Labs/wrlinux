@@ -1,13 +1,13 @@
-Openssl No Weak Ciphers
+OpenSSL No Weak Ciphers
 =======================
-openssl contains some weak ciphers, this feature disables some of them with
-below configuration of openssl_1.0.2j:
+OpenSSL contains some weak ciphers. This template disables some of them with
+below configuration of openssl:
 
 EXTRA_OECONF_class-target +="no-des no-md2 no-ec no-ecdh no-ecdsa no-mdc2 "
 EXTRA_OECONF_class-nativesdk +="no-md2 no-ec no-ecdh no-ecdsa no-mdc2 "
 
 Important notes
 ===============
-If this feature is enabled, the application package which depends on openssl
+If this template is enabled, the application package which depends on openssl
 may fail to build for some source codes are not handled well, for example, the
 DES related codes are not wrapped in "#ifndef OPENSSL_NO_DES" and "#endif".
