@@ -54,6 +54,7 @@ RDEPENDS_${PN} = "\
 	wireless-tools \
 	wpa-supplicant \
 	xinetd \
+	samba \
 	ntp \
 	traceroute \
 	tunctl \
