@@ -57,8 +57,7 @@ echo "# yocto-kernel-cache branch entry"
    echo "Unable to find yocto-kernel-cache repository." >&2
    exit 1
  fi
- echo SRCREV_meta = \"$(git rev-parse yocto-${version})\"
+ echo SRCREV_meta = \"$(git rev-parse yocto-${version}-wr)\"
  echo
  echo LINUX_VERSION = \"$(git show yocto-${version}:kver | sed 's,v,,')\"
 )
-
