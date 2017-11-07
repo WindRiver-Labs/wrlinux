@@ -39,5 +39,9 @@ python linux_yocto_rewrite_uri() {
     # Replace the kernel-cache URI.
     src_uri = src_uri.replace("git://git.yoctoproject.org/yocto-kernel-cache", "git://%s/git/yocto-kernel-cache;protocol=file" % layer_path)
 
+    # The kernel-cache branch is hard coded by oe-core.  We need to make this adjutable.
+    if d.getVar("KERNEL_CACHE_BRANCH"):
+        src_uri = src_uri.replace("branch=yocto-4.12;", "branch=${KERNEL_CACHE_BRANCH};")
+
     d.setVar("SRC_URI", src_uri)
 }
