@@ -13,6 +13,8 @@ SRCREV_machine_qemumips64 = "${AUTOREV}"
 # is done for the same reason as the QEMU machines above.
 SRCREV_machine ?= "${AUTOREV}"
 
+SRCREV_meta = "${AUTOREV}"
+
 # We need to change the SRC_URI to point to our layer.  Otherwise the system
 # may decide to fall back to the yoctoproject URL in some cases.  This would
 # end up causing problems either due to incorrect SRCREV entries or by missing
