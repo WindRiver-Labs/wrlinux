@@ -113,6 +113,10 @@ add_ld_so_conf_d() {
     fi
 }
 
+sdk_ext_postinst_append() {
+    rm $target_sdk_dir/layers/wrlinux/git/.gitignore
+}
+
 ROOTFS_POSTINSTALL_COMMAND += "${@bb.utils.contains('IMAGE_INSTALL', 'fs-local-pkg', 'wrl_fs_local_pkg ;', '', d)} \
                                ${@bb.utils.contains('DISTRO_FEATURES', 'ldconfig', 'add_ld_so_conf_d ;', '', d)} \
 "
