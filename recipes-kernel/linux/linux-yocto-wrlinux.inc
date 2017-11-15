@@ -25,9 +25,9 @@ linux_yocto_rewrite_uri[eventmask] = "bb.event.RecipePreFinalise"
 python linux_yocto_rewrite_uri() {
     d = e.data
 
-    layer_path=d.getVar("LAYER_PATH_wrlinux")
+    layer_path="${LAYER_PATH_wrlinux}"
 
-    if not layer_path:
+    if not d.getVar("LAYER_PATH_wrlinux"):
         bb.warn("Unable to replace SRC_URI paths with wrlinux layer paths.  LAYER_PATH_wrlinux is not defined.")
         return
 
