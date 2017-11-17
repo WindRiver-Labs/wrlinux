@@ -4,38 +4,39 @@ Subject: ash: fix memleak
 
 Signed-off-by: Hu <yadi.hu@windriver.com>
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
 ---
  shell/ash.c | 3 +++
  1 file changed, 3 insertions(+)
 
 diff --git a/shell/ash.c b/shell/ash.c
-index c5ad969..8df6988 100644
+index 7a11305..c17c797 100644
 --- a/shell/ash.c
 +++ b/shell/ash.c
-@@ -8390,6 +8390,7 @@ evaltree(union node *n, int flags)
- 	void (*evalfn)(union node *, int);
- 	int status;
- 	int int_level;
+@@ -8709,6 +8709,7 @@ evaltree(union node *n, int flags)
+ 	int checkexit = 0;
+ 	int (*evalfn)(union node *, int);
+ 	int status = 0;
 +	struct stackmark smark;
  
- 	SAVE_INT(int_level);
- 
-@@ -8429,6 +8430,7 @@ evaltree(union node *n, int flags)
- 		status = !exitstatus;
+ 	if (n == NULL) {
+ 		TRACE(("evaltree(NULL) called\n"));
+@@ -8729,6 +8730,7 @@ evaltree(union node *n, int flags)
+ 		status = !evaltree(n->nnot.com, EV_TESTED);
  		goto setstatus;
  	case NREDIR:
 +		setstackmark(&smark);
  		expredir(n->nredir.redirect);
  		status = redirectsafe(n->nredir.redirect, REDIR_PUSH);
  		if (!status) {
-@@ -8436,6 +8438,7 @@ evaltree(union node *n, int flags)
- 			status = exitstatus;
+@@ -8736,6 +8738,7 @@ evaltree(union node *n, int flags)
  		}
- 		popredir(/*drop:*/ 0, /*restore:*/ 0 /* not sure */);
+ 		if (n->nredir.redirect)
+ 			popredir(/*drop:*/ 0, /*restore:*/ 0 /* not sure */);
 +		popstackmark(&smark);
  		goto setstatus;
  	case NCMD:
  		evalfn = evalcommand;
 -- 
-1.9.1
+2.12.3
 
