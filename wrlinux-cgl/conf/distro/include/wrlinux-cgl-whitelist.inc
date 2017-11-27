@@ -10,7 +10,7 @@ PNWHITELIST_LAYERS_remove = "wrlinux-cgl"
 # Enable items for wrlinux-cgl distro
 #
 # For meta-cgl/meta-cgl-common
-PNWHITELIST_cgl-common_append = "\
+PNWHITELIST_cgl-common_append = " \
     cluster-glue \
     crmsh \
     libhtml-tagset-perl \
@@ -26,7 +26,7 @@ PNWHITELIST_cgl-common_append = "\
 "
 
 # For meta-openembedded/meta-python
-PNWHITELIST_meta-python_append = "\
+PNWHITELIST_meta-python_append = " \
     python-cffi \
     python-lxml \
     python-paste \
@@ -37,7 +37,7 @@ PNWHITELIST_meta-python_append = "\
 "
 
 # For meta-openembedded/meta-networking
-PNWHITELIST_networking-layer_append = "\
+PNWHITELIST_networking-layer_append = " \
     bridge-utils \
     c-ares \
     corosync \
@@ -76,7 +76,7 @@ PNWHITELIST_networking-layer_append = "\
 "
 
 # For meta-openembedded/meta-oe
-PNWHITELIST_openembedded-layer_append = "\
+PNWHITELIST_openembedded-layer_append = " \
     crash \
     edac-utils \
     indent \
@@ -91,7 +91,7 @@ PNWHITELIST_openembedded-layer_append = "\
 "
 
 # For meta-openembedded/meta-perl
-PNWHITELIST_perl-layer_append = "\
+PNWHITELIST_perl-layer_append = " \
     libauthen-sasl-perl \
     libdigest-hmac-perl \
     libdigest-sha1-perl \
@@ -108,6 +108,6 @@ PNWHITELIST_perl-layer_append = "\
 "
 
 # For meta-virtualization
-PNWHITELIST_virtualization-layer_append = "\
+PNWHITELIST_virtualization-layer_append = " \
     lxc \
 "
