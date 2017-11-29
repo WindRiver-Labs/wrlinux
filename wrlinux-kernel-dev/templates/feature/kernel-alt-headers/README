@@ -1,0 +1,11 @@
+Enable the installation of alternative, kernel specific, userspace headers
+into the KERNEL_ALT_HEADER_DIR location.  By default this location will be
+'/usr-alt' on the target or within the SDK's target sysroot directory.
+
+This can be set/overridden in the conf/local.conf or other configuration file.
+
+This template will automatically include the package
+"kernel-extra-headers-misc" in any generated SDK.  If you wish to install
+this package into your rootfs, you will need to add this to your image
+recipe or add the following to your conf/local.conf:
+  IMAGE_INSTALL_append = " kernel-extra-headers-misc"

@@ -33,6 +33,9 @@ Building with the wrlinux-kernel-dev layer
    * feature/kernfeatures-clear : sets KERNEL_FEATURES=""
      (usually wanted for custom kernels)
 
+   * feature/kernel-alt-headers: sets KERNEL_ALT_HEADER_DIR ?= "/usr-alt"
+     (enables installation of alternative userspace headers from the kernel)
+
    * feature/custom-kernel: use linux-yocto-custom.bb
 
 NOTE: This layer is not indexed and therefor not available using
