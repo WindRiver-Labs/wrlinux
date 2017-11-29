@@ -30,8 +30,6 @@ Building with the wrlinux-kernel-dev layer
 3. Add the desired feature templates to your conf/local.conf file
    WRTEMPLATE variable.
 
-   * feature/kernel-dev : include kernel-dev and kernel-devsrc in SDK
-
    * feature/kernfeatures-clear : sets KERNEL_FEATURES=""
      (usually wanted for custom kernels)
 

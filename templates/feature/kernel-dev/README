@@ -1,0 +1,9 @@
+This template will include the kernel-dev, kernel-devsrc in the SDK.
+
+This will allow an SDK to have the necessary support to build out-of-tree
+kernel modules.
+
+#@TYPE: Wrtemplate
+#@NAME: kernel-dev
+#@DESCRIPTION: Include kernel-dev and kernel-devsrc in SDK
+
