@@ -3,6 +3,39 @@ This template will include the kernel-dev, kernel-devsrc in the SDK.
 This will allow an SDK to have the necessary support to build out-of-tree
 kernel modules.
 
+To use this feature to build out-of-tree kernel modules you would need to
+run through the following steps:
+
+1) Install the generate SDK
+
+2) source the environment file for the primary multilib, such as:
+  $ . ./environment-setup-armv5e-wrs-linux-gnueabi
+
+3) Change to the kernel source directory:
+  $ cd ${SDKTARGETSYSROOT}/usr/src/kernel
+
+4) Prep the kernel scripts
+  $ make scripts
+
+5) Prepare the kernel module source as necessary, such as:
+  From: http://www.thegeekstuff.com/2013/07/write-linux-kernel-module
+  (starting at section 'II')
+
+  (step #1 was accomplished by step #1 - #4 above)
+
+  download the source from step #2
+
+  download the makefile from step #3
+  Change the makefile, references to:
+  /lib/modules/$(shell uname -r)/build
+    to
+  ${SDKTARGETSYSROOT}/usr/src/kernel
+
+  copy the resulting hello.ko to a running target
+
+  (verify functionality with step #4)
+
+
 #@TYPE: Wrtemplate
 #@NAME: kernel-dev
 #@DESCRIPTION: Include kernel-dev and kernel-devsrc in SDK
