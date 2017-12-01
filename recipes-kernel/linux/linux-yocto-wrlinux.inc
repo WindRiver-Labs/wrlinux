@@ -47,3 +47,23 @@ python linux_yocto_rewrite_uri() {
 
     d.setVar("SRC_URI", src_uri)
 }
+
+#
+# Verify that the defined KTYPE is in TARGET_SUPPORTED_KTYPES (if defined)
+#
+# This will help detect non-supported/non-tested configurations.
+#
+python () {
+    kernel_type = d.getVar('LINUX_KERNEL_TYPE')
+    supported_types = d.getVar('TARGET_SUPPORTED_KTYPES')
+
+    # Skip checking, as supported types is blank
+    if not supported_types or not kernel_type:
+        return
+
+    if kernel_type not in supported_types.split():
+        raise bb.parse.SkipPackage('(version %s)  The defined LINUX_KERNEL_TYPE (%s) used by\
+ this recipe is not in TARGET_SUPPORTED_KTYPES (%s).  To override add the type\
+ to the supported list in your local.conf, such as:\
+ TARGET_SUPPORTED_KTYPES_append = " %s"' % (d.getVar('PV'), kernel_type, supported_types, kernel_type))
+}
