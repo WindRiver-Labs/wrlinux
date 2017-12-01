@@ -131,6 +131,9 @@ require conf/distro/include/wrlinux-uninative.inc
 # Exclude download layers from eSDK.
 SDK_LAYERS_EXCLUDE_PATTERN ?= ".*-dl$ .*-dl-2\.5$"
 
+# By default we only support 'standard' kernels.  A machine configuration,
+# user, or other configuration file can override this.
+TARGET_SUPPORTED_KTYPES ??= "standard"
 
 # Packages blacklisted by default for wrlinux.
 PNBLACKLIST[musl] ?= "only glibc is supported for wrlinux"
