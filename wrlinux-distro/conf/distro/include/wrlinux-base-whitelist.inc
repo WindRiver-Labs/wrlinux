@@ -58,6 +58,7 @@ PNWHITELIST_openembedded-layer += " \
 	vim \
 	vim-tiny \
 	vlock \
+	iperf3 \
 	"
 
 PNWHITELIST_perl-layer += " \
