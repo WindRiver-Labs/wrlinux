@@ -1,0 +1,41 @@
+From 7b2cab03f23f1bf07154e351840693bcf9db2b0b Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Tue, 3 May 2016 07:00:10 +0000
+Subject: [PATCH] wr-policy: create faillogs with type faillog_t
+
+Reference sources: selinux-policy-3.13.1-128.21.fc22.src.rpm
+Changes come from: policy-f22-base.patch
+
+* create tallylog, faillog, btmp with type faillog_t
+
+Fix avc denial:
+
+  avc: denied { create } for pid=284 comm="login" name="tallylog" \
+  scontext=system_u:system_r:local_login_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:var_log_t:s0 \
+  tclass=file permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/system/authlogin.if | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/policy/modules/system/authlogin.if b/policy/modules/system/authlogin.if
+index 38fd6f9..70a74c7 100644
+--- a/policy/modules/system/authlogin.if
++++ b/policy/modules/system/authlogin.if
+@@ -813,6 +813,9 @@ interface(`auth_manage_faillog',`
+ 
+ 	allow $1 faillog_t:file manage_file_perms;
+ 	logging_rw_generic_log_dirs($1)
++	logging_log_filetrans($1, faillog_t, file, "tallylog")
++	logging_log_filetrans($1, faillog_t, file, "faillog")
++	logging_log_filetrans($1, faillog_t, file, "btmp")
+ ')
+ 
+ #######################################
+-- 
+2.5.0
+

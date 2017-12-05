@@ -1,0 +1,30 @@
+From f6360588d619442fcac9977b32f906879c6c7812 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Mon, 27 Jan 2014 02:05:17 -0500
+Subject: [PATCH] refpolicy: fix real path for cfengine
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/cfengine.fc |    4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/policy/modules/contrib/cfengine.fc b/policy/modules/contrib/cfengine.fc
+index 5b605d6..70cc509 100644
+--- a/policy/modules/contrib/cfengine.fc
++++ b/policy/modules/contrib/cfengine.fc
+@@ -4,6 +4,10 @@
+ /usr/sbin/cf-execd	--	gen_context(system_u:object_r:cfengine_execd_exec_t,s0)
+ /usr/sbin/cf-monitord	--	gen_context(system_u:object_r:cfengine_monitord_exec_t,s0)
+ 
++/usr/bin/cf-serverd	--	gen_context(system_u:object_r:cfengine_serverd_exec_t,s0)
++/usr/bin/cf-execd	--	gen_context(system_u:object_r:cfengine_execd_exec_t,s0)
++/usr/bin/cf-monitord	--	gen_context(system_u:object_r:cfengine_monitord_exec_t,s0)
++
+ /var/cfengine(/.*)?	gen_context(system_u:object_r:cfengine_var_lib_t,s0)
+ 
+ /var/cfengine/outputs(/.*)?	gen_context(system_u:object_r:cfengine_log_t,s0)
+-- 
+1.7.9.5
+

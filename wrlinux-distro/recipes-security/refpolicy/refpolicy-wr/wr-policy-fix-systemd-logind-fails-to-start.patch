@@ -1,0 +1,80 @@
+From e094978dcc909941e67de133ec52806bcf6d3f22 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Mon, 23 Jan 2017 08:42:44 +0000
+Subject: [PATCH] refpolicy: fix systemd-logind fails to start
+
+Reference sources: selinux-policy-3.13.1-225.6.fc25.src.rpm
+Changes come from: policy-f25-base.patch
+                   policy-f25-contrib.patch
+
+* Allow system_dbusd_t read systemd_login PID files
+ (systemd_logind_var_run_t)
+
+* Allow systemd_logind_t write all levels files
+
+* Fix avc denials:
+
+  avc: denied { read open getattr } for pid=319 comm="systemd-logind" \
+  name="file_contexts.subs_dist" dev="vda" ino=95 \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:file_context_t:s0 tclass=file
+
+  avc: denied { write add_name } for pid=319 comm="systemd-logind" \
+  name="user" dev="tmpfs" ino=9638 \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:user_runtime_root_t:s0 tclass=dir
+
+  avc: denied { create mounton relabelto search } for pid=319 \
+  comm="systemd-logind" name="0" \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=root:object_r:user_runtime_t:s0 tclass=dir
+
+  ...
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/dbus.te   | 1 +
+ policy/modules/system/systemd.te | 6 ++++++
+ 2 files changed, 7 insertions(+)
+
+diff --git a/policy/modules/contrib/dbus.te b/policy/modules/contrib/dbus.te
+index 14f94a7..0deb0fe 100644
+--- a/policy/modules/contrib/dbus.te
++++ b/policy/modules/contrib/dbus.te
+@@ -144,6 +144,7 @@ userdom_dontaudit_use_unpriv_user_fds(system_dbusd_t)
+ userdom_dontaudit_search_user_home_dirs(system_dbusd_t)
+ 
+ systemd_write_inherited_logind_sessions_pipes(system_dbusd_t)
++systemd_read_logind_pids(system_dbusd_t)
+ 
+ optional_policy(`
+ 	bluetooth_stream_connect(system_dbusd_t)
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 240de81..86cb1cf 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -283,6 +283,7 @@ kernel_read_kernel_sysctls(systemd_logind_t)
+ fs_mount_tmpfs(systemd_logind_t)
+ auth_manage_var_auth(systemd_logind_t)
+ mls_file_read_all_levels(systemd_logind_t)
++mls_file_write_all_levels(systemd_logind_t)
+ 
+ domain_read_all_domains_state(systemd_logind_t)
+ 
+@@ -297,6 +298,11 @@ optional_policy(`
+ 	dbus_connect_system_bus(systemd_logind_t)
+ ')
+ 
++seutil_read_config(systemd_logind_t)
++seutil_read_file_contexts(systemd_logind_t)
++userdom_manage_user_runtime_dirs(systemd_logind_t)
++userdom_manage_user_runtime_root_dirs(systemd_logind_t)
++
+ #########################################
+ #
+ # Resolved local policy
+-- 
+2.11.0
+

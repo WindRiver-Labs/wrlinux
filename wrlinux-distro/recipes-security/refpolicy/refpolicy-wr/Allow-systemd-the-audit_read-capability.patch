@@ -1,0 +1,34 @@
+From c94097864a928b19c10e12aa05c489900c8722eb Mon Sep 17 00:00:00 2001
+From: Laurent Bigonville <bigon@bigon.be>
+Date: Fri, 15 Jan 2016 11:42:25 +0100
+Subject: [PATCH] Allow systemd the audit_read capability
+
+At early boot, I get the following messages in dmesg:
+
+audit: type=1400 audit(1452851002.184:3): avc:  denied  { audit_read } for  pid=1 comm="systemd" capability=37 scontext=system_u:system_r:init_t:s0 tcontext=system_u:system_r:init_t:s0 tclass=capability2 permissive=1
+systemd[1]: Listening on Journal Audit Socket.
+
+Upstream commit:
+https://github.com/TresysTechnology/refpolicy/commit/c94097864a928b19c10e12aa05c489900c8722eb
+
+Upsteam-Status: Backport
+---
+ policy/modules/system/init.te | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index e75e8f8..ec1faea 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -195,7 +195,7 @@ ifdef(`init_systemd',`
+ 	typeattribute init_t init_run_all_scripts_domain;
+ 
+ 	allow init_t self:process { getcap getsched setsched setpgid setfscreate setsockcreate setcap setrlimit };
+-	allow init_t self:capability2 block_suspend;
++	allow init_t self:capability2 { audit_read block_suspend };
+ 	allow init_t self:netlink_kobject_uevent_socket create_socket_perms;
+ 	allow init_t self:netlink_route_socket create_netlink_socket_perms;
+ 	allow init_t self:netlink_selinux_socket create_socket_perms;
+-- 
+1.9.1
+

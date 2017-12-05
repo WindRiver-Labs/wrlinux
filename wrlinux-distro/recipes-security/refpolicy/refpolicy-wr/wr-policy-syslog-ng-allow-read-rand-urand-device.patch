@@ -1,0 +1,51 @@
+From f15b75696c653562b9923563347bd9e7b80a0ca3 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Fri, 14 Feb 2014 01:37:38 -0500
+Subject: [PATCH] refpolicy: allow read rand/urand device and add block_suspend for syslog-ng
+
+Allow syslog-ng to read /dev/random, /dev/urandom, also add block_suspend
+capability for it. This will fix below avc denied issues:
+
+    type=AVC msg=audit(1392343010.395:64): avc: denied
+    { read } for pid=1654 comm="syslog-ng" name="urandom" dev="devtmpfs" \
+    ino=5039 scontext=system_u:system_r:syslogd_t:s15:c0.c1023 tcontext= \
+    system_u:object_r:urandom_device_t:s0 tclass=chr_file
+
+    type=AVC msg=audit(1392343010.403:65): avc: denied \
+    { read } for pid=1654 comm="syslog-ng" name="random" dev="devtmpfs" \
+    ino=5038 scontext=system_u:system_r:syslogd_t:s15:c0.c1023 tcontext= \
+    system_u: object_r:random_device_t:s0 tclass=chr_file
+
+    type=AVC msg=audit(1392343012.571:82): avc: denied \
+    { block_suspend } for pid=1654 comm="syslog-ng" capability=36 \
+    scontext=system_u:system_r:syslogd_t:s15:c0.c1023 tcontext= \
+    system_u:system_r:syslogd_t:s15:c0.c1023 tclass=capability2
+
+Upstream-Status: pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/system/logging.te |    7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
+index 5c06256..6c7b0da 100644
+--- a/policy/modules/system/logging.te
++++ b/policy/modules/system/logging.te
+@@ -366,6 +366,13 @@ optional_policy(`
+ # cjp: why net_admin!
+ allow syslogd_t self:capability { dac_override sys_resource sys_tty_config net_admin sys_admin sys_nice chown fsetid };
+ dontaudit syslogd_t self:capability sys_tty_config;
++
++# allow read to /dev/random, /dev/urandom for syslog-ng
++dev_read_rand(syslogd_t)
++dev_read_urand(syslogd_t)
++# block_suspend for syslog-ng
++allow syslogd_t self:capability2 block_suspend;
++
+ # setpgid for metalog
+ # setrlimit for syslog-ng
+ # getsched for syslog-ng
+-- 
+1.7.9.5
+

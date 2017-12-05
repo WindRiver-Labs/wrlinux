@@ -1,0 +1,52 @@
+From ecda4010ee951ad02ecec8987c4a4efa85dcdcdf Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 27 Feb 2014 02:46:20 -0500
+Subject: [PATCH] fix avc denied issues for samba
+
+* The pidfile dir is set to /var/run/samba, allow nmbd to create
+  pidfile in this location accordingly;
+* Allow samba creating connections to the system bus.
+
+type=AVC msg=audit(1393318720.400:22): avc: denied { create } for \
+pid=1429 comm="nmbd" name="nmbd.pid" scontext=system_u:system_r: \
+nmbd_t:s0-s15:c0.c1023 tcontext=system_u:object_r:smbd_var_run_t:s0 \
+tclass=file
+type=AVC msg=audit(1393318720.506:23): avc: denied { search } for \
+pid=1427 comm="smbd" name="dbus" dev="tmpfs" ino=1270 scontext= \
+system_u:system_r:smbd_t:s0-s15:c0.c1023 tcontext= \
+system_u:object_r:system_dbusd_var_run_t:s0 tclass=dir
+
+Upstream-Status: pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/samba.te |    6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/policy/modules/contrib/samba.te b/policy/modules/contrib/samba.te
+index 54b89a6..0cd86ee 100644
+--- a/policy/modules/contrib/samba.te
++++ b/policy/modules/contrib/samba.te
+@@ -308,6 +308,10 @@ allow smbd_t nmbd_var_run_t:file read_file_perms;
+ stream_connect_pattern(smbd_t, nmbd_var_run_t, nmbd_var_run_t, nmbd_t)
+ 
+ kernel_getattr_core_if(smbd_t)
++
++# allow samba creating connections to the system bus.
++dbus_system_bus_client(smbd_t)
++
+ kernel_getattr_message_if(smbd_t)
+ kernel_read_network_state(smbd_t)
+ kernel_read_fs_sysctls(smbd_t)
+@@ -515,6 +519,8 @@ manage_files_pattern(nmbd_t, nmbd_var_run_t, nmbd_var_run_t)
+ manage_sock_files_pattern(nmbd_t, nmbd_var_run_t, nmbd_var_run_t)
+ files_pid_filetrans(nmbd_t, nmbd_var_run_t, { dir file sock_file })
+ filetrans_pattern(nmbd_t, smbd_var_run_t, nmbd_var_run_t, dir)
++# allow nmbd to create pidfile in /var/run/samba
++filetrans_pattern(nmbd_t, smbd_var_run_t, nmbd_var_run_t, file)
+ 
+ read_files_pattern(nmbd_t, samba_etc_t, samba_etc_t)
+ read_lnk_files_pattern(nmbd_t, samba_etc_t, samba_etc_t)
+-- 
+1.7.9.5
+

@@ -1,0 +1,143 @@
+From 2f6ce85aa36f39c3875c39ceeda5f73af2b0ddfc Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Wed, 1 Apr 2015 13:59:08 +0800
+Subject: [PATCH] refpolicy: fixes for type *_sudo_t
+
+Reference sources: selinux-policy-3.12.1-196.fc20.src.rpm
+Changes come from: policy-f20-base.patch
+
+Ported from reference sources:
+
+* dontaudit getattr on all device nodes
+* dontaudit search on non security dirs
+* allow to getattr on core kernel interface
+
+WRL fixes:
+
+* dontaudit list_dir_perms on tmpfs directories. This won't block any
+  sudo operation and will remove avc denial issue:
+
+  avc: denied { read } for pid=621 comm="sudo" \
+  name="shm" dev="devtmpfs" ino=7812 \
+  scontext=root:sysadm_r:sysadm_sudo_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:tmpfs_t:s0 tclass=dir
+
+* allow {sysadm,secadm,auditadm}_sudo_t read files at all levels. This
+  removes denial issues:
+
+  avc: denied { getattr } for pid=692 comm="sudo" \
+  path="/proc/kcore" dev="proc" ino=4026531996 \
+  scontext=root:sysadm_r:sysadm_sudo_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:proc_kcore_t:s15:c0.c1023 tclass=file
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/admin/sudo.te         | 19 +++++++++++++++++++
+ policy/modules/kernel/devices.if     | 19 +++++++++++++++++++
+ policy/modules/kernel/files.if       | 19 +++++++++++++++++++
+ policy/modules/system/application.te |  3 +++
+ 4 files changed, 60 insertions(+)
+
+diff --git a/policy/modules/admin/sudo.te b/policy/modules/admin/sudo.te
+index b08db77..267db11 100644
+--- a/policy/modules/admin/sudo.te
++++ b/policy/modules/admin/sudo.te
+@@ -7,3 +7,22 @@ attribute sudodomain;
+ 
+ type sudo_exec_t;
+ application_executable_file(sudo_exec_t)
++
++# dontaudit getattr on all device nodes
++dev_dontaudit_getattr_all(sudodomain)
++
++# get attribues of core kernel interface
++kernel_getattr_core_if(sudodomain)
++
++# WRL Fix:
++# dontaudit attempts to list contents of generic tmpfs directories
++fs_dontaudit_list_tmpfs(sudodomain)
++
++# sudodomain MLS trusted for reading from files at all levels
++gen_require(`
++	type sysadm_sudo_t, secadm_sudo_t, auditadm_sudo_t;
++')
++
++mls_file_read_all_levels(sysadm_sudo_t)
++mls_file_read_all_levels(secadm_sudo_t)
++mls_file_read_all_levels(auditadm_sudo_t)
+diff --git a/policy/modules/kernel/devices.if b/policy/modules/kernel/devices.if
+index e544abc..899f6d0 100644
+--- a/policy/modules/kernel/devices.if
++++ b/policy/modules/kernel/devices.if
+@@ -5031,6 +5031,25 @@ interface(`dev_read_cpu_online',`
+ 
+ ########################################
+ ## <summary>
++##      Dontaudit getattr on all device nodes.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain to not audit.
++##      </summary>
++## </param>
++#
++interface(`dev_dontaudit_getattr_all',`
++	gen_require(`
++		attribute device_node;
++		type device_t;
++	')
++
++	dontaudit $1 { device_t device_node }:dir_file_class_set getattr;
++')
++
++########################################
++## <summary>
+ ##	Unconfined access to devices.
+ ## </summary>
+ ## <param name="domain">
+diff --git a/policy/modules/kernel/files.if b/policy/modules/kernel/files.if
+index a792f95..6c0b5a7 100644
+--- a/policy/modules/kernel/files.if
++++ b/policy/modules/kernel/files.if
+@@ -6738,6 +6738,25 @@ interface(`files_unconfined',`
+ 	typeattribute $1 files_unconfined_type;
+ ')
+ 
++########################################
++## <summary>
++##     Do not audit attempts to search
++##     non security dirs.
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain to not audit.
++##     </summary>
++## </param>
++#
++interface(`files_dontaudit_search_non_security_dirs',`
++	gen_require(`
++		attribute non_security_file_type;
++	')
++
++	dontaudit $1 non_security_file_type:dir search_dir_perms;
++')
++
+ #######################################
+ ## <summary>
+ ##      Create generic pid directory.
+diff --git a/policy/modules/system/application.te b/policy/modules/system/application.te
+index c6fdab7..fbf4f1e 100644
+--- a/policy/modules/system/application.te
++++ b/policy/modules/system/application.te
+@@ -18,3 +18,6 @@ optional_policy(`
+ optional_policy(`
+ 	sudo_sigchld(application_domain_type)
+ ')
++
++# dontaudit attempts to search non security dirs
++files_dontaudit_search_non_security_dirs(application_domain_type)
+-- 
+1.9.1
+

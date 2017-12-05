@@ -1,0 +1,29 @@
+[PATCH] avahi-daemon dontaudit r/w to /dev/console, /dev/pts/*
+
+Upstream-Status: pending
+
+avahi-daemon does not need to read/write /dev/console, so dontaudit
+the AVC messages
+
+type=AVC msg=audit(1399622624.430:7): avc: denied { read write } for pid=337 comm="avahi-daemon" path="/dev/console" dev="devtmpfs" ino=5247 scontext=system_u:system_r:avahi_t:s0-s15:c0.c1023 tcontext=root:object_r:user_tty_device_t:s0 tclass=chr_file
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ policy/modules/contrib/avahi.te |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/contrib/avahi.te b/policy/modules/contrib/avahi.te
+index 95ae264..93b62d0 100644
+--- a/policy/modules/contrib/avahi.te
++++ b/policy/modules/contrib/avahi.te
+@@ -90,6 +90,7 @@ sysnet_domtrans_ifconfig(avahi_t)
+ sysnet_manage_config(avahi_t)
+ sysnet_etc_filetrans_config(avahi_t)
+ 
++userdom_dontaudit_use_user_terminals(avahi_t)
+ userdom_dontaudit_use_unpriv_user_fds(avahi_t)
+ userdom_dontaudit_search_user_home_dirs(avahi_t)
+ 
+-- 
+1.7.10.4
+

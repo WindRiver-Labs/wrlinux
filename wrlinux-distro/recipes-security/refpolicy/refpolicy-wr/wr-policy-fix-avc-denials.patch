@@ -1,0 +1,457 @@
+From 1406538dcca2e4e3d695fd7931ec914fec20538e Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Mon, 27 Feb 2017 10:33:18 +0000
+Subject: [PATCH] refpolicy: fix avc denials
+
+Reference sources: selinux-policy-3.13.1-225.6.fc25.src.rpm
+Changes come from: policy-f25-base.patch
+                   policy-f25-contrib.patch
+
+* allow NetworkManager to read:
+  /run/systemd/seats (systemd_logind_var_run_t)
+  /run/systemd/machines (init_var_run_t)
+  /run/systemd/sessions (systemd_logind_sessions_t)
+
+* allow NetworkManager to write /sys (sysfs_t)
+* allow acpid (apmd_t) to search /run/systemd/journal (syslogd_var_run_t)
+* allow dhclient to search /etc/ssl (cert_t), /run/systemd/journal
+* allow named to search /proc/net (sysctl_net_t)
+* allow polkitd to read:
+  /run/systemd/seats
+  /run/systemd/sessions
+  /proc/sys/vm/overcommit_memory (sysctl_vm_overcommit_t)
+  /run/systemd/machines
+
+* allow polkitd to search:
+  /run/systemd/journal
+  /proc/sys/vm (sysctl_vm_t)
+
+* allow systemd-hostnamed to read sysfs_t file/lnk_file, search /run/systemd/journal and tmpfs dir
+* allow systemd-logind to create, mounton /var/run/user/* (user_runtime_t)
+* allow systemd-logind to start/stop/status init_var_run_t services:
+  /run/systemd/transient/user-0.slice
+  /run/systemd/transient/session-c1.scope
+
+* allow systemd-user-sessions to write /dev/kmsg (kmsg_device_t)
+* allow X to read and write /dev/mem (memory_device_t)
+
+WRL Fixes:
+* allow irqbalance to write /proc/irq/* dirs (sysctl_irq_t), create
+  smp_affinity files (sysctl_irq_t)
+* allow zebra/ripngd/ospf6d/ospfd/ripd/bgpd (zebra_t) to read nsfs_t files
+* dontaudit systemd-user-sessions read file_contexts.subs_dist (file_context_t)
+
+Fix avc denials:
+  avc: denied { read } for pid=452 comm="NetworkManager" \
+  name="seats" dev="tmpfs" ino=1494 \
+  scontext=system_u:system_r:NetworkManager_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:systemd_logind_var_run_t:s0 tclass=dir
+
+  avc: denied { read } for pid=466 comm="NetworkManager" \
+  name="sessions" dev="tmpfs" ino=12334 \
+  scontext=system_u:system_r:NetworkManager_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:systemd_logind_sessions_t:s0 tclass=dir
+
+  avc: denied { read } for pid=449 comm="NetworkManager" \
+  name="machines" dev="tmpfs" ino=1667 \
+  scontext=system_u:system_r:NetworkManager_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:init_var_run_t:s0 tclass=dir
+
+  avc: denied { write } for pid=452 comm="NetworkManager" \
+  name="/" dev="sysfs" ino=1 \
+  scontext=system_u:system_r:NetworkManager_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:sysfs_t:s0 tclass=dir
+
+  avc: denied { search } for pid=473 comm="acpid" \
+  name="journal" dev="tmpfs" ino=12118 \
+  scontext=system_u:system_r:apmd_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 tclass=dir
+
+  avc: denied { search } for pid=983 comm="dhclient" \
+  name="ssl" dev="sda1" ino=1358436 \
+  scontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:cert_t:s0 tclass=dir
+
+  avc: denied { search } for pid=983 comm="dhclient" \
+  name="journal" dev="tmpfs" ino=12118 \
+  scontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 tclass=dir
+
+  avc: denied { write } for pid=440 comm="irqbalance" \
+  name="40" dev="proc" ino=4026531956 \
+  scontext=system_u:system_r:irqbalance_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:sysctl_irq_t:s0 tclass=dir
+
+  avc: denied { create } for pid=420 comm="irqbalance" \
+  name="smp_affinity" \
+  scontext=system_u:system_r:irqbalance_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:sysctl_irq_t:s0 tclass=file
+
+  avc: denied { associate } for pid=423 comm="irqbalance" \
+  name="smp_affinity" \
+  scontext=system_u:object_r:sysctl_irq_t:s0 \
+  tcontext=system_u:object_r:proc_t:s0 tclass=filesystem
+
+  avc: denied { search } for pid=791 comm="named" \
+  name="net" dev="proc" ino=2658 \
+  scontext=system_u:system_r:named_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:sysctl_net_t:s0 tclass=dir
+
+  avc: denied { search } for pid=818 comm="polkitd" \
+  name="journal" dev="tmpfs" ino=12118 \
+  scontext=system_u:system_r:policykit_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 tclass=dir
+
+  avc: denied { read } for pid=818 comm="polkitd" \
+  name="seats" dev="tmpfs" ino=1494 \
+  scontext=system_u:system_r:policykit_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:systemd_logind_var_run_t:s0 tclass=dir
+
+  avc: denied { search } for pid=841 \
+  comm=4A5320536F75727E20546872656164 name="vm" dev="proc" ino=15932 \
+  scontext=system_u:system_r:policykit_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:sysctl_vm_t:s0 tclass=dir
+
+  avc: denied { read } for pid=808 comm="polkitd" \
+  name="sessions" dev="tmpfs" ino=12334 \
+  scontext=system_u:system_r:policykit_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:systemd_logind_sessions_t:s0 tclass=dir
+
+  avc: denied { read } for pid=846 comm=4A5320536F75727E20546872656164 \
+  name="overcommit_memory" dev="proc" ino=17506 \
+  scontext=system_u:system_r:policykit_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:sysctl_vm_overcommit_t:s0 tclass=file
+
+  avc: denied { read } for pid=816 comm="polkitd" \
+  name="machines" dev="tmpfs" ino=1667 \
+  scontext=system_u:system_r:policykit_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:init_var_run_t:s0 tclass=dir
+
+  avc: denied { search } for pid=505 comm="systemd-hostnam" \
+  name="journal" dev="tmpfs" ino=12118 \
+  scontext=system_u:system_r:systemd_hostnamed_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 tclass=dir
+
+  avc: denied { search } for pid=505 comm="systemd-hostnam" \
+  name="/" dev="tmpfs" ino=17436 \
+  scontext=system_u:system_r:systemd_hostnamed_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:tmpfs_t:s0 tclass=dir
+
+  avc: denied { read } for pid=505 comm="systemd-hostnam" \
+  name="id" dev="sysfs" ino=220 \
+  scontext=system_u:system_r:systemd_hostnamed_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:sysfs_t:s0 tclass=lnk_file
+
+  avc: denied { read } for pid=505 comm="systemd-hostnam" \
+  name="pm_profile" dev="sysfs" ino=1390 \
+  scontext=system_u:system_r:systemd_hostnamed_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:sysfs_t:s0 tclass=file
+
+  avc: denied { create } for pid=414 comm="systemd-logind" name="0" \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=root:object_r:user_runtime_t:s0 tclass=dir
+
+  avc: denied { start } for auid=n/a uid=0 gid=0 \
+  path="/run/systemd/transient/user-0.slice" \
+  cmdline="/lib/systemd/systemd-logind" \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:init_var_run_t:s0 tclass=service
+
+  avc: denied { status } for auid=n/a uid=0 gid=0 \
+  path="/run/systemd/transient/session-c1.scope" \
+  cmdline="/lib/systemd/systemd-logind" \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:init_var_run_t:s0 tclass=service
+
+  avc: denied { write } for pid=557 comm="systemd-user-se" \
+  name="kmsg" dev="devtmpfs" ino=2061 \
+  scontext=system_u:system_r:systemd_sessions_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:kmsg_device_t:s15:c0.c1023 tclass=chr_file
+
+  avc: denied { read write } for pid=763 comm="X" \
+  name="mem" dev="devtmpfs" ino=8400 \
+  scontext=system_u:system_r:xserver_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:memory_device_t:s15:c0.c1023 tclass=chr_file
+
+  avc: denied { read } for pid=487 comm="zebra" \
+  dev="nsfs" ino=4026531969 \
+  scontext=system_u:system_r:zebra_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:nsfs_t:s0 tclass=file
+
+  avc: denied { read } for pid=684 comm="systemd-user-se" \
+  name="file_contexts.subs_dist" dev="sda1" ino=1766526 \
+  scontext=system_u:system_r:systemd_sessions_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:file_context_t:s0 tclass=file
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/apm.te            |  1 +
+ policy/modules/contrib/bind.te           |  1 +
+ policy/modules/contrib/irqbalance.te     |  6 ++++++
+ policy/modules/contrib/networkmanager.te |  5 +++++
+ policy/modules/contrib/policykit.te      |  6 ++++++
+ policy/modules/contrib/zebra.te          |  1 +
+ policy/modules/services/xserver.te       |  3 +++
+ policy/modules/system/init.if            | 19 +++++++++++++++++++
+ policy/modules/system/systemd.if         | 19 +++++++++++++++++++
+ policy/modules/system/systemd.te         | 20 ++++++++++++++++++++
+ 10 files changed, 81 insertions(+)
+
+diff --git a/policy/modules/contrib/apm.te b/policy/modules/contrib/apm.te
+index 7c54285..ff42619 100644
+--- a/policy/modules/contrib/apm.te
++++ b/policy/modules/contrib/apm.te
+@@ -87,6 +87,7 @@ files_var_lib_filetrans(apmd_t, apmd_var_lib_t, dir)
+ manage_files_pattern(apmd_t, apmd_var_run_t, apmd_var_run_t)
+ manage_sock_files_pattern(apmd_t, apmd_var_run_t, apmd_var_run_t)
+ files_pid_filetrans(apmd_t, apmd_var_run_t, { file sock_file })
++mls_file_read_all_levels(apmd_t)
+ 
+ can_exec(apmd_t, apmd_var_run_t)
+ 
+diff --git a/policy/modules/contrib/bind.te b/policy/modules/contrib/bind.te
+index 05a7c98..0ac1bae 100644
+--- a/policy/modules/contrib/bind.te
++++ b/policy/modules/contrib/bind.te
+@@ -118,6 +118,7 @@ kernel_read_kernel_sysctls(named_t)
+ kernel_read_vm_overcommit_sysctl(named_t)
+ kernel_read_system_state(named_t)
+ kernel_read_network_state(named_t)
++kernel_read_net_sysctls(named_t)
+ 
+ corecmd_search_bin(named_t)
+ 
+diff --git a/policy/modules/contrib/irqbalance.te b/policy/modules/contrib/irqbalance.te
+index 82040d5..9eb3dd1 100644
+--- a/policy/modules/contrib/irqbalance.te
++++ b/policy/modules/contrib/irqbalance.te
+@@ -32,6 +32,12 @@ kernel_read_network_state(irqbalance_t)
+ kernel_read_system_state(irqbalance_t)
+ kernel_read_kernel_sysctls(irqbalance_t)
+ kernel_rw_irq_sysctls(irqbalance_t)
++gen_require(`
++	type sysctl_irq_t, proc_t;
++')
++allow irqbalance_t sysctl_irq_t:dir { rw_dir_perms };
++allow irqbalance_t sysctl_irq_t:file create;
++allow sysctl_irq_t proc_t:filesystem associate;
+ 
+ dev_read_sysfs(irqbalance_t)
+ 
+diff --git a/policy/modules/contrib/networkmanager.te b/policy/modules/contrib/networkmanager.te
+index 2b530cd..542cc19 100644
+--- a/policy/modules/contrib/networkmanager.te
++++ b/policy/modules/contrib/networkmanager.te
+@@ -135,6 +135,7 @@ corecmd_exec_shell(NetworkManager_t)
+ corecmd_exec_bin(NetworkManager_t)
+ 
+ dev_rw_sysfs(NetworkManager_t)
++dev_write_sysfs_dirs(NetworkManager_t)
+ dev_read_rand(NetworkManager_t)
+ dev_read_urand(NetworkManager_t)
+ dev_dontaudit_getattr_generic_blk_files(NetworkManager_t)
+@@ -161,6 +162,7 @@ storage_getattr_fixed_disk_dev(NetworkManager_t)
+ init_read_utmp(NetworkManager_t)
+ init_dontaudit_write_utmp(NetworkManager_t)
+ init_domtrans_script(NetworkManager_t)
++init_create_pid_dirs(NetworkManager_t)
+ 
+ auth_use_nsswitch(NetworkManager_t)
+ 
+@@ -185,6 +187,9 @@ sysnet_search_dhcp_state(NetworkManager_t)
+ sysnet_manage_config(NetworkManager_t)
+ sysnet_etc_filetrans_config(NetworkManager_t)
+ 
++systemd_login_list_pid_dirs(NetworkManager_t)
++systemd_read_logind_sessions_files(NetworkManager_t)
++
+ # certificates in user home directories (cert_home_t in ~/\.pki)
+ userdom_read_user_home_content_files(NetworkManager_t)
+ 
+diff --git a/policy/modules/contrib/policykit.te b/policy/modules/contrib/policykit.te
+index 6c5f592..8b6f8d1 100644
+--- a/policy/modules/contrib/policykit.te
++++ b/policy/modules/contrib/policykit.te
+@@ -87,10 +87,16 @@ domtrans_pattern(policykit_t, policykit_resolve_exec_t, policykit_resolve_t)
+ 
+ kernel_read_kernel_sysctls(policykit_t)
+ kernel_read_system_state(policykit_t)
++kernel_search_vm_sysctl(policykit_t)
++kernel_read_vm_overcommit_sysctl(policykit_t)
+ 
+ domain_read_all_domains_state(policykit_t)
+ 
+ files_dontaudit_search_all_mountpoints(policykit_t)
++mls_file_read_all_levels(policykit_t)
++systemd_login_list_pid_dirs(policykit_t)
++systemd_read_logind_sessions_files(policykit_t)
++init_create_pid_dirs(policykit_t)
+ 
+ fs_getattr_xattr_fs(policykit_t)
+ fs_list_inotifyfs(policykit_t)
+diff --git a/policy/modules/contrib/zebra.te b/policy/modules/contrib/zebra.te
+index a12ae10..472af62 100644
+--- a/policy/modules/contrib/zebra.te
++++ b/policy/modules/contrib/zebra.te
+@@ -109,6 +109,7 @@ files_read_etc_runtime_files(zebra_t)
+ 
+ fs_getattr_all_fs(zebra_t)
+ fs_search_auto_mountpoints(zebra_t)
++fs_read_nsfs_files(zebra_t)
+ 
+ term_list_ptys(zebra_t)
+ 
+diff --git a/policy/modules/services/xserver.te b/policy/modules/services/xserver.te
+index ed63933..27a7f15 100644
+--- a/policy/modules/services/xserver.te
++++ b/policy/modules/services/xserver.te
+@@ -701,6 +701,9 @@ files_read_etc_files(xserver_t)
+ files_read_etc_runtime_files(xserver_t)
+ files_read_usr_files(xserver_t)
+ 
++mls_file_read_all_levels(xserver_t)
++mls_file_write_all_levels(xserver_t)
++
+ # brought on by rhgb
+ files_search_mnt(xserver_t)
+ # for nscd
+diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
+index 8d27323..94bfc1c 100644
+--- a/policy/modules/system/init.if
++++ b/policy/modules/system/init.if
+@@ -2599,6 +2599,25 @@ interface(`init_create_pid_dirs',`
+ 	create_dirs_pattern($1, init_var_run_t, init_var_run_t)
+ ')
+ 
++########################################
++## <summary>
++##      Allow the specified domain to modify the systemd configuration of
++##      transient scripts.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`init_config_transient_files',`
++	gen_require(`
++		attribute init_var_run_t;
++	')
++
++	allow $1 init_var_run_t:service { start stop status };
++')
++
+ #######################################
+ ## <summary>
+ ##	Reload all systemd units.
+diff --git a/policy/modules/system/systemd.if b/policy/modules/system/systemd.if
+index fee64a5..7e3bb9f 100644
+--- a/policy/modules/system/systemd.if
++++ b/policy/modules/system/systemd.if
+@@ -59,6 +59,25 @@ interface(`systemd_manage_logind_pid_pipes',`
+ 
+ ######################################
+ ## <summary>
++##      Read systemd_login PID files.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`systemd_login_list_pid_dirs',`
++	gen_require(`
++		type systemd_logind_var_run_t;
++	')
++
++	files_search_pids($1)
++	list_dirs_pattern($1, systemd_logind_var_run_t, systemd_logind_var_run_t)
++')
++
++######################################
++## <summary>
+ ##   Use inherited systemd
+ ##   logind file descriptors.
+ ## </summary>
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index d7047aa..e7361e6 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -196,8 +196,11 @@ optional_policy(`
+ #
+ 
+ kernel_read_kernel_sysctls(systemd_hostnamed_t)
++dev_read_sysfs(systemd_hostnamed_t)
+ 
+ files_read_etc_files(systemd_hostnamed_t)
++fs_search_tmpfs(systemd_hostnamed_t)
++mls_file_read_all_levels(systemd_hostnamed_t)
+ 
+ seutil_read_file_contexts(systemd_hostnamed_t)
+ 
+@@ -262,6 +265,7 @@ init_start_all_units(systemd_logind_t)
+ init_stop_all_units(systemd_logind_t)
+ init_service_status(systemd_logind_t)
+ init_service_start(systemd_logind_t)
++init_config_transient_files(systemd_logind_t)
+ 
+ locallogin_read_state(systemd_logind_t)
+ 
+@@ -286,11 +290,13 @@ fs_mount_tmpfs(systemd_logind_t)
+ auth_manage_var_auth(systemd_logind_t)
+ mls_file_read_all_levels(systemd_logind_t)
+ mls_file_write_all_levels(systemd_logind_t)
++domain_obj_id_change_exemption(systemd_logind_t)
+ 
+ domain_read_all_domains_state(systemd_logind_t)
+ 
+ userdom_manage_all_user_tmp_content(systemd_logind_t)
+ userdom_mounton_tmp_dirs(systemd_logind_t)
++userdom_manage_user_tmp_dirs(systemd_logind_t)
+ 
+ files_dontaudit_list_non_security(systemd_logind_t)
+ auth_dontaudit_mounton_var_auth(systemd_logind_t)
+@@ -304,6 +310,7 @@ seutil_read_config(systemd_logind_t)
+ seutil_read_file_contexts(systemd_logind_t)
+ userdom_manage_user_runtime_dirs(systemd_logind_t)
+ userdom_manage_user_runtime_root_dirs(systemd_logind_t)
++userdom_mounton_user_runtime_dirs(systemd_logind_t)
+ 
+ #########################################
+ #
+@@ -345,8 +352,10 @@ optional_policy(`
+ 
+ allow systemd_sessions_t systemd_sessions_var_run_t:file manage_file_perms;
+ files_pid_filetrans(systemd_sessions_t, systemd_sessions_var_run_t, file)
++mls_file_write_all_levels(systemd_sessions_t)
+ 
+ systemd_log_parse_environment(systemd_sessions_t)
++seutil_dontaudit_read_file_contexts(systemd_sessions_t)
+ 
+ #########################################
+ #
+@@ -399,6 +408,17 @@ tunable_policy(`systemd_tmpfiles_manage_all',`
+ 
+ #######################################
+ #
++# Systemd_backlight_t local policy
++#
++
++allow systemd_backlight_t self:unix_dgram_socket create;
++
++dev_write_kmsg(systemd_backlight_t)
++mls_file_write_all_levels(systemd_backlight_t)
++kernel_read_system_state(systemd_backlight_t)
++
++#######################################
++#
+ # Systemd_passwd_agent local policy
+ #
+ 
+-- 
+2.11.0
+

@@ -1,0 +1,79 @@
+Subject: [PATCH] refpolicy: add boolean to allow creating unconfined VMs
+
+While using static labeling, admins may want to create VMs running on
+unconfined_t domain , by setting a static label
+"system_u:system_r:unconfined_t:...".
+
+Add a boolean  and set it to false by default because we do not suggest
+to allow this.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
+---
+ policy/modules/contrib/virt.te      |   14 ++++++++++++++
+ policy/modules/system/unconfined.if |   19 +++++++++++++++++++
+ 2 files changed, 33 insertions(+)
+
+diff --git a/policy/modules/contrib/virt.te b/policy/modules/contrib/virt.te
+index b8ad946..c2777a9 100644
+--- a/policy/modules/contrib/virt.te
++++ b/policy/modules/contrib/virt.te
+@@ -47,6 +47,14 @@ gen_tunable(virt_use_sysfs, false)
+ ## </desc>
+ gen_tunable(virt_use_usb, true)
+ 
++## <desc>
++## <p>
++## Allow admins to create VMs running on unconfined_t domain, by
++## setting a static label "system_u:system_r:unconfined_t:..."
++## </p>
++## </desc>
++gen_tunable(virt_allow_unconfined_vm, false)
++
+ virt_domain_template(svirt)
+ role system_r types svirt_t;
+ 
+@@ -396,6 +404,12 @@ optional_policy(`
+ 	unconfined_domain(virtd_t)
+ ')
+ 
++optional_policy(`
++	tunable_policy(`virt_allow_unconfined_vm',`
++		unconfined_allow_domtrans(virtd_t)
++	')
++')
++
+ ########################################
+ #
+ # virtual domains common policy
+diff --git a/policy/modules/system/unconfined.if b/policy/modules/system/unconfined.if
+index db7aabb..f1bcb1e 100644
+--- a/policy/modules/system/unconfined.if
++++ b/policy/modules/system/unconfined.if
+@@ -587,3 +587,22 @@ interface(`unconfined_dbus_connect',`
+ 
+ 	allow $1 unconfined_t:dbus acquire_svc;
+ ')
++
++########################################
++## <summary>
++##	Allow a domain to transition to unconfined domain
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++#
++interface(`unconfined_allow_domtrans',`
++	gen_require(`
++		type unconfined_t;
++		class process transition;
++	')
++
++	allow $1 unconfined_t:process transition;
++')
+-- 
+1.7.9.5
+

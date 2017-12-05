@@ -1,0 +1,224 @@
+From 61b8b92fad71a2c38db71da4ff146af40f00c0ad Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Fri, 4 Mar 2016 01:52:02 -0500
+Subject: [PATCH] wr-policy: allow initrc_t start systemd_unit_t service
+
+Reference sources: selinux-policy-3.13.1-128.21.fc22.src.rpm
+Changes come from: policy-f22-base.patch
+
+* Fix label for /sbin/sulogin.util-linux
+* Allow initrc_t start, reload systemd_unit_t services
+* Add initial local policy for systemd_passwd_agent_t
+* Allow sulogin_t uses console, ttys, ptys
+* Allow sulogin_t getattr from chr_files, blk_files
+* Allow sulogin_t read generic crypto sysctls
+
+Fix avc denials:
+
+  avc: denied { transition } for pid=1023 comm="sulogin" \
+  path="/bin/bash" dev="hda" ino=27481 \
+  scontext=system_u:system_r:initrc_t:s0-s15:c0.c1023 \
+  tcontext=root:sysadm_r:sysadm_t:s0 \
+  tclass=process permissive=1
+
+  avc: denied { search } for pid=1075 comm="sulogin" \
+  name="sys" dev="proc" ino=4026531855 \
+  scontext=system_u:system_r:sulogin_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:sysctl_t:s0 \
+  tclass=dir permissive=0
+
+  avc: denied { getattr } for pid=985 comm="sulogin" \
+  path="/dev/fuse" dev="devtmpfs" ino=8914 \
+  scontext=system_u:system_r:sulogin_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:fuse_device_t:s0 \
+  tclass=chr_file permissive=1
+
+  avc: denied { getattr } for pid=985 comm="sulogin" \
+  path="/dev/vcsa6" dev="devtmpfs" ino=14541 \
+  scontext=system_u:system_r:sulogin_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:tty_device_t:s0 \
+  tclass=chr_file permissive=1
+
+  avc: denied { getattr } for pid=985 comm="sulogin" \
+  path="/dev/ppp" dev="devtmpfs" ino=8918 \
+  scontext=system_u:system_r:sulogin_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:ppp_device_t:s0 \
+  tclass=chr_file permissive=1
+
+  avc: denied { start } for auid=n/a uid=0 gid=0 \
+  path="/lib/systemd/system/multi-user.target" \
+  cmdline="/bin/systemctl --job-mode=fail --no-block default" \
+  scontext=system_u:system_r:initrc_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:systemd_unit_t:s0 \
+  tclass=service
+
+  avc: denied { read write } for pid=984 comm="systemd-tty-ask" \
+  path="/dev/console" dev="devtmpfs" ino=7265 \
+  scontext=system_u:system_r:systemd_passwd_agent_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:console_device_t:s0 \
+  tclass=chr_file permissive=0
+
+  avc: denied { setfscreate } for pid=940 comm="systemd-tty-ask" \
+  scontext=system_u:system_r:systemd_passwd_agent_t:s0-s15:c0.c1023 \
+  tcontext=system_u:system_r:systemd_passwd_agent_t:s0-s15:c0.c1023 \
+  tclass=process permissive=1
+
+  avc: denied { read } for pid=993 comm="systemd-tty-ask" \
+  name="ask-password" dev="tmpfs" ino=8192 \
+  scontext=system_u:system_r:systemd_passwd_agent_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:init_var_run_t:s0 \
+  tclass=dir permissive=1
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/kernel/devices.te    |  1 +
+ policy/modules/system/init.if       | 37 +++++++++++++++++++++++++++++++++++++
+ policy/modules/system/init.te       |  2 ++
+ policy/modules/system/locallogin.fc |  1 +
+ policy/modules/system/locallogin.te | 10 ++++++++++
+ policy/modules/system/systemd.te    | 18 ++++++++++++++++++
+ 6 files changed, 69 insertions(+)
+
+diff --git a/policy/modules/kernel/devices.te b/policy/modules/kernel/devices.te
+index ed045d9..0cced71 100644
+--- a/policy/modules/kernel/devices.te
++++ b/policy/modules/kernel/devices.te
+@@ -21,6 +21,7 @@ files_mountpoint(device_t)
+ files_associate_tmp(device_t)
+ fs_xattr_type(device_t)
+ fs_use_trans devtmpfs gen_context(system_u:object_r:device_t,s0);
++dev_node(device_t)
+ 
+ #
+ # Type for /dev/agpgart
+diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
+index 5e0e742..44b7564 100644
+--- a/policy/modules/system/init.if
++++ b/policy/modules/system/init.if
+@@ -2543,6 +2543,43 @@ interface(`init_stop_all_units',`
+ 	allow $1 systemdunit:service stop;
+ ')
+ 
++########################################
++## <summary>
++##      Read/Write init unnamed pipes.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`init_rw_pipes',`
++	gen_require(`
++		type init_var_run_t;
++	')
++
++	rw_fifo_files_pattern($1, init_var_run_t, init_var_run_t)
++')
++
++#######################################
++## <summary>
++##  Create a directory in the /run/systemd directory.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`init_create_pid_dirs',`
++	gen_require(`
++		type init_var_run_t;
++	')
++
++	allow $1 init_var_run_t:dir list_dir_perms;
++	create_dirs_pattern($1, init_var_run_t, init_var_run_t)
++')
++
+ #######################################
+ ## <summary>
+ ##	Reload all systemd units.
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index dd89707..a5114a9 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -771,6 +771,8 @@ ifdef(`init_systemd',`
+ 	init_rw_stream_sockets(initrc_t)
+ 	init_get_all_units_status(initrc_t)
+ 	init_stop_all_units(initrc_t)
++	init_reload_all_units(initrc_t)
++	init_start_all_units(initrc_t)
+ 
+ 	# Create /etc/audit.rules.prev after firstboot remediation
+ 	logging_manage_audit_config(initrc_t)
+diff --git a/policy/modules/system/locallogin.fc b/policy/modules/system/locallogin.fc
+index 6c349ed..df5175d 100644
+--- a/policy/modules/system/locallogin.fc
++++ b/policy/modules/system/locallogin.fc
+@@ -1,5 +1,6 @@
+ 
+ /sbin/sulogin		--	gen_context(system_u:object_r:sulogin_exec_t,s0)
++/sbin/sulogin.util-linux	--	gen_context(system_u:object_r:sulogin_exec_t,s0)
+ /sbin/sushell		--	gen_context(system_u:object_r:sulogin_exec_t,s0)
+ 
+ /usr/sbin/sulogin	--	gen_context(system_u:object_r:sulogin_exec_t,s0)
+diff --git a/policy/modules/system/locallogin.te b/policy/modules/system/locallogin.te
+index ef04aa0..ed9f8e1 100644
+--- a/policy/modules/system/locallogin.te
++++ b/policy/modules/system/locallogin.te
+@@ -227,6 +227,7 @@ allow sulogin_t self:msgq create_msgq_perms;
+ allow sulogin_t self:msg { send receive };
+ 
+ kernel_read_system_state(sulogin_t)
++kernel_read_crypto_sysctls(sulogin_t)
+ # because file systems are not mounted:
+ kernel_dontaudit_search_unlabeled(sulogin_t)
+ 
+@@ -251,6 +252,15 @@ userdom_use_user_ptys(sulogin_t)
+ 
+ sysadm_shell_domtrans(sulogin_t)
+ 
++dev_getattr_all_chr_files(sulogin_t)
++dev_getattr_all_blk_files(sulogin_t)
++
++mls_file_read_all_levels(sulogin_t)
++
++term_use_console(sulogin_t)
++term_use_generic_ptys(sulogin_t)
++term_use_all_ttys(sulogin_t)
++
+ # suse and debian do not use pam with sulogin...
+ ifdef(`distro_suse', `define(`sulogin_no_pam')')
+ ifdef(`distro_debian', `define(`sulogin_no_pam')')
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index dab7f44..4a68160 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -315,3 +315,21 @@ tunable_policy(`systemd_tmpfiles_manage_all',`
+ 	files_relabel_non_security_dirs(systemd_tmpfiles_t)
+ 	files_relabel_non_security_files(systemd_tmpfiles_t)
+ ')
++
++#######################################
++#
++# Systemd_passwd_agent local policy
++#
++
++allow systemd_passwd_agent_t self:capability { chown sys_tty_config dac_override };
++allow systemd_passwd_agent_t self:process { setfscreate signal_perms setsockcreate };
++allow systemd_passwd_agent_t self:unix_dgram_socket create_socket_perms;
++
++term_read_console(systemd_passwd_agent_t)
++term_write_console(systemd_passwd_agent_t)
++
++init_search_run(systemd_passwd_agent_t)
++init_rw_pipes(systemd_passwd_agent_t)
++init_create_pid_dirs(systemd_passwd_agent_t)
++init_read_utmp(systemd_passwd_agent_t)
++init_stream_connect(systemd_passwd_agent_t)
+-- 
+1.9.1
+

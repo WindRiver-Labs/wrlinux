@@ -1,0 +1,128 @@
+From 30f9bf43e4afeec2bcdde7b2f786fe27712c0527 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 4 Feb 2016 06:03:19 -0500
+Subject: [PATCH] wr-policy: fix avc denials from systemd-tmpfile
+
+Patches ported from Fedora 22:
+Reference sources: selinux-policy-3.13.1-128.21.fc22.src.rpm
+Changes come from: policy-f22-base.patch
+
+Fix avc denials:
+
+  avc: denied { net_admin } for pid=92 comm="systemd-tmpfile" \
+  capability=12 \
+  scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tcontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tclass=capability
+
+  avc: denied { relabelfrom relabelto } for pid=108 \
+  comm="systemd-tmpfile" name="audit" dev="tmpfs" ino=9432 \
+  scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:auditd_log_t:s15:c0.c1023 \
+  tclass=dir
+
+  avc: denied { getattr } for pid=117 comm="systemd-tmpfile" \
+  path="/var/tmp" dev="hda" ino=5148 \
+  scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:tmp_t:s0 \
+  tclass=lnk_file
+
+  avc: denied { create } for pid=98 comm="systemd-tmpfile" name="log" \
+  scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:var_log_t:s0-s15:c0.c1023 \
+  tclass=dir
+
+  avc: denied { create } for pid=98 comm="systemd-tmpfile" name="tmp" \
+  scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:tmp_t:s0-s15:c0.c1023 \
+  tclass=dir
+
+  avc: denied { read } for pid=92 comm="systemd-tmpfile" \
+  name="filesystems" dev="proc" ino=4026532052 \
+  scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:proc_t:s0 \
+  tclass=file
+
+  avc: denied { search } for pid=92 comm="systemd-tmpfile" name="1" \
+  dev="proc" ino=7987 \
+  scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tcontext=system_u:system_r:init_t:s0-s15:c0.c1023 \
+  tclass=dir
+
+  avc: denied { search } for pid=92 comm="systemd-tmpfile" \
+  name="journal" dev="tmpfs" ino=8226 \
+  scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 \
+  tclass=dir
+
+  avc: denied { write } for pid=92 comm="systemd-tmpfile" \
+  name="kmsg" dev="devtmpfs" ino=7242 \
+  scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:kmsg_device_t:s15:c0.c1023 \
+  tclass=chr_file
+  
+  avc: denied { read } for pid=92 comm="systemd-tmpfile" \
+  name="kmod.conf" dev="tmpfs" ino=8660 \
+  scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:var_run_t:s0 \
+  tclass=file
+  
+  avc: denied { search } for pid=92 comm="systemd-tmpfile" \
+  name="kernel" dev="proc" ino=8731 \
+  scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:sysctl_kernel_t:s0 tclass=dir
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/system/systemd.te | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index aa7b674..0dbb76c 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -10,7 +10,7 @@ policy_module(systemd, 1.1.0)
+ ## Enable support for systemd-tmpfiles to manage all non-security files.
+ ## </p>
+ ## </desc>
+-gen_tunable(systemd_tmpfiles_manage_all, false)
++gen_tunable(systemd_tmpfiles_manage_all, true)
+ 
+ type systemd_activate_t;
+ type systemd_activate_exec_t;
+@@ -260,6 +260,7 @@ logging_send_syslog_msg(systemd_sessions_t)
+ 
+ allow systemd_tmpfiles_t self:capability  { fowner chown fsetid dac_override mknod };
+ allow systemd_tmpfiles_t self:process { setfscreate getcap };
++dontaudit systemd_tmpfiles_t self:capability net_admin;
+ 
+ dev_relabel_all_sysfs(systemd_tmpfiles_t)
+ dev_read_urand(systemd_tmpfiles_t)
+@@ -269,6 +270,8 @@ files_read_etc_files(systemd_tmpfiles_t)
+ files_relabel_all_lock_dirs(systemd_tmpfiles_t)
+ files_relabel_all_pid_dirs(systemd_tmpfiles_t)
+ files_relabel_all_tmp_dirs(systemd_tmpfiles_t)
++files_manage_non_auth_files(systemd_tmpfiles_t)
++files_relabel_non_auth_files(systemd_tmpfiles_t)
+ 
+ auth_manage_var_auth(systemd_tmpfiles_t)
+ auth_manage_login_records(systemd_tmpfiles_t)
+@@ -279,6 +282,13 @@ logging_send_syslog_msg(systemd_tmpfiles_t)
+ 
+ seutil_read_file_contexts(systemd_tmpfiles_t)
+ 
++init_read_state(systemd_tmpfiles_t)
++kernel_read_kernel_sysctls(systemd_tmpfiles_t)
++mls_file_write_all_levels(systemd_tmpfiles_t)
++mls_file_read_all_levels(systemd_tmpfiles_t)
++mls_file_downgrade(systemd_tmpfiles_t)
++mls_file_upgrade(systemd_tmpfiles_t)
++
+ tunable_policy(`systemd_tmpfiles_manage_all',`
+ 	# systemd-tmpfiles can be configured to manage anything.
+ 	# have a last-resort option for users to do this.
+-- 
+1.9.1
+

@@ -1,0 +1,33 @@
+From 02a15cfe0e36b43574c5de8a199a8bfe535cfbc2 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 3 Mar 2016 06:41:15 -0500
+Subject: [PATCH 3/5] wr-policy: allow postfix_master_t getsched to itself
+
+Reference sources: selinux-policy-3.13.1-128.21.fc22.src.rpm
+Changes come from: policy-f22-base.patch
+
+* Allow postfix_master_t get scheduling information of itself
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/postfix.te | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/policy/modules/contrib/postfix.te b/policy/modules/contrib/postfix.te
+index 38890e0..239bf73 100644
+--- a/policy/modules/contrib/postfix.te
++++ b/policy/modules/contrib/postfix.te
+@@ -200,7 +200,7 @@ domain_use_interactive_fds(postfix_user_domains)
+ 
+ allow postfix_master_t self:capability { chown dac_override kill fowner setgid setuid sys_tty_config };
+ allow postfix_master_t self:capability2 block_suspend;
+-allow postfix_master_t self:process setrlimit;
++allow postfix_master_t self:process { setrlimit getsched };
+ allow postfix_master_t self:tcp_socket create_stream_socket_perms;
+ allow postfix_master_t self:udp_socket create_socket_perms;
+ 
+-- 
+1.9.1
+

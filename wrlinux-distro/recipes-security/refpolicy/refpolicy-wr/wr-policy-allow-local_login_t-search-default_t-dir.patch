@@ -1,0 +1,40 @@
+From 307230ec26510b9fd6116b7257c9bdb12a8e73b8 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Fri, 3 Mar 2017 09:28:41 +0000
+Subject: [PATCH] refpolicy: allow local_login_t search default_t dir
+
+Fix login issue with standard policy:
+
+  No directory, logging in with HOME=/
+
+Reference sources: selinux-policy-3.13.1-225.6.fc25.src.rpm
+
+Remove avc denial:
+
+  avc: denied { search } for pid=777 comm="login" \
+  name="root" dev="vda" ino=27071 \
+  scontext=system_u:system_r:local_login_t \
+  tcontext=system_u:object_r:default_t tclass=dir
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/system/locallogin.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/system/locallogin.te b/policy/modules/system/locallogin.te
+index d947d86..0662310 100644
+--- a/policy/modules/system/locallogin.te
++++ b/policy/modules/system/locallogin.te
+@@ -103,6 +103,7 @@ files_read_world_readable_pipes(local_login_t)
+ files_read_world_readable_sockets(local_login_t)
+ # for when /var/mail is a symlink
+ files_read_var_symlinks(local_login_t)
++files_search_default(local_login_t)
+ 
+ fs_search_auto_mountpoints(local_login_t)
+ fs_search_tmpfs(local_login_t)
+-- 
+2.11.0
+

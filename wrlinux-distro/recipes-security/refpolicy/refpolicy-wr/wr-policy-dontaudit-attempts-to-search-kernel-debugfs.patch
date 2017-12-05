@@ -1,0 +1,38 @@
+From a61cb25c79296194e7c4fe7665437311daff5922 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Fri, 20 Mar 2015 11:03:11 +0800
+Subject: [PATCH] refpolicy: dontaudit attempts to search kernel debugfs
+
+Reference sources: selinux-policy-3.12.1-196.fc20.src.rpm
+Changes come from: policy-f20-base.patch
+
+* Do not audit attempts to search the kernel debugging filesystem, this
+  removes AVC denial issues:
+
+  avc: denied { search } for pid=294 comm="mdadm" \
+  name="/" dev="debugfs" ino=1 \
+  scontext=system_u:system_r:mdadm_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:debugfs_t:s0 tclass=dir
+
+Upstream-Status: pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/kernel/domain.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/kernel/domain.te b/policy/modules/kernel/domain.te
+index 62a8911..2ff2d2f 100644
+--- a/policy/modules/kernel/domain.te
++++ b/policy/modules/kernel/domain.te
+@@ -100,6 +100,7 @@ kernel_read_proc_symlinks(domain)
+ # a keyring
+ kernel_dontaudit_search_key(domain)
+ kernel_dontaudit_link_key(domain)
++kernel_dontaudit_search_debugfs(domain)
+ 
+ # create child processes in the domain
+ allow domain self:process { fork sigchld };
+-- 
+1.9.1
+

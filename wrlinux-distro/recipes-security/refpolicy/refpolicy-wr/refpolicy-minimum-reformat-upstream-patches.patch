@@ -1,0 +1,126 @@
+refpolicy-minimum: reformat upstream patches
+
+reformat upstream patches for refpolicy-minimum to get refpolicy-wr/*
+could be applied without conflicts.
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+======================================================
+
+diff --git a/policy/modules/system/authlogin.te b/policy/modules/system/authlogin.te
+index a336c5e..6a0abff 100644
+--- a/policy/modules/system/authlogin.te
++++ b/policy/modules/system/authlogin.te
+@@ -457,10 +457,10 @@ optional_policy(`
+ 	sssd_stream_connect(nsswitch_domain)
+ ')
+ 
++allow chkpwd_t proc_t:filesystem getattr;
++
+ optional_policy(`
+ 	samba_stream_connect_winbind(nsswitch_domain)
+ 	samba_read_var_files(nsswitch_domain)
+ 	samba_dontaudit_write_var_files(nsswitch_domain)
+ ')
+-
+-allow chkpwd_t proc_t:filesystem getattr;
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index b0ca1b8..beb296c 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -1101,13 +1101,6 @@ optional_policy(`
+ 	xserver_read_xdm_rw_config(initrc_t)
+ ')
+ 
+-optional_policy(`
+-	zebra_read_config(initrc_t)
+-')
+-
+-# systemd related allow rules
+-allow kernel_t init_t:process dyntransition;
+-allow devpts_t device_t:filesystem associate;
+ allow init_t self:capability2 block_suspend;
+ allow init_t self:capability2 audit_read;
+ 
+@@ -1121,3 +1114,12 @@ gen_require(`
+ 	class dbus acquire_svc;
+ ')
+ allow init_t initrc_t:dbus { acquire_svc };
++
++optional_policy(`
++	zebra_read_config(initrc_t)
++')
++
++# systemd related allow rules
++allow kernel_t init_t:process dyntransition;
++allow devpts_t device_t:filesystem associate;
++allow init_t self:capability2 block_suspend;
+\ No newline at end of file
+diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
+index 77cf1ed..8c0a9ea 100644
+--- a/policy/modules/system/logging.te
++++ b/policy/modules/system/logging.te
+@@ -564,16 +564,6 @@ optional_policy(`
+ 	seutil_sigchld_newrole(syslogd_t)
+ ')
+ 
+-optional_policy(`
+-	udev_read_db(syslogd_t)
+-')
+-
+-optional_policy(`
+-	# log to the xconsole
+-	xserver_rw_console(syslogd_t)
+-')
+-
+-
+ allow auditd_t tmpfs_t:file { getattr setattr create open read append };
+ allow auditd_t tmpfs_t:dir { open read search add_name write getattr search };
+ allow auditd_t initrc_t:unix_dgram_socket sendto;
+@@ -585,3 +575,12 @@ allow syslogd_t self:sem { create read unix_write write };
+ allow syslogd_t self:shm { read unix_read unix_write write };
+ allow syslogd_t tmpfs_t:file { read write create getattr append open };
+ allow syslogd_t tmpfs_t:dir { search write add_name };
++
++optional_policy(`
++	udev_read_db(syslogd_t)
++')
++
++optional_policy(`
++	# log to the xconsole
++	xserver_rw_console(syslogd_t)
++')
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 062c301..9db2ad8 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -320,15 +320,6 @@ seutil_read_file_contexts(systemd_tmpfiles_t)
+ 
+ systemd_log_parse_environment(systemd_tmpfiles_t)
+ 
+-tunable_policy(`systemd_tmpfiles_manage_all',`
+-	# systemd-tmpfiles can be configured to manage anything.
+-	# have a last-resort option for users to do this.
+-	files_manage_non_security_dirs(systemd_tmpfiles_t)
+-	files_manage_non_security_files(systemd_tmpfiles_t)
+-	files_relabel_non_security_dirs(systemd_tmpfiles_t)
+-	files_relabel_non_security_files(systemd_tmpfiles_t)
+-')
+-
+ allow systemd_tmpfiles_t init_t:dir search;
+ allow systemd_tmpfiles_t proc_t:filesystem getattr;
+ allow systemd_tmpfiles_t initrc_t:unix_dgram_socket sendto;
+@@ -338,3 +329,12 @@ allow systemd_tmpfiles_t init_t:file { open getattr read };
+ 
+ systemd_service_allow_kernel_domain_access_to_sysctl_kernel_t(systemd_tmpfiles_t)
+ systemd_service_allow_kernel_files_domain_to_tmp_t(systemd_tmpfiles_t)
++
++tunable_policy(`systemd_tmpfiles_manage_all',`
++	# systemd-tmpfiles can be configured to manage anything.
++	# have a last-resort option for users to do this.
++	files_manage_non_security_dirs(systemd_tmpfiles_t)
++	files_manage_non_security_files(systemd_tmpfiles_t)
++	files_relabel_non_security_dirs(systemd_tmpfiles_t)
++	files_relabel_non_security_files(systemd_tmpfiles_t)
++')

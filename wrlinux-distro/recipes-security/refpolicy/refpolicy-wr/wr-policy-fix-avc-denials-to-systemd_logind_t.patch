@@ -1,0 +1,126 @@
+From c63d15b3c3b3eadbe1f9ff9ba78d85640eed2177 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 3 Mar 2016 07:15:05 -0500
+Subject: [PATCH] wr-policy: fix avc denials to systemd_logind_t
+
+Reference sources: selinux-policy-3.13.1-128.21.fc22.src.rpm
+Changes come from: policy-f22-base.patch
+
+* Allow systemd_logind_t reboot/halt/stop system
+
+  Note: there's not access vector "stop" for system operations in
+  Fedora 22, it defined "undefined" instead.
+
+* Allow systemd_logind_t list tmpfs_t dir, umount tmpfs_t filesystems
+
+* Get systemd_logind_t create /run/user/* with type user_tmp_t
+
+Fix avc denials:
+
+  avc: denied { stop } for auid=n/a uid=0 gid=0 \
+  cmdline="/lib/systemd/systemd-logind" \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:system_r:init_t:s0-s15:c0.c1023 \
+  tclass=system permissive=0
+
+  avc: denied { read } for pid=373 comm="systemd-logind" \
+  name="/" dev="tmpfs" ino=25737 \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:tmpfs_t:s0 \
+  tclass=dir permissive=0
+
+  avc: denied { write } for pid=356 comm="systemd-logind" \
+  name="systemd" dev="tmpfs" ino=19291 \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:tmpfs_t:s0 \
+  tclass=dir permissive=0
+
+  avc: denied { unmount } for pid=373 comm="systemd-logind" \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:tmpfs_t:s0 \
+  tclass=filesystem permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/system/init.if       | 18 ++++++++++++++++++
+ policy/modules/system/systemd.te    |  5 +++++
+ policy/modules/system/userdomain.if |  2 ++
+ 3 files changed, 25 insertions(+)
+
+diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
+index dadd1e3..5e0e742 100644
+--- a/policy/modules/system/init.if
++++ b/policy/modules/system/init.if
+@@ -864,6 +864,24 @@ interface(`init_system_start',`
+ 
+ ########################################
+ ## <summary>
++##      Tell init to stop system (systemd).
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`init_system_stop',`
++	gen_require(`
++		type init_t;
++	')
++
++	allow $1 init_t:system stop;
++')
++
++########################################
++## <summary>
+ ##	Enable all systemd services (systemd).
+ ## </summary>
+ ## <param name="domain">
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index edebc0b..dab7f44 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -211,6 +211,8 @@ dev_setattr_sound_dev(systemd_logind_t)
+ files_read_etc_files(systemd_logind_t)
+ 
+ fs_getattr_tmpfs(systemd_logind_t)
++fs_list_tmpfs(systemd_logind_t)
++fs_unmount_tmpfs(systemd_logind_t)
+ 
+ storage_getattr_removable_dev(systemd_logind_t)
+ storage_setattr_removable_dev(systemd_logind_t)
+@@ -240,6 +242,9 @@ userdom_use_user_ttys(systemd_logind_t)
+ 
+ init_get_system_status(systemd_logind_t)
+ init_system_start(systemd_logind_t)
++init_reboot_system(systemd_logind_t)
++init_shutdown_system(systemd_logind_t)
++init_system_stop(systemd_logind_t)
+ init_dgram_send(systemd_logind_t)
+ init_write_pid_socket(systemd_logind_t)
+ kernel_read_system_state(systemd_logind_t)
+diff --git a/policy/modules/system/userdomain.if b/policy/modules/system/userdomain.if
+index 2c179db..0c75cad 100644
+--- a/policy/modules/system/userdomain.if
++++ b/policy/modules/system/userdomain.if
+@@ -3475,6 +3475,7 @@ interface(`userdom_dbus_send_all_users',`
+ interface(`userdom_manage_all_user_tmp_content',`
+ 	gen_require(`
+ 		attribute user_tmp_type;
++		type user_tmp_t;
+ 	')
+ 
+ 	manage_dirs_pattern($1, user_tmp_type, user_tmp_type)
+@@ -3483,6 +3484,7 @@ interface(`userdom_manage_all_user_tmp_content',`
+ 	manage_sock_files_pattern($1, user_tmp_type, user_tmp_type)
+ 	manage_fifo_files_pattern($1, user_tmp_type, user_tmp_type)
+ 	files_search_tmp($1)
++	fs_tmpfs_filetrans($1, user_tmp_t, { dir file lnk_file sock_file fifo_file })
+ ')
+ 
+ #######################################
+-- 
+1.9.1
+

@@ -1,0 +1,42 @@
+From 797810328c61e5732c3b517f6a95a7c9cd68d740 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Wed, 29 Mar 2017 02:08:07 +0000
+Subject: [PATCH] refpolicy: allow useradd_t to write file at all levels
+
+Reference sources: selinux-policy-3.13.1-225.6.fc25.src.rpm
+Changes come from: policy-f25-base.patch
+
+Fix avc denials:
+
+  avc: denied { add_name } for pid=890 comm="useradd" \
+  name="policy.30.tmp" \
+  scontext=root:sysadm_r:useradd_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:policy_config_t:s15:c0.c1023 tclass=dir
+
+  avc: denied { remove_name } for pid=890 comm="useradd" \
+  name="policy.30.tmp" dev="vda" ino=28008 \
+  scontext=root:sysadm_r:useradd_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:policy_config_t:s15:c0.c1023 tclass=dir
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/admin/usermanage.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/admin/usermanage.te b/policy/modules/admin/usermanage.te
+index f807733..d06a6c4 100644
+--- a/policy/modules/admin/usermanage.te
++++ b/policy/modules/admin/usermanage.te
+@@ -488,6 +488,7 @@ fs_search_auto_mountpoints(useradd_t)
+ fs_getattr_xattr_fs(useradd_t)
+ 
+ mls_file_upgrade(useradd_t)
++mls_file_write_all_levels(useradd_t)
+ 
+ # Allow access to context for shadow file
+ selinux_get_fs_mount(useradd_t)
+-- 
+2.11.0
+

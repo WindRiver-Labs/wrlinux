@@ -1,0 +1,27 @@
+From 07685ec2fac9effe36b5410968912dc21ef63993 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Mon, 17 Feb 2014 02:46:07 -0500
+Subject: [PATCH 4/6] fix real path for ntop
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/ntop.fc |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/contrib/ntop.fc b/policy/modules/contrib/ntop.fc
+index 52e27ef..e186cac 100644
+--- a/policy/modules/contrib/ntop.fc
++++ b/policy/modules/contrib/ntop.fc
+@@ -3,6 +3,7 @@
+ /etc/rc\.d/init\.d/ntop	--	gen_context(system_u:object_r:ntop_initrc_exec_t,s0)
+ 
+ /usr/sbin/ntop	--	gen_context(system_u:object_r:ntop_exec_t,s0)
++/usr/bin/ntop	--	gen_context(system_u:object_r:ntop_exec_t,s0)
+ 
+ /var/lib/ntop(/.*)?	gen_context(system_u:object_r:ntop_var_lib_t,s0)
+ 
+-- 
+1.7.9.5
+

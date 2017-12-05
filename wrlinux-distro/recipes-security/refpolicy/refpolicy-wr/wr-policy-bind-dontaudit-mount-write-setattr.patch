@@ -1,0 +1,51 @@
+From 5584d07c02f26ccac1bc7574df4afd4e4170d9aa Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 27 Feb 2014 05:07:19 -0500
+Subject: [PATCH] dontaudit mount write, setattr operations
+
+Remove avc denied logs:
+
+type=AVC msg=audit(1393489031.631:5): avc:  denied  { write } for  pid=508 comm="mount" name="bind" dev="hda" ino=2366 scontext=system_u:system_r:mount_t:s0-s15:c0.c1023 tcontext=system_u:object_r:named_zone_t:s0 tclass=dir
+type=AVC msg=audit(1393489031.640:6): avc:  denied  { setattr } for  pid=508 comm="mount" name="bind" dev="hda" ino=2366 scontext=system_u:system_r:mount_t:s0-s15:c0.c1023 tcontext=system_u:object_r:named_zone_t:s0 tclass=dir
+type=AVC msg=audit(1393489031.838:7): avc:  denied  { write } for  pid=520 comm="mount" name="bind" dev="hda" ino=28133 scontext=system_u:system_r:mount_t:s0-s15:c0.c1023 tcontext=system_u:object_r:named_cache_t:s0 tclass=dir
+type=AVC msg=audit(1393489031.841:8): avc:  denied  { setattr } for  pid=520 comm="mount" name="bind" dev="hda" ino=28133 scontext=system_u:system_r:mount_t:s0-s15:c0.c1023 tcontext=system_u:object_r:named_cache_t:s0 tclass=dir
+type=AVC msg=audit(1393489031.881:9): avc:  denied  { write } for  pid=522 comm="mount" name="Universal" dev="hda" ino=19221 scontext=system_u:system_r:mount_t:s0-s15:c0.c1023 tcontext=system_u:object_r:locale_t:s0 tclass=file
+type=AVC msg=audit(1393489031.883:10): avc:  denied  { setattr } for  pid=522 comm="mount" name="Universal" dev="hda" ino=19221 scontext=system_u:system_r:mount_t:s0-s15:c0.c1023 tcontext=system_u:object_r:locale_t:s0 tclass=file
+type=AVC msg=audit(1393489031.925:11): avc:  denied  { write } for  pid=524 comm="mount" name="random" dev="devtmpfs" ino=5038 scontext=system_u:system_r:mount_t:s0-s15:c0.c1023 tcontext=system_u:object_r:random_device_t:s0 tclass=chr_file
+type=AVC msg=audit(1393489031.930:12): avc:  denied  { setattr } for  pid=524 comm="mount" name="random" dev="devtmpfs" ino=5038 scontext=system_u:system_r:mount_t:s0-s15:c0.c1023 tcontext=system_u:object_r:random_device_t:s0 tclass=chr_file
+
+Upstream-Status: Inappropriate [ WR Only ]
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/bind.te |   14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/policy/modules/contrib/bind.te b/policy/modules/contrib/bind.te
+index 3f5dd73..62769d6 100644
+--- a/policy/modules/contrib/bind.te
++++ b/policy/modules/contrib/bind.te
+@@ -159,6 +159,20 @@ miscfiles_read_localization(named_t)
+ userdom_dontaudit_use_unpriv_user_fds(named_t)
+ userdom_dontaudit_search_user_home_dirs(named_t)
+ 
++# dontaudit mount { write, setattr } to:
++# - locale_t:file
++# - named_cache_t:dir
++# - named_zone_t:dir
++# - random_device_t:chr_file
++# they will be mounted to /var/run/named-chroot/*
++gen_require(`
++	type mount_t, locale_t, random_device_t;
++')
++dontaudit mount_t locale_t:file { write setattr };
++dontaudit mount_t named_cache_t:dir { write setattr };
++dontaudit mount_t named_zone_t:dir { write setattr };
++dontaudit mount_t random_device_t:chr_file { write setattr };
++
+ tunable_policy(`named_tcp_bind_http_port',`
+ 	corenet_sendrecv_http_server_packets(named_t)
+ 	corenet_tcp_bind_http_port(named_t)
+-- 
+1.7.9.5
+

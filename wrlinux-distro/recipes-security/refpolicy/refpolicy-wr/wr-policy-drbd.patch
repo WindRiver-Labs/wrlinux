@@ -1,0 +1,54 @@
+Subject: [PATCH] refpolicy: enhance selinux policy for drbd
+    
+Eliminate various selinux access denials when running
+drbd.  We do not allow http_port_t connection or debugfs_t
+search, but we leave them audited.
+
+Upstream-Status: Unknown
+    
+Signed-off-by: Joe Slater <jslater@windriver.com>
+
+
+--- a/policy/modules/contrib/drbd.te
++++ b/policy/modules/contrib/drbd.te
+@@ -30,6 +30,40 @@ allow drbd_t self:unix_stream_socket cre
+ allow drbd_t self:netlink_socket create_socket_perms;
+ allow drbd_t self:netlink_route_socket nlmsg_write;
+ 
++# wrlinux ===
++#
++
++# Not actually pid files, but they are under /var/run
++#
++type drbd_var_run_t;
++files_pid_file(drbd_var_run_t)
++
++# Uncomment to suppress these access denial messages.
++#
++# dontaudit drbd_t http_port_t:tcp_socket name_connect;
++# dontaudit drbd_t debugfs_t:dir search;
++
++# So we can really read and write /dev/drbd*
++#
++mls_file_read_all_levels(drbd_t)
++mls_file_write_all_levels(drbd_t)
++
++storage_raw_write_fixed_disk(drbd_t)
++storage_getattr_fixed_disk_dev(drbd_t)
++
++allow drbd_t self:process signal;
++allow drbd_t self:capability sys_admin;
++allow drbd_t fixed_disk_device_t:blk_file { read write };
++
++files_pid_filetrans(drbd_t,drbd_var_run_t, { file dir lnk_file })
++manage_dirs_pattern(drbd_t,drbd_var_run_t,drbd_var_run_t)
++manage_lnk_files_pattern(drbd_t,drbd_var_run_t,drbd_var_run_t)
++
++corecmd_exec_bin(drbd_t)
++corecmd_exec_shell(drbd_t)
++
++# ===
++
+ manage_dirs_pattern(drbd_t, drbd_var_lib_t, drbd_var_lib_t)
+ manage_files_pattern(drbd_t, drbd_var_lib_t, drbd_var_lib_t)
+ manage_lnk_files_pattern(drbd_t, drbd_var_lib_t, drbd_var_lib_t)

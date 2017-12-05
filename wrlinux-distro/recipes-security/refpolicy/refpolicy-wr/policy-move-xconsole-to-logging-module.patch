@@ -1,0 +1,240 @@
+Subject: [PATCH] refpolicy: fix modular issue for xconsole
+
+xconsole is defined in xserver module, but logging module uses it
+for syslogd domains to access /dev/xconsole.
+
+Move it to logging module since logging is a core module but
+xserver not.
+
+Upstream-Status: pending
+
+Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/services/xserver.fc |    5 ----
+ policy/modules/services/xserver.if |   36 ------------------------
+ policy/modules/services/xserver.te |   10 ++-----
+ policy/modules/system/init.te      |    4 ++-
+ policy/modules/system/logging.fc   |    2 ++
+ policy/modules/system/logging.if   |   54 ++++++++++++++++++++++++++++++++++++
+ policy/modules/system/logging.te   |   15 ++++++----
+ 7 files changed, 71 insertions(+), 55 deletions(-)
+
+diff --git a/policy/modules/services/xserver.fc b/policy/modules/services/xserver.fc
+index d1f64a0..dd672db 100644
+--- a/policy/modules/services/xserver.fc
++++ b/policy/modules/services/xserver.fc
+@@ -11,11 +11,6 @@ HOME_DIR/\.xauth.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
+ HOME_DIR/\.Xauthority.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
+ 
+ #
+-# /dev
+-#
+-/dev/xconsole		-p	gen_context(system_u:object_r:xconsole_device_t,s0)
+-
+-#
+ # /etc
+ #
+ /etc/gdm(3)?/PostSession/.*	--	gen_context(system_u:object_r:xsession_exec_t,s0)
+diff --git a/policy/modules/services/xserver.if b/policy/modules/services/xserver.if
+index 6bf0ecc..ec01f3c 100644
+--- a/policy/modules/services/xserver.if
++++ b/policy/modules/services/xserver.if
+@@ -602,42 +602,6 @@ interface(`xserver_read_user_xauth',`
+ 
+ ########################################
+ ## <summary>
+-##	Set the attributes of the X windows console named pipes.
+-## </summary>
+-## <param name="domain">
+-##	<summary>
+-##	Domain allowed access.
+-##	</summary>
+-## </param>
+-#
+-interface(`xserver_setattr_console_pipes',`
+-	gen_require(`
+-		type xconsole_device_t;
+-	')
+-
+-	allow $1 xconsole_device_t:fifo_file setattr;
+-')
+-
+-########################################
+-## <summary>
+-##	Read and write the X windows console named pipe.
+-## </summary>
+-## <param name="domain">
+-##	<summary>
+-##	Domain allowed access.
+-##	</summary>
+-## </param>
+-#
+-interface(`xserver_rw_console',`
+-	gen_require(`
+-		type xconsole_device_t;
+-	')
+-
+-	allow $1 xconsole_device_t:fifo_file rw_fifo_file_perms;
+-')
+-
+-########################################
+-## <summary>
+ ##	Use file descriptors for xdm.
+ ## </summary>
+ ## <param name="domain">
+
+diff --git a/policy/modules/services/xserver.te b/policy/modules/services/xserver.te
+index 8479a52..7ab8678 100644
+--- a/policy/modules/services/xserver.te
++++ b/policy/modules/services/xserver.te
+@@ -148,13 +148,6 @@ typealias xauth_tmp_t alias { user_xauth_tmp_t staff_xauth_tmp_t sysadm_xauth_tm
+ typealias xauth_tmp_t alias { auditadm_xauth_tmp_t secadm_xauth_tmp_t };
+ userdom_user_tmp_file(xauth_tmp_t)
+ 
+-# this is not actually a device, its a pipe
+-type xconsole_device_t;
+-files_type(xconsole_device_t)
+-dev_associate(xconsole_device_t)
+-fs_associate_tmpfs(xconsole_device_t)
+-files_associate_tmp(xconsole_device_t)
+-
+ type xdm_t;
+ type xdm_exec_t;
+ auth_login_pgm_domain(xdm_t)
+@@ -313,7 +306,8 @@ allow xdm_t self:socket create_socket_perms;
+ allow xdm_t self:appletalk_socket create_socket_perms;
+ allow xdm_t self:key { search link write };
+ 
+-allow xdm_t xconsole_device_t:fifo_file { getattr setattr };
++logging_setattr_xconsole(xdm_t)
++logging_getattr_xconsole(xdm_t)
+ 
+ # Allow gdm to run gdm-binary
+ can_exec(xdm_t, xdm_exec_t)
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index e96f111..e1e1ac2 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -890,8 +890,10 @@ optional_policy(`
+ 
+ optional_policy(`
+ 	# Set device ownerships/modes.
+-	xserver_setattr_console_pipes(initrc_t)
++	logging_setattr_xconsole(initrc_t)
++')
+ 
++optional_policy(`
+ 	# init script wants to check if it needs to update windowmanagerlist
+ 	xserver_read_xdm_rw_config(initrc_t)
+ ')
+diff --git a/policy/modules/system/logging.fc b/policy/modules/system/logging.fc
+index fe85ac3..91cba84 100644
+--- a/policy/modules/system/logging.fc
++++ b/policy/modules/system/logging.fc
+@@ -1,5 +1,7 @@
+ /dev/log		-s	gen_context(system_u:object_r:devlog_t,mls_systemhigh)
+ 
++/dev/xconsole           -p      gen_context(system_u:object_r:xconsole_device_t,s0)
++
+ /etc/rsyslog.conf		gen_context(system_u:object_r:syslog_conf_t,s0)
+ /etc/syslog.conf		gen_context(system_u:object_r:syslog_conf_t,s0)
+ /etc/syslog.conf\.sysklogd	gen_context(system_u:object_r:syslog_conf_t,s0)
+diff --git a/policy/modules/system/logging.if b/policy/modules/system/logging.if
+index 9a6f599..4a5a049 100644
+--- a/policy/modules/system/logging.if
++++ b/policy/modules/system/logging.if
+@@ -976,6 +976,60 @@ interface(`logging_manage_generic_logs',`
+ 
+ ########################################
+ ## <summary>
++##     Set the attributes of the X windows console named pipes.
++## </summary>
++## <param name="domain">
++##     <summary>
++#      Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`logging_setattr_xconsole',`
++	gen_require(`
++		type xconsole_device_t;
++	')
++
++	allow $1 xconsole_device_t:fifo_file setattr_fifo_file_perms;
++')
++
++########################################
++## <summary>
++##     Set the attributes of the X windows console named pipes.
++## </summary>
++## <param name="domain">
++##     <summary>
++#      Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`logging_getattr_xconsole',`
++	gen_require(`
++		type xconsole_device_t;
++	')
++
++	allow $1 xconsole_device_t:fifo_file getattr_fifo_file_perms;
++')
++
++########################################
++## <summary>
++##     Read and write the X windows console named pipe.
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`logging_rw_xconsole',`
++	gen_require(`
++		type xconsole_device_t;
++	')
++
++	allow $1 xconsole_device_t:fifo_file rw_fifo_file_perms;
++')
++
++########################################
++## <summary>
+ ##	All of the rules required to administrate
+ ##	the audit environment
+ ## </summary>
+diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
+index 8d8de5c..5c06256 100644
+--- a/policy/modules/system/logging.te
++++ b/policy/modules/system/logging.te
+@@ -81,6 +81,13 @@ type var_log_t;
+ logging_log_file(var_log_t)
+ files_mountpoint(var_log_t)
+ 
++# this is not actually a device, its a pipe
++type xconsole_device_t;
++files_type(xconsole_device_t)
++dev_node(xconsole_device_t)
++fs_associate_tmpfs(xconsole_device_t)
++files_associate_tmp(xconsole_device_t)
++
+ ifdef(`enable_mls',`
+ 	init_ranged_daemon_domain(auditd_t, auditd_exec_t, mls_systemhigh)
+ 	init_ranged_daemon_domain(syslogd_t, syslogd_exec_t, mls_systemhigh)
+@@ -534,8 +541,6 @@ optional_policy(`
+ 	udev_read_db(syslogd_t)
+ ')
+ 
+-optional_policy(`
+-	# log to the xconsole
+-	xserver_rw_console(syslogd_t)
+-	xserver_setattr_console_pipes(syslogd_t)
+-')
++# log to the xconsole
++logging_rw_xconsole(syslogd_t)
++logging_setattr_xconsole(syslogd_t)
+-- 
+1.7.9.5
+

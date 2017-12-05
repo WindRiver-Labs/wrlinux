@@ -1,0 +1,33 @@
+From 3d029a7e81045be930b8946aa272c24745da36a9 Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Thu, 20 Feb 2014 17:07:05 +0800
+Subject: [PATCH] allow sysadm_r to run crontab
+
+Upstream-Status: Inappropriate [configuration]
+
+This permission has been given if release is not redhat; but we want it even
+we define distro_redhat
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ policy/modules/roles/sysadm.te |    4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/policy/modules/roles/sysadm.te b/policy/modules/roles/sysadm.te
+index 5674b36..1c092dd 100644
+--- a/policy/modules/roles/sysadm.te
++++ b/policy/modules/roles/sysadm.te
+@@ -436,6 +436,10 @@ optional_policy(`
+ 	yam_run(sysadm_t, sysadm_r)
+ ')
+ 
++optional_policy(`
++      cron_admin_role(sysadm_r, sysadm_t)
++')
++
+ ifndef(`distro_redhat',`
+ 	optional_policy(`
+ 		auth_role(sysadm_r, sysadm_t)
+-- 
+1.7.10.4
+

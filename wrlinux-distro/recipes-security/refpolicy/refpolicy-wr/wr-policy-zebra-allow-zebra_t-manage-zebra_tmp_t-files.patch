@@ -1,0 +1,36 @@
+From 103cd042c324f69a214d5c130ba6a34b56822f84 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 20 Feb 2014 23:27:20 -0500
+Subject: [PATCH] allow zebra_t manage zebra_tmp_t files
+
+Fix avc denied issue:
+
+type=AVC msg=audit(1392949311.316:83): avc:  denied \
+{ create } for  pid=470 comm="ospf6d" name="quagga.ospf6d.crashlog" \
+scontext=system_u:system_r:zebra_t:s0-s15:c0.c1023 tcontext= \
+system_u:object_r:tmp_t:s0 tclass=file
+
+Upstream-Status: pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/zebra.te |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/policy/modules/contrib/zebra.te b/policy/modules/contrib/zebra.te
+index 2e80d04..d4347f0 100644
+--- a/policy/modules/contrib/zebra.te
++++ b/policy/modules/contrib/zebra.te
+@@ -59,7 +59,8 @@ manage_sock_files_pattern(zebra_t, zebra_log_t, zebra_log_t)
+ logging_log_filetrans(zebra_t, zebra_log_t, { sock_file file dir })
+ 
+ allow zebra_t zebra_tmp_t:sock_file manage_sock_file_perms;
+-files_tmp_filetrans(zebra_t, zebra_tmp_t, sock_file)
++allow zebra_t zebra_tmp_t:file manage_file_perms;
++files_tmp_filetrans(zebra_t, zebra_tmp_t, { sock_file file })
+ 
+ manage_dirs_pattern(zebra_t, zebra_var_run_t, zebra_var_run_t)
+ manage_files_pattern(zebra_t, zebra_var_run_t, zebra_var_run_t)
+-- 
+1.7.9.5
+

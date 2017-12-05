@@ -1,0 +1,111 @@
+Subject: [PATCH] refpolicy: boolean for sysadm to run kdump
+
+Most distros use fixed initscripts or systemd units to run kdump,
+so there are no rules for sysadm to run kdump directly.
+
+Our product does not provide kdump initscripts, and may never
+provide them. We must run kdump directly in the shells, so add
+a new "sysadm_use_kdump" boolean to allow this.
+
+This boolean is set to "off" by default, admins still need to
+change it to "on" before running kdump.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/kdump.if |   28 ++++++++++++++++++++++++++++
+ policy/modules/contrib/kdump.te |   14 ++++++++++++++
+ policy/modules/roles/sysadm.te  |    4 ++++
+ 3 files changed, 46 insertions(+)
+
+diff --git a/policy/modules/contrib/kdump.if b/policy/modules/contrib/kdump.if
+index 3a00b3a..66b5cd8 100644
+--- a/policy/modules/contrib/kdump.if
++++ b/policy/modules/contrib/kdump.if
+@@ -19,6 +19,34 @@ interface(`kdump_domtrans',`
+ 	domtrans_pattern($1, kdump_exec_t, kdump_t)
+ ')
+ 
++########################################
++## <summary>
++##     Conditionally execute kdump daemon for sysadm.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed to transition.
++##      </summary>
++## </param>
++## <param name="role">
++##      <summary>
++##      Role allowed access.
++##      </summary>
++## </param>
++## <rolecap/>
++#
++interface(`kdump_run_cond',`
++       gen_require(`
++               type kdump_t;
++       ')
++
++       role $2 types kdump_t;
++
++       tunable_policy(`sysadm_use_kdump',`
++               kdump_domtrans($1)
++       ')
++')
++
+ #######################################
+ ## <summary>
+ ##	Execute kdump in the kdump domain.
+diff --git a/policy/modules/contrib/kdump.te b/policy/modules/contrib/kdump.te
+index 715fc21..13ef03c 100644
+--- a/policy/modules/contrib/kdump.te
++++ b/policy/modules/contrib/kdump.te
+@@ -5,6 +5,13 @@ policy_module(kdump, 1.3.0)
+ # Declarations
+ #
+ 
++## <desc>
++## <p>
++## Allow sysadm to run kdump/kexec
++## </p>
++## </desc>
++gen_tunable(sysadm_use_kdump, false)
++
+ type kdump_t;
+ type kdump_exec_t;
+ init_system_domain(kdump_t, kdump_exec_t)
+@@ -46,6 +53,13 @@ dev_read_sysfs(kdump_t)
+ 
+ term_use_console(kdump_t)
+ 
++tunable_policy(`sysadm_use_kdump',`
++       userdom_use_user_terminals(kdump_t)
++       domain_use_interactive_fds(kdump_t)
++')
++# kdump will try to read /proc/kcore which is labeled in level s15
++mls_file_read_all_levels(kdump_t)
++
+ #######################################
+ #
+ # Ctl local policy
+diff --git a/policy/modules/roles/sysadm.te b/policy/modules/roles/sysadm.te
+index 2b194e5..2acf443 100644
+--- a/policy/modules/roles/sysadm.te
++++ b/policy/modules/roles/sysadm.te
+@@ -66,6 +66,10 @@ tunable_policy(`allow_ptrace',`
+ ')
+ 
+ optional_policy(`
++	kdump_run_cond(sysadm_t, sysadm_r)
++')
++
++optional_policy(`
+ 	amanda_run_recover(sysadm_t, sysadm_r)
+ ')
+ 
+-- 
+1.7.9.5
+

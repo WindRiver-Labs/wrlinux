@@ -1,0 +1,37 @@
+From af6ab58fc3480a5adcf5ccf932ed7ed99b527d73 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 3 Mar 2016 22:41:24 -0500
+Subject: [PATCH 3/4] wr-policy: allow radiusd_t getcap to itself
+
+* Allow radiusd_t get linux capabilities of itself (process)
+
+Fix avc denial:
+
+  avc: denied { getcap } for pid=1196 comm="radiusd" \
+  scontext=system_u:system_r:radiusd_t:s0-s15:c0.c1023
+  tcontext=system_u:system_r:radiusd_t:s0-s15:c0.c1023 \
+  tclass=process permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/radius.te | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/policy/modules/contrib/radius.te b/policy/modules/contrib/radius.te
+index 1239a2e..0f63b4f 100644
+--- a/policy/modules/contrib/radius.te
++++ b/policy/modules/contrib/radius.te
+@@ -34,7 +34,7 @@ files_pid_file(radiusd_var_run_t)
+ 
+ allow radiusd_t self:capability { chown dac_override fsetid kill setgid setuid sys_resource sys_tty_config };
+ dontaudit radiusd_t self:capability sys_tty_config;
+-allow radiusd_t self:process { getsched setrlimit setsched sigkill signal };
++allow radiusd_t self:process { getcap getsched setrlimit setsched sigkill signal };
+ allow radiusd_t self:fifo_file rw_fifo_file_perms;
+ allow radiusd_t self:unix_stream_socket { accept listen };
+ allow radiusd_t self:tcp_socket { accept listen };
+-- 
+1.9.1
+

@@ -1,0 +1,30 @@
+From 51a35134178ea4062ad3b0612b03da2dd7a971d6 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Fri, 15 Jan 2016 03:55:44 -0500
+Subject: [PATCH 4/4] wr-policy-init_t-get-all-service-status
+
+Allow init_t to get status of all services that have type init_t.
+
+systemd-logind service fails to start w/o this rule.
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/system/init.te | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index c6ff0fb..d7cd0dd 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -1105,3 +1105,6 @@ allow init_t self:capability2 block_suspend;
+ # MLS trusted for lowering/raising the level of files
+ mls_file_downgrade(init_t)
+ mls_file_upgrade(init_t)
++
++# Get all service status (systemd)
++init_get_system_status(init_t)
+-- 
+1.9.1
+

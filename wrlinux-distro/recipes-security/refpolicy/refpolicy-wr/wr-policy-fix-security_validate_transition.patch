@@ -1,0 +1,68 @@
+From 95f8ceb28a9427b05e5d08fb4c3c304adaf35132 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Fri, 15 Jan 2016 03:47:05 -0500
+Subject: [PATCH] wr-policy-fix-security_validate_transition
+
+Make init_t/kernel_t MLS trusted for lowering/raising the level of
+files.
+
+Fix security_validate_transition issues:
+
+  op=security_validate_transition seresult=denied \
+  oldcontext=system_u:object_r:device_t:s15:c0.c1023 \
+  newcontext=system_u:object_r:device_t:s0 \
+  taskcontext=system_u:system_r:init_t:s0-s15:c0.c1023 \
+  tclass=dir
+
+  op=security_validate_transition seresult=denied \
+  oldcontext=system_u:object_r:var_run_t:s0 \
+  newcontext=system_u:object_r:var_log_t:s0-s15:c0.c1023 \
+  taskcontext=system_u:system_r:init_t:s0-s15:c0.c1023 \
+  tclass=dir
+
+  op=security_validate_transition seresult=denied \
+  oldcontext=system_u:object_r:device_t:s15:c0.c1023 \
+  newcontext=system_u:object_r:device_t:s0 \
+  taskcontext=system_u:system_r:kernel_t:s15:c0.c1023 \
+  tclass=dir
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/kernel/kernel.te | 3 +++
+ policy/modules/system/init.te   | 6 +++++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/policy/modules/kernel/kernel.te b/policy/modules/kernel/kernel.te
+index 18f336f..4614534 100644
+--- a/policy/modules/kernel/kernel.te
++++ b/policy/modules/kernel/kernel.te
+@@ -296,6 +296,9 @@ mls_file_read_all_levels(kernel_t)
+ mls_socket_write_all_levels(kernel_t)
+ mls_fd_use_all_levels(kernel_t)
+ mls_process_set_level(kernel_t)
++# make kernel_t MLS trusted for lower level files
++# https://bugzilla.redhat.com/show_bug.cgi?id=667370
++mls_file_downgrade(kernel_t)
+ 
+ ifdef(`distro_redhat',`
+ 	# Bugzilla 222337
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index 4271625..c6ff0fb 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -1100,4 +1100,8 @@ optional_policy(`
+ # systemd related allow rules
+ allow kernel_t init_t:process dyntransition;
+ allow devpts_t device_t:filesystem associate;
+-allow init_t self:capability2 block_suspend;
+\ No newline at end of file
++allow init_t self:capability2 block_suspend;
++
++# MLS trusted for lowering/raising the level of files
++mls_file_downgrade(init_t)
++mls_file_upgrade(init_t)
+-- 
+1.9.1
+
