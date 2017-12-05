@@ -1,0 +1,35 @@
+From 74b55228457bbe0719369bd1173d0013a25e2239 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Wed, 3 Feb 2016 04:16:06 -0500
+Subject: [PATCH] wr-policy-allow-init_t-read-any-level-sockets
+
+Fix avc denial issues:
+  avc: denied { listen } for pid=1 comm="systemd" \
+  path="/run/systemd/journal/stdout" \
+  scontext=system_u:system_r:init_t:s0-s15:c0.c1023 \
+  tcontext=system_u:system_r:syslogd_t:s15:c0.c1023 \
+  tclass=unix_stream_socket permissive=1
+
+  systemd[1]: Failded to listen on Journal Socket
+
+Upstream-Status: pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/system/init.te | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index d5bad82..0c46841 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -1108,3 +1108,6 @@ mls_file_upgrade(init_t)
+ 
+ # Get all service status (systemd)
+ init_get_system_status(init_t)
++
++# MLS trusted for reading from sockets at any level
++mls_socket_read_all_levels(init_t)
+-- 
+1.9.1
+

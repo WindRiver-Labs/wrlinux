@@ -1,0 +1,142 @@
+From 90985156dae676db5cb6cc2619340726a7aa4b9a Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 25 Feb 2016 05:42:52 -0500
+Subject: [PATCH] wr-policy: allow systemd_logind_t manage /run/user*
+
+Reference sources: selinux-policy-3.13.1-128.21.fc22.src.rpm
+Changes come from: policy-f22-base.patch
+
+* label /run/user* with type user_tmp_t
+* allow systemd_logind_t to /run/user*
+
+Fix avc denial issue:
+
+  avc: denied { mounton } for pid=343 comm="systemd-logind" \
+  path="/run/user/0" dev="tmpfs" ino=18496 \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:var_auth_t:s0 \
+  tclass=dir permissive=1
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/system/authlogin.if  |  2 ++
+ policy/modules/system/systemd.te    |  3 ++
+ policy/modules/system/userdomain.if | 61 +++++++++++++++++++++++++++++++++++++
+ policy/modules/system/userdomain.te |  3 ++
+ 4 files changed, 69 insertions(+)
+
+diff --git a/policy/modules/system/authlogin.if b/policy/modules/system/authlogin.if
+index bcf0963..16659cb 100644
+--- a/policy/modules/system/authlogin.if
++++ b/policy/modules/system/authlogin.if
+@@ -61,6 +61,8 @@ interface(`auth_use_pam',`
+ 	logging_send_audit_msgs($1)
+ 	logging_send_syslog_msg($1)
+ 
++	userdom_search_user_tmp_dirs($1)
++
+ 	optional_policy(`
+ 		dbus_system_bus_client($1)
+ 
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 4810bbf..6dfe016 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -279,6 +279,9 @@ fs_mount_tmpfs(systemd_logind_t)
+ auth_manage_var_auth(systemd_logind_t)
+ mls_file_read_all_levels(systemd_logind_t)
+ 
++userdom_manage_all_user_tmp_content(systemd_logind_t)
++userdom_mounton_tmp_dirs(systemd_logind_t)
++
+ optional_policy(`
+ 	dbus_system_bus_client(systemd_logind_t)
+ 	dbus_connect_system_bus(systemd_logind_t)
+diff --git a/policy/modules/system/userdomain.if b/policy/modules/system/userdomain.if
+index c106a25..688c53f 100644
+--- a/policy/modules/system/userdomain.if
++++ b/policy/modules/system/userdomain.if
+@@ -3830,3 +3830,64 @@ interface(`userdom_dbus_send_all_users',`
+ 
+ 	allow $1 userdomain:dbus send_msg;
+ ')
++
++########################################
++## <summary>
++##      Manage all user temporary content.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`userdom_manage_all_user_tmp_content',`
++	gen_require(`
++		attribute user_tmp_type;
++	')
++
++	manage_dirs_pattern($1, user_tmp_type, user_tmp_type)
++	manage_files_pattern($1, user_tmp_type, user_tmp_type)
++	manage_lnk_files_pattern($1, user_tmp_type, user_tmp_type)
++	manage_sock_files_pattern($1, user_tmp_type, user_tmp_type)
++	manage_fifo_files_pattern($1, user_tmp_type, user_tmp_type)
++	files_search_tmp($1)
++')
++
++#######################################
++## <summary>
++##      Manage user temporary directories
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++## <rolebase/>
++#
++interface(`userdom_mounton_tmp_dirs',`
++	gen_require(`
++		type user_tmp_t;
++	')
++
++	allow $1 user_tmp_t:dir mounton;
++')
++
++########################################
++## <summary>
++##      Search user tmp directories.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`userdom_search_user_tmp_dirs',`
++	gen_require(`
++		type user_tmp_t;
++	')
++
++	files_search_tmp($1)
++	allow $1 user_tmp_t:dir search_dir_perms;
++')
+diff --git a/policy/modules/system/userdomain.te b/policy/modules/system/userdomain.te
+index 0f3db57..661dc7e 100644
+--- a/policy/modules/system/userdomain.te
++++ b/policy/modules/system/userdomain.te
+@@ -107,6 +107,9 @@ typealias user_tmp_t alias { staff_untrusted_content_tmp_t sysadm_untrusted_cont
+ files_tmp_file(user_tmp_t)
+ userdom_user_home_content(user_tmp_t)
+ 
++attribute user_tmp_type;
++typeattribute user_tmp_t user_tmp_type;
++
+ type user_tmpfs_t alias { staff_tmpfs_t sysadm_tmpfs_t secadm_tmpfs_t auditadm_tmpfs_t unconfined_tmpfs_t };
+ files_tmpfs_file(user_tmpfs_t)
+ userdom_user_home_content(user_tmpfs_t)
+-- 
+2.11.0
+

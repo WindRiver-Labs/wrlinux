@@ -1,0 +1,22 @@
+From 8ce9ba2b9d6f393ff3001735bb7428169b952c45 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Mon, 17 Feb 2014 02:30:30 -0500
+Subject: [PATCH 2/6] fix real path for brctl.bridge-utils
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/brctl.fc |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/contrib/brctl.fc b/policy/modules/contrib/brctl.fc
+index 32f8ee9..6b256e4 100644
+--- a/policy/modules/contrib/brctl.fc
++++ b/policy/modules/contrib/brctl.fc
+@@ -1 +1,2 @@
+ /usr/sbin/brctl	--	gen_context(system_u:object_r:brctl_exec_t,s0)
++/usr/sbin/brctl\.bridge-utils	--	gen_context(system_u:object_r:brctl_exec_t,s0)
+-- 
+1.7.9.5
+

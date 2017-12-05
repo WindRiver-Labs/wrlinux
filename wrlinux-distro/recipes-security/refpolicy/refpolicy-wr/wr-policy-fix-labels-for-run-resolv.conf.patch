@@ -1,0 +1,43 @@
+From 00b6f383962b586b5928781b61eb2af83ceffaea Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Fri, 24 Feb 2017 07:43:30 +0000
+Subject: [PATCH] refpolicy: fix labels for /run/resolv.conf
+
+Reference sources: selinux-policy-3.13.1-225.6.fc25.src.rpm
+
+* fix labels for /run/resolv.conf:
+  NetworkManager_var_run_t -> net_conf_t
+
+Remove avc denial:
+
+  avc: denied { getattr } for pid=465 comm="snmptrapd" \
+  path="/run/resolv.conf" dev="tmpfs" ino=14744 \
+  scontext=system_u:system_r:snmpd_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:NetworkManager_var_run_t:s0 tclass=file
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/networkmanager.te | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/policy/modules/contrib/networkmanager.te b/policy/modules/contrib/networkmanager.te
+index 9b57543..2b530cd 100644
+--- a/policy/modules/contrib/networkmanager.te
++++ b/policy/modules/contrib/networkmanager.te
+@@ -90,6 +90,11 @@ manage_dirs_pattern(NetworkManager_t, NetworkManager_var_run_t, NetworkManager_v
+ manage_files_pattern(NetworkManager_t, NetworkManager_var_run_t, NetworkManager_var_run_t)
+ manage_sock_files_pattern(NetworkManager_t, NetworkManager_var_run_t, NetworkManager_var_run_t)
+ files_pid_filetrans(NetworkManager_t, NetworkManager_var_run_t, { dir file sock_file })
++gen_require(`
++	type var_run_t, net_conf_t;
++')
++filetrans_pattern(NetworkManager_t, var_run_t, net_conf_t, file, "resolv.conf")
++filetrans_pattern(NetworkManager_t, var_run_t, net_conf_t, file, "resolv.conf.tmp")
+ 
+ can_exec(NetworkManager_t, { NetworkManager_exec_t wpa_cli_exec_t NetworkManager_tmp_t })
+ 
+-- 
+2.11.0
+

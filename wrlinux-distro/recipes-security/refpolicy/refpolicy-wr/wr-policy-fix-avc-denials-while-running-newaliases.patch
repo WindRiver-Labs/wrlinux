@@ -1,0 +1,95 @@
+From cbedb7368663f45b3312345dd76118145387c662 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Fri, 26 Feb 2016 07:24:57 -0500
+Subject: [PATCH] wr-policy: fix avc denials while running newaliases
+
+* allow user_mail_t, sendmail_t search /run/systemd/journal which
+  labeled as mls_systemhigh
+* allow user_mail_t manage etc_aliases_t files
+* allow postfix_master_t create etc_aliases_t files
+
+Fix avc denials:
+
+  avc: denied { search } for pid=886 comm="newaliases" \
+  name="journal" dev="tmpfs" ino=8228 \
+  scontext=root:sysadm_r:user_mail_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 \
+  tclass=dir permissive=0
+
+  avc: denied { search } for pid=510 comm="newaliases" \
+  name="journal" dev="tmpfs" ino=8228 \
+  scontext=system_u:system_r:sendmail_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 \
+  tclass=dir permissive=0
+
+  avc: denied { write } for pid=922 comm="postalias" \
+  name="etc" dev="hda" ino=12 \
+  scontext=root:sysadm_r:user_mail_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:etc_t:s0 \
+  tclass=dir permissive=0
+
+  avc: denied { create } for pid=510 comm="postalias" \
+  name="__db.aliases.db" \
+  scontext=system_u:system_r:postfix_master_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:etc_t:s0 \
+  tclass=file permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/mta.te      | 8 ++++++++
+ policy/modules/contrib/postfix.te  | 4 ++++
+ policy/modules/contrib/sendmail.te | 2 ++
+ 3 files changed, 14 insertions(+)
+
+diff --git a/policy/modules/contrib/mta.te b/policy/modules/contrib/mta.te
+index 61f78ae..f2c4089 100644
+--- a/policy/modules/contrib/mta.te
++++ b/policy/modules/contrib/mta.te
+@@ -394,6 +394,14 @@ dev_read_sysfs(user_mail_t)
+ 
+ userdom_use_user_terminals(user_mail_t)
+ 
++# WRL fix:
++# create /etc/aliases* with type etc_aliases_t
++files_etc_filetrans(user_mail_t, etc_aliases_t, { file lnk_file sock_file fifo_file })
++# create, read, write, and delete mail address aliases
++mta_manage_aliases(user_mail_t)
++
++mls_file_read_all_levels(user_mail_t)
++
+ optional_policy(`
+ 	allow user_mail_t self:capability dac_override;
+ 
+diff --git a/policy/modules/contrib/postfix.te b/policy/modules/contrib/postfix.te
+index 0bcdc78..38890e0 100644
+--- a/policy/modules/contrib/postfix.te
++++ b/policy/modules/contrib/postfix.te
+@@ -318,6 +318,10 @@ mta_read_sendmail_bin(postfix_master_t)
+ mta_getattr_spool(postfix_master_t)
+ mls_file_read_all_levels(postfix_master_t)
+ 
++# WRL fix:
++# create /etc/__db.aliases.db with type etc_aliases_t
++mta_etc_filetrans_aliases(postfix_master_t, file, "__db.aliases.db")
++
+ optional_policy(`
+ 	cyrus_stream_connect(postfix_master_t)
+ ')
+diff --git a/policy/modules/contrib/sendmail.te b/policy/modules/contrib/sendmail.te
+index 04aa439..c8baf18 100644
+--- a/policy/modules/contrib/sendmail.te
++++ b/policy/modules/contrib/sendmail.te
+@@ -125,6 +125,8 @@ mta_manage_spool(sendmail_t)
+ mta_read_config(sendmail_t)
+ mta_sendmail_exec(sendmail_t)
+ 
++mls_file_read_all_levels(sendmail_t)
++
+ optional_policy(`
+ 	cfengine_dontaudit_write_log_files(sendmail_t)
+ ')
+-- 
+1.9.1
+

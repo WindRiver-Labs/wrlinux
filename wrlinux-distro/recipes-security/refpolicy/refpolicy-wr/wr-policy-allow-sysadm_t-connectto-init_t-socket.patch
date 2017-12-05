@@ -1,0 +1,31 @@
+From 72afc6914e3226ddd8471d162436c53953bc539b Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Mon, 22 Feb 2016 10:13:32 -0500
+Subject: [PATCH] wr-policy: allow sysadm_t connectto init_t socket
+
+Reference sources: selinux-policy-3.13.1-128.21.fc22.src.rpm
+Changes come from: policy-f22-base.patch
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/system/init.if | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
+index 5cce600..dadd1e3 100644
+--- a/policy/modules/system/init.if
++++ b/policy/modules/system/init.if
+@@ -1200,6 +1200,8 @@ interface(`init_telinit',`
+ 		allow $1 self:unix_dgram_socket create_socket_perms;
+ 		allow $1 init_t:unix_dgram_socket sendto;
+ 	')
++
++	allow $1 init_t:unix_stream_socket connectto;
+ ')
+ 
+ ########################################
+-- 
+1.9.1
+

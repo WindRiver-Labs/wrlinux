@@ -1,0 +1,27 @@
+From aa4d15a62c9334666e57aa33d5431f5f1632b4d4 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Mon, 17 Feb 2014 02:42:51 -0500
+Subject: [PATCH 3/6] fix real path for msmtp
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/mta.fc |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/contrib/mta.fc b/policy/modules/contrib/mta.fc
+index 0d4bcef..8234851 100644
+--- a/policy/modules/contrib/mta.fc
++++ b/policy/modules/contrib/mta.fc
+@@ -15,6 +15,7 @@ HOME_DIR/\.maildir(/.*)?	gen_context(system_u:object_r:mail_home_rw_t,s0)
+ 
+ /usr/bin/esmtp	--	gen_context(system_u:object_r:sendmail_exec_t,s0)
+ /usr/bin/mail(x)?	--	gen_context(system_u:object_r:sendmail_exec_t,s0)
++/usr/bin/msmtp	--	gen_context(system_u:object_r:sendmail_exec_t,s0)
+ 
+ /usr/lib/sendmail	--	gen_context(system_u:object_r:sendmail_exec_t,s0)
+ /usr/lib/courier/bin/sendmail	--	gen_context(system_u:object_r:sendmail_exec_t,s0)
+-- 
+1.7.9.5
+

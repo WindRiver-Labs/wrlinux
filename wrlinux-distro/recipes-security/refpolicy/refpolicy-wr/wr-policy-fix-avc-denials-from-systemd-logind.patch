@@ -1,0 +1,200 @@
+From f69ae397f4fefbab9a2898c7aa67b693041ea9ff Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 21 Jan 2016 01:06:36 -0500
+Subject: [PATCH] wr-policy-fix-avc-denials-from-systemd-logind
+
+Patches ported from Fedora 22.
+
+Reference sources: selinux-policy-3.13.1-128.21.fc22.src.rpm
+Changes come from: policy-f22-base.patch
+
+Fix avc denials:
+
+  avc: denied { net_admin } for pid=328 comm="login" capability=12 \
+  scontext=system_u:system_r:local_login_t:s0-s15:c0.c1023 \
+  tcontext=system_u:system_r:local_login_t:s0-s15:c0.c1023 \
+  tclass=capability permissive=1
+
+  avc: denied { setfscreate } for pid=271 comm="systemd-logind" \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tclass=process permissive=1
+
+  avc: denied { status start } for auid=n/a uid=0 gid=0 \
+  cmdline="/lib/systemd/systemd-logind" \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:system_r:init_t:s0-s15:c0.c1023 \
+  tclass=system exe="/lib/systemd/systemd"
+
+  avc: denied { sendto } for pid=271 comm="systemd-logind" \
+  path="/run/systemd/notify" \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:system_r:init_t:s0-s15:c0.c1023 \
+  tclass=unix_dgram_socket permissive=1
+
+  avc: denied { write } for pid=271 comm="systemd-logind" \
+  name="notify" dev="tmpfs" ino=8180 \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:init_var_run_t:s0 \
+  tclass=sock_file permissive=1
+
+  avc: denied { read } for pid=271 comm="systemd-logind" \
+  name="cmdline" dev="proc" ino=4026531990 \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:proc_t:s0 tclass=file permissive=1
+
+  avc: denied { read } for pid=271 comm="systemd-logind" \
+  name="boot_id" dev="proc" ino=9003 \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:sysctl_kernel_t:s0 \
+  tclass=file permissive=1
+
+  avc: denied { read } for pid=271 comm="systemd-logind" \
+  name="master-of-seat" dev="tmpfs" ino=9425 \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:udev_var_run_t:s0 \
+  tclass=dir permissive=1
+
+  avc: denied { mount } for pid=271 comm="systemd-logind" \
+  name="/" dev="tmpfs" ino=17394 \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:tmpfs_t:s0 \
+  tclass=filesystem permissive=1
+
+  avc: denied { getattr write } for pid=271 comm="systemd-logind" \
+  path="/run/user" dev="tmpfs" ino=9472 \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:var_auth_t:s0 \
+  tclass=dir permissive=1
+
+  avc: denied { add_name create } for pid=271 \
+  comm="systemd-logind" name="0" \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:var_auth_t:s0 \
+  tclass=dir permissive=1
+
+Upstream-Status: pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/system/init.if       | 37 +++++++++++++++++++++++++++++++++++++
+ policy/modules/system/locallogin.te |  2 ++
+ policy/modules/system/systemd.te    | 11 ++++++++++-
+ policy/modules/system/udev.if       |  4 ++++
+ 4 files changed, 53 insertions(+), 1 deletion(-)
+
+diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
+index b68dfc1..5cce600 100644
+--- a/policy/modules/system/init.if
++++ b/policy/modules/system/init.if
+@@ -793,6 +793,25 @@ interface(`init_rw_stream_sockets',`
+ 	allow $1 init_t:unix_stream_socket rw_stream_socket_perms;
+ ')
+ 
++#######################################
++## <summary>
++##  Allow the specified domain to write to
++##  init sock file.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`init_write_pid_socket',`
++	gen_require(`
++		type init_var_run_t;
++	')
++
++	allow $1 init_var_run_t:sock_file write;
++')
++
+ ########################################
+ ## <summary>
+ ##	Send UDP network traffic to init.  (Deprecated)
+@@ -827,6 +846,24 @@ interface(`init_get_system_status',`
+ 
+ ########################################
+ ## <summary>
++##      Tell init to start system (systemd).
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`init_system_start',`
++        gen_require(`
++                type init_t;
++        ')
++
++        allow $1 init_t:system start;
++')
++
++########################################
++## <summary>
+ ##	Enable all systemd services (systemd).
+ ## </summary>
+ ## <param name="domain">
+diff --git a/policy/modules/system/locallogin.te b/policy/modules/system/locallogin.te
+index f26a622..ef04aa0 100644
+--- a/policy/modules/system/locallogin.te
++++ b/policy/modules/system/locallogin.te
+@@ -135,6 +135,8 @@ userdom_use_unpriv_users_fds(local_login_t)
+ userdom_sigchld_all_users(local_login_t)
+ userdom_create_all_users_keys(local_login_t)
+ 
++dontaudit local_login_t self:capability net_admin;
++
+ ifdef(`init_systemd',`
+ 	auth_manage_faillog(local_login_t)
+ 
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 61af4c0..0dbb76c 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -178,7 +178,7 @@ optional_policy(`
+ #
+ 
+ allow systemd_logind_t self:capability { fowner sys_tty_config chown dac_override };
+-allow systemd_logind_t self:process getcap;
++allow systemd_logind_t self:process { getcap setfscreate };
+ allow systemd_logind_t self:netlink_kobject_uevent_socket create_socket_perms;
+ allow systemd_logind_t self:unix_dgram_socket create_socket_perms;
+ allow systemd_logind_t self:fifo_file rw_fifo_file_perms;
+@@ -229,6 +229,15 @@ udev_read_pid_files(systemd_logind_t)
+ 
+ userdom_use_user_ttys(systemd_logind_t)
+ 
++init_get_system_status(systemd_logind_t)
++init_system_start(systemd_logind_t)
++init_dgram_send(systemd_logind_t)
++init_write_pid_socket(systemd_logind_t)
++kernel_read_system_state(systemd_logind_t)
++kernel_read_kernel_sysctls(systemd_logind_t)
++fs_mount_tmpfs(systemd_logind_t)
++auth_manage_var_auth(systemd_logind_t)
++
+ optional_policy(`
+ 	dbus_system_bus_client(systemd_logind_t)
+ 	dbus_connect_system_bus(systemd_logind_t)
+diff --git a/policy/modules/system/udev.if b/policy/modules/system/udev.if
+index 211a596..c78787c 100644
+--- a/policy/modules/system/udev.if
++++ b/policy/modules/system/udev.if
+@@ -296,6 +296,10 @@ interface(`udev_read_pid_files',`
+ 	')
+ 
+ 	files_search_pids($1)
++
++	# port changes from fedora
++	allow $1 udev_var_run_t:dir list_dir_perms;
++
+ 	read_files_pattern($1, udev_var_run_t, udev_var_run_t)
+ ')
+ 
+-- 
+1.9.1
+

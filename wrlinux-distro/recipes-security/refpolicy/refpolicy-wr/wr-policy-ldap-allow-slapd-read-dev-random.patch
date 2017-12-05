@@ -1,0 +1,36 @@
+From 1cf9ddd57e4e1a0818ee08718ab762edf971bf2d Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Sat, 22 Feb 2014 02:01:10 -0500
+Subject: [PATCH] allow slapd read /dev/random
+
+Fix avc denied issue:
+
+type=1400 audit(1393050201.457:140): avc:  denied  { getattr } for \
+pid=945 comm="slapd" path="/dev/random" dev="devtmpfs" ino=5038 \
+scontext=system_u:system_r:slapd_t:s0-s15:c0.c1023 tcontext= \
+system_u:object_r:random_device_t:s0 tclass=chr_file
+
+Upstream-Status: pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/ldap.te |    3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/policy/modules/contrib/ldap.te b/policy/modules/contrib/ldap.te
+index 5be4dd7..6e6d831 100644
+--- a/policy/modules/contrib/ldap.te
++++ b/policy/modules/contrib/ldap.te
+@@ -50,6 +50,9 @@ allow slapd_t self:process setsched;
+ allow slapd_t self:fifo_file rw_fifo_file_perms;
+ allow slapd_t self:tcp_socket { accept listen };
+ 
++# allow slapd read /dev/random
++dev_read_rand(slapd_t)
++
+ allow slapd_t slapd_cert_t:dir list_dir_perms;
+ read_files_pattern(slapd_t, slapd_cert_t, slapd_cert_t)
+ read_lnk_files_pattern(slapd_t, slapd_cert_t, slapd_cert_t)
+-- 
+1.7.9.5
+

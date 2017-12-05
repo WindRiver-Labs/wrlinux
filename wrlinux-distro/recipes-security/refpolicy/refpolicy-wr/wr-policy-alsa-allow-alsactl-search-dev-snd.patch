@@ -1,0 +1,37 @@
+From ad606a0d280e3f7a7905c1929160a49e37403119 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Mon, 24 Feb 2014 01:00:43 -0500
+Subject: [PATCH] allow alsactl to search /dev/snd
+
+Fix avc denied issue:
+
+type=1400 audit(1393212618.060:13): avc:  denied  { search } \
+for  pid=390 comm="alsactl" name="snd" dev="devtmpfs" ino=5741 \
+scontext=system_u:system_r:alsa_t:s0-s15:c0.c1023 tcontext= \
+system_u:object_r:device_t:s15:c0.c1023 tclass=dir
+
+Upstream-Status: pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/alsa.te |    4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/policy/modules/contrib/alsa.te b/policy/modules/contrib/alsa.te
+index 901a6d3..b6ab166 100644
+--- a/policy/modules/contrib/alsa.te
++++ b/policy/modules/contrib/alsa.te
+@@ -59,6 +59,10 @@ dev_read_sound(alsa_t)
+ dev_read_sysfs(alsa_t)
+ dev_write_sound(alsa_t)
+ 
++# add alsa_t to attribute mlsfileread, this allows alsactl
++# to search /dev/snd which with mls level s15
++mls_file_read_all_levels(alsa_t)
++
+ files_read_usr_files(alsa_t)
+ files_search_var_lib(alsa_t)
+ 
+-- 
+1.7.9.5
+

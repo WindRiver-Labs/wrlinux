@@ -1,0 +1,33 @@
+From dab29752b9b9eb29c9ecb5bd613b141e3b33e606 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Wed, 1 Apr 2015 15:17:10 +0800
+Subject: [PATCH] refpolicy: dontaudit use privfd
+
+Reference sources: selinux-policy-3.12.1-196.fc20.src.rpm
+Changes come from: policy-f20-base.patch
+
+* dontaudit inherit file descriptors from domains with interactive
+  programs.
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/system/init.te | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index a5114a9..d64cca7 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -1144,3 +1144,7 @@ tunable_policy(`daemons_use_tty',`
+ 	term_dontaudit_use_all_ttys(daemon)
+ 	term_dontaudit_use_all_ptys(daemon)
+  ')
++
++# dontaudit attempts to inherit file descriptors from domains with
++# interactive programs.
++domain_dontaudit_use_interactive_fds(daemon)
+-- 
+1.9.1
+

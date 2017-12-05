@@ -1,0 +1,28 @@
+From 5484ad4666115261e5dcb9db12ed3e83ccc4ad4e Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Mon, 17 Feb 2014 03:00:02 -0500
+Subject: [PATCH 5/6] fix real path for snmptrap
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/snmp.fc |    2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/contrib/snmp.fc b/policy/modules/contrib/snmp.fc
+index c73fa24..23bf08f 100644
+--- a/policy/modules/contrib/snmp.fc
++++ b/policy/modules/contrib/snmp.fc
+@@ -3,6 +3,8 @@
+ /usr/sbin/snmptrap	--	gen_context(system_u:object_r:snmpd_exec_t,s0)
+ /usr/sbin/snmptrapd	--	gen_context(system_u:object_r:snmpd_exec_t,s0)
+ 
++/usr/bin/snmptrap	--	gen_context(system_u:object_r:snmpd_exec_t,s0)
++
+ /usr/share/snmp/mibs/\.index	--	gen_context(system_u:object_r:snmpd_var_lib_t,s0)
+ 
+ /var/agentx(/.*)?	gen_context(system_u:object_r:snmpd_var_lib_t,s0)
+-- 
+1.7.9.5
+

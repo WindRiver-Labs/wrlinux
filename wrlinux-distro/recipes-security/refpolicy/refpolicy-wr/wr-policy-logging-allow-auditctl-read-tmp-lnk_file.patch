@@ -1,0 +1,39 @@
+From 436a909274cce3294418aecdf7a074b5ddbeca21 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Fri, 6 Jun 2014 02:26:52 -0400
+Subject: [PATCH] logging: allow auditctl read tmp lnk_file
+
+auditctl fails to run on /tmp/xxx since /tmp is lnk_file that with
+type tmp_t:
+  $ newrole -r auditadm_r -p
+  $ auditctl -w /tmp/watch_me -p rwxa
+  Error sending add rule data request (Permission denied)
+
+This fixes avc denied error:
+  avc: denied { read } for pid=414 comm="auditctl" \
+  name="tmp" dev="hda" ino=5713 \
+  scontext=root:auditadm_r:auditctl_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:tmp_t:s0-s15:c0.c1023 tclass=lnk_file
+
+Upstream-Status: pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/system/logging.te |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
+index ecb8553..0050304 100644
+--- a/policy/modules/system/logging.te
++++ b/policy/modules/system/logging.te
+@@ -108,6 +108,7 @@ allow auditctl_t auditd_etc_t:dir list_dir_perms;
+ files_getattr_all_dirs(auditctl_t)
+ files_getattr_all_files(auditctl_t)
+ files_read_etc_files(auditctl_t)
++files_read_generic_tmp_symlinks(auditctl_t)
+ 
+ kernel_read_kernel_sysctls(auditctl_t)
+ kernel_read_proc_symlinks(auditctl_t)
+-- 
+1.7.9.5
+

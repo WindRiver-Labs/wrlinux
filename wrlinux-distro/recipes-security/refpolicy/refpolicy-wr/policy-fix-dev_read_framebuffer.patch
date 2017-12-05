@@ -1,0 +1,28 @@
+Subject: [PATCH] refpolicy: fix a syntax issue in dev_read_framebuffer
+
+dev_read_framebuffer should requires device_t, and would cause failures
+while compiling policy modules sometimes.
+
+Upstream-Status: pending
+
+Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
+---
+ policy/modules/kernel/devices.if | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/policy/modules/kernel/devices.if b/policy/modules/kernel/devices.if
+index d820975..e97ca02 100644
+--- a/policy/modules/kernel/devices.if
++++ b/policy/modules/kernel/devices.if
+@@ -2063,7 +2063,7 @@ interface(`dev_dontaudit_setattr_framebuffer_dev',`
+ #
+ interface(`dev_read_framebuffer',`
+ 	gen_require(`
+-		type framebuf_device_t;
++		type device_t, framebuf_device_t;
+ 	')
+ 
+ 	read_chr_files_pattern($1, device_t, framebuf_device_t)
+-- 
+1.7.11.7
+

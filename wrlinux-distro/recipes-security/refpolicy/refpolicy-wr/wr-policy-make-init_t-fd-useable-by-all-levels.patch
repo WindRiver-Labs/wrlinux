@@ -1,0 +1,58 @@
+From a165ad862b98a6659494b37ab2139870afdff017 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 7 Apr 2016 04:00:03 -0400
+Subject: [PATCH] wr-policy: make init_t fd useable by all levels
+
+Reference sources: selinux-policy-3.13.1-128.21.fc22.src.rpm
+Changes come from: policy-f22-base.patch
+
+Fix avc denials like:
+
+  avc: denied { use } for pid=347 comm="vsftpd" \
+  path="/dev/null" dev="devtmpfs" ino=7106 \
+  scontext=system_u:system_r:ftpd_t:s15:c0.c1023 \
+  tcontext=system_u:system_r:init_t:s0-s15:c0.c1023 \
+  tclass=fd permissive=0
+
+  avc: denied { use } for pid=347 comm="vsftpd" \
+  path="socket:[24512]" dev="sockfs" ino=24512 \
+  scontext=system_u:system_r:ftpd_t:s15:c0.c1023 \
+  tcontext=system_u:system_r:init_t:s0-s15:c0.c1023 \
+  tclass=fd permissive=0
+
+  avc: denied { use } for pid=347 comm="vsftpd" \
+  path="/lib64/ld-2.22.so" dev="hda" ino=2582 \
+  scontext=system_u:system_r:ftpd_t:s15:c0.c1023 \
+  tcontext=system_u:system_r:init_t:s0-s15:c0.c1023 \
+  tclass=fd permissive=0
+
+  avc: denied { use } for pid=347 comm="vsftpd" \
+  path="/null" dev="selinuxfs" ino=22 \
+  scontext=system_u:system_r:ftpd_t:s15:c0.c1023 \
+  tcontext=system_u:system_r:init_t:s0-s15:c0.c1023 \
+  tclass=fd permissive=0
+
+  ...
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/system/init.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index 8cae3f7..ef8097d 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -173,6 +173,7 @@ mls_file_read_all_levels(init_t)
+ mls_file_write_all_levels(init_t)
+ mls_process_write_all_levels(init_t)
+ mls_fd_use_all_levels(init_t)
++mls_fd_share_all_levels(init_t)
+ 
+ selinux_set_all_booleans(init_t)
+ 
+-- 
+1.9.1
+

@@ -1,0 +1,31 @@
+refpolicy: insmod_t
+
+modprobe might try to read /dev/null, and that will fail
+in mls systems because insmod_t is s0-s15 while /dev/null
+is s0.  So, we defeat that constraint for insmod_t.
+
+Upstream-Status: Pending
+
+Signed-off-by: Joe Slater <jslater@windriver.com>
+
+
+--- a/policy/modules/system/modutils.te
++++ b/policy/modules/system/modutils.te
+@@ -15,6 +15,7 @@ role system_r types depmod_t;
+ type insmod_t;
+ type insmod_exec_t;
+ application_domain(insmod_t, insmod_exec_t)
++mls_file_read_all_levels(insmod_t)
+ mls_file_write_all_levels(insmod_t)
+ role system_r types insmod_t;
+ 
+@@ -115,6 +116,9 @@ read_files_pattern(insmod_t, modules_con
+ list_dirs_pattern(insmod_t, modules_dep_t, modules_dep_t)
+ read_files_pattern(insmod_t, modules_dep_t, modules_dep_t)
+ 
++# read /dev/null !
++allow insmod_t device_t:chr_file read;
++
+ can_exec(insmod_t, insmod_exec_t)
+ 
+ kernel_load_module(insmod_t)

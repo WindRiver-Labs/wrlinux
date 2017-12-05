@@ -1,0 +1,126 @@
+From 2b8646d2ce68f752cce926923e76387e363492c8 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Mon, 24 Feb 2014 08:00:01 -0500
+Subject: [PATCH] remove avc denied messages for named service
+
+* fix real path for named ROOTDIR
+* fix avc denied issues like:
+
+type=AVC msg=audit(1393242619.202:5): avc:  denied  { mounton } for \
+pid=509 comm="mount" path="/run/named-chroot/var/run/named" dev= \
+"tmpfs" ino=9411 scontext=system_u:system_r:mount_t:s0-s15:c0.c1023 \
+tcontext=system_u:object_r:named_var_run_t:s0 tclass=dir
+
+type=AVC msg=audit(1393242620.829:13): avc:  denied  { write } for \
+pid=527 comm="named" name="bind" dev="hda" ino=28146 scontext= \
+system_u:system_r:named_t:s0-s15:c0.c1023 tcontext= \
+system_u:object_r:named_conf_t:s0 tclass=dir
+
+Upstream-Status: Inappropriate [WR Only]
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/bind.fc     | 16 ++++++++++++++++
+ policy/modules/contrib/bind.te     |  2 ++
+ policy/modules/contrib/dbus.fc     |  1 +
+ policy/modules/kernel/devices.fc   |  5 +++++
+ policy/modules/system/logging.fc   |  3 +++
+ policy/modules/system/miscfiles.fc |  1 +
+ 6 files changed, 28 insertions(+)
+
+diff --git a/policy/modules/contrib/bind.fc b/policy/modules/contrib/bind.fc
+index fd45d53..da60643 100644
+--- a/policy/modules/contrib/bind.fc
++++ b/policy/modules/contrib/bind.fc
+@@ -54,3 +54,19 @@
+ /var/run/bind(/.*)?	gen_context(system_u:object_r:named_var_run_t,s0)
+ /var/run/named(/.*)?	gen_context(system_u:object_r:named_var_run_t,s0)
+ /var/run/unbound(/.*)?	gen_context(system_u:object_r:named_var_run_t,s0)
++
++/var/run/named-chroot(/.*)? gen_context(system_u:object_r:named_conf_t,s0)
++/var/run/named-chroot/etc/rndc\.key --      gen_context(system_u:object_r:dnssec_t,s0)
++/var/run/named-chroot/etc/named\.conf       --      gen_context(system_u:object_r:named_conf_t,s0)
++/var/run/named-chroot/etc/named\.rfc1912\.zones     --      gen_context(system_u:object_r:named_conf_t,s0)
++/var/run/named-chroot/etc/named\.root\.hints        --      gen_context(system_u:object_r:named_conf_t,s0)
++/var/run/named-chroot/etc/named\.caching-nameserver\.conf   --      gen_context(system_u:object_r:named_conf_t,s0)
++/var/run/named-chroot/proc(/.*)?    <<none>>
++/var/run/named-chroot/var/run/named.*       gen_context(system_u:object_r:named_var_run_t,s0)
++/var/run/named-chroot/var/tmp(/.*)? gen_context(system_u:object_r:named_cache_t,s0)
++/var/run/named-chroot/var/named(/.*)?       gen_context(system_u:object_r:named_zone_t,s0)
++/var/run/named-chroot/var/named/slaves(/.*)?        gen_context(system_u:object_r:named_cache_t,s0)
++/var/run/named-chroot/var/named/data(/.*)?  gen_context(system_u:object_r:named_cache_t,s0)
++/var/run/named-chroot/var/named/dynamic(/.*)?       gen_context(system_u:object_r:named_cache_t,s0)
++/var/run/named-chroot/var/named/named\.ca   --      gen_context(system_u:object_r:named_conf_t,s0)
++/var/run/named-chroot/var/log/named.*       --      gen_context(system_u:object_r:named_log_t,s0)
+diff --git a/policy/modules/contrib/bind.te b/policy/modules/contrib/bind.te
+index 6991aeb..c5fe855 100644
+--- a/policy/modules/contrib/bind.te
++++ b/policy/modules/contrib/bind.te
+@@ -56,6 +56,7 @@ files_tmp_file(named_tmp_t)
+ type named_var_run_t;
+ files_pid_file(named_var_run_t)
+ init_daemon_pid_file(named_var_run_t, dir, "named")
++files_mountpoint(named_var_run_t)
+ 
+ # for primary zone files
+ type named_zone_t;
+@@ -82,6 +83,7 @@ allow named_t dnssec_t:file read_file_perms;
+ 
+ allow named_t named_conf_t:dir list_dir_perms;
+ read_files_pattern(named_t, named_conf_t, named_conf_t)
++manage_dirs_pattern(named_t, named_conf_t, named_conf_t)
+ read_lnk_files_pattern(named_t, named_conf_t, named_conf_t)
+ 
+ manage_files_pattern(named_t, named_cache_t, named_cache_t)
+diff --git a/policy/modules/contrib/dbus.fc b/policy/modules/contrib/dbus.fc
+index 309a462..012ec93 100644
+--- a/policy/modules/contrib/dbus.fc
++++ b/policy/modules/contrib/dbus.fc
+@@ -21,3 +21,4 @@ HOME_DIR/\.dbus(/.*)?	gen_context(system_u:object_r:session_dbusd_home_t,s0)
+ /var/run/messagebus\.pid	--	gen_context(system_u:object_r:system_dbusd_var_run_t,s0)
+ 
+ /var/named/chroot/var/run/dbus(/.*)?	gen_context(system_u:object_r:system_dbusd_var_run_t,s0)
++/var/run/named-chroot/var/run/dbus(/.*)?	gen_context(system_u:object_r:system_dbusd_var_run_t,s0)
+diff --git a/policy/modules/kernel/devices.fc b/policy/modules/kernel/devices.fc
+index a33e395..0c41090 100644
+--- a/policy/modules/kernel/devices.fc
++++ b/policy/modules/kernel/devices.fc
+@@ -208,4 +208,9 @@ ifdef(`distro_redhat',`
+ /var/named/chroot/dev/null -c	gen_context(system_u:object_r:null_device_t,s0)
+ /var/named/chroot/dev/random -c	gen_context(system_u:object_r:random_device_t,s0)
+ /var/named/chroot/dev/zero -c	gen_context(system_u:object_r:zero_device_t,s0)
++
++/var/run/named-chroot/dev   -d      gen_context(system_u:object_r:device_t,s0)
++/var/run/named-chroot/dev/null -c   gen_context(system_u:object_r:null_device_t,s0)
++/var/run/named-chroot/dev/random -c gen_context(system_u:object_r:random_device_t,s0)
++/var/run/named-chroot/dev/zero -c   gen_context(system_u:object_r:zero_device_t,s0)
+ ')
+diff --git a/policy/modules/system/logging.fc b/policy/modules/system/logging.fc
+index 581154b..f789437 100644
+--- a/policy/modules/system/logging.fc
++++ b/policy/modules/system/logging.fc
+@@ -63,6 +63,9 @@ ifndef(`distro_gentoo',`
+ ifdef(`distro_redhat',`
+ /var/named/chroot/var/log -d	gen_context(system_u:object_r:var_log_t,s0)
+ /var/named/chroot/dev/log -s	gen_context(system_u:object_r:devlog_t,s0)
++
++/var/run/named-chroot/var/log -d    gen_context(system_u:object_r:var_log_t,s0)
++/var/run/named-chroot/dev/log -s    gen_context(system_u:object_r:devlog_t,s0)
+ ')
+ 
+ /var/run/audit_events	-s	gen_context(system_u:object_r:auditd_var_run_t,mls_systemhigh)
+diff --git a/policy/modules/system/miscfiles.fc b/policy/modules/system/miscfiles.fc
+index fb7e7b2..1c7d0ad 100644
+--- a/policy/modules/system/miscfiles.fc
++++ b/policy/modules/system/miscfiles.fc
+@@ -87,6 +87,7 @@ ifdef(`distro_redhat',`
+ /var/cache/man(/.*)?		gen_context(system_u:object_r:man_cache_t,s0)
+ 
+ /var/named/chroot/etc/pki(/.*)? gen_context(system_u:object_r:cert_t,s0)
++/var/run/named-chroot/etc/pki(/.*)? gen_context(system_u:object_r:cert_t,s0)
+ 
+ /var/spool/abrt-upload(/.*)?	gen_context(system_u:object_r:public_content_rw_t,s0)
+ /var/spool/texmf(/.*)?		gen_context(system_u:object_r:tetex_data_t,s0)
+-- 
+1.9.1
+

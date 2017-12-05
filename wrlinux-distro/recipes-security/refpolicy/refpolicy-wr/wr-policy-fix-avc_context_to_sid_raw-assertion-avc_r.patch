@@ -1,0 +1,67 @@
+From b2961c53bfd815aad09b4f922eebb4ab42f8a333 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Tue, 26 Apr 2016 05:24:09 -0400
+Subject: [PATCH] wr-policy: fix avc_context_to_sid_raw assertion `avc_running'
+ failure
+
+When trying to run su or groupadd, the following error occurs:
+
+  $ groupadd test
+  groupadd: avc.c:74: avc_context_to_sid_raw: Assertion `avc_running' failed.
+  Aborted
+
+  $ su root
+  su: avc.c:74: avc_context_to_sid_raw: Assertion `avc_running' failed.
+  traps: su[282] general protection ip:7fca208b96e6 sp:7fffbf4baad0 error:0 in libc-2.22.so[7fca20883000+19a000]
+  Segmentation fault
+
+The following AVC denials is shown in audit logs:
+
+  avc: denied { create bind } for pid=831 comm="su" \
+  scontext=root:sysadm_r:sysadm_su_t:s0-s15:c0.c1023 \
+  tcontext=root:sysadm_r:sysadm_su_t:s0-s15:c0.c1023 \
+  tclass=netlink_selinux_socket permissive=0
+
+  avc: denied { create bind } for pid=880 comm="groupadd" \
+  scontext=root:sysadm_r:groupadd_t:s0-s15:c0.c1023 \
+  tcontext=root:sysadm_r:groupadd_t:s0-s15:c0.c1023 \
+  tclass=netlink_selinux_socket permissive=0
+
+RedHat also has the same issue:
+  https://bugzilla.redhat.com/show_bug.cgi?format=multiple&id=1146987
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/admin/su.if         | 1 +
+ policy/modules/admin/usermanage.te | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/policy/modules/admin/su.if b/policy/modules/admin/su.if
+index 36eaac5..b7a826c 100644
+--- a/policy/modules/admin/su.if
++++ b/policy/modules/admin/su.if
+@@ -159,6 +159,7 @@ template(`su_role_template',`
+ 	allow $1_su_t self:process { setexec setsched setrlimit };
+ 	allow $1_su_t self:fifo_file rw_fifo_file_perms;
+ 	allow $1_su_t self:netlink_audit_socket { nlmsg_relay create_netlink_socket_perms };
++	allow $1_su_t self:netlink_selinux_socket { bind create };
+ 	allow $1_su_t self:key { search write };
+ 
+ 	allow $1_su_t $3:key search;
+diff --git a/policy/modules/admin/usermanage.te b/policy/modules/admin/usermanage.te
+index def8386..f807733 100644
+--- a/policy/modules/admin/usermanage.te
++++ b/policy/modules/admin/usermanage.te
+@@ -203,6 +203,7 @@ allow groupadd_t self:unix_dgram_socket create_socket_perms;
+ allow groupadd_t self:unix_stream_socket create_stream_socket_perms;
+ allow groupadd_t self:unix_dgram_socket sendto;
+ allow groupadd_t self:unix_stream_socket connectto;
++allow groupadd_t self:netlink_selinux_socket { bind create };
+ 
+ fs_getattr_xattr_fs(groupadd_t)
+ fs_search_auto_mountpoints(groupadd_t)
+-- 
+2.8.1
+

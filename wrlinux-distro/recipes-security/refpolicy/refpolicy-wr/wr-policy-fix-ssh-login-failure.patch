@@ -1,0 +1,265 @@
+From c961cfb331421c8a5b6fe7e232b6c902a344e17a Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Wed, 24 Feb 2016 21:42:07 -0500
+Subject: [PATCH] wr-policy: fix ssh login failure
+
+Reference sources: selinux-policy-3.13.1-128.21.fc22.src.rpm
+Changes come from: policy-f22-base.patch
+
+Fix avc denials:
+
+  avc: denied { getattr search } for pid=900 comm="sshd" \
+  path="/run/sshd" dev="tmpfs" ino=11156 \
+  scontext=system_u:system_r:sshd_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:initrc_var_run_t:s0 \
+  tclass=dir permissive=1
+
+  avc: denied { net_admin } for  pid=900 comm="sshd" capability=12 \
+  scontext=system_u:system_r:sshd_t:s0-s15:c0.c1023 \
+  tcontext=system_u:system_r:sshd_t:s0-s15:c0.c1023 \
+  tclass=capability permissive=1
+
+  avc: denied { search } for pid=343 comm="systemd-logind" \
+  name="900" dev="proc" ino=23114 \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:system_r:sshd_t:s0-s15:c0.c1023 \
+  tclass=dir permissive=1
+
+  avc: denied { read open getattr } for pid=343 comm="systemd-logind" \
+  name="cgroup" dev="proc" ino=23184 \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:system_r:sshd_t:s0-s15:c0.c1023 \
+  tclass=file permissive=1
+
+  avc: denied { use } for pid=377 comm="dbus-daemon" \
+  path="/run/systemd/sessions/c2.ref" dev="tmpfs" ino=23251 \
+  scontext=system_u:system_r:system_dbusd_t:s0-s15:c0.c1023 \
+  tcontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tclass=fd permissive=1
+
+  avc: denied { write } for pid=377 comm="dbus-daemon" \
+  path="/run/systemd/sessions/c2.ref" dev="tmpfs" ino=23251 \
+  scontext=system_u:system_r:system_dbusd_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:systemd_logind_var_run_t:s0 \
+  tclass=fifo_file permissive=1
+
+  avc: denied { use } for pid=900 comm="sshd" \
+  path="/run/systemd/sessions/c2.ref" dev="tmpfs" ino=23251 \
+  scontext=system_u:system_r:sshd_t:s0-s15:c0.c1023 \
+  tcontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tclass=fd permissive=1
+
+  avc: denied { write } for pid=900 comm="sshd" \
+  path="/run/systemd/sessions/c2.ref" dev="tmpfs" ino=23251 \
+  scontext=system_u:system_r:sshd_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:systemd_logind_var_run_t:s0 \
+  tclass=fifo_file permissive=1
+
+  avc: denied { getattr read open write } for pid=908 comm="sshd" \
+  path="/var/volatile/log/lastlog" dev="tmpfs" ino=18480 \
+  scontext=system_u:system_r:sshd_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:var_log_t:s0 \
+  tclass=file permissive=1
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/dbus.te     |  2 ++
+ policy/modules/services/ssh.if     |  2 +-
+ policy/modules/services/ssh.te     |  1 +
+ policy/modules/system/authlogin.if | 28 +++++++++++++++++++++++++
+ policy/modules/system/systemd.fc   |  2 +-
+ policy/modules/system/systemd.if   | 43 ++++++++++++++++++++++++++++++++++++++
+ policy/modules/system/systemd.te   |  9 ++++++++
+ 7 files changed, 85 insertions(+), 2 deletions(-)
+
+diff --git a/policy/modules/contrib/dbus.te b/policy/modules/contrib/dbus.te
+index 69949fb..ee768e7 100644
+--- a/policy/modules/contrib/dbus.te
++++ b/policy/modules/contrib/dbus.te
+@@ -143,6 +143,8 @@ seutil_read_default_contexts(system_dbusd_t)
+ userdom_dontaudit_use_unpriv_user_fds(system_dbusd_t)
+ userdom_dontaudit_search_user_home_dirs(system_dbusd_t)
+ 
++systemd_write_inherited_logind_sessions_pipes(system_dbusd_t)
++
+ optional_policy(`
+ 	bluetooth_stream_connect(system_dbusd_t)
+ ')
+diff --git a/policy/modules/services/ssh.if b/policy/modules/services/ssh.if
+index 3fda887..05f91b3 100644
+--- a/policy/modules/services/ssh.if
++++ b/policy/modules/services/ssh.if
+@@ -181,7 +181,7 @@ template(`ssh_server_template', `
+ 	type $1_var_run_t;
+ 	files_pid_file($1_var_run_t)
+ 
+-	allow $1_t self:capability { kill sys_chroot sys_nice sys_resource chown dac_override fowner fsetid setgid setuid sys_tty_config };
++	allow $1_t self:capability { kill sys_chroot sys_nice sys_resource chown dac_override fowner fsetid net_admin setgid setuid sys_tty_config };
+ 	allow $1_t self:fifo_file rw_fifo_file_perms;
+ 	allow $1_t self:process { signal getsched setsched setrlimit setexec setkeycreate };
+ 	allow $1_t self:tcp_socket create_stream_socket_perms;
+diff --git a/policy/modules/services/ssh.te b/policy/modules/services/ssh.te
+index 06fe64f..ad07b7e 100644
+--- a/policy/modules/services/ssh.te
++++ b/policy/modules/services/ssh.te
+@@ -250,6 +250,7 @@ manage_dirs_pattern(sshd_t, sshd_tmp_t, sshd_tmp_t)
+ manage_files_pattern(sshd_t, sshd_tmp_t, sshd_tmp_t)
+ manage_sock_files_pattern(sshd_t, sshd_tmp_t, sshd_tmp_t)
+ files_tmp_filetrans(sshd_t, sshd_tmp_t, { dir file sock_file })
++files_search_all(sshd_t)
+ 
+ kernel_search_key(sshd_t)
+ kernel_link_key(sshd_t)
+diff --git a/policy/modules/system/authlogin.if b/policy/modules/system/authlogin.if
+index 9d72947..bcf0963 100644
+--- a/policy/modules/system/authlogin.if
++++ b/policy/modules/system/authlogin.if
+@@ -56,6 +56,7 @@ interface(`auth_use_pam',`
+ 	auth_rw_faillog($1)
+ 	auth_exec_pam($1)
+ 	auth_use_nsswitch($1)
++	auth_create_lastlog($1)
+ 
+ 	logging_send_audit_msgs($1)
+ 	logging_send_syslog_msg($1)
+@@ -80,6 +81,13 @@ interface(`auth_use_pam',`
+ 	optional_policy(`
+ 		nis_authenticate($1)
+ 	')
++
++	optional_policy(`
++		systemd_dbus_chat_logind($1)
++		systemd_use_logind_fds($1)
++		systemd_write_inherited_logind_sessions_pipes($1)
++		systemd_read_logind_sessions_files($1)
++	')
+ ')
+ 
+ ########################################
+@@ -1873,3 +1881,23 @@ interface(`auth_unconfined',`
+ 	typeattribute $1 can_write_shadow_passwords;
+ 	typeattribute $1 can_relabelto_shadow_passwords;
+ ')
++
++#######################################
++## <summary>
++##      Manage create logins log.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`auth_create_lastlog',`
++	gen_require(`
++		type lastlog_t;
++	')
++
++	logging_search_logs($1)
++	allow $1 lastlog_t:file create;
++	logging_log_filetrans($1, lastlog_t, file, "lastlog")
++')
+diff --git a/policy/modules/system/systemd.fc b/policy/modules/system/systemd.fc
+index 864979d..1d1af3d 100644
+--- a/policy/modules/system/systemd.fc
++++ b/policy/modules/system/systemd.fc
+@@ -33,7 +33,7 @@
+ /var/run/nologin	--	gen_context(system_u:object_r:systemd_sessions_var_run_t,s0)
+ 
+ /var/run/systemd/seats(/.*)?	gen_context(system_u:object_r:systemd_logind_var_run_t,s0)
+-/var/run/systemd/sessions(/.*)?	gen_context(system_u:object_r:systemd_logind_var_run_t,s0)
++/var/run/systemd/sessions(/.*)?	gen_context(system_u:object_r:systemd_logind_sessions_t,s0)
+ /var/run/systemd/users(/.*)?	gen_context(system_u:object_r:systemd_logind_var_run_t,s0)
+ /var/run/systemd/inhibit(/.*)?	gen_context(system_u:object_r:systemd_logind_var_run_t,s0)
+ /var/run/tmpfiles\.d/kmod.conf	gen_context(system_u:object_r:systemd_kmod_conf_t,s0)
+diff --git a/policy/modules/system/systemd.if b/policy/modules/system/systemd.if
+index c1c34be..7b49754 100644
+--- a/policy/modules/system/systemd.if
++++ b/policy/modules/system/systemd.if
+@@ -76,6 +76,9 @@ interface(`systemd_dbus_chat_logind',`
+ 
+ 	allow $1 systemd_logind_t:dbus send_msg;
+ 	allow systemd_logind_t $1:dbus send_msg;
++	ps_process_pattern(systemd_logind_t, $1)
++	allow systemd_logind_t $1:process signal;
++	allow $1 systemd_logind_t:fd use;
+ ')
+ 
+ ########################################
+@@ -189,3 +192,43 @@ interface(`systemd_getattr_unit_dirs',`
+ 
+ 	allow $1 systemd_unit_t:dir getattr;
+ ')
++
++######################################
++## <summary>
++##      Read logind sessions files.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`systemd_read_logind_sessions_files',`
++	gen_require(`
++		type systemd_logind_sessions_t;
++	')
++
++	init_search_run($1)
++	allow $1 systemd_logind_sessions_t:dir list_dir_perms;
++	read_files_pattern($1, systemd_logind_sessions_t, systemd_logind_sessions_t)
++')
++
++######################################
++## <summary>
++##      Write inherited logind sessions pipes.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`systemd_write_inherited_logind_sessions_pipes',`
++	gen_require(`
++		type systemd_logind_sessions_t;
++		type systemd_logind_t;
++	')
++
++	allow $1 systemd_logind_t:fd use;
++	allow $1 systemd_logind_sessions_t:fifo_file write;
++')
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 693ef00..ea0ade6 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -104,6 +104,10 @@ type systemd_kmod_conf_t;
+ files_config_file(systemd_kmod_conf_t)
+ init_daemon_domain(systemd_tmpfiles_t, systemd_tmpfiles_exec_t)
+ 
++# /run/systemd/sessions
++type systemd_logind_sessions_t;
++files_pid_file(systemd_logind_sessions_t)
++
+ #
+ # Unit file types
+ #
+@@ -190,6 +194,11 @@ manage_fifo_files_pattern(systemd_logind_t, systemd_logind_var_run_t, systemd_lo
+ manage_files_pattern(systemd_logind_t, systemd_logind_var_run_t, systemd_logind_var_run_t)
+ files_search_pids(systemd_logind_t)
+ 
++manage_dirs_pattern(systemd_logind_t, { systemd_logind_sessions_t systemd_logind_var_run_t }, { systemd_logind_sessions_t systemd_logind_var_run_t })
++manage_files_pattern(systemd_logind_t, { systemd_logind_sessions_t systemd_logind_var_run_t }, { systemd_logind_var_run_t systemd_logind_sessions_t })
++manage_fifo_files_pattern(systemd_logind_t, systemd_logind_sessions_t, { systemd_logind_sessions_t systemd_logind_var_run_t })
++init_pid_filetrans(systemd_logind_t, systemd_logind_sessions_t, dir, "sessions")
++
+ auth_manage_faillog(systemd_logind_t)
+ 
+ dev_rw_sysfs(systemd_logind_t)
+-- 
+1.9.1
+

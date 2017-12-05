@@ -1,0 +1,59 @@
+From 76b52686bedd06e6b1359d8178fd5210d5abbb7b Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 25 Feb 2016 04:25:08 -0500
+Subject: [PATCH] wr-policy: allow ftpd_t, auditd_t write to socket at any
+ level
+
+* allow ftpd_t, auditd_t write to init_t:unix_stream_socket
+  at any level
+
+Fix avc denials:
+
+  avc: denied { write } for pid=459 comm="vsftpd" \
+  path="socket:[15446]" dev="sockfs" ino=15446 \
+  scontext=system_u:system_r:ftpd_t:s15:c0.c1023 \
+  tcontext=system_u:system_r:init_t:s0-s15:c0.c1023 \
+  tclass=unix_stream_socket permissive=1
+
+  avc: denied { write } for pid=748 comm="auditd" \
+  path="socket:[17371]" dev="sockfs" ino=17371 \
+  scontext=system_u:system_r:auditd_t:s15:c0.c1023 \
+  tcontext=system_u:system_r:init_t:s0-s15:c0.c1023 \
+  tclass=unix_stream_socket permissive=1
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/ftp.te    | 2 ++
+ policy/modules/system/logging.te | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/policy/modules/contrib/ftp.te b/policy/modules/contrib/ftp.te
+index d4ee24b..b9023eb 100644
+--- a/policy/modules/contrib/ftp.te
++++ b/policy/modules/contrib/ftp.te
+@@ -262,6 +262,8 @@ sysnet_use_ldap(ftpd_t)
+ userdom_dontaudit_use_unpriv_user_fds(ftpd_t)
+ userdom_dontaudit_search_user_home_dirs(ftpd_t)
+ 
++mls_socket_write_all_levels(ftpd_t)
++
+ tunable_policy(`allow_ftpd_anon_write',`
+ 	miscfiles_manage_public_files(ftpd_t)
+ ')
+diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
+index b56ec44..629208f 100644
+--- a/policy/modules/system/logging.te
++++ b/policy/modules/system/logging.te
+@@ -208,6 +208,7 @@ miscfiles_read_localization(auditd_t)
+ mls_file_read_all_levels(auditd_t)
+ mls_file_write_all_levels(auditd_t) # Need to be able to write to /var/run/ directory
+ mls_fd_use_all_levels(auditd_t) # WRL fix - ported from CGP7
++mls_socket_write_all_levels(auditd_t)
+ 
+ seutil_dontaudit_read_config(auditd_t)
+ 
+-- 
+1.9.1
+

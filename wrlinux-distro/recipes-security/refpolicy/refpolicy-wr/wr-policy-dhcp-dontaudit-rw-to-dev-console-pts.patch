@@ -1,0 +1,68 @@
+From f012183df55cfd476303508b373ee790b0ee1666 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Tue, 3 Jun 2014 04:06:41 -0400
+Subject: [PATCH] dhcp: dontaudit r/w to /dev/console, /dev/pts/*
+
+From audit.log although r/w to terminal devices are denied, but nothing
+was blocked:
+
+  avc: denied { read write } for pid=417 comm="dhcpd" \
+  path="/dev/pts/0" dev="devpts" ino=3 \
+  scontext=system_u:system_r:dhcpd_t:s0-s15:c0.c1023 \
+  tcontext=root:object_r:user_devpts_t:s0 tclass=chr_file
+  type=1300 audit(1401014574.776:21): arch=c000003e syscall=59 \
+  success=yes exit=0 a0=39566df7452 a1=39566df7220 ...
+
+  avc: denied { read write } for pid=638 comm="dhcpd" \
+  path="/dev/console" dev="devtmpfs" ino=5018 \
+  scontext=system_u:system_r:dhcpd_t:s0-s15:c0.c1023 \
+  tcontext=root:object_r:user_tty_device_t:s0 tclass=chr_file
+  type=SYSCALL msg=audit(1401781412.329:31): arch=c000003e syscall=59 \
+  success=yes exit=0 a0=3e8e0b2346c a1=3e8e0b23260 ...
+
+And search from current policy db:
+  $ sesearch --dontaudit -c chr_file|grep dhcpd
+  dontaudit dhcpd_t console_device_t : chr_file \
+  { ioctl read write getattr lock append open } ;
+  dontaudit dhcpd_t tty_device_t : chr_file \
+  { ioctl read write getattr lock append open } ;
+
+It's proper to dontaudit those syscalls.
+
+Also fix context for /var/lib/dhcp/dhcpd6.leases
+
+Upstream-Status: pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/dhcp.fc |    2 +-
+ policy/modules/contrib/dhcp.te |    1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/policy/modules/contrib/dhcp.fc b/policy/modules/contrib/dhcp.fc
+index 8182c48..98e8321 100644
+--- a/policy/modules/contrib/dhcp.fc
++++ b/policy/modules/contrib/dhcp.fc
+@@ -3,6 +3,6 @@
+ /usr/sbin/dhcpd.*	--	gen_context(system_u:object_r:dhcpd_exec_t,s0)
+ 
+ /var/lib/dhcpd(/.*)?	gen_context(system_u:object_r:dhcpd_state_t,s0)
+-/var/lib/dhcp(3)?/dhcpd\.leases.*	--	gen_context(system_u:object_r:dhcpd_state_t,s0)
++/var/lib/dhcp(3)?/dhcpd(6)?\.leases.*	--	gen_context(system_u:object_r:dhcpd_state_t,s0)
+ 
+ /var/run/dhcpd(6)?\.pid	--	gen_context(system_u:object_r:dhcpd_var_run_t,s0)
+diff --git a/policy/modules/contrib/dhcp.te b/policy/modules/contrib/dhcp.te
+index 98a24b9..23eeba5 100644
+--- a/policy/modules/contrib/dhcp.te
++++ b/policy/modules/contrib/dhcp.te
+@@ -108,6 +108,7 @@ sysnet_read_dhcp_config(dhcpd_t)
+ 
+ userdom_dontaudit_use_unpriv_user_fds(dhcpd_t)
+ userdom_dontaudit_search_user_home_dirs(dhcpd_t)
++userdom_dontaudit_use_user_terminals(dhcpd_t)
+ 
+ tunable_policy(`dhcpd_use_ldap',`
+ 	sysnet_use_ldap(dhcpd_t)
+-- 
+1.7.9.5
+

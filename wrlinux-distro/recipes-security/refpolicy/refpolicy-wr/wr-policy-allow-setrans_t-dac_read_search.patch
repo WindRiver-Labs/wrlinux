@@ -1,0 +1,39 @@
+From ab5ef900d85eba19b0a2a0aa0c0f56cac3eb761b Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Wed, 8 Apr 2015 16:17:39 +0800
+Subject: [PATCH] refpolicy: allow setrans_t dac_read_search
+
+allow setrans_t process read and search permission on all setrans_t
+files and directories regardless of their DAC settings except for
+where not permitted by SELinux permissions.
+
+This removes avc denial issue:
+
+  avc: denied { dac_read_search } for pid=488 \
+  comm="mcstransd" capability=2 \
+  scontext=system_u:system_r:setrans_t:s15:c0.c1023 \
+  tcontext=system_u:system_r:setrans_t:s15:c0.c1023 tclass=capability
+
+Upstream-Status: pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/system/setrans.te | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/policy/modules/system/setrans.te b/policy/modules/system/setrans.te
+index a1f8c77..9a7c8f1 100644
+--- a/policy/modules/system/setrans.te
++++ b/policy/modules/system/setrans.te
+@@ -37,7 +37,7 @@ ifdef(`enable_mls',`
+ # setrans local policy
+ #
+ 
+-allow setrans_t self:capability sys_resource;
++allow setrans_t self:capability { sys_resource dac_read_search };
+ allow setrans_t self:process { setrlimit getcap setcap signal_perms };
+ allow setrans_t self:unix_stream_socket create_stream_socket_perms;
+ allow setrans_t self:unix_dgram_socket create_socket_perms;
+-- 
+1.9.1
+

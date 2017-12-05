@@ -1,0 +1,51 @@
+From 6ef34164fb7e0e50ab74b20e1909f659e2f81428 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 3 Mar 2016 22:35:53 -0500
+Subject: [PATCH 2/4] wr-policy: allow unconfined_domain_type manage
+ system/services
+
+Reference sources: selinux-policy-3.13.1-128.21.fc22.src.rpm
+Changes come from: policy-f22-base.patch
+
+* Allow unconfined_domain_type manage system/services
+
+Fix avc denial:
+
+  avc:  denied  { reboot } for auid=n/a uid=0 gid=0 \
+  cmdline="/bin/systemctl --force reboot" \
+  scontext=system_u:system_r:initrc_t:s0-s15:c0.c1023 \
+  tcontext=system_u:system_r:init_t:s0-s15:c0.c1023 \
+  tclass=system
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/kernel/domain.te | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/policy/modules/kernel/domain.te b/policy/modules/kernel/domain.te
+index b9b0794..fe35529 100644
+--- a/policy/modules/kernel/domain.te
++++ b/policy/modules/kernel/domain.te
+@@ -190,6 +190,17 @@ allow unconfined_domain_type domain:key *;
+ # receive from all domains over labeled networking
+ domain_all_recvfrom_all_domains(unconfined_domain_type)
+ 
++optional_policy(`
++	# manage services/system
++	init_disable(unconfined_domain_type)
++	init_enable(unconfined_domain_type)
++	init_reload(unconfined_domain_type)
++	init_get_system_status(unconfined_domain_type)
++	init_service_status(unconfined_domain_type)
++	init_reboot_system(unconfined_domain_type)
++	init_shutdown_system(unconfined_domain_type)
++')
++
+ tunable_policy(`domain_fd_use',`
+ 	# Allow all domains to use fds past to them
+ 	allow domain domain:fd use;
+-- 
+1.9.1
+

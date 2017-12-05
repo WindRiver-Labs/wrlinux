@@ -1,0 +1,28 @@
+portmap: allow portmap to manage portmap_t type socket
+
+Upstream-Status: Pending
+
+portmap needs to create socket to receive message
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ policy/modules/contrib/portmap.te |    3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/policy/modules/contrib/portmap.te b/policy/modules/contrib/portmap.te
+index 18b255e..bacf66b 100644
+--- a/policy/modules/contrib/portmap.te
++++ b/policy/modules/contrib/portmap.te
+@@ -16,6 +16,9 @@ type portmap_helper_exec_t;
+ init_system_domain(portmap_helper_t, portmap_helper_exec_t)
+ role portmap_helper_roles types portmap_helper_t;
+ 
++allow portmap_t self:tcp_socket create_socket_perms;
++allow portmap_t self:udp_socket create_socket_perms;
++
+ type portmap_initrc_exec_t;
+ init_script_file(portmap_initrc_exec_t)
+ 
+-- 
+1.7.10.4
+

@@ -1,0 +1,63 @@
+From a272f3950db771e01a2e7354cf126f97ad0edf3b Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Wed, 25 May 2016 03:16:24 -0400
+Subject: [PATCH] wr-policy: fix avc denials for rngd
+
+* fix security contexts for /etc/init.d/rng-tools
+* allow rngd_t to search /run/systemd/journal
+* allow domain trans from sysadm_t to rngd_t
+
+Fix avc denials:
+
+  avc: denied { search } for pid=247 comm="rngd" \
+  name="journal" dev="tmpfs" ino=8194 \
+  scontext=system_u:system_r:rngd_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 \
+  tclass=dir permissive=0
+
+  avc: denied { write } for pid=295 comm="rngd" \
+  name="random" dev="devtmpfs" ino=7228 \
+  scontext=root:sysadm_r:sysadm_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:random_device_t:s0 \
+  tclass=chr_file permissive=1
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/rngd.fc |  1 +
+ policy/modules/contrib/rngd.te | 11 +++++++++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/policy/modules/contrib/rngd.fc b/policy/modules/contrib/rngd.fc
+index fa19aa8..0093098 100644
+--- a/policy/modules/contrib/rngd.fc
++++ b/policy/modules/contrib/rngd.fc
+@@ -1,4 +1,5 @@
+ /etc/rc\.d/init\.d/rngd	--	gen_context(system_u:object_r:rngd_initrc_exec_t,s0)
++/etc/init\.d/rng-tools	--	gen_context(system_u:object_r:rngd_initrc_exec_t,s0)
+ 
+ /usr/sbin/rngd	--	gen_context(system_u:object_r:rngd_exec_t,s0)
+ 
+diff --git a/policy/modules/contrib/rngd.te b/policy/modules/contrib/rngd.te
+index 5f97a72..9876c06 100644
+--- a/policy/modules/contrib/rngd.te
++++ b/policy/modules/contrib/rngd.te
+@@ -40,3 +40,14 @@ files_read_etc_files(rngd_t)
+ logging_send_syslog_msg(rngd_t)
+ 
+ miscfiles_read_localization(rngd_t)
++
++mls_file_read_all_levels(rngd_t)
++
++# WRL fixes - allow domain trans from sysadm_t to rngd_t
++gen_require(`
++	type sysadm_t;
++	role sysadm_r;
++')
++
++role sysadm_r types rngd_t;
++domtrans_pattern(sysadm_t, rngd_exec_t, rngd_t)
+-- 
+2.8.1
+

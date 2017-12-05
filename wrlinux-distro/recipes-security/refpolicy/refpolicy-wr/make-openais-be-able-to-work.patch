@@ -1,0 +1,50 @@
+From baafad06e07f6249f2e56d08e96e3a5be77b51c7 Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Sat, 22 Feb 2014 17:08:42 +0800
+Subject: [PATCH] make openais be able to work
+
+Upstream-Status: pending
+
+1.  give aisexec the permission to bootup corosync, since aisexec calls
+corosync
+2.  allow corosync to associate device_t filesystem
+
+Starting OpenAIS (aisexec): type=1400 audit(1393059863.470:26): avc:  denied  { associate } for  pid=837 comm="corosync" name="fdata-JDp3yH" scontext=system_u:object_r:corosync_tmpfs_t:s0 tcontext=system_u:object_r:device_t:s0 tclass=filesystem
+type=1300 audit(1393059863.470:26): arch=c000003e syscall=2 success=yes exit=3 a0=7fffc5f8bd80 a1=c2 a2=180 a3=0 items=0 ppid=836 pid=837 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 ses=4294967295 tty=pts0 comm="corosync" exe="/usr/sbin/corosync" subj=system_u:system_r:corosync_t:s0-s15:c0.c1023 key=(null)
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ policy/modules/contrib/aisexec.te  |    2 ++
+ policy/modules/contrib/corosync.te |    3 +++
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/policy/modules/contrib/aisexec.te b/policy/modules/contrib/aisexec.te
+index 4e4f063..18108e9 100644
+--- a/policy/modules/contrib/aisexec.te
++++ b/policy/modules/contrib/aisexec.te
+@@ -85,6 +85,8 @@ corenet_sendrecv_cluster_server_packets(aisexec_t)
+ corenet_udp_bind_cluster_port(aisexec_t)
+ corenet_udp_sendrecv_cluster_port(aisexec_t)
+ 
++corosync_domtrans(aisexec_t)
++
+ dev_read_urand(aisexec_t)
+ 
+ files_manage_mounttab(aisexec_t)
+diff --git a/policy/modules/contrib/corosync.te b/policy/modules/contrib/corosync.te
+index d5aa1e4..84f50d8 100644
+--- a/policy/modules/contrib/corosync.te
++++ b/policy/modules/contrib/corosync.te
+@@ -108,6 +108,9 @@ miscfiles_read_localization(corosync_t)
+ userdom_read_user_tmp_files(corosync_t)
+ userdom_manage_user_tmpfs_files(corosync_t)
+ 
++dev_associate(corosync_tmpfs_t)
++
++
+ optional_policy(`
+ 	ccs_read_config(corosync_t)
+ ')
+-- 
+1.7.10.4
+

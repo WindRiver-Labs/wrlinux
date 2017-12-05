@@ -1,0 +1,29 @@
+From df0cd7db8d7a7fdd562130561cbb45eaba70af31 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 20 Feb 2014 00:53:34 -0500
+Subject: [PATCH] allow dmesg read /dev/kmsg
+
+Upstream-Status: pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/admin/dmesg.te |    3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/policy/modules/admin/dmesg.te b/policy/modules/admin/dmesg.te
+index c591aea..f73e049 100644
+--- a/policy/modules/admin/dmesg.te
++++ b/policy/modules/admin/dmesg.te
+@@ -19,6 +19,9 @@ dontaudit dmesg_t self:capability sys_tty_config;
+ 
+ allow dmesg_t self:process signal_perms;
+ 
++# allow dmesg read /dev/kmsg
++mls_file_read_all_levels(dmesg_t)
++
+ kernel_read_kernel_sysctls(dmesg_t)
+ kernel_read_ring_buffer(dmesg_t)
+ kernel_clear_ring_buffer(dmesg_t)
+-- 
+1.7.9.5
+

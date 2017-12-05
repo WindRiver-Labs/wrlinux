@@ -1,0 +1,92 @@
+From 0b0f47b83c37842f5f9ac32b8f241f765fe0b4bc Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 4 Feb 2016 03:44:57 -0500
+Subject: [PATCH] wr-policy: fix avc denials from systemd-cgroups
+
+Fix avc denials:
+
+  avc: denied { net_admin } for pid=328 comm="systemd-cgroups" \
+  capability=12 \
+  scontext=system_u:system_r:systemd_cgroups_t:s15:c0.c1023 \
+  tcontext=system_u:system_r:systemd_cgroups_t:s15:c0.c1023 \
+  tclass=capability
+
+  avc: denied { search } for pid=376 comm="systemd-cgroups" \
+  name="1" dev="proc" ino=8012 \
+  scontext=system_u:system_r:systemd_cgroups_t:s15:c0.c1023 \
+  tcontext=system_u:system_r:init_t:s0-s15:c0.c1023 \
+  tclass=dir
+
+  avc: denied { read open getattr } for pid=376 \
+  comm="systemd-cgroups" name="environ" dev="proc" ino=8123 \
+  scontext=system_u:system_r:systemd_cgroups_t:s15:c0.c1023 \
+  tcontext=system_u:system_r:init_t:s0-s15:c0.c1023 \
+  tclass=file
+
+  avc: denied { connectto } for pid=376 comm="systemd-cgroups" \
+  path="/run/systemd/private" \
+  scontext=system_u:system_r:systemd_cgroups_t:s15:c0.c1023 \
+  tcontext=system_u:system_r:init_t:s0-s15:c0.c1023 \
+  tclass=unix_stream_socket
+
+  avc: denied { write } for pid=209 comm="systemd-cgroups" \
+  name="private" dev="tmpfs" ino=8182 \
+  scontext=system_u:system_r:systemd_cgroups_t:s15:c0.c1023 \
+  tcontext=system_u:object_r:init_var_run_t:s0 \
+  tclass=sock_file
+
+  avc: denied { read } for pid=527 comm="systemd-cgroups" \
+  name="cmdline" dev="proc" ino=4026531990 \
+  scontext=system_u:system_r:systemd_cgroups_t:s15:c0.c1023 \
+  tcontext=system_u:object_r:proc_t:s0 \
+  tclass=file
+
+  avc: denied { write } for pid=637 comm="systemd-cgroups" \
+  name="socket" dev="tmpfs" ino=14437 \
+  scontext=system_u:system_r:systemd_cgroups_t:s15:c0.c1023 \
+  tcontext=system_u:object_r:syslogd_var_run_t:s0 \
+  tclass=sock_file
+
+  avc: denied { write } for pid=640 comm="systemd-cgroups" \
+  name="kmsg" dev="devtmpfs" ino=7242 \
+  scontext=system_u:system_r:systemd_cgroups_t:s15:c0.c1023 \
+  tcontext=system_u:object_r:kmsg_device_t:s15:c0.c1023 \
+  tclass=chr_file
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/system/systemd.te | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 681f766..aa7b674 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -124,6 +124,22 @@ logging_send_syslog_msg(systemd_cgroups_t)
+ 
+ kernel_dgram_send(systemd_cgroups_t)
+ 
++allow systemd_cgroups_t self:capability net_admin;
++# read the process state (/proc/pid) of init
++init_read_state(systemd_cgroups_t)
++# MLS trusted for writing to sockets at any level
++mls_socket_write_all_levels(systemd_cgroups_t)
++# write to init sock file
++init_write_pid_socket(systemd_cgroups_t)
++# MLS trusted for writing to files at all levels
++mls_file_write_all_levels(systemd_cgroups_t)
++# read system state information in /proc
++kernel_read_system_state(systemd_cgroups_t)
++# write to the kernel messages device
++dev_write_kmsg(systemd_cgroups_t)
++# create, read, write, and delete syslog PID sockets
++logging_manage_pid_sockets(systemd_cgroups_t)
++
+ #######################################
+ #
+ # locale local policy
+-- 
+1.9.1
+

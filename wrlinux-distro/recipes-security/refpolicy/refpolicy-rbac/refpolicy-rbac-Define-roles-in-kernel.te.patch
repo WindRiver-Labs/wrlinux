@@ -1,0 +1,32 @@
+From 97d92c224fc175a07e0cf0151e39ac4634f850d0 Mon Sep 17 00:00:00 2001
+From: Xin Ouyang <Xin.Ouyang@windriver.com>
+Date: Thu, 5 Apr 2012 13:41:08 +0800
+Subject: [PATCH 3/4] refpolicy-rbac: Define roles in kernel.te.
+
+Define the roles in kernel.te, or else there are compiling problems
+when use these roles in the file policy/users which defines the
+SELinux users.
+
+Upstream-Status: Inappropriate [no upstream]
+---
+ policy/modules/kernel/kernel.te |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
+
+diff --git a/policy/modules/kernel/kernel.te b/policy/modules/kernel/kernel.te
+index 8340ca8..8598792 100644
+--- a/policy/modules/kernel/kernel.te
++++ b/policy/modules/kernel/kernel.te
+@@ -32,6 +32,10 @@ role system_r;
+ role sysadm_r;
+ role staff_r;
+ role user_r;
++role engineer_r;
++role senior_engineer_r;
++role manager_r;
++role technical_lead_r;
+ 
+ # here until order dependence is fixed:
+ role unconfined_r;
+-- 
+1.7.5.4
+

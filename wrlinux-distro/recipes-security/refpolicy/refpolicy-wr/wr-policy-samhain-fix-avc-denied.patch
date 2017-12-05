@@ -1,0 +1,64 @@
+From 70921857a72b605e7813722effa39a4e1970216c Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Tue, 25 Feb 2014 06:41:34 -0500
+Subject: [PATCH] fix avc denied for samhain
+
+Fix avc denied issues:
+
+type=AVC msg=audit(1393312243.158:22): avc:  denied  { transition } for  pid=828 comm="sh" path="/usr/sbin/samhain" dev="hda" ino=27140 scontext=root:secadm_r:secadm_t:s0-s15:c0.c1023 tcontext=root:secadm_r:samhain_t:s15:c0.c1023 tclass=process
+type=AVC msg=audit(1393312243.329:23): avc:  denied  { use } for  pid=828 comm="samhain" path="/lib64/ld-2.18.so" dev="hda" ino=27380 scontext=root:secadm_r:samhain_t:s15:c0.c1023 tcontext=root:secadm_r:secadm_t:s0-s15:c0.c1023 tclass=fd
+type=AVC msg=audit(1393312244.258:24): avc:  denied  { write } for  pid=828 comm="samhain" path="pipe:[11803]" dev="pipefs" ino=11803 scontext=root:secadm_r:samhain_t:s15:c0.c1023 tcontext=root:secadm_r:samhain_t:s15:c0.c1023 tclass=fifo_file
+type=AVC msg=audit(1393312244.294:25): avc:  denied  { read } for  pid=829 comm="samhain" path="pipe:[11803]" dev="pipefs" ino=11803 scontext=root:secadm_r:samhain_t:s15:c0.c1023 tcontext=root:secadm_r:samhain_t:s15:c0.c1023 tclass=fifo_file
+type=AVC msg=audit(1393312244.506:26): avc:  denied  { open } for  pid=828 comm="samhain" path="/dev/random" dev="devtmpfs" ino=5038 scontext=root:secadm_r:samhain_t:s15:c0.c1023 tcontext=system_u:object_r:random_device_t:s0 tclass=chr_file
+...
+
+Upstream-Status: pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/samhain.if | 1 +
+ policy/modules/contrib/samhain.te | 6 ++++++
+ 2 files changed, 7 insertions(+)
+
+diff --git a/policy/modules/contrib/samhain.if b/policy/modules/contrib/samhain.if
+index 983fee5..d530107 100644
+--- a/policy/modules/contrib/samhain.if
++++ b/policy/modules/contrib/samhain.if
+@@ -89,6 +89,7 @@ interface(`samhain_run',`
+ 	roleattribute $2 samhain_roles;
+ 
+ 	ifdef(`enable_mls', `
++		mls_process_set_level($1)
+ 		range_transition $1 samhain_exec_t:process mls_systemhigh;
+ 	')
+ ')
+diff --git a/policy/modules/contrib/samhain.te b/policy/modules/contrib/samhain.te
+index ac6a0f0..ce02007 100644
+--- a/policy/modules/contrib/samhain.te
++++ b/policy/modules/contrib/samhain.te
+@@ -31,9 +31,11 @@ files_pid_file(samhain_var_run_t)
+ samhain_service_template(samhain)
+ application_domain(samhain_t, samhain_exec_t)
+ role samhain_roles types samhain_t;
++typeattribute samhain_t samhain_domain;
+ 
+ samhain_service_template(samhaind)
+ init_system_domain(samhaind_t, samhain_exec_t)
++typeattribute samhaind_t samhain_domain;
+ 
+ ifdef(`enable_mcs',`
+ 	init_ranged_system_domain(samhaind_t, samhain_exec_t, mcs_systemhigh)
+@@ -91,6 +93,10 @@ init_read_utmp(samhain_domain)
+ 
+ logging_send_syslog_msg(samhain_domain)
+ 
++mls_fd_use_all_levels(samhain_t)
++mls_fd_use_all_levels(samhaind_t)
++userdom_use_user_ttys(samhaind_t)
++dev_read_rand(samhain_domain)
+ ########################################
+ #
+ # Client local policy
+-- 
+1.9.1
+

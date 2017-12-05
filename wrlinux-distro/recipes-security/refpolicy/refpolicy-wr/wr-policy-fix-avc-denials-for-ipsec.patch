@@ -1,0 +1,78 @@
+From d2ec95c8d67aa5b20db7644abbd6e512337ec31f Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Fri, 26 Feb 2016 03:08:21 -0500
+Subject: [PATCH] wr-policy: fix avc denials for ipsec
+
+* Port changes From fedora 22:
+  Reference sources: selinux-policy-3.13.1-128.21.fc22.src.rpm
+  Changes come from: policy-f22-base.patch
+
+  - allow ipsec_t execute_no_trans on ipsec_exec_t
+  - allow ipsec_t manage config files /etc/ipsec.secrets ...
+
+* WRL fix:
+  - fix path for ipsec executables
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/kernel/domain.if | 2 +-
+ policy/modules/system/ipsec.fc  | 3 +++
+ policy/modules/system/ipsec.te  | 9 +++++++++
+ 3 files changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/policy/modules/kernel/domain.if b/policy/modules/kernel/domain.if
+index 899c9bf..725006e 100644
+--- a/policy/modules/kernel/domain.if
++++ b/policy/modules/kernel/domain.if
+@@ -128,7 +128,7 @@ interface(`domain_entry_file',`
+ 	')
+ 
+ 	allow $1 $2:file entrypoint;
+-	allow $1 $2:file { mmap_file_perms ioctl lock };
++	allow $1 $2:file { mmap_file_perms ioctl lock execute_no_trans };
+ 
+ 	typeattribute $2 entry_type;
+ 
+diff --git a/policy/modules/system/ipsec.fc b/policy/modules/system/ipsec.fc
+index d42b08e..71327fc 100644
+--- a/policy/modules/system/ipsec.fc
++++ b/policy/modules/system/ipsec.fc
+@@ -58,3 +58,6 @@
+ /var/run/charon\.(.*)?		--	gen_context(system_u:object_r:ipsec_var_run_t,s0)
+ /var/run/pluto(/.*)?			gen_context(system_u:object_r:ipsec_var_run_t,s0)
+ /var/run/racoon\.pid		--	gen_context(system_u:object_r:ipsec_var_run_t,s0)
++
++# WRL fix
++/usr/lib/strongswan/ipsec/.*	--	gen_context(system_u:object_r:ipsec_exec_t,s0)
+diff --git a/policy/modules/system/ipsec.te b/policy/modules/system/ipsec.te
+index 580b71e..b3406c7 100644
+--- a/policy/modules/system/ipsec.te
++++ b/policy/modules/system/ipsec.te
+@@ -111,6 +111,13 @@ files_pid_filetrans(ipsec_t, ipsec_var_run_t, { dir file sock_file })
+ 
+ can_exec(ipsec_t, ipsec_mgmt_exec_t)
+ 
++# create files in /etc with the type net_conf_t
++sysnet_etc_filetrans_config(ipsec_t)
++# create, read, write, and delete network config files
++sysnet_manage_config(ipsec_t)
++# search /run/systemd/journal
++mls_file_read_all_levels(ipsec_t)
++
+ # pluto runs an updown script (by calling popen()!) as this is by default
+ # a shell script, we need to find a way to make things work without
+ # letting all sorts of stuff possibly be run...
+@@ -213,6 +220,8 @@ read_files_pattern(ipsec_mgmt_t, ipsec_t, ipsec_t)
+ read_lnk_files_pattern(ipsec_mgmt_t, ipsec_t, ipsec_t)
+ 
+ allow ipsec_mgmt_t ipsec_conf_file_t:file read_file_perms;
++# list dirs /etc/strongswan.d*
++allow ipsec_mgmt_t ipsec_conf_file_t:dir list_dir_perms;
+ 
+ manage_files_pattern(ipsec_mgmt_t, ipsec_key_file_t, ipsec_key_file_t)
+ manage_lnk_files_pattern(ipsec_mgmt_t, ipsec_key_file_t, ipsec_key_file_t)
+-- 
+1.9.1
+

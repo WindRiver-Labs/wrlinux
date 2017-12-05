@@ -1,0 +1,171 @@
+From 43a9d23829bd1090c497618b9094dd1584ab3b56 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Wed, 24 Feb 2016 01:14:01 -0500
+Subject: [PATCH] wr-policy: fix avc denials about searching journal dir
+
+Fix avc denials about searching dir /run/systemd/journal:
+
+avc: denied { search } for pid=311 comm="avahi-daemon" name="journal" dev="tmpfs" ino=8228 scontext=system_u:system_r:avahi_t:s0-s15:c0.c1023 tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 tclass=dir permissive=1
+avc: denied { search } for pid=345 comm="zebra" name="journal" dev="tmpfs" ino=8228 scontext=system_u:system_r:zebra_t:s0-s15:c0.c1023 tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 tclass=dir permissive=1
+avc: denied { search } for pid=329 comm="starter" name="journal" dev="tmpfs" ino=8228 scontext=system_u:system_r:ipsec_mgmt_t:s0-s15:c0.c1023 tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 tclass=dir permissive=1
+avc: denied { search } for pid=382 comm="racoon" name="journal" dev="tmpfs" ino=8228 scontext=system_u:system_r:racoon_t:s0-s15:c0.c1023 tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 tclass=dir permissive=1
+avc: denied { search } for pid=425 comm="ripngd" name="journal" dev="tmpfs" ino=8228 scontext=system_u:system_r:zebra_t:s0-s15:c0.c1023 tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 tclass=dir permissive=1
+avc: denied { search } for pid=405 comm="ntpd" name="journal" dev="tmpfs" ino=8228 scontext=system_u:system_r:ntpd_t:s0-s15:c0.c1023 tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 tclass=dir permissive=1
+avc: denied { search } for pid=457 comm="xinetd" name="journal" dev="tmpfs" ino=8228 scontext=system_u:system_r:inetd_t:s0-s15:c0.c1023 tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 tclass=dir permissive=1
+avc: denied { search } for pid=460 comm="charon" name="journal" dev="tmpfs" ino=8228 scontext=system_u:system_r:ipsec_mgmt_t:s0-s15:c0.c1023 tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 tclass=dir permissive=1
+avc: denied { search } for pid=415 comm="bgpd" name="journal" dev="tmpfs" ino=8228 scontext=system_u:system_r:zebra_t:s0-s15:c0.c1023 tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 tclass=dir permissive=1
+avc: denied { search } for pid=447 comm="named" name="journal" dev="tmpfs" ino=8228 scontext=system_u:system_r:named_t:s0-s15:c0.c1023 tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 tclass=dir permissive=1
+avc: denied { search } for pid=399 comm="snmptrapd" name="journal" dev="tmpfs" ino=8228 scontext=system_u:system_r:snmpd_t:s0-s15:c0.c1023 tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 tclass=dir permissive=1
+avc: denied { search } for pid=572 comm="postfix" name="journal" dev="tmpfs" ino=8228 scontext=system_u:system_r:postfix_master_t:s0-s15:c0.c1023 tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 tclass=dir permissive=1
+avc: denied { search } for pid=787 comm="pickup" name="journal" dev="tmpfs" ino=8228 scontext=system_u:system_r:postfix_pickup_t:s0-s15:c0.c1023 tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 tclass=dir permissive=1
+avc: denied { search } for pid=788 comm="qmgr" name="journal" dev="tmpfs" ino=8228 scontext=system_u:system_r:postfix_qmgr_t:s0-s15:c0.c1023 tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 tclass=dir permissive=1
+avc: denied { search } for pid=336 comm="systemd-logind" name="journal" dev="tmpfs" ino=8203 scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 tclass=dir permissive=1
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/avahi.te   | 2 ++
+ policy/modules/contrib/bind.te    | 1 +
+ policy/modules/contrib/inetd.te   | 1 +
+ policy/modules/contrib/ntp.te     | 2 ++
+ policy/modules/contrib/postfix.te | 4 ++++
+ policy/modules/contrib/snmp.te    | 2 ++
+ policy/modules/contrib/zebra.te   | 2 ++
+ policy/modules/system/ipsec.te    | 4 ++++
+ policy/modules/system/systemd.te  | 1 +
+ 9 files changed, 19 insertions(+)
+
+diff --git a/policy/modules/contrib/avahi.te b/policy/modules/contrib/avahi.te
+index cb1aec3..b643015 100644
+--- a/policy/modules/contrib/avahi.te
++++ b/policy/modules/contrib/avahi.te
+@@ -114,3 +114,5 @@ optional_policy(`
+ optional_policy(`
+ 	udev_read_db(avahi_t)
+ ')
++
++mls_file_read_all_levels(avahi_t)
+diff --git a/policy/modules/contrib/bind.te b/policy/modules/contrib/bind.te
+index 64de479..319b790 100644
+--- a/policy/modules/contrib/bind.te
++++ b/policy/modules/contrib/bind.te
+@@ -157,6 +157,7 @@ fs_search_auto_mountpoints(named_t)
+ auth_use_nsswitch(named_t)
+ 
+ logging_send_syslog_msg(named_t)
++mls_file_read_all_levels(named_t)
+ 
+ miscfiles_read_generic_certs(named_t)
+ miscfiles_read_localization(named_t)
+diff --git a/policy/modules/contrib/inetd.te b/policy/modules/contrib/inetd.te
+index c6450df..6693eb3 100644
+--- a/policy/modules/contrib/inetd.te
++++ b/policy/modules/contrib/inetd.te
+@@ -164,6 +164,7 @@ mls_socket_read_to_clearance(inetd_t)
+ mls_socket_write_to_clearance(inetd_t)
+ mls_net_outbound_all_levels(inetd_t)
+ mls_process_set_level(inetd_t)
++mls_file_read_all_levels(inetd_t)
+ 
+ userdom_dontaudit_use_unpriv_user_fds(inetd_t)
+ userdom_dontaudit_search_user_home_dirs(inetd_t)
+diff --git a/policy/modules/contrib/ntp.te b/policy/modules/contrib/ntp.te
+index 12a6162..f8f8c61 100644
+--- a/policy/modules/contrib/ntp.te
++++ b/policy/modules/contrib/ntp.te
+@@ -113,6 +113,8 @@ dev_rw_realtime_clock(ntpd_t)
+ domain_use_interactive_fds(ntpd_t)
+ domain_dontaudit_list_all_domains_state(ntpd_t)
+ 
++mls_file_read_all_levels(ntpd_t)
++
+ files_read_etc_runtime_files(ntpd_t)
+ files_read_usr_files(ntpd_t)
+ files_list_var_lib(ntpd_t)
+diff --git a/policy/modules/contrib/postfix.te b/policy/modules/contrib/postfix.te
+index 8b12a98..0bcdc78 100644
+--- a/policy/modules/contrib/postfix.te
++++ b/policy/modules/contrib/postfix.te
+@@ -316,6 +316,7 @@ mta_etc_filetrans_aliases(postfix_master_t, file, "aliasesdb-stamp")
+ mta_spec_filetrans_aliases(postfix_master_t, postfix_etc_t, file)
+ mta_read_sendmail_bin(postfix_master_t)
+ mta_getattr_spool(postfix_master_t)
++mls_file_read_all_levels(postfix_master_t)
+ 
+ optional_policy(`
+ 	cyrus_stream_connect(postfix_master_t)
+@@ -542,6 +543,8 @@ delete_files_pattern(postfix_pickup_t, postfix_spool_maildrop_t, postfix_spool_m
+ mcs_file_read_all(postfix_pickup_t)
+ mcs_file_write_all(postfix_pickup_t)
+ 
++mls_file_read_all_levels(postfix_pickup_t)
++
+ ########################################
+ #
+ # Pipe local policy
+@@ -679,6 +682,7 @@ manage_lnk_files_pattern(postfix_qmgr_t, postfix_spool_t, postfix_spool_t)
+ files_spool_filetrans(postfix_qmgr_t, postfix_spool_t, dir)
+ 
+ corecmd_exec_bin(postfix_qmgr_t)
++mls_file_read_all_levels(postfix_qmgr_t)
+ 
+ ########################################
+ #
+diff --git a/policy/modules/contrib/snmp.te b/policy/modules/contrib/snmp.te
+index 3f20eba..43cfba8 100644
+--- a/policy/modules/contrib/snmp.te
++++ b/policy/modules/contrib/snmp.te
+@@ -183,3 +183,5 @@ optional_policy(`
+ 	xen_stream_connect(snmpd_t)
+ 	xen_stream_connect_xenstore(snmpd_t)
+ ')
++
++mls_file_read_all_levels(snmpd_t)
+diff --git a/policy/modules/contrib/zebra.te b/policy/modules/contrib/zebra.te
+index 9d1eb3b..a12ae10 100644
+--- a/policy/modules/contrib/zebra.te
++++ b/policy/modules/contrib/zebra.te
+@@ -140,3 +140,5 @@ optional_policy(`
+ optional_policy(`
+ 	udev_read_db(zebra_t)
+ ')
++
++mls_file_read_all_levels(zebra_t)
+diff --git a/policy/modules/system/ipsec.te b/policy/modules/system/ipsec.te
+index 0d04891..580b71e 100644
+--- a/policy/modules/system/ipsec.te
++++ b/policy/modules/system/ipsec.te
+@@ -311,6 +311,8 @@ sysnet_etc_filetrans_config(ipsec_mgmt_t)
+ 
+ userdom_use_user_terminals(ipsec_mgmt_t)
+ 
++mls_file_read_all_levels(ipsec_mgmt_t)
++
+ optional_policy(`
+ 	consoletype_exec(ipsec_mgmt_t)
+ ')
+@@ -421,6 +423,8 @@ tunable_policy(`racoon_read_shadow',`
+ 	auth_tunable_read_shadow(racoon_t)
+ ')
+ 
++mls_file_read_all_levels(racoon_t)
++
+ ########################################
+ #
+ # Setkey local policy
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 0dbb76c..693ef00 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -237,6 +237,7 @@ kernel_read_system_state(systemd_logind_t)
+ kernel_read_kernel_sysctls(systemd_logind_t)
+ fs_mount_tmpfs(systemd_logind_t)
+ auth_manage_var_auth(systemd_logind_t)
++mls_file_read_all_levels(systemd_logind_t)
+ 
+ optional_policy(`
+ 	dbus_system_bus_client(systemd_logind_t)
+-- 
+1.9.1
+

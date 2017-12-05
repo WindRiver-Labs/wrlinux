@@ -1,0 +1,80 @@
+From 938fc23ce5ade9f6f41b9bbc98b4f5486516c7de Mon Sep 17 00:00:00 2001
+From: Nicolas Iooss <nicolas.iooss@m4x.org>
+Date: Tue, 27 Dec 2016 14:44:58 +0100
+Subject: [PATCH] systemd: add systemd-backlight policy
+
+The documentation page of this service describes well which access are
+needed
+(https://www.freedesktop.org/software/systemd/man/systemd-backlight@.service.html).
+systemd-backlight:
+- is a systemd service
+- manages /var/lib/systemd/backlight/
+- reads udev device properties to find ID_BACKLIGHT_CLAMP
+
+Upstream-Status: Backport
+
+Signed-off-by: Nicolas Iooss <nicolas.iooss@m4x.org>
+---
+ policy/modules/system/systemd.fc |  2 ++
+ policy/modules/system/systemd.te | 24 ++++++++++++++++++++++++
+ 2 files changed, 26 insertions(+)
+
+diff --git a/policy/modules/system/systemd.fc b/policy/modules/system/systemd.fc
+index ff0f976..673bb68 100644
+--- a/policy/modules/system/systemd.fc
++++ b/policy/modules/system/systemd.fc
+@@ -28,7 +28,9 @@
+ /usr/lib/systemd/system/[^/]*shutdown.*	--	gen_context(system_u:object_r:power_unit_t,s0)
+ /usr/lib/systemd/system/[^/]*sleep.*	--	gen_context(system_u:object_r:power_unit_t,s0)
+ /usr/lib/systemd/system/[^/]*suspend.*	--	gen_context(system_u:object_r:power_unit_t,s0)
++/usr/lib/systemd/system/systemd-backlight.*	--	gen_context(system_u:object_r:systemd_backlight_unit_t,s0)
+ 
++/var/lib/systemd/backlight(/.*)?	gen_context(system_u:object_r:systemd_backlight_var_lib_t,s0)
+ /var/lib/systemd/linger(/.*)?	gen_context(system_u:object_r:systemd_logind_var_lib_t,s0)
+ 
+ /run/\.nologin[^/]*	--	gen_context(system_u:object_r:systemd_sessions_var_run_t,s0)
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 196abab..c50e93a 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -26,6 +26,12 @@ type systemd_backlight_t;
+ type systemd_backlight_exec_t;
+ init_system_domain(systemd_backlight_t, systemd_backlight_exec_t)
+ 
++type systemd_backlight_unit_t;
++init_unit_file(systemd_backlight_unit_t)
++
++type systemd_backlight_var_lib_t;
++files_type(systemd_backlight_var_lib_t)
++
+ type systemd_binfmt_t;
+ type systemd_binfmt_exec_t;
+ init_system_domain(systemd_binfmt_t, systemd_binfmt_exec_t)
+@@ -140,6 +146,24 @@ logging_send_syslog_msg(systemd_log_parse_env_type)
+ 
+ ######################################
+ #
++# Backlight local policy
++#
++
++allow systemd_backlight_t systemd_backlight_var_lib_t:dir manage_dir_perms;
++init_var_lib_filetrans(systemd_backlight_t, systemd_backlight_var_lib_t, dir)
++manage_files_pattern(systemd_backlight_t, systemd_backlight_var_lib_t, systemd_backlight_var_lib_t)
++
++systemd_log_parse_environment(systemd_backlight_t)
++
++# Allow systemd-backlight to write to /sys/class/backlight/*/brightness
++dev_rw_sysfs(systemd_backlight_t)
++
++files_read_etc_files(systemd_backlight_t)
++
++udev_read_pid_files(systemd_backlight_t)
++
++######################################
++#
+ # Cgroups local policy
+ #
+ 
+-- 
+2.7.4
+

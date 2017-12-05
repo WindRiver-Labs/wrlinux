@@ -1,0 +1,35 @@
+From 11029c54a27457e07a4c17e6176b3297cd260d5d Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Mon, 22 Feb 2016 19:52:15 -0500
+Subject: [PATCH] wr-policy: allow sysadm_t start/stop/status service
+
+* allow sysadm_t to start/stop/status/reload services
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/roles/sysadm.te | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/policy/modules/roles/sysadm.te b/policy/modules/roles/sysadm.te
+index b0e51f8..e503474 100644
+--- a/policy/modules/roles/sysadm.te
++++ b/policy/modules/roles/sysadm.te
+@@ -51,6 +51,13 @@ init_reload_generic_units(sysadm_t)
+ userdom_manage_user_home_dirs(sysadm_t)
+ userdom_home_filetrans_user_home_dir(sysadm_t)
+ 
++ifdef(`init_systemd',`
++	init_get_all_units_status(sysadm_t)
++	init_start_all_units(sysadm_t)
++	init_stop_all_units(sysadm_t)
++	init_reload_all_units(sysadm_t)
++')
++
+ ifdef(`direct_sysadm_daemon',`
+ 	optional_policy(`
+ 		init_run_daemon(sysadm_t, sysadm_r)
+-- 
+1.9.1
+

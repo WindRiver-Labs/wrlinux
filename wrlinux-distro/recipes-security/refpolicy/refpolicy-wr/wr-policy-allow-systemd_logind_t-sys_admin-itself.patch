@@ -1,0 +1,38 @@
+From 39296072ec6e027c8ad0fbc4ceedd1792f4e1aed Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Fri, 26 Feb 2016 06:01:26 -0500
+Subject: [PATCH] wr-policy: allow systemd_logind_t sys_admin itself
+
+Reference sources: selinux-policy-3.13.1-128.21.fc22.src.rpm
+Changes come from: policy-f22-base.patch
+
+Fix avc denial:
+
+  avc: denied { sys_admin } for pid=358 comm="systemd-logind" \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tclass=capability permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/system/systemd.te | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 61f331e..edebc0b 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -181,7 +181,7 @@ optional_policy(`
+ # Logind local policy
+ #
+ 
+-allow systemd_logind_t self:capability { fowner sys_tty_config chown dac_override };
++allow systemd_logind_t self:capability { fowner sys_tty_config chown dac_override sys_admin };
+ allow systemd_logind_t self:process { getcap setfscreate };
+ allow systemd_logind_t self:netlink_kobject_uevent_socket create_socket_perms;
+ allow systemd_logind_t self:unix_dgram_socket create_socket_perms;
+-- 
+1.9.1
+
