@@ -42,6 +42,6 @@ SRCREV_machine_kb-standard-wr-base ?= "9cc6b0ae1aad7312e85ac4134398f81c0140de33"
 
 # yocto-kernel-cache branch entry
 KERNEL_CACHE_BRANCH = "yocto-4.12-wr"
-SRCREV_meta = "4ab25c8890317f26337a450516aa9b564beeeccf"
+SRCREV_meta = "7b0fbe5d1dcb33f377eaf3a3323bd56dbc8e1c1f"
 
-LINUX_VERSION = "4.12.14"
+LINUX_VERSION = "4.12.16"
