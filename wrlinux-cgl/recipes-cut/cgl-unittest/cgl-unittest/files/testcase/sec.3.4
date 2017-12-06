@@ -6,6 +6,7 @@
 # developer : Chi Xu <chi.xu@windriver.com>
 #
 # changelog
+# * 12/06/2017 Update the check for /etc/default/samhain-standalone
 # * 03/17/2015 change the strategy to wait samhain
 #              checking the file system
 # * 02/06/2015 update the test for systemd
@@ -28,6 +29,7 @@ clean()
 	${SAMHAIN_STOP}
 	[ -f /var/lib/samhain/samhain_file ] && rm -rf /var/lib/samhain/samhain_file
 	mv /etc/samhainrc.bac /etc/samhainrc
+	mv /etc/default/samhain-standalone.bak /etc/default/samhain-standalone
 	chmod 644 /etc/fstab
 	rm -rf /bin/vi.orig
 	rm -rf /sbin/fdisk.orig
@@ -55,6 +57,10 @@ samhain -t init
 checkerr "samhain init error"
 
 echo "******Start samhain******"
+if [ -f /etc/default/samhain-standalone ]; then
+    cp /etc/default/samhain-standalone /etc/default/samhain-standalone.bak
+    sed -i 's:SAMHAIN_STANDALONE_START=\"no\":SAMHAIN_STANDALONE_START=\"yes\":' /etc/default/samhain-standalone
+fi
 ${SAMHAIN_START}
 checkerr "samhain start error"
 
