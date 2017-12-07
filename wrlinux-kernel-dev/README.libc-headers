@@ -23,6 +23,15 @@ changes.
 The exported headers are used for both sysroot and SDK population and are
 generated from the kernel's "headers_install" target.
 
+Steps:
+=============================================
 Add the lines to local.conf to enable it:
-PREFERRED_PROVIDER_linux-libc-headers = "linux-libc-headers-windriver"
-PREFERRED_PROVIDER_nativesdk-linux-libc-headers = "nativesdk-linux-libc-headers-windriver"
+	PREFERRED_PROVIDER_linux-libc-headers = "linux-libc-headers-windriver"
+	PREFERRED_PROVIDER_nativesdk-linux-libc-headers = "nativesdk-linux-libc-headers-windriver"
+	ENABLE_KERNEL_DEV = '1'
+
+Add the layer to BBLAYERS:
+	layers/wrlinux/wrlinux-kernel-dev 
+
+Header files will finally be packaged into linux-libc-headers-windriver-dev. To populate it into rootfs:
+	IMAGE_INSTALL_append = " linux-libc-headers-windriver-dev"
