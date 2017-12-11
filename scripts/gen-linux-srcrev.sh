@@ -29,7 +29,8 @@ echo "#"
 echo "# Any manual changes will be overwritten."
 echo "#"
 echo
-echo "MACHINEOVERRIDES =. \"kb-\${@d.getVar('KBRANCH', True).replace(\"/\", \"-\")}:\""
+echo "# This will cause SRCREV_machine_kb-<KBRANCH> take priority over SRCREV_machine_<machine>"
+echo "MACHINEOVERRIDES .= \":kb-\${@d.getVar('KBRANCH', True).replace(\"/\", \"-\")}\""
 echo
 echo "# linux-yocto-${version} branch entries"
 (

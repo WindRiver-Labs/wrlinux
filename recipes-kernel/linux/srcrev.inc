@@ -5,7 +5,8 @@
 # Any manual changes will be overwritten.
 #
 
-MACHINEOVERRIDES =. "kb-${@d.getVar('KBRANCH', True).replace("/", "-")}:"
+# This will cause SRCREV_machine_kb-<KBRANCH> take priority over SRCREV_machine_<machine>
+MACHINEOVERRIDES .= ":kb-${@d.getVar('KBRANCH', True).replace("/", "-")}"
 
 # linux-yocto-4.12 branch entries
 SRCREV_machine_kb-master ?= "1ea1c41db9839e56eb0f41dfffc7c6dd80bf7a64"
