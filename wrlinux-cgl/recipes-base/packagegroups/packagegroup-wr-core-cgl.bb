@@ -73,7 +73,6 @@ RDEPENDS_${PN} = "\
 	rpcbind \
 	smartmontools \
 	ucarp \
-	vrf \
 	pciutils \
 	ipvsadm \
 	"
