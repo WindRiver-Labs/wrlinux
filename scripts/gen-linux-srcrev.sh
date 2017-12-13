@@ -43,7 +43,29 @@ echo "# linux-yocto-${version} branch entries"
    exit 1
  fi
  for branch in `git for-each-ref --format='%(refname)' refs/heads` ; do
+   # Skip any branch with 'rebase' in the name, these are only useful
+   # for bisecting and should not be used by BSPs.
+   if [ ${branch/rebase//} != ${branch} ]; then
+     continue
+   fi
+
+   VERSION=$(git show $branch:Makefile | grep "^VERSION =" | sed s/.*=\ *//)
+   PATCHLEVEL=$(git show $branch:Makefile | grep "^PATCHLEVEL =" | sed s/.*=\ *//)
+   SUBLEVEL=$(git show $branch:Makefile | grep "^SUBLEVEL =" | sed s/.*=\ *//)
+   EXTRAVERSION=$(git show $branch:Makefile | grep "^EXTRAVERSION =" | sed s/.*=\ *//)
+
+   # Build a plain version string
+   vers="${VERSION}.${PATCHLEVEL}"
+   if [ -n "${SUBLEVEL}" ]; then
+           # Ignoring a SUBLEVEL of zero is fine
+           if [ "${SUBLEVEL}" != "0" ]; then
+                   vers="${vers}.${SUBLEVEL}"
+           fi
+   fi
+   vers="${vers}${EXTRAVERSION}"
+
    echo SRCREV_machine_kb-$(echo $branch | sed 's,refs/heads/,,' | sed 's,/,-,g') ?= \"$(git rev-parse $branch)\"
+   echo LINUX_VERSION_kb-$(echo $branch | sed 's,refs/heads/,,' | sed 's,/,-,g') ?= \"${vers}\"
  done
 )
 
