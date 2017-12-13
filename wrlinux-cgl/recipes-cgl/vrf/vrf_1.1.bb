@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Wind River Systems, Inc.
+# Copyright (C) 2012 - 2017 Wind River Systems, Inc.
 #
 SUMMARY    ="Virtual Route Forwarding foundation package"
 
@@ -12,6 +12,8 @@ LICENSE    ="GPLv2"
 LIC_FILES_CHKSUM="file://COPYING;md5=801f80980d171dd6425610833a22dbe6"
 
 SRC_URI    = "file://vrf-1.1.tgz \
+              file://vrf-package.list-remove-the-hardcoded-version-number.patch \
+              file://vrf-helper-check-os-release-for-version-info.patch \
 "
 
 
@@ -34,6 +36,11 @@ VRF_ROOTFSDIR = "/vrf/fs"
 EXTRA_OECONF += "--with-vrf-sysconfdir='${VRF_SYSDIR}' \
 	         --with-vrf-datadir='${VRF_ROOTFSDIR}' \
 	         --enable-wrlinux"
+
+do_install_append () {
+    mv ${D}${VRF_SYSDIR}/package/wrlinux-cgl_package.list \
+       ${D}${VRF_SYSDIR}/package/wrlinux-cgl_${WRLINUX_VERSION}_package.list
+}
 
 
 FILES_${PN}  += "${VRF_SYSDIR}/package/"

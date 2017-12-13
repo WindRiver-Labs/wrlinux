@@ -1,0 +1,35 @@
+From e851269b0c820856900ef263292614e7668590bb Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Tue, 12 Dec 2017 23:32:33 +0800
+Subject: [PATCH] package.list: remove the hardcoded version number
+
+Remove the hardcoded version number in the package list
+file name, so that we don't need to update it for each
+release.
+
+Upstream-Status: Inappropriate [no upstream]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ package/Makefile.am                                                | 2 +-
+ package/{wrlinux-cgl_8.0_package.list => wrlinux-cgl_package.list} | 0
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+ rename package/{wrlinux-cgl_8.0_package.list => wrlinux-cgl_package.list} (100%)
+
+diff --git a/package/Makefile.am b/package/Makefile.am
+index 15d9468..503b55a 100644
+--- a/package/Makefile.am
++++ b/package/Makefile.am
+@@ -1,4 +1,4 @@
+-install-data-hook:wrlinux-cgl_8.0_package.list
++install-data-hook:wrlinux-cgl_package.list
+ 	$(INSTALL) -m 0755 -d $(DESTDIR)$(vrf_sysconfdir)/package
+ 	$(INSTALL) -m 0644 $^ $(DESTDIR)$(vrf_sysconfdir)/package
+ 
+diff --git a/package/wrlinux-cgl_8.0_package.list b/package/wrlinux-cgl_package.list
+similarity index 100%
+rename from package/wrlinux-cgl_8.0_package.list
+rename to package/wrlinux-cgl_package.list
+-- 
+2.12.3
+
