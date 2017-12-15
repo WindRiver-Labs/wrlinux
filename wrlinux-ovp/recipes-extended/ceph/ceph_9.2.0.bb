@@ -31,7 +31,7 @@ inherit autotools python-dir autotools-brokensep setuptools systemd
 
 DEPENDS = "boost curl fcgi fuse keyutils leveldb libaio snappy \
            libedit libxml2 nss util-linux udev xfsprogs \
-           python-setuptools-native python \
+           python-setuptools-native python expat \
 "
 
 SYSTEMD_SERVICE_${PN} = "ceph-radosgw@.service \
