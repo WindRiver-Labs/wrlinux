@@ -5,6 +5,8 @@
 #developer : Yongli He  <yongli.he@windriver.com>
 #
 # changelog
+# * 12/15/2017 update to use /etc/sysconfig/o2cb for o2cb service
+#              Fix a typo(O2cb_START to O2CB_START)
 # * 02/06/2015 update the test for systemd
 # -
 
@@ -107,14 +109,21 @@ fi
 
 
 #configure the ocfs2
-cp /etc/default/o2cb o2cb.bak
+if [ -f /etc/default/o2cb ]; then
+    cp /etc/default/o2cb o2cb.bak
+    echo "O2CB_ENABLED=true" >  /etc/default/o2cb
+    echo "O2CB_BOOTCLUSTER=wrs001" >>  /etc/default/o2cb
+    echo "dump /etc/default/o2cb "
+    cat /etc/default/o2cb
+elif [ -f /etc/sysconfig/o2cb ]; then
+    cp /etc/sysconfig/o2cb o2cb.bak
+    echo "O2CB_ENABLED=true" >  /etc/sysconfig/o2cb
+    echo "O2CB_BOOTCLUSTER=wrs001" >>  /etc/sysconfig/o2cb
+else
+    :
+fi
+
 cp  /etc/ocfs2/cluster.conf cluster.conf.bak
-
-echo "O2CB_ENABLED=true" >  /etc/default/o2cb
-echo "O2CB_BOOTCLUSTER=wrs001" >>  /etc/default/o2cb
-
-echo "dump /etc/default/o2cb "
-cat /etc/default/o2cb
 
 echo "node:" >  /etc/ocfs2/cluster.conf
 echo '	ip_port=7777' >>/etc/ocfs2/cluster.conf
@@ -130,7 +139,7 @@ echo "dump /etc/ocfs2/cluster.conf "
 cat /etc/ocfs2/cluster.conf
 
 #start service
-${O2cb_START}
+${O2CB_START}
 ${O2CB_RESTART}
 checkerr "o2cb restart error"
 
