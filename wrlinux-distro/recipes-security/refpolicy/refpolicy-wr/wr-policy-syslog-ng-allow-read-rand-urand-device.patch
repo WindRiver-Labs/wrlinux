@@ -25,17 +25,17 @@ Upstream-Status: pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/system/logging.te |    7 +++++++
+ policy/modules/system/logging.te | 7 +++++++
  1 file changed, 7 insertions(+)
 
 diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
-index 5c06256..6c7b0da 100644
+index bb05505..255bbac 100644
 --- a/policy/modules/system/logging.te
 +++ b/policy/modules/system/logging.te
-@@ -366,6 +366,13 @@ optional_policy(`
+@@ -377,6 +377,13 @@ optional_policy(`
  # cjp: why net_admin!
  allow syslogd_t self:capability { dac_override sys_resource sys_tty_config net_admin sys_admin sys_nice chown fsetid };
- dontaudit syslogd_t self:capability sys_tty_config;
+ dontaudit syslogd_t self:capability { sys_tty_config sys_ptrace };
 +
 +# allow read to /dev/random, /dev/urandom for syslog-ng
 +dev_read_rand(syslogd_t)
@@ -47,5 +47,5 @@ index 5c06256..6c7b0da 100644
  # setrlimit for syslog-ng
  # getsched for syslog-ng
 -- 
-1.7.9.5
+2.13.3
 

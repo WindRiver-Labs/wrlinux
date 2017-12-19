@@ -13,7 +13,7 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/policy/modules/system/fstools.fc b/policy/modules/system/fstools.fc
-index e241e45..d31b61b 100644
+index b7e61c2..b45f550 100644
 --- a/policy/modules/system/fstools.fc
 +++ b/policy/modules/system/fstools.fc
 @@ -1,8 +1,8 @@
@@ -26,15 +26,14 @@ index e241e45..d31b61b 100644
 +/sbin/blockdev\.util-linux		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
  /sbin/cfdisk		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
  /sbin/dosfsck		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
- /usr/sbin/dosfsck	--	gen_context(system_u:object_r:fsadm_exec_t,s0)
-@@ -12,12 +12,12 @@
+ /sbin/dump		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+@@ -11,11 +11,11 @@
  /sbin/e4fsck		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
  /sbin/e2label		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
  /sbin/fdisk		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
 -/sbin/fdisk/.util-linux		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
 +/sbin/fdisk\.util-linux		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
  /sbin/findfs		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
- /usr/sbin/findfs		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
  /sbin/fsck.*		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
  /sbin/hdparm		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
 -/sbin/hdparm/.util-linux		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
@@ -42,7 +41,7 @@ index e241e45..d31b61b 100644
  /sbin/install-mbr	--	gen_context(system_u:object_r:fsadm_exec_t,s0)
  /sbin/jfs_.*		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
  /sbin/losetup.*		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
-@@ -31,7 +31,7 @@
+@@ -28,7 +28,7 @@
  /sbin/mkraid		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
  /sbin/mkreiserfs	--	gen_context(system_u:object_r:fsadm_exec_t,s0)
  /sbin/mkswap		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
@@ -51,8 +50,8 @@ index e241e45..d31b61b 100644
  /sbin/parted		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
  /sbin/partprobe		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
  /sbin/partx		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
-@@ -43,7 +43,7 @@
- /usr/sbin/sfdisk		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+@@ -39,7 +39,7 @@
+ /sbin/scsi_info		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
  /sbin/sfdisk		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
  /sbin/swapoff		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
 -/sbin/swapoff/.util-linux		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
@@ -61,5 +60,5 @@ index e241e45..d31b61b 100644
  /sbin/tune2fs		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
  /sbin/zdb		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
 -- 
-1.9.1
+2.13.3
 

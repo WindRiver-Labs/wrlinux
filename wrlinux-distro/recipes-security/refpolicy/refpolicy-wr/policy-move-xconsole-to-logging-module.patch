@@ -11,20 +11,20 @@ Upstream-Status: pending
 Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/services/xserver.fc |    5 ----
- policy/modules/services/xserver.if |   36 ------------------------
- policy/modules/services/xserver.te |   10 ++-----
- policy/modules/system/init.te      |    4 ++-
- policy/modules/system/logging.fc   |    2 ++
- policy/modules/system/logging.if   |   54 ++++++++++++++++++++++++++++++++++++
- policy/modules/system/logging.te   |   15 ++++++----
- 7 files changed, 71 insertions(+), 55 deletions(-)
+ policy/modules/services/xserver.fc |  5 ----
+ policy/modules/services/xserver.if | 36 -------------------------
+ policy/modules/services/xserver.te |  9 ++-----
+ policy/modules/system/init.te      |  4 ++-
+ policy/modules/system/logging.fc   |  2 ++
+ policy/modules/system/logging.if   | 54 ++++++++++++++++++++++++++++++++++++++
+ policy/modules/system/logging.te   | 15 +++++++----
+ 7 files changed, 71 insertions(+), 54 deletions(-)
 
 diff --git a/policy/modules/services/xserver.fc b/policy/modules/services/xserver.fc
-index d1f64a0..dd672db 100644
+index 10d68b4..c916766 100644
 --- a/policy/modules/services/xserver.fc
 +++ b/policy/modules/services/xserver.fc
-@@ -11,11 +11,6 @@ HOME_DIR/\.xauth.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
+@@ -13,11 +13,6 @@ HOME_DIR/\.xsession-errors	--	gen_context(system_u:object_r:xsession_log_t,s0)
  HOME_DIR/\.Xauthority.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
  
  #
@@ -35,12 +35,12 @@ index d1f64a0..dd672db 100644
 -#
  # /etc
  #
- /etc/gdm(3)?/PostSession/.*	--	gen_context(system_u:object_r:xsession_exec_t,s0)
+ /etc/gdm(3)?/PostSession/.* --	gen_context(system_u:object_r:xsession_exec_t,s0)
 diff --git a/policy/modules/services/xserver.if b/policy/modules/services/xserver.if
-index 6bf0ecc..ec01f3c 100644
+index f0761c9..ec459e2 100644
 --- a/policy/modules/services/xserver.if
 +++ b/policy/modules/services/xserver.if
-@@ -602,42 +602,6 @@ interface(`xserver_read_user_xauth',`
+@@ -664,42 +664,6 @@ interface(`xserver_read_user_iceauth',`
  
  ########################################
  ## <summary>
@@ -83,12 +83,11 @@ index 6bf0ecc..ec01f3c 100644
  ##	Use file descriptors for xdm.
  ## </summary>
  ## <param name="domain">
-
 diff --git a/policy/modules/services/xserver.te b/policy/modules/services/xserver.te
-index 8479a52..7ab8678 100644
+index d2f44fb..ca3794b 100644
 --- a/policy/modules/services/xserver.te
 +++ b/policy/modules/services/xserver.te
-@@ -148,13 +148,6 @@ typealias xauth_tmp_t alias { user_xauth_tmp_t staff_xauth_tmp_t sysadm_xauth_tm
+@@ -159,13 +159,6 @@ typealias xauth_tmp_t alias { user_xauth_tmp_t staff_xauth_tmp_t sysadm_xauth_tm
  typealias xauth_tmp_t alias { auditadm_xauth_tmp_t secadm_xauth_tmp_t };
  userdom_user_tmp_file(xauth_tmp_t)
  
@@ -102,21 +101,20 @@ index 8479a52..7ab8678 100644
  type xdm_t;
  type xdm_exec_t;
  auth_login_pgm_domain(xdm_t)
-@@ -313,7 +306,8 @@ allow xdm_t self:socket create_socket_perms;
- allow xdm_t self:appletalk_socket create_socket_perms;
+@@ -329,6 +322,8 @@ allow xdm_t self:appletalk_socket create_socket_perms;
  allow xdm_t self:key { search link write };
  
--allow xdm_t xconsole_device_t:fifo_file { getattr setattr };
+ allow xdm_t xconsole_device_t:fifo_file { read_fifo_file_perms setattr_fifo_file_perms };
 +logging_setattr_xconsole(xdm_t)
 +logging_getattr_xconsole(xdm_t)
  
  # Allow gdm to run gdm-binary
  can_exec(xdm_t, xdm_exec_t)
 diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
-index e96f111..e1e1ac2 100644
+index f1e1a74..6612946 100644
 --- a/policy/modules/system/init.te
 +++ b/policy/modules/system/init.te
-@@ -890,8 +890,10 @@ optional_policy(`
+@@ -1119,8 +1119,10 @@ optional_policy(`
  
  optional_policy(`
  	# Set device ownerships/modes.
@@ -129,7 +127,7 @@ index e96f111..e1e1ac2 100644
  	xserver_read_xdm_rw_config(initrc_t)
  ')
 diff --git a/policy/modules/system/logging.fc b/policy/modules/system/logging.fc
-index fe85ac3..91cba84 100644
+index e37cf6a..cd4be79 100644
 --- a/policy/modules/system/logging.fc
 +++ b/policy/modules/system/logging.fc
 @@ -1,5 +1,7 @@
@@ -141,10 +139,10 @@ index fe85ac3..91cba84 100644
  /etc/syslog.conf		gen_context(system_u:object_r:syslog_conf_t,s0)
  /etc/syslog.conf\.sysklogd	gen_context(system_u:object_r:syslog_conf_t,s0)
 diff --git a/policy/modules/system/logging.if b/policy/modules/system/logging.if
-index 9a6f599..4a5a049 100644
+index de26249..6207811 100644
 --- a/policy/modules/system/logging.if
 +++ b/policy/modules/system/logging.if
-@@ -976,6 +976,60 @@ interface(`logging_manage_generic_logs',`
+@@ -1017,6 +1017,60 @@ interface(`logging_manage_generic_logs',`
  
  ########################################
  ## <summary>
@@ -206,10 +204,10 @@ index 9a6f599..4a5a049 100644
  ##	the audit environment
  ## </summary>
 diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
-index 8d8de5c..5c06256 100644
+index cdc60d7..784aa1d 100644
 --- a/policy/modules/system/logging.te
 +++ b/policy/modules/system/logging.te
-@@ -81,6 +81,13 @@ type var_log_t;
+@@ -89,6 +89,13 @@ type var_log_t;
  logging_log_file(var_log_t)
  files_mountpoint(var_log_t)
  
@@ -223,7 +221,7 @@ index 8d8de5c..5c06256 100644
  ifdef(`enable_mls',`
  	init_ranged_daemon_domain(auditd_t, auditd_exec_t, mls_systemhigh)
  	init_ranged_daemon_domain(syslogd_t, syslogd_exec_t, mls_systemhigh)
-@@ -534,8 +541,6 @@ optional_policy(`
+@@ -613,8 +620,6 @@ optional_policy(`
  	udev_read_db(syslogd_t)
  ')
  
@@ -236,5 +234,5 @@ index 8d8de5c..5c06256 100644
 +logging_rw_xconsole(syslogd_t)
 +logging_setattr_xconsole(syslogd_t)
 -- 
-1.7.9.5
+2.13.3
 
