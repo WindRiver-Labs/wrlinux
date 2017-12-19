@@ -37,12 +37,10 @@ SRC_URI += "file://wr-policy-getty-console.patch \
             file://wr-fc-cfengine.patch \
             file://wr-fc-udevadm.patch \
             file://wr-fc-brctl.patch \
-            file://wr-fc-fstools.patch \
             file://wr-fc-mta.patch \
             file://wr-fc-netutils.patch \
             file://wr-fc-ntop.patch \
             file://wr-fc-snmp.patch \
-            file://wr-fc-locallogin.patch \
             file://wr-allow-ifconfig-to-read-search-var-run.patch \
             file://portmap-allow-portmap-to-create-socket.patch \
             file://wr-policy-drbd.patch \
@@ -59,7 +57,6 @@ SRC_URI += "file://wr-policy-getty-console.patch \
             file://wr-policy-avahi-dontaudit-rw-console.patch \
             file://wr-policy-telnet-fix-for-telnetlogin.patch \
             file://wr-policy-fix-file_contexts.subs_dist.patch \
-            file://wr-policy-kernel_t-mls-trusted-for-setting-process-l.patch \
             file://wr-policy-fix-security_validate_transition.patch \
             file://wr-policy-init_t-get-all-service-status.patch \
             file://wr-policy-allow-init_t-read-any-level-sockets.patch \
@@ -117,11 +114,6 @@ SRC_URI += "file://wr-policy-getty-console.patch \
             file://wr-policy-allow-local_login_t-search-default_t-dir.patch \
             file://wr-policy-allow-useradd_t-to-write-file-at-all-level.patch \
            "
-
-# Patches back port from upstream new version
-SRC_URI += "file://Remove-unneeded-system_u-seusers-mapping.patch \
-            file://systemd-add-systemd-backlight-policy.patch \
-"
 
 # Fixes of modular error
 SRC_URI += "file://policy-move-xconsole-to-logging-module.patch"

@@ -81,15 +81,15 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/kernel/files.if   | 19 +++++++++++++++++++
  policy/modules/system/init.te    |  8 ++++++++
  policy/modules/system/logging.if | 19 +++++++++++++++++++
- policy/modules/system/logging.te | 21 ++++++++++++++++++++-
+ policy/modules/system/logging.te | 19 +++++++++++++++++++
  policy/modules/system/systemd.if | 18 ++++++++++++++++++
- 5 files changed, 84 insertions(+), 1 deletion(-)
+ 5 files changed, 83 insertions(+)
 
 diff --git a/policy/modules/kernel/files.if b/policy/modules/kernel/files.if
-index 9348f07..a792f95 100644
+index 5bd7566..168d123 100644
 --- a/policy/modules/kernel/files.if
 +++ b/policy/modules/kernel/files.if
-@@ -6737,3 +6737,22 @@ interface(`files_unconfined',`
+@@ -6906,3 +6906,22 @@ interface(`files_unconfined',`
  
  	typeattribute $1 files_unconfined_type;
  ')
@@ -113,10 +113,10 @@ index 9348f07..a792f95 100644
 +	allow $1 var_run_t:dir create_dir_perms;
 +')
 diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
-index 0c46841..1ea0532 100644
+index b7d9932..3e951e7 100644
 --- a/policy/modules/system/init.te
 +++ b/policy/modules/system/init.te
-@@ -263,6 +263,8 @@ ifdef(`init_systemd',`
+@@ -271,6 +271,8 @@ ifdef(`init_systemd',`
  
  	# systemd_socket_activated policy
  	mls_socket_write_all_levels(init_t)
@@ -125,9 +125,9 @@ index 0c46841..1ea0532 100644
  
  	selinux_compute_create_context(init_t)
  	selinux_compute_access_vector(init_t)
-@@ -283,6 +285,12 @@ ifdef(`init_systemd',`
- 	# udevd is a "systemd kobject uevent socket activated daemon"
- 	udev_create_kobject_uevent_sockets(init_t)
+@@ -293,6 +295,12 @@ ifdef(`init_systemd',`
+ 		systemd_dbus_chat_logind(init_t)
+ 	')
  
 +	# get status, start, stop, reload generic systemd units
 +	init_get_all_units_status(init_t)
@@ -139,10 +139,10 @@ index 0c46841..1ea0532 100644
  		dbus_system_bus_client(init_t)
  		dbus_connect_system_bus(init_t)
 diff --git a/policy/modules/system/logging.if b/policy/modules/system/logging.if
-index 663fea2..7157316 100644
+index b160159..de26249 100644
 --- a/policy/modules/system/logging.if
 +++ b/policy/modules/system/logging.if
-@@ -1186,3 +1186,22 @@ interface(`logging_admin',`
+@@ -1132,3 +1132,22 @@ interface(`logging_admin',`
  	logging_admin_audit($1, $2)
  	logging_admin_syslog($1, $2)
  ')
@@ -166,19 +166,10 @@ index 663fea2..7157316 100644
 +	stream_connect_pattern($1, syslogd_var_run_t, syslogd_var_run_t, syslogd_t)
 +')
 diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
-index d2eb0ed..bbf90d8 100644
+index 255bbac..f76abb8 100644
 --- a/policy/modules/system/logging.te
 +++ b/policy/modules/system/logging.te
-@@ -380,7 +380,7 @@ optional_policy(`
- # sys_admin for the integrated klog of syslog-ng and metalog
- # sys_nice for rsyslog
- # cjp: why net_admin!
--allow syslogd_t self:capability { dac_override sys_resource sys_tty_config net_admin sys_admin sys_nice chown fsetid };
-+allow syslogd_t self:capability { sys_ptrace dac_override sys_resource sys_tty_config net_admin sys_admin sys_nice chown fsetid };
- dontaudit syslogd_t self:capability sys_tty_config;
- 
- # allow read to /dev/random, /dev/urandom for syslog-ng
-@@ -406,6 +406,8 @@ allow syslogd_t self:tcp_socket create_stream_socket_perms;
+@@ -401,6 +401,8 @@ allow syslogd_t self:tcp_socket create_stream_socket_perms;
  allow syslogd_t syslog_conf_t:file read_file_perms;
  allow syslogd_t syslog_conf_t:lnk_file read_file_perms;
  
@@ -187,8 +178,8 @@ index d2eb0ed..bbf90d8 100644
  # Create and bind to /dev/log or /var/run/log.
  allow syslogd_t devlog_t:sock_file manage_sock_file_perms;
  files_pid_filetrans(syslogd_t, devlog_t, sock_file)
-@@ -433,6 +435,9 @@ manage_files_pattern(syslogd_t, syslogd_var_run_t, syslogd_var_run_t)
- manage_sock_files_pattern(syslogd_t, syslogd_var_run_t, syslogd_var_run_t)
+@@ -427,6 +429,9 @@ files_search_var_lib(syslogd_t)
+ manage_files_pattern(syslogd_t, syslogd_var_run_t, syslogd_var_run_t)
  files_pid_filetrans(syslogd_t, syslogd_var_run_t, file)
  
 +# manage dirs /var/run/systemd/{streams, journal}
@@ -197,7 +188,7 @@ index d2eb0ed..bbf90d8 100644
  kernel_read_system_state(syslogd_t)
  kernel_read_network_state(syslogd_t)
  kernel_read_kernel_sysctls(syslogd_t)
-@@ -492,8 +497,10 @@ files_var_lib_filetrans(syslogd_t, syslogd_var_lib_t, { file dir })
+@@ -488,8 +493,10 @@ files_var_lib_filetrans(syslogd_t, syslogd_var_lib_t, { file dir })
  
  fs_getattr_all_fs(syslogd_t)
  fs_search_auto_mountpoints(syslogd_t)
@@ -208,7 +199,7 @@ index d2eb0ed..bbf90d8 100644
  mls_trusted_object(syslogd_t) # Other process need to have the right to connectto/sendto /dev/log
  
  term_write_console(syslogd_t)
-@@ -514,9 +521,11 @@ term_use_all_ptys(syslogd_t)
+@@ -504,9 +511,11 @@ term_write_all_ttys(syslogd_t)
  auth_use_nsswitch(syslogd_t)
  
  init_use_fds(syslogd_t)
@@ -220,7 +211,7 @@ index d2eb0ed..bbf90d8 100644
  
  miscfiles_read_localization(syslogd_t)
  
-@@ -535,6 +544,16 @@ ifdef(`init_systemd',`
+@@ -528,6 +537,16 @@ ifdef(`init_systemd',`
  	init_dgram_send(syslogd_t)
  
  	udev_read_pid_files(syslogd_t)
@@ -238,10 +229,10 @@ index d2eb0ed..bbf90d8 100644
  
  ifdef(`distro_gentoo',`
 diff --git a/policy/modules/system/systemd.if b/policy/modules/system/systemd.if
-index 3cd6670..c1c34be 100644
+index 705cbaa..35cc69f 100644
 --- a/policy/modules/system/systemd.if
 +++ b/policy/modules/system/systemd.if
-@@ -171,3 +171,21 @@ interface(`systemd_start_power_units',`
+@@ -190,3 +190,21 @@ interface(`systemd_start_power_units',`
  
  	allow $1 power_unit_t:service start;
  ')
@@ -264,5 +255,5 @@ index 3cd6670..c1c34be 100644
 +	allow $1 systemd_unit_t:dir getattr;
 +')
 -- 
-1.9.1
+2.13.3
 

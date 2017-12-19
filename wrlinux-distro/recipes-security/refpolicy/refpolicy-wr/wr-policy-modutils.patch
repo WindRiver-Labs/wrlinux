@@ -7,25 +7,33 @@ is s0.  So, we defeat that constraint for insmod_t.
 Upstream-Status: Pending
 
 Signed-off-by: Joe Slater <jslater@windriver.com>
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/system/modutils.te | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-
+diff --git a/policy/modules/system/modutils.te b/policy/modules/system/modutils.te
+index a1398b5..34b133a 100644
 --- a/policy/modules/system/modutils.te
 +++ b/policy/modules/system/modutils.te
-@@ -15,6 +15,7 @@ role system_r types depmod_t;
- type insmod_t;
- type insmod_exec_t;
- application_domain(insmod_t, insmod_exec_t)
+@@ -9,6 +9,7 @@ type kmod_t alias { insmod_t depmod_t update_modules_t };
+ type kmod_exec_t alias { insmod_exec_t depmod_exec_t update_modules_exec_t };
+ application_domain(kmod_t, kmod_exec_t)
+ kernel_domtrans_to(kmod_t, kmod_exec_t)
 +mls_file_read_all_levels(insmod_t)
- mls_file_write_all_levels(insmod_t)
- role system_r types insmod_t;
+ mls_file_write_all_levels(kmod_t)
+ role system_r types kmod_t;
  
-@@ -115,6 +116,9 @@ read_files_pattern(insmod_t, modules_con
- list_dirs_pattern(insmod_t, modules_dep_t, modules_dep_t)
- read_files_pattern(insmod_t, modules_dep_t, modules_dep_t)
+@@ -111,6 +112,9 @@ userdom_use_user_terminals(kmod_t)
+ 
+ userdom_dontaudit_search_user_home_dirs(kmod_t)
  
 +# read /dev/null !
 +allow insmod_t device_t:chr_file read;
 +
- can_exec(insmod_t, insmod_exec_t)
+ ifdef(`init_systemd',`
+ 	init_rw_stream_sockets(kmod_t)
  
- kernel_load_module(insmod_t)
+-- 
+2.13.3
+

@@ -84,23 +84,23 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  9 files changed, 32 insertions(+), 2 deletions(-)
 
 diff --git a/policy/modules/contrib/irqbalance.te b/policy/modules/contrib/irqbalance.te
-index 414ad21..82040d5 100644
+index b8cea5e..e955650 100644
 --- a/policy/modules/contrib/irqbalance.te
 +++ b/policy/modules/contrib/irqbalance.te
-@@ -20,7 +20,7 @@ files_pid_file(irqbalance_var_run_t)
+@@ -24,7 +24,7 @@ init_unit_file(irqbalance_unit_t)
  # Local policy
  #
  
--allow irqbalance_t self:capability { setpcap net_admin };
-+allow irqbalance_t self:capability { setpcap net_admin dac_override };
+-allow irqbalance_t self:capability { setpcap };
++allow irqbalance_t self:capability { setpcap dac_override };
  dontaudit irqbalance_t self:capability sys_tty_config;
  allow irqbalance_t self:process { getcap getsched setcap signal_perms };
  allow irqbalance_t self:udp_socket create_socket_perms;
 diff --git a/policy/modules/contrib/networkmanager.te b/policy/modules/contrib/networkmanager.te
-index dcdcfe4..9b57543 100644
+index 9580c7a..c30bb09 100644
 --- a/policy/modules/contrib/networkmanager.te
 +++ b/policy/modules/contrib/networkmanager.te
-@@ -55,6 +55,7 @@ allow NetworkManager_t self:netlink_kobject_uevent_socket create_socket_perms;
+@@ -56,6 +56,7 @@ allow NetworkManager_t self:netlink_kobject_uevent_socket create_socket_perms;
  allow NetworkManager_t self:tcp_socket { accept listen };
  allow NetworkManager_t self:tun_socket { create_socket_perms relabelfrom relabelto };
  allow NetworkManager_t self:packet_socket create_socket_perms;
@@ -108,7 +108,7 @@ index dcdcfe4..9b57543 100644
  allow NetworkManager_t self:socket create_socket_perms;
  
  allow NetworkManager_t wpa_cli_t:unix_dgram_socket sendto;
-@@ -63,6 +64,10 @@ allow NetworkManager_t NetworkManager_etc_t:dir list_dir_perms;
+@@ -64,6 +65,10 @@ allow NetworkManager_t NetworkManager_etc_t:dir list_dir_perms;
  allow NetworkManager_t NetworkManager_etc_t:file read_file_perms;
  allow NetworkManager_t NetworkManager_etc_t:lnk_file read_lnk_file_perms;
  
@@ -120,7 +120,7 @@ index dcdcfe4..9b57543 100644
  manage_files_pattern(NetworkManager_t, NetworkManager_etc_rw_t, NetworkManager_etc_rw_t)
  filetrans_pattern(NetworkManager_t, NetworkManager_etc_t, NetworkManager_etc_rw_t, { dir file })
 diff --git a/policy/modules/contrib/radius.te b/policy/modules/contrib/radius.te
-index 0f63b4f..ddcefdc 100644
+index fa7698f..501562f 100644
 --- a/policy/modules/contrib/radius.te
 +++ b/policy/modules/contrib/radius.te
 @@ -96,6 +96,7 @@ domain_use_interactive_fds(radiusd_t)
@@ -132,7 +132,7 @@ index 0f63b4f..ddcefdc 100644
  files_read_usr_files(radiusd_t)
  files_read_etc_runtime_files(radiusd_t)
 diff --git a/policy/modules/contrib/watchdog.te b/policy/modules/contrib/watchdog.te
-index edfe9e7..c4817dc 100644
+index 431aab3..0a68d76 100644
 --- a/policy/modules/contrib/watchdog.te
 +++ b/policy/modules/contrib/watchdog.te
 @@ -74,6 +74,7 @@ files_read_all_pids(watchdog_t)
@@ -144,10 +144,10 @@ index edfe9e7..c4817dc 100644
  auth_append_login_records(watchdog_t)
  
 diff --git a/policy/modules/kernel/files.if b/policy/modules/kernel/files.if
-index 151ddb9..6f75f1b 100644
+index 008cdd8..a59c316 100644
 --- a/policy/modules/kernel/files.if
 +++ b/policy/modules/kernel/files.if
-@@ -6776,6 +6776,24 @@ interface(`files_dontaudit_search_non_security_dirs',`
+@@ -6926,6 +6926,24 @@ interface(`files_dontaudit_search_non_security_dirs',`
  	dontaudit $1 non_security_file_type:dir search_dir_perms;
  ')
  
@@ -173,7 +173,7 @@ index 151ddb9..6f75f1b 100644
  ## <summary>
  ##      Create generic pid directory.
 diff --git a/policy/modules/system/ipsec.te b/policy/modules/system/ipsec.te
-index b3406c7..ab2f06a 100644
+index ec730fa..c36d8ef 100644
 --- a/policy/modules/system/ipsec.te
 +++ b/policy/modules/system/ipsec.te
 @@ -491,6 +491,8 @@ allow ipsec_supervisor_t ipsec_var_run_t:sock_file { rw_sock_file_perms unlink }
@@ -186,7 +186,7 @@ index b3406c7..ab2f06a 100644
  domtrans_pattern(ipsec_supervisor_t, ipsec_exec_t, ipsec_t);
  
 diff --git a/policy/modules/system/locallogin.te b/policy/modules/system/locallogin.te
-index ed9f8e1..d947d86 100644
+index 77f649b..379254f 100644
 --- a/policy/modules/system/locallogin.te
 +++ b/policy/modules/system/locallogin.te
 @@ -105,6 +105,7 @@ files_read_world_readable_sockets(local_login_t)
@@ -198,10 +198,10 @@ index ed9f8e1..d947d86 100644
  storage_dontaudit_getattr_fixed_disk_dev(local_login_t)
  storage_dontaudit_setattr_fixed_disk_dev(local_login_t)
 diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
-index 86cb1cf..d7047aa 100644
+index d8622aa..169edd9 100644
 --- a/policy/modules/system/systemd.te
 +++ b/policy/modules/system/systemd.te
-@@ -157,6 +157,8 @@ systemd_log_parse_environment(systemd_cgroups_t)
+@@ -172,6 +172,8 @@ udev_read_pid_files(systemd_backlight_t)
  allow systemd_cgroups_t self:capability net_admin;
  # read the process state (/proc/pid) of init
  init_read_state(systemd_cgroups_t)
@@ -211,7 +211,7 @@ index 86cb1cf..d7047aa 100644
  mls_socket_write_all_levels(systemd_cgroups_t)
  # write to init sock file
 diff --git a/policy/modules/system/udev.te b/policy/modules/system/udev.te
-index cb748f2..6d4729f 100644
+index 7f14835..ad4ce32 100644
 --- a/policy/modules/system/udev.te
 +++ b/policy/modules/system/udev.te
 @@ -40,7 +40,7 @@ ifdef(`enable_mcs',`
@@ -224,5 +224,5 @@ index cb748f2..6d4729f 100644
  allow udev_t self:process { execmem setfscreate };
  allow udev_t self:fd use;
 -- 
-2.11.0
+2.13.3
 
