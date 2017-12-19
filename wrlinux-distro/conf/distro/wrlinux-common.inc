@@ -132,7 +132,7 @@ PACKAGECONFIG_pn-sysstat = "lm-sensors"
 
 # we usually use gnutls as the default PACKAGECONFIG of wpa-supplicant, but its sub-packege gnutls-openssl
 # is GPLv3, so need this check to switch to openssl if GLPv3 is blacklisted.
-PACKAGECONFIG_pn-wpa-supplicant = "${@bb.utils.contains('INCOMPATIBLE_LICENSE', 'GPLv3', 'openssl', 'gnutls', d)}"
+PACKAGECONFIG_pn-wpa-supplicant ?= "${@bb.utils.contains('INCOMPATIBLE_LICENSE', 'GPLv3', 'openssl', 'gnutls', d)}"
 
 # dnsmasq and named (provided by bind) use the same default port 53:
 # | dnsmasq: failed to create listening socket for port 53: Address already in use
