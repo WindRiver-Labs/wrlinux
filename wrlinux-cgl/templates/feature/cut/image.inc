@@ -3,6 +3,7 @@
 # and multithreaded debugging needs libc-dbg
 IMAGE_INSTALL += "gdb glibc-dbg"
 
+# Needed by test case for STD.3.1 SCTP - Base Features
 IMAGE_INSTALL += "lksctp-tools-ptest"
 
 # the iscsi testcase needs iscsitarget
