@@ -19,7 +19,6 @@ PACKAGES = "\
 RDEPENDS_packagegroup-glusterfs = "\
     fuse \
     fuse-utils \
-    dpdk-dev-libibverbs \
     libulockmgr \
     glusterfs \
     glusterfs-rdma \
