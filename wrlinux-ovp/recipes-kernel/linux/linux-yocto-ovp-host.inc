@@ -7,7 +7,6 @@ require ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'recipes-kerne
 
 KERNEL_FEATURES += "\
  cfg/virtio.scc \
- features/kvm/qemu-kvm-enable.scc \
  features/netfilter/netfilter.scc \
  features/lxc/lxc-enable.scc \
  features/intel-dpdk/intel-dpdk.scc \
