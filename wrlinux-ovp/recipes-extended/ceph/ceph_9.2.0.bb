@@ -43,6 +43,8 @@ SYSTEMD_SERVICE_${PN} = "ceph-radosgw@.service \
 	ceph.target \
 "
 
+CFLAGS += "-D_FILE_OFFSET_BITS=64"
+
 PACKAGECONFIG = "nss radosgw"
 
 PACKAGECONFIG[cryptopp] = "--with-cryptopp, --without-cryptopp,"
