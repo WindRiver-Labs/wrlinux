@@ -11,6 +11,7 @@ KERNEL_FEATURES += "\
  features/lxc/lxc-enable.scc \
  features/intel-dpdk/intel-dpdk.scc \
  features/aufs/aufs-enable.scc \
+ features/nfsd/nfsd-enable.scc \
 "
 
 # Following is not yet available:
