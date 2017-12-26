@@ -122,7 +122,6 @@ setup_cluster()
     HOSTNAME2=`ssh root@$CLIENT_IP -- hostname`
     TARGET_IP=`get_targetip`
     cus_hosts $HOSTNAME1 $TARGET_IP $HOSTNAME2 $CLIENT_IP
-    autossh $HOSTNAME2
     
     cus_corosync
     # start corosync and pacemaker
