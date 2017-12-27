@@ -1,0 +1,66 @@
+From 5f19e591c964ce9c3c4c337a5ef32416e60a2bfd Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Wed, 27 Dec 2017 07:05:44 +0000
+Subject: [PATCH] wr-policy: fixes for samba service
+
+Reference sources: selinux-policy-3.13.1-225.6.fc25.src.rpm
+Changes come from: policy-f25-contrib.patch
+
+* allow nmbd_t to read urandom_device_t chr_file
+* add capability net_admin for smbd_t, nmbd_t
+
+Fix error: [FAILED] Failed to start Samba NMB Daemon.
+
+Fix avc denials:
+  avc: denied { read open } for pid=317 comm="nmbd" \
+  name="urandom" dev="devtmpfs" ino=8270 \
+  scontext=system_u:system_r:nmbd_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:urandom_device_t:s0 tclass=chr_file
+
+  avc: denied { net_admin } for pid=317 comm="nmbd" capability=12 \
+  scontext=system_u:system_r:nmbd_t:s0-s15:c0.c1023 \
+  tcontext=system_u:system_r:nmbd_t:s0-s15:c0.c1023 tclass=capability
+
+  avc: denied { net_admin } for pid=422 comm="smbd" capability=12 \
+  scontext=system_u:system_r:smbd_t:s0-s15:c0.c1023 \
+  tcontext=system_u:system_r:smbd_t:s0-s15:c0.c1023 tclass=capability
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/contrib/samba.te | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/policy/modules/contrib/samba.te b/policy/modules/contrib/samba.te
+index ed7058d..baa2215 100644
+--- a/policy/modules/contrib/samba.te
++++ b/policy/modules/contrib/samba.te
+@@ -261,7 +261,7 @@ optional_policy(`
+ # Smbd Local policy
+ #
+ 
+-allow smbd_t self:capability { chown fowner kill fsetid setgid setuid sys_chroot sys_nice sys_admin sys_resource lease dac_override dac_read_search };
++allow smbd_t self:capability { chown fowner kill fsetid setgid setuid sys_chroot sys_nice sys_admin sys_resource lease dac_override dac_read_search net_admin };
+ dontaudit smbd_t self:capability sys_tty_config;
+ allow smbd_t self:process ~{ ptrace setcurrent setexec setfscreate execmem execstack execheap };
+ allow smbd_t self:fd use;
+@@ -512,6 +512,7 @@ optional_policy(`
+ #
+ 
+ dontaudit nmbd_t self:capability sys_tty_config;
++allow nmbd_t self:capability { net_admin };
+ allow nmbd_t self:process ~{ ptrace setcurrent setexec setfscreate setrlimit execmem execstack execheap };
+ allow nmbd_t self:fd use;
+ allow nmbd_t self:fifo_file rw_fifo_file_perms;
+@@ -575,6 +576,7 @@ corenet_tcp_sendrecv_smbd_port(nmbd_t)
+ 
+ dev_read_sysfs(nmbd_t)
+ dev_getattr_mtrr_dev(nmbd_t)
++dev_read_urand(nmbd_t)
+ 
+ domain_use_interactive_fds(nmbd_t)
+ 
+-- 
+2.13.3
+
