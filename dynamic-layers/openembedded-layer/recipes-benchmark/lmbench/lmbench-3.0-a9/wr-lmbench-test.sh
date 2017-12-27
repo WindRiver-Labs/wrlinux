@@ -75,6 +75,10 @@ log_file="$LOGDIR/10k_file_cd"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_fs -s 10k 2>&1 | awk '{print 1000000/$3 " " 1000000/$4}' >> $log_file 2>&1
 done
 
@@ -86,6 +90,10 @@ log_file="$LOGDIR/100k_file_cd"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_fs -s 100k 2>&1 | awk '{print 1000000/$3 " " 1000000/$4}' >> $log_file 2>&1;
 done
 
@@ -100,6 +108,10 @@ log_file="$LOGDIR/proc_fork_latency"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_proc fork >> $log_file 2>&1
 done
 
@@ -112,6 +124,10 @@ log_file="$LOGDIR/proc_exec_latency"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_proc exec >> $log_file 2>&1
 done
 
@@ -124,6 +140,10 @@ log_file="$LOGDIR/proc_shell_latency"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_proc shell >> $log_file 2>&1
 done
 
@@ -139,6 +159,10 @@ log_file="$LOGDIR/pipe_latency"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_pipe >> $log_file 2>&1
 done
 
@@ -151,6 +175,10 @@ log_file="$LOGDIR/unix_sock_latency"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_unix >> $log_file 2>&1
 done
 
@@ -164,6 +192,10 @@ log_file="$LOGDIR/pipe_bandwidth"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   bw_pipe -P 1 -M 100m >> $log_file 2>&1
 done
 
@@ -175,6 +207,10 @@ log_file="$LOGDIR/unix_bandwidth"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   bw_unix -P 1 -M 100m >> $log_file 2>&1
 done
 
@@ -187,6 +223,10 @@ log_file="$LOGDIR/ctx_latency"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_ctx -P 1 -s 64k 8 >> $log_file 2>&1
 done
 
@@ -203,6 +243,10 @@ current_percent=0
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_sig -P $SYNC_MAX install >> $log_file  2>&1
 done
 
@@ -214,6 +258,10 @@ current_percent=0
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_sig  -P $SYNC_MAX catch >> $log_file 2>&1
 done
 
@@ -225,6 +273,10 @@ current_percent=0
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_sig -P $SYNC_MAX prot ${LMBENCH_BIN_PATH}/lat_sig >> $log_file 2>&1
 done
 
@@ -241,6 +293,10 @@ current_percent=0
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_syscall -P $SYNC_MAX null >> $log_file 2>&1
 done
 
@@ -251,6 +307,10 @@ current_percent=0
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_syscall -P $SYNC_MAX read >> $log_file 2>&1
 done
 
@@ -262,6 +322,10 @@ current_percent=0
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_syscall -P $SYNC_MAX write >> $log_file 2>&1
 done
 
@@ -272,6 +336,10 @@ current_percent=0
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_syscall -P $SYNC_MAX stat $STAT >> $log_file 2>&1
 done
 
@@ -282,6 +350,10 @@ current_percent=0
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_syscall -P $SYNC_MAX fstat $STAT >> $log_file 2>&1
 done
 
@@ -292,6 +364,10 @@ current_percent=0
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_syscall -P $SYNC_MAX open $STAT >> $log_file 2>&1
 done
 
@@ -308,6 +384,10 @@ log_file="$LOGDIR/select_file_latency"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_select -n $FDS -P $SYNC_MAX file >> $log_file 2>&1
 done
 
@@ -319,6 +399,10 @@ log_file="$LOGDIR/select_tcp_latency"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_select -n $FDS -P $SYNC_MAX tcp >> $log_file 2>&1
 done
 
@@ -333,6 +417,10 @@ bw_tcp -s
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   bw_tcp -m 10m localhost >> $log_file 2>&1
 done
 bw_tcp -S localhost
@@ -346,6 +434,10 @@ lat_tcp -s
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_tcp -m 10k localhost >> $log_file 2>&1
 done
 lat_tcp -S localhost
@@ -359,6 +451,10 @@ lat_udp -s
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_udp -m 10k localhost >> $log_file 2>&1
 done
 lat_udp -S localhost
@@ -371,6 +467,10 @@ log_file="$LOGDIR/tcp_connect_latency"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_connect -s
   lat_connect localhost >> $log_file 2>&1
   lat_connect -S localhost
@@ -391,6 +491,10 @@ lat_rpc -s
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_rpc -P $SYNC_MAX -p udp localhost >> $log_file 2>&1
   lat_rpc -P $SYNC_MAX -p tcp localhost >> $log_file 2>&1
 done
@@ -408,6 +512,10 @@ log_file="$LOGDIR/ops_latency"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_ops >> $log_file 2>&1
 done
 
@@ -434,6 +542,10 @@ log_file="$LOGDIR/pagefaults_latency"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_pagefault -P $SYNC_MAX $FILE >> $log_file 2>&1
   drop_caches
 done
@@ -449,6 +561,10 @@ log_file="$LOGDIR/memory_bcopy_bandwidth"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   bw_mem -P $SYNC_MAX ${HALF}m bcopy >> $log_file 2>&1
 done
 
@@ -460,6 +576,10 @@ log_file="$LOGDIR/mmap_latency"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_mmap -P $SYNC_MAX ${MB}m $FILE >> $log_file 2>&1
   drop_caches
 done
@@ -472,6 +592,10 @@ log_file="$LOGDIR/mmap_read_bandwidth"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   bw_mmap_rd -P $SYNC_MAX ${FILE_SIZE}m mmap_only $FILE >> $log_file 2>&1
   drop_caches
 done
@@ -484,6 +608,10 @@ log_file="$LOGDIR/mmap_open2close_bandwidth"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   bw_mmap_rd -P $SYNC_MAX ${FILE_SIZE}m open2close $FILE >> $log_file 2>&1
   drop_caches
 done
@@ -496,6 +624,10 @@ log_file="$LOGDIR/memory_read_bandwidth"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   bw_mem -P $SYNC_MAX ${MB}m frd >> $log_file 2>&1
 done
 
@@ -507,6 +639,10 @@ log_file="$LOGDIR/memory_write_bandwidth"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   bw_mem -P $SYNC_MAX ${MB}m fwr >> $log_file 2>&1
 done
 
@@ -519,6 +655,10 @@ log_file="$LOGDIR/memory_load_latency"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   lat_mem_rd -P $SYNC_MAX ${MB}m 128 >> $log_file 2>&1
 done
 
@@ -531,6 +671,10 @@ log_file="$LOGDIR/file_read_bandwidth"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   bw_file_rd -P $SYNC_MAX ${FILE_SIZE}m io_only $FILE >> $log_file 2>&1
   drop_caches
 done
@@ -543,6 +687,10 @@ log_file="$LOGDIR/file_open2close_bandwidth"
 while :
 do
   echo_process
+  if [ $? -eq 1 ]
+  then
+    break
+  fi
   bw_file_rd -P $SYNC_MAX ${FILE_SIZE}m open2close $FILE >> $log_file 2>&1
   drop_caches
 done

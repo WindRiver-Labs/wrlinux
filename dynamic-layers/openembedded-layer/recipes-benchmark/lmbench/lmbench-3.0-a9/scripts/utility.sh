@@ -39,9 +39,10 @@ echo_process()
       number=`expr $number - 1`
   done
   [ $current_percent -eq 0 ] && { $DATE; }
-  [ $done_percent -ge $full_percent ] && { echo; echo "Task is over!"; $DATE; echo; break; }
+  [ $done_percent -ge $full_percent ] && { echo; echo "Task is over!"; $DATE; echo; return 1; }
   let current_percent=$current_percent+1
   msleep 250
+  return 0
 }
 
 ##Clean up cached data in memory
