@@ -14,6 +14,7 @@ LIC_FILES_CHKSUM="file://COPYING;md5=801f80980d171dd6425610833a22dbe6"
 SRC_URI    = "file://vrf-1.1.tgz \
               file://vrf-package.list-remove-the-hardcoded-version-number.patch \
               file://vrf-helper-check-os-release-for-version-info.patch \
+              file://vrf-create-add-the-mount-entry-for-tmp.patch \
 "
 
 

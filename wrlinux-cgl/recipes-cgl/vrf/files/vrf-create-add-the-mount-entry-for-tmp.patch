@@ -1,0 +1,43 @@
+From c71a0cbaaf738587e68f7029eca4874fdf55573d Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Tue, 26 Dec 2017 16:16:08 +0800
+Subject: [PATCH] vrf-create: add the mount entry for tmp
+
+The entry for tmp is needed to be shared between host and
+the vrf containers, or it fails when deleting interface:
+/bin/sh: /tmp/vrf.delete_interface.4771.8VyHsr: No such file or directory
+
+Upstream-Status: Inappropriate [no upstream]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ src/vrf-create | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/vrf-create b/src/vrf-create
+index 29d38b2..cb5c6ef 100755
+--- a/src/vrf-create
++++ b/src/vrf-create
+@@ -319,6 +319,9 @@ do_write_lxc_rootfs_conf () {
+ #1.
+     do_write_lxc_mount_entry /sbin /bin /usr
+ 
++    # for shared /tmp directory
++    _do_write_lxc_mount_entry $VRF_ROOTFS/tmp tmp
++
+ #2./lib, /libxx
+     if [ -d "/lib" ]; then
+ 	do_write_lxc_mount_entry /lib
+@@ -363,6 +366,9 @@ EOF
+         do_write_lxc_mount_entry /$LIBN
+     fi
+ 
++    # for shared /tmp directory
++    _do_write_lxc_mount_entry $VRF_ROOTFS/tmp tmp
++
+ }
+ 
+ do_install2_sysv () {
+-- 
+2.11.0
+
