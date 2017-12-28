@@ -1,0 +1,34 @@
+From 5b2c8d8cb0d107e04265e42675b8aa757b33cce9 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 28 Dec 2017 08:14:05 +0000
+Subject: [PATCH] wr-policy: allow staff_t read etc_t files
+
+Fix avc denial:
+  avc: denied { read } for pid=469 comm="uname" \
+  name="ld.so.cache" dev="sda1" ino=1063343 \
+  scontext=root:staff_r:staff_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:etc_t:s15:c0.c1023 tclass=file
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/roles/staff.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/roles/staff.te b/policy/modules/roles/staff.te
+index 1cdbdcd..1349dce 100644
+--- a/policy/modules/roles/staff.te
++++ b/policy/modules/roles/staff.te
+@@ -71,6 +71,8 @@ optional_policy(`
+ 	xserver_role(staff_r, staff_t)
+ ')
+ 
++mls_file_read_all_levels(staff_t)
++
+ ifndef(`distro_redhat',`
+ 	optional_policy(`
+ 		auth_role(staff_r, staff_t)
+-- 
+2.13.3
+
