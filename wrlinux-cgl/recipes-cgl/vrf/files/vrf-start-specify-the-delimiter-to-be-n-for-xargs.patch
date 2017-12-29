@@ -1,0 +1,37 @@
+From 5f3d1b468d3f298c704aa7cb5a3b59287e465ec5 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Fri, 29 Dec 2017 11:18:26 +0800
+Subject: [PATCH] vrf-start: specify the delimiter to be '\n' for xargs
+
+Some of the directory names include backslash, e.g.
+/sys/fs/cgroup/systemd/lxc/vrf_1/system.slice/system-vrf\\x2dgetty.slice/tasks
+
+And it fails when using xargs with:
+cat: /sys/fs/cgroup/systemd/lxc/vrf_1/system.slice/system-vrfx2dgetty.slice/tasks: No such file or directory
+
+To avoid the issue, specify the delimiter to be '\n' for xargs, so that it
+disables backslash processing.
+
+Upstream-Status: Inappropriate [no upstream]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ src/vrf-start | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/vrf-start b/src/vrf-start
+index b7ad5b7..4ecb8bf 100755
+--- a/src/vrf-start
++++ b/src/vrf-start
+@@ -66,7 +66,7 @@ sleep 1
+ debug_log -e "cgroup mounted at \"$CGROUP_MNT\""
+ 
+ VRF_PATH=$(find $CGROUP_MNT -name $VRF_NAME)
+-if [ -n "$VRF_PATH" ] && [ "$(find $VRF_PATH -name tasks |xargs cat |wc -l)" -gt 0 ] ; then
++if [ -n "$VRF_PATH" ] && [ "$(find $VRF_PATH -name tasks |xargs -d'\n' cat |wc -l)" -gt 0 ] ; then
+     echo "$VRF_NAME successfully started"
+     exit $VRF_SUCCESS
+ else
+-- 
+2.11.0
+
