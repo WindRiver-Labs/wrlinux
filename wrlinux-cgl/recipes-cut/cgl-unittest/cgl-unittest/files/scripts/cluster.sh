@@ -79,7 +79,7 @@ cus_corosync()
     
     # compare the two network address
     if [ x"$NETADDR1" != x"$NETADDR2" ]; then
-        cuterr "The two host used to setup a cluster not in a same network"
+        cuterr "The two hosts used to setup a cluster not in a same network"
     fi
     
     # customize the corosync.conf
@@ -120,6 +120,16 @@ setup_cluster()
     # customize the hosts file
     HOSTNAME1=`hostname`
     HOSTNAME2=`ssh root@$CLIENT_IP -- hostname`
+
+    if [ x"$HOSTNAME1" = x ] || [ x"$HOSTNAME2" = x ]; then
+        cuterr "The hostname used to setup a cluster cannot be null"
+    fi
+
+    # compare the two hostname
+    if [ x"$HOSTNAME1" = x"$HOSTNAME2" ]; then
+        cuterr "The two hosts used to setup a cluster cannot use the same hostname"
+    fi
+
     TARGET_IP=`get_targetip`
     cus_hosts $HOSTNAME1 $TARGET_IP $HOSTNAME2 $CLIENT_IP
     
