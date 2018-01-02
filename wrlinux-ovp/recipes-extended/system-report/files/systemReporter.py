@@ -77,11 +77,14 @@ def getProcCpuInfo():
         return retVal
 
     for line in proc_cpu_info:
-        # CPU model name and speed
-        match = re.match("^model\s+name\s+\:\s(.*)\s+@\s+(.*)$", line)
+        # CPU model name
+        match = re.match("^model\s+name\s+\:\s(.*)$", line)
         if match:
             retVal["cpuModel"] = match.group(1)
-            retVal["cpuSpeed"] = match.group(2)
+        # CPU speed
+        match = re.match("^cpu\s+MHz\s+\:\s(.*)$", line)
+        if match:
+            retVal["cpuSpeed"] = match.group(1) + "MHz"
         # CPU cores
         match = re.match("^cpu\s+cores\s+\:\s+(.*)$", line)
         if match:
