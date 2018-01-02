@@ -117,6 +117,7 @@ SRC_URI += "file://wr-policy-getty-console.patch \
             file://wr-policy-fixes-for-samba-service.patch \
             file://wr-policy-allow-staff_t-read-etc_t-files.patch \
             file://wr-policy-allow-systemd_logind_t-relabel-user_tmp_t-.patch \
+            file://0001-Add-userdom_transition_login_userdomain-interface.patch \
            "
 
 # Backport from upstream
