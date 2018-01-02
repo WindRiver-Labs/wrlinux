@@ -76,6 +76,6 @@ LINUX_VERSION_kb-standard-wr-base ?= "4.12.18"
 
 # yocto-kernel-cache branch entry
 KERNEL_CACHE_BRANCH = "yocto-4.12-wr"
-SRCREV_meta = "690ab72640b986812da5314a24b93d2c42cc9135"
+SRCREV_meta = "bc5361e3a565aaa8f0def9b7802637eb9c38584c"
 
 LINUX_VERSION = "4.12.18"
