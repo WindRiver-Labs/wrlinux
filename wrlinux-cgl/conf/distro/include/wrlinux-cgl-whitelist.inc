@@ -30,6 +30,7 @@ PNWHITELIST_meta-python_append = " \
     python-cffi \
     python-lxml \
     python-paste \
+    python-ply \
     python-pyasn1 \
     python-pycparser \
     python-six \
