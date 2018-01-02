@@ -119,6 +119,10 @@ SRC_URI += "file://wr-policy-getty-console.patch \
             file://wr-policy-allow-systemd_logind_t-relabel-user_tmp_t-.patch \
            "
 
+# Backport from upstream
+SRC_URI += "file://0001-postfix-Silence-cap_dac_read_search-denials.patch \
+           "
+
 # Fixes of modular error
 SRC_URI += "file://policy-move-xconsole-to-logging-module.patch"
 
