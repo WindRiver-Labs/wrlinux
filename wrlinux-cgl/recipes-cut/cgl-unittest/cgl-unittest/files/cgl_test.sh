@@ -62,7 +62,6 @@ CGL4_TESTCASE=$tmp
 KERNEL_TESTCASE="\
 	scripts/coredump_test.sh \
 	scripts/cyclic-test \
-	scripts/death-notify-test \
 	scripts/tmpfs.sh \
 	scripts/bonding.sh \
 	testcase/std.10.0 \

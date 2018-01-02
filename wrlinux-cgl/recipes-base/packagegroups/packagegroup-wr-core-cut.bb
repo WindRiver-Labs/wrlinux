@@ -20,7 +20,6 @@ ALLOW_EMPTY_${PN} = "1"
 
 RDEPENDS_${PN} = "\
         cyclictest \
-        death-notify \
         gen-coredump \
         ipsec-test \
         libevent \
