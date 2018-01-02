@@ -75,6 +75,7 @@ PNWHITELIST_meta-python += " \
 	python-pyrex-native \
 	python3-django \
 	python3-django-south \
+	python3-pytz \
 	nativesdk-python3-beautifulsoup4 \
 	nativesdk-python3-pytz \
 	"
