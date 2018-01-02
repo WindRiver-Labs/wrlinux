@@ -120,6 +120,7 @@ SRC_URI += "file://wr-policy-getty-console.patch \
             file://0001-Add-userdom_transition_login_userdomain-interface.patch \
             file://wr-policy-allow-ping_t-read-all-levels-file.patch \
             file://0001-Allow-search-all-pid-dirs-when-managing-net_conf_t-f.patch \
+            file://0001-wr-policy-allow-secadm_t-read_policy.patch \
            "
 
 # Backport from upstream
