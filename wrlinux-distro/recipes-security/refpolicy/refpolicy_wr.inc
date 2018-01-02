@@ -119,6 +119,7 @@ SRC_URI += "file://wr-policy-getty-console.patch \
             file://wr-policy-allow-systemd_logind_t-relabel-user_tmp_t-.patch \
             file://0001-Add-userdom_transition_login_userdomain-interface.patch \
             file://wr-policy-allow-ping_t-read-all-levels-file.patch \
+            file://0001-Allow-search-all-pid-dirs-when-managing-net_conf_t-f.patch \
            "
 
 # Backport from upstream
