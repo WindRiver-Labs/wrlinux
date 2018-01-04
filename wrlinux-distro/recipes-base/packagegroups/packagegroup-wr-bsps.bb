@@ -38,28 +38,28 @@ RDEPENDS_packagegroup-wr-bsps = "\
     "
 
 SUMMARY_packagegroup-wr-bsps-parser = "Parser Generator Support"
-RRECOMMENDS_packagegroup-wr-bsps-parser = "\
+RDEPENDS_packagegroup-wr-bsps-parser = "\
 	flex \
 	bison"
 
 SUMMARY_packagegroup-wr-bsps-shell-tools = "Shell tools support"
-RRECOMMENDS_packagegroup-wr-bsps-shell-tools = "\
+RDEPENDS_packagegroup-wr-bsps-shell-tools = "\
 	dialog"
 
 SUMMARY_packagegroup-wr-bsps-filesystem-tools = "Filesystem tools support"
-RRECOMMENDS_packagegroup-wr-bsps-filesystem-tools = "\
+RDEPENDS_packagegroup-wr-bsps-filesystem-tools = "\
 	fio \
 	smartmontools"
 
 SUMMARY_packagegroup-wr-bsps-profile-tools = "Profile tools support"
-RRECOMMENDS_packagegroup-wr-bsps-profile-tools = "\
+RDEPENDS_packagegroup-wr-bsps-profile-tools = "\
 	perf"
 
 SUMMARY_packagegroup-wr-bsps-network-tools = "Network tools support"
-RRECOMMENDS_packagegroup-wr-bsps-network-tools = "\
+RDEPENDS_packagegroup-wr-bsps-network-tools = "\
 	iperf3"
 
 SUMMARY_packagegroup-wr-bsps-bsp-extras = "BSP related extras devices tools"
-RRECOMMENDS_packagegroup-wr-bsps-bsp-extras = "\
+RDEPENDS_packagegroup-wr-bsps-bsp-extras = "\
 	${BSP_EXTRAS_PACKAGES} \
 	"
