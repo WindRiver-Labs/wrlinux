@@ -7,6 +7,7 @@ require ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'recipes-kerne
 
 KERNEL_FEATURES += "\
  cfg/virtio.scc \
+ cfg/rbd.scc \
  features/netfilter/netfilter.scc \
  features/lxc/lxc-enable.scc \
  features/intel-dpdk/intel-dpdk.scc \
