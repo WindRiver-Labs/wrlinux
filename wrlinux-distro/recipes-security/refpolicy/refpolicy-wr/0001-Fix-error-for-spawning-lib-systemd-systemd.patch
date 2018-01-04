@@ -1,0 +1,129 @@
+From 29467dda7d0d2fe30c74b16fab2c4344ed2e7e86 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 4 Jan 2018 05:11:36 +0000
+Subject: [PATCH] Fix error for spawning /lib/systemd/systemd
+
+Port patches from https://github.com/fedora-selinux/selinux-policy:
+  cf08e3c1 Add init_entrypoint_exec() interface.
+  49a30cfe Allow user domains with login_userdomain to have entrypoint \
+           access on init_exec. It is needed by pam_selinux.so call in \
+           systemd-users. BZ(#1263350)
+  Pick fixes from:
+  32ec69ac Remove init_systemd and init_upstart boolean, Move \
+           init_daemon_domain and init_system_domain to use attributes \
+           to shrink policy
+  3eaa9939 UPdate for f14 policy
+
+Remove error:
+  user@0.service: Failed at step EXEC spawning \
+  /lib/systemd/systemd: Permission denied
+
+Fix avc denials:
+  avc: denied { sendto } for pid=567 comm="systemd" \
+  path="/run/systemd/notify" \
+  scontext=root:sysadm_r:sysadm_t:s0 \
+  tcontext=system_u:system_r:init_t:s0-s15:c0.c1023 \
+  tclass=unix_dgram_socket
+
+  avc: denied { create } for pid=567 comm="systemd" \
+  scontext=root:sysadm_r:sysadm_t:s0 \
+  tcontext=root:sysadm_r:sysadm_t:s0 \
+  tclass=netlink_kobject_uevent_socket
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/system/init.if       | 38 +++++++++++++++++++++++++++----------
+ policy/modules/system/userdomain.if |  5 +++++
+ 2 files changed, 33 insertions(+), 10 deletions(-)
+
+diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
+index 4486404..60341ae 100644
+--- a/policy/modules/system/init.if
++++ b/policy/modules/system/init.if
+@@ -556,6 +556,24 @@ interface(`init_domtrans',`
+ 
+ ########################################
+ ## <summary>
++##	Allow any file point to be the entrypoint of this domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`init_entrypoint_exec',`
++	gen_require(`
++		type init_exec_t;
++	')
++
++	allow $1 init_exec_t:file entrypoint;
++')
++
++########################################
++## <summary>
+ ##	Execute the init program in the caller domain.
+ ## </summary>
+ ## <param name="domain">
+@@ -1202,23 +1220,23 @@ interface(`init_write_initctl',`
+ interface(`init_telinit',`
+ 	gen_require(`
+ 		type initctl_t;
++		type init_t;
+ 	')
+ 
++	corecmd_exec_bin($1)
++
+ 	dev_list_all_dev_nodes($1)
+ 	allow $1 initctl_t:fifo_file rw_fifo_file_perms;
+ 
+ 	init_exec($1)
+ 
+-	tunable_policy(`init_upstart',`
+-		gen_require(`
+-			type init_t;
+-		')
+-
+-		# upstart uses a datagram socket instead of initctl pipe
+-		allow $1 self:unix_dgram_socket create_socket_perms;
+-		allow $1 init_t:unix_dgram_socket sendto;
+-	')
+-
++	ps_process_pattern($1, init_t)
++	allow $1 init_t:process signal;
++	dontaudit $1 self:capability net_admin;
++	# upstart uses a datagram socket instead of initctl pipe
++	allow $1 self:unix_dgram_socket create_socket_perms;
++	allow $1 init_t:unix_dgram_socket sendto;
++	#576913
+ 	allow $1 init_t:unix_stream_socket connectto;
+ ')
+ 
+diff --git a/policy/modules/system/userdomain.if b/policy/modules/system/userdomain.if
+index 22eb576..bd64cf1 100644
+--- a/policy/modules/system/userdomain.if
++++ b/policy/modules/system/userdomain.if
+@@ -529,6 +529,8 @@ template(`userdom_common_user_template',`
+ 	# evolution and gnome-session try to create a netlink socket
+ 	dontaudit $1_t self:netlink_socket { create ioctl read getattr write setattr append bind connect getopt setopt shutdown };
+ 	dontaudit $1_t self:netlink_route_socket { create ioctl read getattr write setattr append bind connect getopt setopt shutdown nlmsg_read nlmsg_write };
++	allow $1_t self:netlink_kobject_uevent_socket create_socket_perms;
++	allow $1_t self:socket create_socket_perms;
+ 
+ 	allow $1_t unpriv_userdomain:fd use;
+ 
+@@ -891,6 +893,9 @@ template(`userdom_login_user_template', `
+ 	init_dontaudit_use_fds($1_t)
+ 	init_dontaudit_use_script_fds($1_t)
+ 
++	# Needed by pam_selinux.so calling in systemd-users
++	init_entrypoint_exec(login_userdomain)
++
+ 	libs_exec_lib_files($1_t)
+ 
+ 	logging_dontaudit_getattr_all_logs($1_t)
+-- 
+2.13.3
+
