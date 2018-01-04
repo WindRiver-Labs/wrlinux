@@ -1,0 +1,51 @@
+From f8d9b2440b7f6dd17c8158499134e10a3b20aa07 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Thu, 4 Jan 2018 15:06:41 +0800
+Subject: [PATCH] vrf-stop: do the startup_stop_action with runtime config file
+
+The lxc config file can't be auto-reloaded if there is
+any changes at runtime, so do the startup_stop_action
+with runtime config file to avoid inconsistence, and
+run startup_start_post_action after startup_stop_action.
+
+Upstream-Status: Inappropriate [no upstream]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ src/vrf-stop | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/src/vrf-stop b/src/vrf-stop
+index b6731a1..d7e2a64 100755
+--- a/src/vrf-stop
++++ b/src/vrf-stop
+@@ -24,13 +24,23 @@ common_handle_input stop $*
+ initialize_env
+ check_vrf_nonexist $VRF_NAME
+ 
+-#make sure lxc's config has the latest
+-startup_start_post_action $VRF_FILE
+ # stop the VRF
+ lxc-stop -n $VRF_NAME
+ 
++# get the runtime lxc config file
++vrf_get_lxc_path
++if [ -d "$LXC_PATH/$VRF_NAME/" ]; then
++    LXC_VRF_FILE="$LXC_PATH/$VRF_NAME/config"
++else
++    LXC_VRF_FILE="/var/lib/lxc/$VRF_NAME/config"
++fi
++
+ # perform the cleanup actions
+-startup_stop_action $VRF_FILE
++startup_stop_action $LXC_VRF_FILE
++
++# make sure lxc's config has the latest
++startup_start_post_action $VRF_FILE
++
+ [ -e $VRF_CONNECT ] && rm -f $VRF_CONNECT
+ 
+ echo "$VRF_NAME successfully stopped"
+-- 
+2.11.0
+

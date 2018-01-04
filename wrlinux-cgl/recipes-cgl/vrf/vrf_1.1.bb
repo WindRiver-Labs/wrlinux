@@ -16,6 +16,7 @@ SRC_URI    = "file://vrf-1.1.tgz \
               file://vrf-helper-check-os-release-for-version-info.patch \
               file://vrf-create-add-the-mount-entry-for-tmp.patch \
               file://vrf-start-specify-the-delimiter-to-be-n-for-xargs.patch \
+              file://vrf-stop-do-the-startup_stop_action-with-runtime-con.patch \
 "
 
 
