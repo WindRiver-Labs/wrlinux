@@ -53,7 +53,6 @@ RRECOMMENDS_packagegroup-wr-bsps-filesystem-tools = "\
 
 SUMMARY_packagegroup-wr-bsps-profile-tools = "Profile tools support"
 RRECOMMENDS_packagegroup-wr-bsps-profile-tools = "\
-	hwlatdetect \
 	perf"
 
 SUMMARY_packagegroup-wr-bsps-network-tools = "Network tools support"
