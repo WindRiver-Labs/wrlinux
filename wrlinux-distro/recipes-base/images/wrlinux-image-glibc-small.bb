@@ -26,4 +26,4 @@ FEATURE_PACKAGES_ssh-sftp-servers = "\
 
 # allows root login without a password
 #
-IMAGE_FEATURES += "debug-tweaks"
+IMAGE_FEATURES += "debug-tweaks wr-bsps"

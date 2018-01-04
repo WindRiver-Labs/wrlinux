@@ -20,3 +20,5 @@ IMAGE_INSTALL = " \
 inherit wrlinux-image
 
 NO_RECOMMENDATIONS_task-rootfs = "1"
+
+IMAGE_FEATURES += "wr-bsps"
