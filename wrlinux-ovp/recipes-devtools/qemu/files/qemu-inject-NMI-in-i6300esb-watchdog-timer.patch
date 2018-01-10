@@ -1,7 +1,7 @@
-From b443171ca2e55ba5db1f260af4e05aa66a9ae966 Mon Sep 17 00:00:00 2001
+From e92bcf2ef2314bc7a7d3d86b5ae5d06bfc25258e Mon Sep 17 00:00:00 2001
 From: Nam Ninh <nam.ninh@windriver.com>
 Date: Mon, 2 Feb 2015 12:42:19 -0500
-Subject: [PATCH 17/18] qemu: inject NMI in i6300esb watchdog timer
+Subject: [PATCH 4/5] qemu: inject NMI in i6300esb watchdog timer
 
 Inject the NMI to the guest instance of the current qemu if the WDT is
 triggered and expired. The other guests will not receive the NMI if
@@ -46,5 +46,5 @@ index 49b3cd18..626c6834 100644
          /* Start the second stage. */
          i6300esb_restart_timer(d, 2);
 -- 
-2.11.0
+2.13.3
 

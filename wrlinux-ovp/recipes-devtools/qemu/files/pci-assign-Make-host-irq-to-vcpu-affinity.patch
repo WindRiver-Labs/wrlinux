@@ -1,7 +1,7 @@
-From 9bfc5d928c845fe760db170e7deb7c23c1d4c094 Mon Sep 17 00:00:00 2001
+From 16a3c5f3db21f609160f80135888664ef4805ab8 Mon Sep 17 00:00:00 2001
 From: Jim Somerville <Jim.Somerville@windriver.com>
 Date: Mon, 14 Apr 2014 16:43:05 -0400
-Subject: [PATCH 06/18] pci-assign: Make host irq to vcpu affinity
+Subject: [PATCH 2/5] pci-assign: Make host irq to vcpu affinity
 
     Based upon qemu-kvm commit 1ba2612d057ea34f505bb1d0ee9601aef705ca6d
     [
@@ -18,7 +18,7 @@ Signed-off-by: Jim Somerville <Jim.Somerville@windriver.com>
 	hw/i386/kvm/pci-assign.c
 ]
 Signed-off-by: Yunguo Wei <yunguo.wei@windriver.com>
-[Adjust code context]
+[Fix context conflict in linux-headers/linux/kvm.h]
 Upstream-Status: Pending
 Signed-off-by: He Zhe <zhe.he@windriver.com>
 ---
@@ -30,10 +30,10 @@ Signed-off-by: He Zhe <zhe.he@windriver.com>
  5 files changed, 103 insertions(+), 2 deletions(-)
 
 diff --git a/cpus.c b/cpus.c
-index 2ab447ad..8bbd8dc5 100644
+index ffddb1a0..17d988e2 100644
 --- a/cpus.c
 +++ b/cpus.c
-@@ -918,6 +918,11 @@ static void qemu_kvm_init_cpu_signals(CPUState *cpu)
+@@ -1021,6 +1021,11 @@ static void qemu_init_sigbus(void)
  static cpu_set_t vcpu_affinity[1024];
  static int vcpu_priority[1024];
  
@@ -46,7 +46,7 @@ index 2ab447ad..8bbd8dc5 100644
  {
      int idx = env->cpu_index;
 diff --git a/hw/i386/kvm/pci-assign.c b/hw/i386/kvm/pci-assign.c
-index 87dcbdd5..8d33b68b 100644
+index 33e20cb3..14ea8827 100644
 --- a/hw/i386/kvm/pci-assign.c
 +++ b/hw/i386/kvm/pci-assign.c
 @@ -36,6 +36,7 @@
@@ -79,7 +79,7 @@ index 87dcbdd5..8d33b68b 100644
      MSIXTableEntry *msix_table;
      hwaddr msix_table_addr;
      uint16_t msix_table_size;
-@@ -949,6 +954,10 @@ static void assigned_dev_update_irq_routing(PCIDevice *dev)
+@@ -947,6 +952,10 @@ static void assigned_dev_update_irq_routing(PCIDevice *dev)
      }
  }
  
@@ -90,7 +90,7 @@ index 87dcbdd5..8d33b68b 100644
  static void assigned_dev_update_msi(PCIDevice *pci_dev)
  {
      AssignedDevice *assigned_dev = PCI_ASSIGN(pci_dev);
-@@ -1137,6 +1146,22 @@ static void assigned_dev_update_msix(PCIDevice *pci_dev)
+@@ -1135,6 +1144,22 @@ static void assigned_dev_update_msix(PCIDevice *pci_dev)
          assigned_dev->intx_route.mode = PCI_INTX_DISABLED;
          assigned_dev->intx_route.irq = -1;
          assigned_dev->assigned_irq_type = ASSIGNED_IRQ_MSIX;
@@ -113,7 +113,7 @@ index 87dcbdd5..8d33b68b 100644
      } else {
          Error *local_err = NULL;
  
-@@ -1154,6 +1179,14 @@ static uint32_t assigned_dev_pci_read_config(PCIDevice *pci_dev,
+@@ -1152,6 +1177,14 @@ static uint32_t assigned_dev_pci_read_config(PCIDevice *pci_dev,
      uint32_t virt_val = pci_default_read_config(pci_dev, address, len);
      uint32_t real_val, emulate_mask, full_emulation_mask;
  
@@ -128,7 +128,7 @@ index 87dcbdd5..8d33b68b 100644
      emulate_mask = 0;
      memcpy(&emulate_mask, assigned_dev->emulate_config_read + address, len);
      emulate_mask = le32_to_cpu(emulate_mask);
-@@ -1532,6 +1565,53 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
+@@ -1518,6 +1551,53 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
      return 0;
  }
  
@@ -182,7 +182,7 @@ index 87dcbdd5..8d33b68b 100644
  static uint64_t
  assigned_dev_msix_mmio_read(void *opaque, hwaddr addr,
                              unsigned size)
-@@ -1606,6 +1686,7 @@ static void assigned_dev_msix_mmio_write(void *opaque, hwaddr addr,
+@@ -1592,6 +1672,7 @@ static void assigned_dev_msix_mmio_write(void *opaque, hwaddr addr,
                      error_report("Error updating irq routing entry (%d)", ret);
                  }
                  kvm_irqchip_commit_routes(kvm_state);
@@ -190,7 +190,7 @@ index 87dcbdd5..8d33b68b 100644
              }
          }
      }
-@@ -1813,6 +1894,8 @@ static void assigned_realize(struct PCIDevice *pci_dev, Error **errp)
+@@ -1799,6 +1880,8 @@ static void assigned_realize(struct PCIDevice *pci_dev, Error **errp)
          goto assigned_out;
      }
  
@@ -199,7 +199,7 @@ index 87dcbdd5..8d33b68b 100644
      assigned_dev_load_option_rom(dev);
  
      return;
-@@ -1852,6 +1935,8 @@ static Property assigned_dev_properties[] = {
+@@ -1838,6 +1921,8 @@ static Property assigned_dev_properties[] = {
                      ASSIGNED_DEVICE_PREFER_MSI_BIT, false),
      DEFINE_PROP_BIT("share_intx", AssignedDevice, features,
                      ASSIGNED_DEVICE_SHARE_INTX_BIT, true),
@@ -209,10 +209,10 @@ index 87dcbdd5..8d33b68b 100644
      DEFINE_PROP_END_OF_LIST(),
  };
 diff --git a/include/standard-headers/linux/pci_regs.h b/include/standard-headers/linux/pci_regs.h
-index 40409512..bf593dd9 100644
+index c22d3eba..19bb1341 100644
 --- a/include/standard-headers/linux/pci_regs.h
 +++ b/include/standard-headers/linux/pci_regs.h
-@@ -309,6 +309,9 @@
+@@ -317,6 +317,9 @@
  #define PCI_MSI_MASK_64		16	/* Mask bits register for 64-bit devices */
  #define PCI_MSI_PENDING_64	20	/* Pending intrs for 64-bit devices */
  
@@ -223,10 +223,10 @@ index 40409512..bf593dd9 100644
  #define PCI_MSIX_FLAGS		2	/* Message Control */
  #define  PCI_MSIX_FLAGS_QSIZE	0x07FF	/* Table size */
 diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
-index 8db8a3dd..baa8c012 100644
+index a6e000cf..06580366 100644
 --- a/include/sysemu/cpus.h
 +++ b/include/sysemu/cpus.h
-@@ -27,6 +27,7 @@ void cpu_synchronize_all_post_init(void);
+@@ -31,6 +31,7 @@ void cpu_synchronize_all_pre_loadvm(void);
  
  void qtest_clock_warp(int64_t dest);
  void vcpu_parse(const char *optarg);
@@ -235,10 +235,10 @@ index 8db8a3dd..baa8c012 100644
  #ifndef CONFIG_USER_ONLY
  /* vl.c */
 diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index e60e21ba..55e25aa4 100644
+index 7971a4f8..959bbeae 100644
 --- a/linux-headers/linux/kvm.h
 +++ b/linux-headers/linux/kvm.h
-@@ -1037,6 +1037,8 @@ struct kvm_arm_device_addr {
+@@ -1112,6 +1112,8 @@ struct kvm_arm_device_addr {
  	__u64 addr;
  };
  
@@ -247,9 +247,9 @@ index e60e21ba..55e25aa4 100644
  /*
   * Device control API, available with KVM_CAP_DEVICE_CTRL
   */
-@@ -1313,4 +1315,9 @@ struct kvm_assigned_msix_entry {
- 	__u16 padding[3];
- };
+@@ -1416,4 +1418,9 @@ struct kvm_assigned_msix_entry {
+ #define KVM_ARM_DEV_EL1_PTIMER		(1 << 1)
+ #define KVM_ARM_DEV_PMU			(1 << 2)
  
 +struct kvm_assigned_msix_query_irq {
 +	__u32 assigned_dev_id;
@@ -258,5 +258,5 @@ index e60e21ba..55e25aa4 100644
 +
  #endif /* __LINUX_KVM_H */
 -- 
-2.11.0
+2.13.3
 

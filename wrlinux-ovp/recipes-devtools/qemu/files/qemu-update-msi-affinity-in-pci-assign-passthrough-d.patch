@@ -1,7 +1,7 @@
-From 40cbbb1fdd087f2f02b617bc164bd238fd7ba595 Mon Sep 17 00:00:00 2001
+From c7739fb62bf0ba52939ae07fb1aef88b6e82031b Mon Sep 17 00:00:00 2001
 From: Nam Ninh <nam.ninh@windriver.com>
 Date: Thu, 26 Feb 2015 14:37:19 -0500
-Subject: [PATCH 18/18] qemu: update msi affinity in pci-assign passthrough
+Subject: [PATCH 5/5] qemu: update msi affinity in pci-assign passthrough
  device
 
 Issue: OVP-2305
@@ -26,10 +26,10 @@ Signed-off-by: He Zhe <zhe.he@windriver.com>
  1 file changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/hw/i386/kvm/pci-assign.c b/hw/i386/kvm/pci-assign.c
-index 24865f50..39a7d758 100644
+index 599dc5ad..0b74f406 100644
 --- a/hw/i386/kvm/pci-assign.c
 +++ b/hw/i386/kvm/pci-assign.c
-@@ -1018,13 +1018,19 @@ static void assigned_dev_update_msi_msg(PCIDevice *pci_dev)
+@@ -1016,13 +1016,19 @@ static void assigned_dev_update_msi_msg(PCIDevice *pci_dev)
      uint8_t ctrl_byte = pci_get_byte(pci_dev->config + pci_dev->msi_cap +
                                       PCI_MSI_FLAGS);
  
@@ -52,5 +52,5 @@ index 24865f50..39a7d758 100644
  }
  
 -- 
-2.11.0
+2.13.3
 
