@@ -10,15 +10,15 @@
 # 2. check the openl2tp-testing package avaiable or not
 # 3. start rpcbind service
 # 4. backup below files and customise the config
-#    /opt/openl2tp/test_procs.tcl
-#    /opt/openl2tp/tunnel.test
-#    /opt/openl2tp/session.test
+#    ${OPENL2TP_DIR}/ptest/test_procs.tcl
+#    ${OPENL2TP_DIR}/ptest/tunnel.test
+#    ${OPENL2TP_DIR}/ptest/session.test
 # 5. load module l2tp_ppp
 # 6. Start openl2tpd
 # 7. Start test
 # 8. check the result, pass if FAILNUM is 0 and PASSNUM not 0.
-#    PASSNUM=`grep PASS $TMP_DIR/results/test-l2tpd.result | wc -l`
-#    FAILNUM=`grep FAIL $TMP_DIR/results/test-l2tpd.result | wc -l`
+#    PASSNUM=`grep PASS ${OPENL2TP_DIR}/results/test-l2tpd.result | wc -l`
+#    FAILNUM=`grep FAIL ${OPENL2TP_DIR}/results/test-l2tpd.result | wc -l`
 
 TOPDIR=${CUTDIR-/opt/cut/}
 . $TOPDIR/function.sh
@@ -43,15 +43,15 @@ clean()
     if [ $? -eq 0  ] && [ "$srv_flag" = true ]; then
         which systemctl && systemctl stop rpcbind || service rpcbind stop
     fi
-    [ -d /opt/openl2tp/results ] && rm -rf /opt/openl2tp/results
-    [ -f /opt/l2tpconfig ] && rm -rf /opt/l2tpconfig
+    [ -d $OPENL2TP_DIR/results ] && rm -rf $OPENL2TP_DIR/results
+    [ -f $OPENL2TP_DIR/l2tpconfig ] && rm -rf $OPENL2TP_DIR/l2tpconfig
     # restore the console log level
     [ -f ${TMP_DIR}/printk ] && cp ${TMP_DIR}/printk /proc/sys/kernel/printk
     # restore the backup file
     for file in test_procs.tcl tunnel.test session.test
     do
         if [ -f $TMP_DIR/$file ]; then
-            cp -f $TMP_DIR/$file /opt/openl2tp/
+            cp -f $TMP_DIR/$file ${OPENL2TP_DIR}/ptest/
         fi
     done
     rm -rf $TMP_DIR
@@ -62,8 +62,16 @@ clean()
 zcat /proc/config.gz | grep CONFIG_L2TP=y  || cutna "Configure CONFIG_L2TP=y first"
 zcat /proc/config.gz | grep CONFIG_PPPOL2TP=m  || cutna "Configure CONFIG_PPPOL2TP=m first"
 
-# check if openl2tp-testing installed
-rpm -qa | grep openl2tp-testing || cutna "Need to install openl2tp-testing first."
+# check if openl2tp-ptest installed
+rpm -qa | grep openl2tp-ptest || cutna "Need to install openl2tp-ptest first."
+
+if [ -d /usr/lib64/openl2tp/ptest ]; then
+        OPENL2TP_DIR="/usr/lib64/openl2tp"
+elif [ -d /usr/lib/openl2tp/ptest ]; then
+        OPENL2TP_DIR="/usr/lib/openl2tp"
+else
+        cutna "The openl2tp ptest directory not installed, skip the test"
+fi
 
 # customise the console log level only print error message and above
 # to avoid the noisy info message in test report.
@@ -80,19 +88,19 @@ which systemctl && systemctl status rpcbind || service rpcbind status
 [ $? -ne 0 ] && cuterr "Failed to start rpcbind service"
 
 # backup the below files
-cp /opt/openl2tp/test_procs.tcl $TMP_DIR
-cp /opt/openl2tp/tunnel.test $TMP_DIR
-cp /opt/openl2tp/session.test $TMP_DIR
+cp ${OPENL2TP_DIR}/ptest/test_procs.tcl $TMP_DIR
+cp ${OPENL2TP_DIR}/ptest/tunnel.test $TMP_DIR
+cp ${OPENL2TP_DIR}/ptest/session.test $TMP_DIR
 
 # customise the config
 if [ x"$ETH_TEST" = x ]; then
 	cuterr "Please set ETH_TEST which used to test in /opt/cut/env/runtime_env first"
 fi
 
-sed -i 's/eth2/'\"$ETH_TEST\"'/g' /opt/openl2tp/test_procs.tcl
+sed -i 's/eth2/'\"$ETH_TEST\"'/g' ${OPENL2TP_DIR}/ptest/test_procs.tcl
 test_ip="`ifconfig $ETH_TEST | grep 'inet ' | sed 's/^.*inet addr://g' | \
     sed 's/ *Mask.*$//g'|sed 's/ *Bcast.*$//g'`"
-sed -i 's/192.168.0.1/'"$test_ip"'/g' /opt/openl2tp/tunnel.test
+sed -i 's/192.168.0.1/'"$test_ip"'/g' ${OPENL2TP_DIR}/ptest/tunnel.test
 
 # load module l2tp_ppp
 modprobe  l2tp_ppp
@@ -103,15 +111,16 @@ ppp_path=`rpm -ql openl2tp | grep ppp_null.so`
 /usr/sbin/openl2tpd -d all -D -f -p ${ppp_path} &
 
 # prepare the test env
-mkdir -p /opt/openl2tp/results || cuterr "Failed to mkdir /opt/openl2tp/results"
-cp /usr/bin/l2tpconfig /opt || cuterr "Failed to copy /usr/bin/l2tpconfig to /opt"
+rm -rf $OPENL2TP_DIR/results
+mkdir -p $OPENL2TP_DIR/results || cuterr "Failed to mkdir $OPENL2TP_DIR/results"
+cp /usr/bin/l2tpconfig $OPENL2TP_DIR || cuterr "Failed to copy /usr/bin/l2tpconfig to $OPENL2TP_DIR"
 
 # start the test
-cd /opt/openl2tp/ && tclsh all.tcl -preservecore 3 -verbose bps -tmpdir $TMP_DIR/results -outfile test-l2tpd.result -constraints "l2tpdRunning peerProfile tunnelProfile sessionProfile pppProfile system"
+cd $OPENL2TP_DIR/ptest && tclsh all.tcl -preservecore 3 -verbose bps -tmpdir $OPENL2TP_DIR/results -outfile test-l2tpd.result -constraints "l2tpdRunning peerProfile tunnelProfile sessionProfile pppProfile system" -match "peer_profile-1.1 tunnel_profile-1.1 session_profile-1.1 ppp_profile-1.1 system-1.1"
 
 # check the result
-PASSNUM=`grep PASS $TMP_DIR/results/test-l2tpd.result | wc -l`
-FAILNUM=`grep FAIL $TMP_DIR/results/test-l2tpd.result | wc -l`
+PASSNUM=`grep PASS $OPENL2TP_DIR/results/test-l2tpd.result | wc -l`
+FAILNUM=`grep FAIL $OPENL2TP_DIR/results/test-l2tpd.result | wc -l`
 if [ $PASSNUM -ne 0 ] && [ $FAILNUM -eq 0 ]; then
     cutpass
 fi
