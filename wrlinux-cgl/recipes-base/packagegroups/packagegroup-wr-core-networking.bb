@@ -39,7 +39,6 @@ RDEPENDS_${PN} = "\
 	netcat-openbsd \
 	netkit-rsh-client \
 	netkit-telnet \
-	ntop \
 	ppp \
 	python-paste \
 	radvd \
