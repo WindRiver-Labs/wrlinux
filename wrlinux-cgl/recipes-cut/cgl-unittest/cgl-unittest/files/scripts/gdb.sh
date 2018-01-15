@@ -32,7 +32,7 @@ fi
 
 
 # ensure the gen-coredump package is loaded
-rpm -q gen-coredump
+rpm -qa | grep gen-coredump
 if [ ! $? = 0 ]
 then
    echo "****************************************"
