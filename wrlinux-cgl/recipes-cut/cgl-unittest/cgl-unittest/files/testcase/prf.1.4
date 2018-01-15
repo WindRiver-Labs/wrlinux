@@ -58,7 +58,7 @@ then
 	error "hres_active is not 1"
 fi
 
-$TOPDIR/script/cyclic-test | tee /tmp/prf.1.4.log
+$TOPDIR/scripts/cyclic-test | tee /tmp/prf.1.4.log
 
 FAILNUM=`cat /tmp/prf.1.4.log | grep  FAIL | wc -l`
 if [ $FAILNUM -ne 0 ]

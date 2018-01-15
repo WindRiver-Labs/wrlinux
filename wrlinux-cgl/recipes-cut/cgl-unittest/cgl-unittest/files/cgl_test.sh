@@ -44,11 +44,7 @@ CGL4_TESTCASE="\
 	smm.3.2 smm.7.2 smm.7.3 smm.8.1 smm.8.2 smm.12.0 smm.17 smm.18 \
 	spm.1.0 \
 	std.4.1 std.5.1 std.9.0 std.17.1 std.17.2 std.17.3 \
-	std.6.1 std.26.1 std.26.2 cfh.2.0 caf.2.1 caf.2.2 \
-	"
-CLG4_drop="\
-	testcase/avl.21.0 \ # bonding test, replaced by scripts/bonding.sh
-	testcase/std.8.8 \  # replaced by testcase saftest
+	std.6.1 std.8.8 std.26.1 std.26.2 cfh.2.0 caf.2.1 caf.2.2 \
 	"
 tmp=
 for i in $CGL4_TESTCASE; do
@@ -77,7 +73,6 @@ ROOTFS_TESTCASE="\
 	scripts/snmp.sh \
 	scripts/gdb.sh \
 	scripts/perf.sh \
-	scripts/saftest.sh \
 	scripts/selinux.sh \
 	"
 

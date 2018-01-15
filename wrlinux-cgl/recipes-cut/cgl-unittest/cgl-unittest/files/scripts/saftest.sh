@@ -1,10 +1,13 @@
 #!/bin/bash
 #Copyright (c) 2008 Wind River Systems, Inc.
-#description :  STD.8.8 SMM.2.0 SMM.2.1 CMON.1.1 SA Forum HPI
+#description :  STD.8.8 SA Forum HPI
 #
 #developer : Yongli He  <yongli.he@windriver.com>
 #
 # changelog
+# * 15/01/2018 Remove the deprecated case
+#   SMM.2.0, SMM.2.1 and CMON.1.1 per CGL 5.0
+#   specification
 # * 02/04/2015 update the test for systemd
 # -
 
@@ -41,7 +44,7 @@ clean()
    echo "Cleanup done."
 }
 
-rpm -q saftest
+rpm -qa | grep saftest
 if [ ! $? = 0 ]
 then
    echo "****************************************"
@@ -51,7 +54,7 @@ then
    cutfail
 fi
 
-rpm -q openhpi
+rpm -qa | grep openhpi
 if [ ! $? = 0 ]
 then
    echo "****************************************"
@@ -61,7 +64,7 @@ then
    cutfail
 fi
 
-rpm -q openipmi
+rpm -qa | grep openipmi
 if [ ! $? = 0 ]
 then
    echo "****************************************"
