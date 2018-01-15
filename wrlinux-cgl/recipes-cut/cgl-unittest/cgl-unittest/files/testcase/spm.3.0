@@ -22,9 +22,10 @@ clean()
 
 pkg=coreutils
 
-rpm -q $pkg
+rpm -qa | grep $pkg | grep -v policycoreutils
 check "The required package $pkg is not installed"
 
+pkg=`rpm -qa | grep $pkg | grep -v policycoreutils`
 rpm -q -i $pkg
 check "Check info about $pkg fail"
 
