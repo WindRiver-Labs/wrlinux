@@ -276,7 +276,9 @@ runstep_0()
 
 main_fun()
 {
-    cat /proc/cmdline | awk '{print $NF}'| grep crashkernel= || cutna "Please set the crashkernel as the last boot parameter"
+    if [ ! -f $flag_file ]; then
+        cat /proc/cmdline | awk '{print $NF}'| grep crashkernel= || cutna "Please set the crashkernel as the last boot parameter"
+    fi
     kdump_case=$1
     test_report="$TMP_DIR/test_${kdump_case}_report"
     eval runstep_${test_step}
