@@ -49,7 +49,11 @@ fi
 
 
 # look for ESP packets
-tcpdump  > /tmp/ipsec.tcpdump &
+# -i parameter guarantee tcpdump catch the expected
+# packets when have multiple interface as the default
+# interface as eth0
+# -n parameter to avoid convert addresses
+tcpdump -i $LOCAL_ETH -n > /tmp/ipsec.tcpdump &
 ping -c10 ${rmtIP}
 
 # kill tcpdump and wait for it to finish
