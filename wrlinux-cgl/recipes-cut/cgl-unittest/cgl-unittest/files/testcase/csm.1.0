@@ -185,6 +185,13 @@ check_drbd $CLIENT_IP
 # customize the hosts file
 HOSTNAME1=`hostname`
 HOSTNAME2=`ssh root@$CLIENT_IP -- hostname`
+if [ x"$HOSTNAME1" = x ] || [ x"$HOSTNAME2" = x ]; then
+    cuterr "The hostname used to set up network duplication cannot be null"
+fi
+# compare the two hostname
+if [ x"$HOSTNAME1" = x"$HOSTNAME2" ]; then
+    cuterr "The two hosts used to set up network duplication cannot use the same hostname"
+fi
 # add get_targetip line to double check if LOCAL_ETH set in /opt/cut/env/runtime_env
 get_targetip
 TARGET_IP=`get_targetip`
@@ -205,6 +212,8 @@ ssh root@${CLIENT_IP} -- "[ -f /etc/init.d/drbd ] && service drbd start || syste
 # confirm drbd run on the client
 ssh root@${CLIENT_IP} -- ps -e | grep drbd
 
+# wait 10s to let the service be stable
+sleep 10
 # check drbd status
 drbd-overview | grep "Connected Primary/Secondary" || cutfail
 
