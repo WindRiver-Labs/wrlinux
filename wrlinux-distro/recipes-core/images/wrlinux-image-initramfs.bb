@@ -24,3 +24,13 @@ export IMAGE_BASENAME = "wrlinux-image-initramfs"
 PACKAGE_INSTALL = "${IMAGE_INSTALL_INITRAMFS}"
 
 USE_DEVFS = "0"
+
+# grub_efi is only available for x86
+#
+python () {
+    import re
+    target = d.getVar('TARGET_ARCH', True)
+    if target.startswith('x86') or re.match('i.86', target):
+        deps = ' grub-efi:do_populate_lic'
+        d.appendVarFlag('do_image_complete', 'depends', deps)
+}
