@@ -123,6 +123,7 @@ SRC_URI += "file://wr-policy-getty-console.patch \
             file://0001-wr-policy-allow-secadm_t-read_policy.patch \
             file://0001-Fix-systemd-resolved-failures.patch \
             file://0001-Fix-error-for-spawning-lib-systemd-systemd.patch \
+            file://wr-policy-allow-systemd_backlight_t-read-all-level-f.patch \
            "
 
 # Backport from upstream
