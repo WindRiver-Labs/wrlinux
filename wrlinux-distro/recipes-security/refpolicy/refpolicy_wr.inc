@@ -125,6 +125,7 @@ SRC_URI += "file://wr-policy-getty-console.patch \
             file://0001-Fix-error-for-spawning-lib-systemd-systemd.patch \
             file://wr-policy-allow-systemd_backlight_t-read-all-level-f.patch \
             file://wr-policy-allow-kmod_t-search-tracefs.patch \
+            file://0001-Allow-systemd_logind_t-relabelto-user_runt.patch \
            "
 
 # Backport from upstream
