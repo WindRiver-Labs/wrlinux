@@ -1,0 +1,37 @@
+From 1ae4d7839631ae2dbf4136c7ab40bbca27f67474 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Fri, 2 Feb 2018 07:26:41 +0000
+Subject: [PATCH 1/1] wr-policy: allow systemd_logind_t relabelto
+ user_runtime_t
+
+Pick oneline change from:
+https://github.com/TresysTechnology/refpolicy/commit/b411e4b300448d6eecd997c133a31e536dfc2f34
+
+Remove avc denial:
+  avc: denied { relabelto } for pid=218 comm="systemd-logind" \
+  name="/" dev="tmpfs" ino=17980 \
+  scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023 \
+  tcontext=root:object_r:user_runtime_t:s0 tclass=dir
+
+Upstream-Status: Backport
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/system/systemd.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 5836f46..d73f440 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -338,6 +338,7 @@ domain_read_all_domains_state(systemd_logind_t)
+ userdom_manage_all_user_tmp_content(systemd_logind_t)
+ userdom_mounton_tmp_dirs(systemd_logind_t)
+ userdom_manage_user_tmp_dirs(systemd_logind_t)
++userdom_relabelto_user_runtime_dirs(systemd_logind_t)
+ 
+ files_dontaudit_list_non_security(systemd_logind_t)
+ auth_dontaudit_mounton_var_auth(systemd_logind_t)
+-- 
+2.13.3
+
