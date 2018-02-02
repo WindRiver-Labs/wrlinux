@@ -1,1 +1,1 @@
-IMAGE_INSTALL += "packagegroup-core-selinux"
+IMAGE_INSTALL += "packagegroup-core-selinux auditd"
