@@ -1,0 +1,3 @@
+search -f -n --set=root /EFI/BOOT/wrlinux-installer.version
+prefix=($root)/EFI/BOOT/
+configfile /EFI/BOOT/grub.cfg
