@@ -1,0 +1,10 @@
+# If you want to improve performance of real-time,
+# you can enable rt-tune feature by doing followings
+#
+# Host:
+# WRTEMPLATE += "feature/host-rt-tune" > conf/local.conf
+# Guest:
+# WRTEMPLATE += "feature/guest-rt-tune" > conf/local.conf
+# 
+# This may disable some configuration of kernel that would
+# affect other modules. So it should be use with caution.
