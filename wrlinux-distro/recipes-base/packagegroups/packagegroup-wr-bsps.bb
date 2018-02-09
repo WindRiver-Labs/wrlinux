@@ -53,7 +53,7 @@ RDEPENDS_packagegroup-wr-bsps-filesystem-tools = "\
 
 SUMMARY_packagegroup-wr-bsps-profile-tools = "Profile tools support"
 RDEPENDS_packagegroup-wr-bsps-profile-tools = "\
-	perf"
+	${@bb.utils.contains('INCOMPATIBLE_LICENSE', 'GPLv3', '', 'perf', d)}"
 
 SUMMARY_packagegroup-wr-bsps-network-tools = "Network tools support"
 RDEPENDS_packagegroup-wr-bsps-network-tools = "\
