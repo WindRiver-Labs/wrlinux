@@ -7,7 +7,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 # Note how we "name" the checksums.
 #
-SRC_URI += "http://pkgs.fedoraproject.org/repo/pkgs/pam/pam-redhat-0.99.11.tar.bz2/29eab110f57e8d60471081a6278a5a92/pam-redhat-0.99.11.tar.bz2;name=redhat \
+SRC_URI += "http://src.fedoraproject.org/repo/pkgs/pam/pam-redhat-0.99.11.tar.bz2/29eab110f57e8d60471081a6278a5a92/pam-redhat-0.99.11.tar.bz2;name=redhat \
             file://pam-1.0.90-redhat-modules.patch \
             file://pam-1.1.0-console-nochmod.patch \
             file://pam_console_deps.patch \

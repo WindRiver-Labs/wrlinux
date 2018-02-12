@@ -9,7 +9,7 @@ compression ratio."
 LICENSE = "NewBSD"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b2c8cef4261c6377dcae51b2903d704b"
 
-SRC_URI = "http://pkgs.fedoraproject.org/repo/pkgs/snappy/snappy-1.1.1.tar.gz/8887e3b7253b22a31f5486bca3cbc1c2/snappy-1.1.1.tar.gz"
+SRC_URI = "http://src.fedoraproject.org/repo/pkgs/snappy/snappy-1.1.1.tar.gz/8887e3b7253b22a31f5486bca3cbc1c2/snappy-1.1.1.tar.gz"
 
 SRC_URI[md5sum] = "8887e3b7253b22a31f5486bca3cbc1c2"
 SRC_URI[sha256sum] = "d79f04a41b0b513a014042a4365ec999a1ad5575e10d5e5578720010cb62fab3"
