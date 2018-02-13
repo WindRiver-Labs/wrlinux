@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012-2013-2013 Wind River Systems Inc.
+# Copyright (C) 2012-2013 Wind River Systems Inc.
 #
 # This package matches a FEATURE_PACKAGES_packagegroup-wr-core-sys-util definition in
 # wrlinux-image.bbclass that may be used to customize an image by
