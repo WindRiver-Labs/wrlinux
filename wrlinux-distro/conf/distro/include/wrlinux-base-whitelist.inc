@@ -52,6 +52,7 @@ PNWHITELIST_openembedded-layer += " \
 	sdparm \
 	sg3-utils \
 	syslog-ng \
+	tclap \
 	unixodbc \
 	usleep \
 	uw-imap \
@@ -101,6 +102,7 @@ PNWHITELIST_security += " \
 
 PNWHITELIST_integrity += " \
 	keyutils \
+	ima-inspect \
 	"
 
 # Workaround for nmap possibly requiring python-pygtk which is not available
