@@ -103,6 +103,7 @@ PNWHITELIST_security += " \
 PNWHITELIST_integrity += " \
 	keyutils \
 	ima-inspect \
+	ima-evm-utils \
 	"
 
 # Workaround for nmap possibly requiring python-pygtk which is not available
