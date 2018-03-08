@@ -9,7 +9,7 @@ SRC_URI = "file://sidebar-logo.png \
 
 S = "${WORKDIR}"
 
-PACKAGE_ARCH = "all"
+inherit allarch
 
 FILES_${PN} = "${datadir}/anaconda"
 
