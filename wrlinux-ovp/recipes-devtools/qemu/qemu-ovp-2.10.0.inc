@@ -47,6 +47,7 @@ PACKAGECONFIG_append_x86-64_class-target = " spice"
 SRC_URI += "\
     file://qemu-inject-NMI-in-i6300esb-watchdog-timer.patch \
     file://qemu-update-msi-affinity-in-pci-assign-passthrough-d.patch \
+    file://0001-pci-assign-Remove.patch \
     "
 
 RDEPENDS_${PN}_class-nativesdk += "nativesdk-python-core"
