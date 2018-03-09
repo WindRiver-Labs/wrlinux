@@ -13,6 +13,7 @@ KERNEL_FEATURES += "\
  features/intel-dpdk/intel-dpdk.scc \
  features/aufs/aufs-enable.scc \
  features/nfsd/nfsd-enable.scc \
+ features/vfio/vfio.scc \
 "
 
 # Following is not yet available:
