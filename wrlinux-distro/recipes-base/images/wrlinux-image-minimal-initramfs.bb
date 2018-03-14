@@ -1,6 +1,6 @@
 require ${COREBASE}/meta/recipes-core/images/core-image-minimal-initramfs.bb
 
-export IMAGE_BASENAME = "wrlinux-image-minimal-initramfs"
+export IMAGE_BASENAME = "${MLPREFIX}wrlinux-image-minimal-initramfs"
 
 QB_DEFAULT_FSTYPE = "cpio.gz"
 
