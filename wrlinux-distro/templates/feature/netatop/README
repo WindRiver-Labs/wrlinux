@@ -1,0 +1,13 @@
+The Linux kernel does not maintain counters for the number of network accesses
+issued per process or per thread. As a consequence, it is not possible to
+analyze which process and/or thread causes most load in case that atop shows a
+high utilization on one of your network interfaces.
+
+The optional kernel module netatop can be loaded to gather statistics about the
+TCP and UDP packets that have been transmitted/received per process and per
+thread. As soon as atop discovers that this module is active, it shows the
+columns SNET and RNET in the generic screen for the number of transmitted and
+received packets per process. When the 'n' key is pressed, it shows detailed
+counters about the number packets transmitted/received via TCP and UDP, the
+average sizes of these packets, and the total bandwidth consumed for input and
+output per process/thread.
