@@ -31,6 +31,8 @@ SRCREV_machine_kb-standard-mti-malta64 ?= "3879cb9ed592f8d5db6b35c51761818ad6049
 LINUX_VERSION_kb-standard-mti-malta64 ?= "4.12.20"
 SRCREV_machine_kb-standard-nxp-imx-sdk-4.9.11-base ?= "718928bc3c8cdbc0d54ccedce853294e3f3ba7e8"
 LINUX_VERSION_kb-standard-nxp-imx-sdk-4.9.11-base ?= "4.12.20"
+SRCREV_machine_kb-standard-nxp-imx-sdk-4.9.11-nxp-imx6 ?= "718928bc3c8cdbc0d54ccedce853294e3f3ba7e8"
+LINUX_VERSION_kb-standard-nxp-imx-sdk-4.9.11-nxp-imx6 ?= "4.12.20"
 SRCREV_machine_kb-standard-nxp-imx-sdk-4.9.11-nxp-imx7 ?= "718928bc3c8cdbc0d54ccedce853294e3f3ba7e8"
 LINUX_VERSION_kb-standard-nxp-imx-sdk-4.9.11-nxp-imx7 ?= "4.12.20"
 SRCREV_machine_kb-standard-nxp-ls-base ?= "fa3d618df3a06e051a29f33b24c527abf399ebab"
@@ -49,6 +51,8 @@ SRCREV_machine_kb-standard-preempt-rt-intel-x86 ?= "84ff23a02948bbefd55a19d34f60
 LINUX_VERSION_kb-standard-preempt-rt-intel-x86 ?= "4.12.20"
 SRCREV_machine_kb-standard-preempt-rt-nxp-imx-sdk-4.9.11-base ?= "d0919311a7e436f4deeec5220e6b4410dac178e6"
 LINUX_VERSION_kb-standard-preempt-rt-nxp-imx-sdk-4.9.11-base ?= "4.12.20"
+SRCREV_machine_kb-standard-preempt-rt-nxp-imx-sdk-4.9.11-nxp-imx6 ?= "d0919311a7e436f4deeec5220e6b4410dac178e6"
+LINUX_VERSION_kb-standard-preempt-rt-nxp-imx-sdk-4.9.11-nxp-imx6 ?= "4.12.20"
 SRCREV_machine_kb-standard-preempt-rt-nxp-imx-sdk-4.9.11-nxp-imx7 ?= "d0919311a7e436f4deeec5220e6b4410dac178e6"
 LINUX_VERSION_kb-standard-preempt-rt-nxp-imx-sdk-4.9.11-nxp-imx7 ?= "4.12.20"
 SRCREV_machine_kb-standard-preempt-rt-nxp-ls-base ?= "51d1408a06e6a48d8d840c175a3c7f11b49e9c0e"
@@ -76,6 +80,6 @@ LINUX_VERSION_kb-standard-wr-base ?= "4.12.20"
 
 # yocto-kernel-cache branch entry
 KERNEL_CACHE_BRANCH = "yocto-4.12-wr"
-SRCREV_meta = "84580dca33a23f95c01e8c33c4cc4e306e762936"
+SRCREV_meta = "9cb7182e2961dfb1d34a0212415babe958cf258a"
 
 LINUX_VERSION = "4.12.20"
