@@ -67,6 +67,8 @@ PNWHITELIST_filesystems-layer += "\
 # Whitelist for meta-openembedded/meta-oe
 PNWHITELIST_openembedded-layer += "\
     augeas \
+    efibootmgr \
+    efivar \
     libblockdev \
     libbytesize \
     libpwquality \
@@ -87,3 +89,4 @@ PNWHITELIST_openembedded-layer += "\
     volume-key \
     xmlrpc-c \
 "
+
