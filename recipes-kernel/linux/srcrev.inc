@@ -81,9 +81,15 @@ SRCREV_machine_kb-standard-tiny-wr-base ?= "56d41f19a5eebe6324115945282cc524d487
 LINUX_VERSION_kb-standard-tiny-wr-base ?= "4.12.20"
 SRCREV_machine_kb-standard-wr-base ?= "027b6f65082dad1cd706393d8bd965c33d4d19d8"
 LINUX_VERSION_kb-standard-wr-base ?= "4.12.20"
+SRCREV_machine_kb-standard-xilinx-base ?= "027b6f65082dad1cd706393d8bd965c33d4d19d8"
+LINUX_VERSION_kb-standard-xilinx-base ?= "4.12.20"
+SRCREV_machine_kb-standard-xilinx-sdk2017-04-base ?= "027b6f65082dad1cd706393d8bd965c33d4d19d8"
+LINUX_VERSION_kb-standard-xilinx-sdk2017-04-base ?= "4.12.20"
+SRCREV_machine_kb-standard-xilinx-sdk2017-04-xilinx-zynqmp ?= "96c6cf2f8471a547ae53afd2b9c452780cee2a07"
+LINUX_VERSION_kb-standard-xilinx-sdk2017-04-xilinx-zynqmp ?= "4.12.20"
 
 # yocto-kernel-cache branch entry
 KERNEL_CACHE_BRANCH = "yocto-4.12-wr"
-SRCREV_meta = "ec83083ccddc5e978fe14b26a166392dbbdacbbb"
+SRCREV_meta = "9e692608a7a6b95015b2d182c585695d0483f84a"
 
 LINUX_VERSION = "4.12.20"
