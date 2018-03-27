@@ -46,6 +46,7 @@ SRC_URI = "\
 	file://files/resource/ssl.ca-0.1.tar.gz;unpack=no \
 	file://files/resource/pktgen_eth_test.sh \
 	file://files/resource/pci.ids \
+	file://files/resource/corosync.conf.example \
 	file://files/resource/crash_input \
 	file://files/resource/avl.28.2.img \
 	file://files/resource/avl.28.2.img_info \

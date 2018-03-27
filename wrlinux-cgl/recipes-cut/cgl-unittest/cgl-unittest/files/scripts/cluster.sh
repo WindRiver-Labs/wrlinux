@@ -64,7 +64,6 @@ clean()
 
 cus_corosync()
 {
-    cp /etc/corosync/corosync.conf.example /etc/corosync/corosync.conf
     check_localeth
  
     # get netmask
@@ -83,7 +82,11 @@ cus_corosync()
     fi
     
     # customize the corosync.conf
-    cp /etc/corosync/corosync.conf.example /etc/corosync/corosync.conf
+    if [ -f /opt/cut/resource/corosync.conf.example ]; then
+        cp /opt/cut/resource/corosync.conf.example /etc/corosync/corosync.conf
+    else
+        cp /etc/corosync/corosync.conf.example /etc/corosync/corosync.conf
+    fi
    
     # update the bindnetaddr item in /etc/corosync/corosync.conf
     sed -i "s/bindnetaddr: .*$/bindnetaddr: $NETADDR1/g" /etc/corosync/corosync.conf
