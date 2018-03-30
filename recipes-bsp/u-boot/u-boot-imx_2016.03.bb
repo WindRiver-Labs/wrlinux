@@ -10,6 +10,7 @@ SRCBRANCH = "imx_v2016.03_4.1.15_2.0.0_ga"
 UBOOT_SRC ?= "git://git.freescale.com/imx/uboot-imx.git;protocol=git"
 SRC_URI = "${UBOOT_SRC};branch=${SRCBRANCH}"
 SRCREV = "a57b13b942d59719e3621179e98bd8a0ab235088"
+SRC_URI += "file://0001-net-Use-packed-structures-for-networking.patch"
 
 S = "${WORKDIR}/git"
 
