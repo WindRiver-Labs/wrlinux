@@ -8,10 +8,10 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
                     file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
 
-inherit wrlinux-image
-
 IMAGE_INSTALL = " \
    packagegroup-core-boot \
    packagegroup-ovp-vm \
    packagegroup-containers \
 "
+
+inherit wrlinux-image
