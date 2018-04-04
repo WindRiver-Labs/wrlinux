@@ -1,24 +1,7 @@
-# For Wind River Linux we want to override the QEMU BSP machine SRCREV values
-# to AUTOREV, this ensures that the -KBRANCH- value will be used, and the
-# latest commit in that branch will always be used.
-SRCREV_machine_qemuarm    = "${AUTOREV}"
-SRCREV_machine_qemuarm64  = "${AUTOREV}"
-SRCREV_machine_qemumips   = "${AUTOREV}"
-SRCREV_machine_qemuppc    = "${AUTOREV}"
-SRCREV_machine_qemux86    = "${AUTOREV}"
-SRCREV_machine_qemux86-64 = "${AUTOREV}"
-SRCREV_machine_qemumips64 = "${AUTOREV}"
-
-# Default the system to AUTOREV for any other BSPs not already defined.  This
-# is done for the same reason as the QEMU machines above.
-SRCREV_machine ?= "${AUTOREV}"
-
-SRCREV_meta = "${AUTOREV}"
-
-# We need to change the SRC_URI to point to our layer.  Otherwise the system
-# may decide to fall back to the yoctoproject URL in some cases.  This would
-# end up causing problems either due to incorrect SRCREV entries or by missing
-# critical patches.
+# We need to change the SRC_URI to point to the bare git report in our layer.
+# Otherwise the system may decide to fall back to the yoctoproject URL in some
+# cases.  This would end up causing problems either due to incorrect SRCREV
+# entries or by missing critical patches.
 addhandler linux_yocto_rewrite_uri
 linux_yocto_rewrite_uri[eventmask] = "bb.event.RecipePreFinalise"
 
@@ -35,17 +18,30 @@ python linux_yocto_rewrite_uri() {
     # want to expand it.
     src_uri=d.getVar("SRC_URI", False)
 
+    # We need the -file- PV, not the actual PV...
+    pv = d.expand("${@bb.parse.BBHandler.vars_from_file(d.getVar('FILE', False),d)[1] or 'dev'}")
+
     # Replace the kernel URI.
-    src_uri = src_uri.replace("git://git.yoctoproject.org/linux-yocto-4.12.git", "git://%s/git/linux-yocto-4.12.git;protocol=file" % layer_path)
+    if os.path.exists("%s/git/linux-yocto.git" % (d.expand(layer_path))):
+        src_uri = src_uri.replace("git://git.yoctoproject.org/linux-yocto.git", "git://%s/git/linux-yocto.git;protocol=file" % (layer_patch))
+
+    if os.path.exists("%s/git/linux-yocto-%s.git" % (d.expand(layer_path), pv)):
+        src_uri = src_uri.replace("git://git.yoctoproject.org/linux-yocto-%s.git" % (pv), "git://%s/git/linux-yocto-%s.git;protocol=file" % (layer_path, pv))
 
     # Replace the kernel-cache URI.
-    src_uri = src_uri.replace("git://git.yoctoproject.org/yocto-kernel-cache", "git://%s/git/yocto-kernel-cache;protocol=file" % layer_path)
+    if os.path.exists("%s/git/yocto-kernel-cache.git" % d.expand(layer_path)):
+        src_uri = src_uri.replace("git://git.yoctoproject.org/yocto-kernel-cache", "git://%s/git/yocto-kernel-cache.git;protocol=file" % layer_path)
 
-    # The kernel-cache branch is hard coded by oe-core.  We need to make this adjutable.
-    if d.getVar("KERNEL_CACHE_BRANCH"):
-        src_uri = src_uri.replace("branch=yocto-4.12;", "branch=${KERNEL_CACHE_BRANCH};")
+        # The kernel-cache branch is hard coded by oe-core.  We need to make this adjutable.
+        if d.getVar("KERNEL_CACHE_BRANCH_%s" % pv):
+            import re
+            src_uri = re.sub('(yocto-kernel-cache.*;branch=)([^;]*)', '\\1${KERNEL_CACHE_BRANCH_%s}' % pv, src_uri)
+
+        if d.getVar("SRCREV_meta_%s" % pv):
+            d.setVar("SRCREV_meta", d.getVar("SRCREV_meta_%s" % pv))
+
+        if d.getVar("LINUX_VERSION_%s" % pv):
+            d.setVar("LINUX_VERSION", d.getVar("LINUX_VERSION_%s" % pv))
 
     d.setVar("SRC_URI", src_uri)
 }
-
-LINUX_VERSION = "4.12.21"
