@@ -128,7 +128,7 @@ DISTRO_FEATURES_BACKFILL_CONSIDERED += "ldconfig"
 MULTILIBS ?= ""
 require conf/multilib.conf
 
-PACKAGECONFIG_pn-sysstat = "lm-sensors"
+PACKAGECONFIG_pn-sysstat ?= "lm-sensors"
 
 # we usually use gnutls as the default PACKAGECONFIG of wpa-supplicant, but its sub-packege gnutls-openssl
 # is GPLv3, so need this check to switch to openssl if GLPv3 is blacklisted.
