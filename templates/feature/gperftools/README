@@ -1,0 +1,5 @@
+This template adds gperftools to the filesystem.
+
+To use this template, add the following to your setup line:
+
+    --templates feature/gperftools
