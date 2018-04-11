@@ -1,4 +1,4 @@
-From d838f417efbba49bb4b8a595ee4a298d43bc9e60 Mon Sep 17 00:00:00 2001
+From f6ca22006904767887cab3be2c26995e325d3c29 Mon Sep 17 00:00:00 2001
 From: Jin Li <jin.li@windriver.com>
 Date: Thu, 31 Aug 2017 03:09:43 -0400
 Subject: [PATCH] change some auto-detecting options to configurable ones
@@ -6,18 +6,18 @@ Subject: [PATCH] change some auto-detecting options to configurable ones
 Upstream-Status: Inappropriate [WR Linux specific change]
 
 Signed-off-by: Jin Li <jin.li@windriver.com>
-
 Signed-off-by: Dengke Du <dengke.du@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 ---
  configure.ac | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++----
  1 file changed, 57 insertions(+), 4 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 514cba2..5d32d4e 100644
+index 7f066be..e864093 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -142,16 +142,70 @@ AC_CONFIG_SUBDIRS([utils/ffsb-6.0-rc2])
- AC_CONFIG_COMMANDS([syscalls.h], [cd include/lapi/syscalls; ./regen.sh])
+@@ -159,16 +159,70 @@ AC_CONFIG_SUBDIRS([utils/ffsb-6.0-rc2])
+ AC_CONFIG_COMMANDS([syscalls.h], [cd ${ac_top_srcdir}/include/lapi/syscalls; ./regen.sh])
  
  # END testsuites knobs
 +
@@ -90,7 +90,7 @@ index 514cba2..5d32d4e 100644
  LTP_CHECK_SIGNAL
  LTP_CHECK_SYSCALL_EVENTFD
  LTP_CHECK_SYSCALL_MODIFY_LDT
-@@ -163,7 +217,6 @@ LTP_CHECK_SYSCALL_UTIMENSAT
+@@ -182,7 +236,6 @@ LTP_CHECK_SYSCALL_UTIMENSAT
  LTP_CHECK_TASKSTATS
  LTP_CHECK_TIME
  LTP_CHECK_MADVISE
@@ -98,6 +98,3 @@ index 514cba2..5d32d4e 100644
  LTP_CHECK_FS_IOC_FLAGS
  LTP_CHECK_MREMAP_FIXED
  LTP_CHECK_KERNEL_DEVEL
--- 
-2.8.1
-

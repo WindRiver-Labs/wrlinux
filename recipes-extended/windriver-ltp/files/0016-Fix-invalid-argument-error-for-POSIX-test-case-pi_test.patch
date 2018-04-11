@@ -1,7 +1,7 @@
-From c11d6ee0f6c09c88cf51cd5dac94bada8c7f1f80 Mon Sep 17 00:00:00 2001
+From 029b273b32403dbc2d6225a54445ddb1158b9667 Mon Sep 17 00:00:00 2001
 From: Jin Li <jin.li@windriver.com>
 Date: Wed, 18 Dec 2013 14:25:14 +0800
-Subject: [PATCH 14/15] Fix invalid argument error for POSIX test case pi_test
+Subject: [PATCH] Fix invalid argument error for POSIX test case pi_test
 
 Upstream-Status: Pending
 
@@ -29,6 +29,7 @@ The size of struct thread_param tp[] should be allocated based on the number of
 cpu instead of being given a fix value - 6
 
 Signed-off-by: Jin Li <jin.li@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 ---
  .../functional/threads/include/pitest.h            | 30 ++++++++++++++
  .../functional/threads/pi_test/pitest-1.c          | 44 +++++++++-----------
@@ -81,7 +82,7 @@ index dd7a48f..04693b4 100644
  double seconds_read(void)
  {
 diff --git a/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-1.c b/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-1.c
-index 11867fe..056dd03 100644
+index 12fe9f3..2738adb 100644
 --- a/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-1.c
 +++ b/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-1.c
 @@ -52,35 +52,12 @@ pthread_mutex_t mutex;
@@ -121,8 +122,8 @@ index 11867fe..056dd03 100644
  
  	for (granularity_cnt = 0; granularity_cnt < granularity_top;
  	     granularity_cnt++) {
-@@ -232,7 +209,7 @@ int main(int argc, char **argv)
- {
+@@ -233,7 +210,7 @@ int main(int argc, char **argv)
+ 	cpus = sysconf(_SC_NPROCESSORS_ONLN);
  	pthread_mutexattr_t mutex_attr;
  	pthread_attr_t threadattr;
 -	pthread_t threads[cpus - 1], threadsample, threadtp, threadtl, threadtb;
@@ -131,7 +132,7 @@ index 11867fe..056dd03 100644
  	int multiplier = 1;
  	int i;
 @@ -242,6 +219,23 @@ int main(int argc, char **argv)
- 	cpus = sysconf(_SC_NPROCESSORS_ONLN);
+ 	test_set_priority(pthread_self(), SCHED_FIFO, 6);
  	base_time = seconds_read();
  
 +	threads = malloc((cpus - 1) * sizeof(pthread_t));
@@ -155,7 +156,7 @@ index 11867fe..056dd03 100644
  	mutex_attr_init(&mutex_attr);
  	mutex_init(&mutex, &mutex_attr);
 diff --git a/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-2.c b/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-2.c
-index dda51c3..bc13117 100644
+index ac3e66e..d2560c6 100644
 --- a/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-2.c
 +++ b/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-2.c
 @@ -53,36 +53,12 @@ pthread_mutex_t mutex;
@@ -196,8 +197,8 @@ index dda51c3..bc13117 100644
  
  	for (granularity_cnt = 0; granularity_cnt < granularity_top;
  	     granularity_cnt++) {
-@@ -257,8 +233,7 @@ int main(int argc, char **argv)
- {
+@@ -258,8 +234,7 @@ int main(int argc, char **argv)
+ 	cpus = sysconf(_SC_NPROCESSORS_ONLN);
  	pthread_mutexattr_t mutex_attr;
  	pthread_attr_t threadattr;
 -	pthread_t threads[cpus - 1];
@@ -207,7 +208,7 @@ index dda51c3..bc13117 100644
  	time_t multiplier = 1;
  	int i;
 @@ -268,6 +243,24 @@ int main(int argc, char **argv)
- 	cpus = sysconf(_SC_NPROCESSORS_ONLN);
+ 	test_set_priority(pthread_self(), SCHED_FIFO, 8);
  	base_time = seconds_read();
  
 +	threads = malloc((cpus - 1) * sizeof(pthread_t));
@@ -232,7 +233,7 @@ index dda51c3..bc13117 100644
  	mutex_attr_init(&mutex_attr);
  	mutex_init(&mutex, &mutex_attr);
 diff --git a/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-3.c b/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-3.c
-index 5e925a5..402cde5 100644
+index d1cba22..918d8e6 100644
 --- a/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-3.c
 +++ b/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-3.c
 @@ -54,36 +54,12 @@ pthread_mutex_t mutex2;
@@ -273,8 +274,8 @@ index 5e925a5..402cde5 100644
  
  	for (granularity_cnt = 0; granularity_cnt < granularity_top;
  	     granularity_cnt++) {
-@@ -268,8 +244,7 @@ int main(int argc, char **argv)
- {
+@@ -269,8 +245,7 @@ int main(int argc, char **argv)
+ 	cpus = sysconf(_SC_NPROCESSORS_ONLN);
  	pthread_mutexattr_t mutex_attr;
  	pthread_attr_t threadattr;
 -	pthread_t threads[cpus - 1];
@@ -284,8 +285,8 @@ index 5e925a5..402cde5 100644
  	time_t multiplier = 1;
  	int i;
 @@ -279,6 +254,24 @@ int main(int argc, char **argv)
+ 	test_set_priority(pthread_self(), SCHED_FIFO, 8);
  	base_time = seconds_read();
- 	cpus = sysconf(_SC_NPROCESSORS_ONLN);
  
 +	threads = malloc((cpus - 1) * sizeof(pthread_t));
 +	if (threads == NULL) {
@@ -309,7 +310,7 @@ index 5e925a5..402cde5 100644
  	mutex_attr_init(&mutex_attr);
  	mutex_init(&mutex1, &mutex_attr);
 diff --git a/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-4.c b/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-4.c
-index dc4bd02..12edb1e 100644
+index 8dd013b..c87add1 100644
 --- a/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-4.c
 +++ b/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-4.c
 @@ -55,35 +55,12 @@ pthread_mutex_t mutex2;
@@ -349,8 +350,8 @@ index dc4bd02..12edb1e 100644
  
  	for (granularity_cnt = 0; granularity_cnt < granularity_top;
  	     granularity_cnt++) {
-@@ -238,8 +215,7 @@ int main(int argc, char **argv)
- {
+@@ -239,8 +216,7 @@ int main(int argc, char **argv)
+ 	cpus = sysconf(_SC_NPROCESSORS_ONLN);
  	pthread_mutexattr_t mutex_attr;
  	pthread_attr_t threadattr;
 -	pthread_t threads[cpus - 1];
@@ -360,8 +361,8 @@ index dc4bd02..12edb1e 100644
  	time_t multiplier = 1;
  	int i;
 @@ -249,6 +225,23 @@ int main(int argc, char **argv)
+ 	test_set_priority(pthread_self(), SCHED_FIFO, 8);
  	base_time = seconds_read();
- 	cpus = sysconf(_SC_NPROCESSORS_ONLN);
  
 +	threads = malloc((cpus - 1) * sizeof(pthread_t));
 +	if (threads == NULL) {
@@ -384,7 +385,7 @@ index dc4bd02..12edb1e 100644
  	mutex_attr_init(&mutex_attr);
  	mutex_init(&mutex1, &mutex_attr);
 diff --git a/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-5.c b/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-5.c
-index 9540d06..c398248 100644
+index 3e49626..e041518 100644
 --- a/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-5.c
 +++ b/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-5.c
 @@ -53,35 +53,12 @@ volatile int ts_stop = 0;
@@ -424,8 +425,8 @@ index 9540d06..c398248 100644
  
  	for (granularity_cnt = 0; granularity_cnt < granularity_top;
  	     granularity_cnt++) {
-@@ -256,7 +233,7 @@ int main(int argc, char **argv)
- {
+@@ -257,7 +234,7 @@ int main(int argc, char **argv)
+ 	cpus = sysconf(_SC_NPROCESSORS_ONLN);
  	pthread_mutexattr_t mutex_attr;
  	pthread_attr_t threadattr;
 -	pthread_t threads[cpus - 1], threadsample, threadtp, threadtl, threadtb;
@@ -434,8 +435,8 @@ index 9540d06..c398248 100644
  	int i;
  	int rc;
 @@ -265,6 +242,23 @@ int main(int argc, char **argv)
+ 	test_set_priority(pthread_self(), SCHED_FIFO, 6);
  	base_time = seconds_read();
- 	cpus = sysconf(_SC_NPROCESSORS_ONLN);
  
 +	threads = malloc((cpus - 1) * sizeof(pthread_t));
 +	if (threads == NULL) {
@@ -458,7 +459,7 @@ index 9540d06..c398248 100644
  	mutex_attr_init(&mutex_attr);
  	mutex_init(&mutex, &mutex_attr);
 diff --git a/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-6.c b/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-6.c
-index 19d6755..e3292f3 100644
+index aa3a2c8..269ce88 100644
 --- a/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-6.c
 +++ b/testcases/open_posix_testsuite/functional/threads/pi_test/pitest-6.c
 @@ -51,35 +51,12 @@ pthread_mutex_t mutex;
@@ -516,9 +517,9 @@ index 19d6755..e3292f3 100644
  
  	time_t multiplier = 1;
  	int i;
-@@ -242,6 +219,23 @@ int main(int argc, char **argv)
+@@ -241,6 +218,23 @@ int main(int argc, char **argv)
+ 	test_set_priority(pthread_self(), SCHED_FIFO, 6);
  	base_time = seconds_read();
- 	cpus = sysconf(_SC_NPROCESSORS_ONLN);
  
 +	threads = malloc((cpus - 1) * sizeof(pthread_t));
 +	if (threads == NULL) {
@@ -540,6 +541,3 @@ index 19d6755..e3292f3 100644
  	/* Initialize a mutex with PTHREAD_PRIO_INHERIT protocol */
  	mutex_attr_init(&mutex_attr);
  	mutex_init(&mutex, &mutex_attr);
--- 
-1.9.1
-
