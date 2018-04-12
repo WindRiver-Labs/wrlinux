@@ -1,0 +1,17 @@
+This template adds the libteam package to image.
+
+libteam - Library for controlling team network device
+
+The Team softdev Linux driver provides a mechanism to team multiple
+NICs (ports) into a single logical one (teamdev) at L2 layer.
+This process is called "channel bonding", "Ethernet bonding", "channel
+teaming", "link aggregation", etc. Bonding is already implemented in the
+Linux kernel but the Team softdev Linux driver is modular, userspace
+driven, very lean and efficient, and it does have some distinct
+advantages over the kernel's bonding driver.
+
+Detail description can be found in:
+http://libteam.org
+
+To use the template, add "--templates feature/network-bond-libteam" as
+a setup option.
