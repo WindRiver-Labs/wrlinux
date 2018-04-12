@@ -69,8 +69,6 @@ PNWHITELIST_openembedded-layer += "\
     augeas \
     efibootmgr \
     efivar \
-    libblockdev \
-    libbytesize \
     libpwquality \
     libreport \
     libtar \
@@ -86,7 +84,6 @@ PNWHITELIST_openembedded-layer += "\
     satyr \
     tigervnc \
     uthash \
-    volume-key \
     xmlrpc-c \
 "
 
