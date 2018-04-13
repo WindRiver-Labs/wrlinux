@@ -1,7 +1,14 @@
-Add rpath to find mysql lib at runtime
+From a1f25bab6e684f4a035f6d1360100b95be5aefd1 Mon Sep 17 00:00:00 2001
+From: Julia Karastoianova <Julia.Karastoianova@windriver.com>
+Date: Fri, 8 Sep 2017 15:00:40 +0800
+Subject: [PATCH] Add rpath to find mysql lib at runtime
 
 Signed-off-by: Julia Karastoianova <Julia.Karastoianova@windriver.com>
+
 ---
+ apps/Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 diff --git a/apps/Makefile.in b/apps/Makefile.in
 index 77404dd..2ce9beb 100644
 --- a/apps/Makefile.in

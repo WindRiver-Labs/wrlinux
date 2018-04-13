@@ -1,15 +1,23 @@
-potential double free. netsnmp_register_mib_table_row calls 
+From 3aaddef1efc50c77659af0f54aa7502d64bfb72a Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Fri, 8 Sep 2017 15:00:40 +0800
+Subject: [PATCH] wrlinux-cgl: Add initial version of wrlinux-cgl
+
+potential double free. netsnmp_register_mib_table_row calls
 netsnmp_handler_registration_free() to free the reginfo in case
-netsnmp_register_handler_nocallback() gets back error. but 
-netsnmp_register_handler_nocallback() calls netsnmp_register_mib() 
+netsnmp_register_handler_nocallback() gets back error. but
+netsnmp_register_handler_nocallback() calls netsnmp_register_mib()
 which frees anyway in case of failure.
+
 ---
- net-snmp-5.6.1/agent/helpers/old_api.c |    1 -
+ agent/helpers/old_api.c | 1 -
  1 file changed, 1 deletion(-)
 
+diff --git a/agent/helpers/old_api.c b/agent/helpers/old_api.c
+index d2b99d9..7f4c93f 100644
 --- a/agent/helpers/old_api.c
 +++ b/agent/helpers/old_api.c
-@@ -206,7 +206,6 @@ netsnmp_register_mib_table_row(const cha
+@@ -229,7 +229,6 @@ netsnmp_register_mib_table_row(const char *moduleName,
              MIB_REGISTERED_OK) {
              DEBUGMSGTL(("netsnmp_register_mib_table_row",
                          "register failed %d\n", rc));

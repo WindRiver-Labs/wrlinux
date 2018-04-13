@@ -1,10 +1,16 @@
+From b86fefcf2b822639349a6d2a2343a154437ec893 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Fri, 8 Sep 2017 15:00:40 +0800
+
 ---
- net-snmp-5.6.1/configure.d/config_os_progs |    7 -------
+ configure.d/config_os_progs | 7 -------
  1 file changed, 7 deletions(-)
 
+diff --git a/configure.d/config_os_progs b/configure.d/config_os_progs
+index 160134c..bf9747a 100644
 --- a/configure.d/config_os_progs
 +++ b/configure.d/config_os_progs
-@@ -417,13 +417,6 @@ case $target_os in
+@@ -418,13 +418,6 @@ case $target_os in
  esac
  
  

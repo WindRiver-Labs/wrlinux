@@ -1,12 +1,18 @@
+From fb13a41e8bc9b20edb97276b3da44632b8e9f7c9 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Fri, 8 Sep 2017 15:00:40 +0800
+
 ---
- net-snmp-5.6.1/agent/mibgroup/host/data_access/swinst_rpm.c |    4 +++-
- net-snmp-5.6.1/agent/mibgroup/host/hr_swinst.c              |    2 +-
- net-snmp-5.6.1/configure.d/config_os_libs1                  |    6 +++---
+ agent/mibgroup/host/data_access/swinst_rpm.c | 4 +++-
+ agent/mibgroup/host/hr_swinst.c              | 2 +-
+ configure.d/config_os_libs1                  | 6 +++---
  3 files changed, 7 insertions(+), 5 deletions(-)
 
+diff --git a/agent/mibgroup/host/data_access/swinst_rpm.c b/agent/mibgroup/host/data_access/swinst_rpm.c
+index 71595be..abdbaa7 100644
 --- a/agent/mibgroup/host/data_access/swinst_rpm.c
 +++ b/agent/mibgroup/host/data_access/swinst_rpm.c
-@@ -24,10 +24,12 @@
+@@ -25,10 +25,12 @@
  #endif
  
  #ifdef HAVE_RPM_RPMLIB_H
@@ -20,9 +26,11 @@
  #endif
  #ifdef HAVE_RPMGETPATH		/* HAVE_RPM_RPMMACRO_H */
  #include <rpm/rpmmacro.h>
+diff --git a/agent/mibgroup/host/hr_swinst.c b/agent/mibgroup/host/hr_swinst.c
+index 25582bd..cf50aff 100644
 --- a/agent/mibgroup/host/hr_swinst.c
 +++ b/agent/mibgroup/host/hr_swinst.c
-@@ -42,7 +42,7 @@
+@@ -43,7 +43,7 @@
  
  #ifdef HAVE_LIBRPM
  #include <rpm/rpmlib.h>
@@ -31,6 +39,8 @@
  #include <fcntl.h>
  
  #ifdef HAVE_RPM_RPMFILEUTIL_H
+diff --git a/configure.d/config_os_libs1 b/configure.d/config_os_libs1
+index 35f052a..e62fd2d 100644
 --- a/configure.d/config_os_libs1
 +++ b/configure.d/config_os_libs1
 @@ -11,12 +11,12 @@

@@ -1,11 +1,17 @@
-fix include and link paths to use cross-compile environment
+From 88fa0f13ceae09a4b1b3e79f6b2ce50e377cb8c0 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Fri, 8 Sep 2017 15:00:40 +0800
+Subject: [PATCH] fix include and link paths to use cross-compile environment
+
 ---
- net-snmp-5.7.1/net-snmp-config.in |   14 +++++++-------
+ net-snmp-config.in | 14 +++++++-------
  1 file changed, 7 insertions(+), 7 deletions(-)
 
+diff --git a/net-snmp-config.in b/net-snmp-config.in
+index d55872c..63b7c92 100644
 --- a/net-snmp-config.in
 +++ b/net-snmp-config.in
-@@ -54,7 +54,7 @@ NSC_LAGENTLIBS="@LAGENTLIBS@ @PERLLDOPTS
+@@ -54,7 +54,7 @@ NSC_LAGENTLIBS="@LAGENTLIBS@ @PERLLDOPTS_FOR_APPS@"
  NSC_LMIBLIBS="@LMIBLIBS@"
  
  NSC_INCLUDEDIR=${includedir}
@@ -52,7 +58,7 @@ fix include and link paths to use cross-compile environment
        fi
        echo $result
        ;;
-@@ -599,7 +599,7 @@ EOF
+@@ -598,7 +598,7 @@ EOF
          echo "Ack.  Can't create $tmpfile."
  	exit 1
        fi
