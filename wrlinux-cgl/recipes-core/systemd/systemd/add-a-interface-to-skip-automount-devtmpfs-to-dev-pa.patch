@@ -1,4 +1,7 @@
-[PATCH] add a interface to skip automount devtmpfs to /dev/ path
+From 7cd923e4a918d8b8427615f65ef83da8f508fefc Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Fri, 8 Sep 2017 15:00:40 +0800
+Subject: [PATCH] add a interface to skip automount devtmpfs to /dev/ path
 
 Upstream-Status: Inappropriate [other]
 
@@ -16,15 +19,16 @@ Add a interface, which is to check if /.skip_mount_devtmpfs_on_dev
 exist, to skip mount devtmpfs to /dev/ path
 
 Signed-off-by: Roy Li <rongqing.li@windriver.com>
+
 ---
  src/core/mount-setup.c | 10 +++++++++-
  1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/src/core/mount-setup.c b/src/core/mount-setup.c
-index 1782d40..29d8d97 100644
+index a0c5f5a..7c5c5ad 100644
 --- a/src/core/mount-setup.c
 +++ b/src/core/mount-setup.c
-@@ -68,13 +68,15 @@ typedef struct MountPoint {
+@@ -73,13 +73,15 @@ typedef struct MountPoint {
  #define N_EARLY_MOUNT 4
  #endif
  
@@ -40,8 +44,8 @@ index 1782d40..29d8d97 100644
 +          skip_mount_dev,          MNT_FATAL|MNT_IN_CONTAINER },
          { "securityfs",  "/sys/kernel/security",      "securityfs", NULL,                      MS_NOSUID|MS_NOEXEC|MS_NODEV,
            NULL,          MNT_NONE                   },
- #ifdef HAVE_SMACK
-@@ -133,6 +135,12 @@ bool mount_point_is_api(const char *path) {
+ #if ENABLE_SMACK
+@@ -144,6 +146,12 @@ bool mount_point_is_api(const char *path) {
          return path_startswith(path, "/sys/fs/cgroup/");
  }
  
@@ -54,6 +58,3 @@ index 1782d40..29d8d97 100644
  bool mount_point_ignore(const char *path) {
          const char *i;
  
--- 
-1.9.1
-
