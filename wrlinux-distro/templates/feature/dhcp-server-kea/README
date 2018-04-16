@@ -1,0 +1,14 @@
+This template adds the kea package as a dhcp server to the image.
+
+The kea package is the next generation of DHCP software developed
+by ISC. It supports both DHCPv4 and DHCPv6 protocols along with
+their ext ensions, e.g. prefix delegation and dynamic updates to
+DNS.
+
+Detail description can be found in:
+http://kea.isc.org/wiki
+
+To use the template, add "--templates feature/dhcp-server-kea" as a
+setup option.
+
+
