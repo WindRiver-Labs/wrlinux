@@ -22,19 +22,19 @@ efi_hddimg_populate() {
         bbwarn "${IMAGE_ROOTFS}/boot/efi${EFIDIR} doesn't exist"
     fi
 
-    bbnote "Trying to install ${DEPLOY_DIR_IMAGE}/${VM_DEFAULT_KERNEL} as ${DEST}/${VM_DEFAULT_KERNEL}"
+    bbnote "Trying to install ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE} as ${DEST}/${KERNEL_IMAGETYPE}"
     # cleanup vmlinuz that deployed by OE
     rm -f ${DEST}/vmlinuz
 
-    if [ -e ${DEPLOY_DIR_IMAGE}/${VM_DEFAULT_KERNEL} ]; then
-        install -m 0644 ${DEPLOY_DIR_IMAGE}/${VM_DEFAULT_KERNEL} ${DEST}/${VM_DEFAULT_KERNEL}
-        install -m 0644 ${DEPLOY_DIR_IMAGE}/${VM_DEFAULT_KERNEL}.p7b ${DEST}/${VM_DEFAULT_KERNEL}.p7b
+    if [ -e ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE} ]; then
+        install -m 0644 ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE} ${DEST}/${KERNEL_IMAGETYPE}
+        install -m 0644 ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}.p7b ${DEST}/${KERNEL_IMAGETYPE}.p7b
 
         # create a backup kernel for recovery boot
-        install -m 0644 ${DEPLOY_DIR_IMAGE}/${VM_DEFAULT_KERNEL} ${DEST}/${VM_DEFAULT_KERNEL}_bakup
-        install -m 0644 ${DEPLOY_DIR_IMAGE}/${VM_DEFAULT_KERNEL}.p7b ${DEST}/${VM_DEFAULT_KERNEL}_bakup.p7b
+        install -m 0644 ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE} ${DEST}/${KERNEL_IMAGETYPE}_bakup
+        install -m 0644 ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}.p7b ${DEST}/${KERNEL_IMAGETYPE}_bakup.p7b
     else
-        bbwarn "${DEPLOY_DIR_IMAGE}/${VM_DEFAULT_KERNEL} doesn't exist"
+        bbwarn "${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE} doesn't exist"
     fi
 
     # allow to copy ${INITRD_IMAGE_LIVE} as initrd if ${INITRAMFS_IMAGE} was not built
