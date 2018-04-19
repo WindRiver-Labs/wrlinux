@@ -1,0 +1,23 @@
+# If you want to reduce latency and improve real time, you can 
+# enable rt-tune feature by doing the following.
+#
+# The first method:
+#
+# Build host:
+# echo "WRTEMPLATE += \"feature/host-rt-tune\"" >> conf/local.conf
+#
+# Build guest:
+# echo "WRTEMPLATE += \"feature/guest-rt-tune\"" >> conf/local.conf
+# 
+# The second method:
+# (The cmdline only show how to enable rt-tune feature, you should 
+# add other parameters according to your situation)
+# 
+# Host:
+# setup.sh --templates feature/host-rt-tune 
+#
+# Guest:
+# setup.sh --templates feature/guest-rt-tune  
+# 
+# This may disable some configuration of kernel that would
+# affect other modules. So it should be used with caution.
