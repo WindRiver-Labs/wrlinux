@@ -83,13 +83,13 @@ SRCREV_machine_kb-standard-wr-base ?= "1c048637b3d66ad3a493fad6543e853cb38a6694"
 LINUX_VERSION_kb-standard-wr-base ?= "4.12.21"
 SRCREV_machine_kb-standard-xilinx-base ?= "1c048637b3d66ad3a493fad6543e853cb38a6694"
 LINUX_VERSION_kb-standard-xilinx-base ?= "4.12.21"
-SRCREV_machine_kb-standard-xilinx-sdk2017-04-base ?= "b8ba944059d4738338648e35f2b70d79dd94c209"
+SRCREV_machine_kb-standard-xilinx-sdk2017-04-base ?= "9cfa42b5fb93cae87f007c4690f4f430f6203e92"
 LINUX_VERSION_kb-standard-xilinx-sdk2017-04-base ?= "4.12.21"
-SRCREV_machine_kb-standard-xilinx-sdk2017-04-xilinx-zynqmp ?= "e28cba75b8cd69aadf0650dd5974606532b178df"
+SRCREV_machine_kb-standard-xilinx-sdk2017-04-xilinx-zynqmp ?= "23253f6fe25583018063a56cbf04b82fdd0f4d3d"
 LINUX_VERSION_kb-standard-xilinx-sdk2017-04-xilinx-zynqmp ?= "4.12.21"
 
 # yocto-kernel-cache branch entry
 KERNEL_CACHE_BRANCH = "yocto-4.12-wr"
-SRCREV_meta = "4a4459bf02c822644da12ff2fe82650db72d8f7d"
+SRCREV_meta = "5200beba585237d9eb82cdb07210d9b4a66766cf"
 
 LINUX_VERSION = "4.12.21"
