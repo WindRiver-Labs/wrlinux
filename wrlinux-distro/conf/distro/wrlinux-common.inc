@@ -44,6 +44,9 @@ WRSDK_RDEPENDS ?= "\
         nativesdk-syslinux \
         nativesdk-unfs3 \
         nativesdk-util-linux \
+        nativesdk-python \
+        nativesdk-perl \
+        nativesdk-perl-module-file-copy \
 "
 
 # We must disable this for a mingw sdk!
