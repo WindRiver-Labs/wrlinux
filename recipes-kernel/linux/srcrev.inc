@@ -9,8 +9,6 @@
 MACHINEOVERRIDES .= ":kb-${@d.getVar('KBRANCH', True).replace("/", "-")}"
 
 # linux-yocto-4.12 branch entries
-SRCREV_machine_kb-HEAD ?= "1ea1c41db9839e56eb0f41dfffc7c6dd80bf7a64"
-LINUX_VERSION_kb-HEAD ?= "4.12.7"
 SRCREV_machine_kb-master ?= "1ea1c41db9839e56eb0f41dfffc7c6dd80bf7a64"
 LINUX_VERSION_kb-master ?= "4.12.7"
 SRCREV_machine_kb-standard-arm-versatile-926ejs ?= "add1c3f986e1b93c49136dc4c8949afd12600854"
