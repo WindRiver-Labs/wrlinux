@@ -65,7 +65,7 @@ SRCREV_machine_kb-standard-preempt-rt-nxp-ls-lsdk-1709-nxp-ls10xx ?= "d0130b05f6
 LINUX_VERSION_kb-standard-preempt-rt-nxp-ls-lsdk-1709-nxp-ls10xx ?= "4.12.23"
 SRCREV_machine_kb-standard-preempt-rt-nxp-ls-lsdk-1709-nxp-ls20xx ?= "27ff5e2044ca189b2a07cdf92a754669a3c726a8"
 LINUX_VERSION_kb-standard-preempt-rt-nxp-ls-lsdk-1709-nxp-ls20xx ?= "4.12.23"
-SRCREV_machine_kb-standard-preempt-rt-wr-axxia-base ?= "6927954fb92fc4f6f7d39a2619d0c096e576c76a"
+SRCREV_machine_kb-standard-preempt-rt-wr-axxia-base ?= "f9879d9e840e6b1ab733843dfbc17be8c1a85577"
 LINUX_VERSION_kb-standard-preempt-rt-wr-axxia-base ?= "4.12.23"
 SRCREV_machine_kb-standard-preempt-rt-wr-base ?= "6927954fb92fc4f6f7d39a2619d0c096e576c76a"
 LINUX_VERSION_kb-standard-preempt-rt-wr-base ?= "4.12.23"
@@ -81,7 +81,7 @@ SRCREV_machine_kb-standard-tiny-intel-x86 ?= "bd619a347ee6cacc26befba945bb0712aa
 LINUX_VERSION_kb-standard-tiny-intel-x86 ?= "4.12.23"
 SRCREV_machine_kb-standard-tiny-wr-base ?= "e747f69d1d91fff374a6c7cbc94d9452b9f36b82"
 LINUX_VERSION_kb-standard-tiny-wr-base ?= "4.12.23"
-SRCREV_machine_kb-standard-wr-axxia-base ?= "cf9b5fa29fdf840fa8ad06c45cbd378228e2dfbd"
+SRCREV_machine_kb-standard-wr-axxia-base ?= "f922a9bdab927e5e48adf203e5921d87940ee47f"
 LINUX_VERSION_kb-standard-wr-axxia-base ?= "4.12.23"
 SRCREV_machine_kb-standard-wr-base ?= "cf9b5fa29fdf840fa8ad06c45cbd378228e2dfbd"
 LINUX_VERSION_kb-standard-wr-base ?= "4.12.23"
@@ -96,6 +96,6 @@ LINUX_VERSION_kb-standard-xilinx-sdk2017-04-xilinx-zynqmp ?= "4.12.23"
 
 # yocto-kernel-cache branch entry
 KERNEL_CACHE_BRANCH = "yocto-4.12-wr"
-SRCREV_meta = "e91aa0a22c592352d52d8c5e0e756e1e4ebfeb04"
+SRCREV_meta = "d3a9ba573cf6eff7eb077eb1f3eec0ed6a30cfac"
 
 LINUX_VERSION = "4.12.22"
