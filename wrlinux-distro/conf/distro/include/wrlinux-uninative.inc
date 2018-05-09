@@ -12,7 +12,6 @@
 # - Update UNINATIVE_URL to <uninative_dir>
 # - Update UNINATIVE_CHECKSUM with "sha256sum ${SDK_ARCH}-nativesdk-libc.tar.bz2"
 #
-WRSDK_RDEPENDS_pn-uninative-tarball = ""
 UNINATIVE_URL ?= "file://${LAYER_PATH_wrlinux}/files/uninative-tarballs/"
 UNINATIVE_CHECKSUM[i686] ?= "d7c341460035936c19d63fe02f354ef1bc993c62d694ae3a31458d1c6997f0c5"
 UNINATIVE_CHECKSUM[x86_64] ?= "ed033c868b87852b07957a4400f3b744c00aef5d6470346ea1a59b6d3e03075e"

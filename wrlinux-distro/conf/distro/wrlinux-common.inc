@@ -38,26 +38,6 @@ TOOLCHAIN_OUTPUTNAME_pn-buildtools-tarball_forcevariable = "${SDK_ARCH}-buildtoo
 # Workaround for extensible SDK
 TOOLCHAIN_OUTPUTNAME_pn-uninative-tarball = "${SDK_ARCH}-nativesdk-libc"
 
-WRSDK_RDEPENDS ?= "\
-        nativesdk-cmake \
-        nativesdk-mtools \
-        nativesdk-syslinux \
-        nativesdk-unfs3 \
-        nativesdk-util-linux \
-        nativesdk-python \
-        nativesdk-perl \
-        nativesdk-perl-module-file-copy \
-"
-
-# We must disable this for a mingw sdk!
-WRSDK_RDEPENDS_sdkmingw32 = ""
-
-# eSDk doesn't need extra TOOLCHAIN_HOST_TASK, eSDK ships
-# buildtools-tarball which includes them.
-WRSDK_RDEPENDS_task-populate-sdk-ext = ""
-
-TOOLCHAIN_HOST_TASK_append = " ${WRSDK_RDEPENDS}"
-
 # Add changelist.xml and fs_final*.sh processing
 IMAGE_CLASSES += "image-fs_finalize"
 
