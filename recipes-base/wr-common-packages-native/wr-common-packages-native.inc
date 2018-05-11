@@ -60,9 +60,7 @@ DEPENDS = "\
     gtk-icon-utils-native \
     harfbuzz-native \
     icu-native \
-    inputproto-native \
     intltool-native \
-    kbproto-native \
     kern-tools-native \
     kmod-native \
     ldconfig-native \
@@ -139,9 +137,7 @@ DEPENDS = "\
     qemu-helper-native \
     qemu-native \
     quilt-native \
-    randrproto-native \
     readline-native \
-    renderproto-native \
     rpm-native \
     shadow-native \
     shared-mime-info-native \
@@ -162,9 +158,8 @@ DEPENDS = "\
     vala-native \
     wayland-native \
     xcb-proto-native \
-    xextproto-native \
     xmlto-native \
-    xproto-native \
+    xorgproto-native \
     xtrans-native \
     xz-native \
     zlib-native \
