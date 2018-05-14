@@ -7,5 +7,5 @@
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_4.12 = "yocto-4.12-wr"
-SRCREV_meta_4.12 = "545434d40237433fe50ddb95b7b430f88e77137a"
+SRCREV_meta_4.12 = "c65289391b994aaa46e5f3b0c6059e0af961cf83"
 LINUX_VERSION_4.12 = "4.12.23"
