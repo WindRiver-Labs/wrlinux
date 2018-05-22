@@ -42,6 +42,7 @@ PNWHITELIST_networking-layer_append = " \
     bridge-utils \
     c-ares \
     corosync \
+    freediameter \
     geoip \
     geoip-perl \
     ifenslave \
