@@ -8,6 +8,7 @@ PNWHITELIST_gnome-layer += "\
     libgnomekbd \
     libgnome-keyring \
     libtimezonemap \
+    libuser \
     metacity \
     network-manager-applet \
     usermode \
