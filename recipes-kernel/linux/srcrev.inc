@@ -96,6 +96,6 @@ LINUX_VERSION_kb-standard-xilinx-sdk2017-04-xilinx-zynqmp ?= "4.12.24"
 
 # yocto-kernel-cache branch entry
 KERNEL_CACHE_BRANCH = "yocto-4.12-wr"
-SRCREV_meta = "18dc32d53b9e5cbe11bccdd8de66f294c687279b"
+SRCREV_meta = "2c028bd9dbcc35658f348d683ca285a57cee090d"
 
 LINUX_VERSION = "4.12.24"
