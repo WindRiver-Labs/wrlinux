@@ -11,12 +11,10 @@
 #
 # Configuration files belong in: TOPDIR/conf/
 #
-# such as: TOPDIR/conf/changelist.xml
 #
 # such as: TOPDIR/conf/fs_final00.sh
 #          TOPDIR/conf/fs_final01.sh
 #
-WRL_CHANGELIST_PATH ?= "${TOPDIR}/conf"
 WRL_FS_FINAL_PATH   ?= "${TOPDIR}/conf"
 
 python() {
@@ -77,31 +75,6 @@ wrl_fs_final_run() {
 			rm -rf ${IMAGE_ROOTFS}/etc/rpm
 		fi
 	fi 
-
-	# Handle changelist.xml after fs_final.sh to acquire changes/appends to etc files 
-	if [ -n "${WRL_CHANGELIST_PATH}" ]; then
-	  count=0
-	  for wrl_path in ${WRL_CHANGELIST_PATH}; do
-	    echo "Checking for ${wrl_path}/changelist.xml"
-	    if  [ -s ${wrl_path}/changelist.xml ]; then
-		# Store symlink for later debugging if necessary
-		targetcount=`printf '%.4d' $count`
-		count=`expr $count + 1`
-		ln -s ${wrl_path}/changelist.xml ${logpath}/changelist-${targetcount}.xml.${PID}
-
-		echo "Running filesystem change script (${targetcount}) ${wrl_path}/changelist.xml"
-
-		export TOP_BUILD_DIR="${wrl_path}"
-		export EXPORT_DIST_DIR="${IMAGE_ROOTFS}"
-		changelist=`which fs_changelist.lua 2>/dev/null`
-		if [ -e "${changelist}" ]; then
-			rpm --eval "%{lua: dofile(\"${changelist}\")} "
-		else
-			echo "ERROR: Unable to find fs_changelist.lua"
-		fi
-	    fi
-	  done
-	fi
 }
 
 add_ld_so_conf_d() {
