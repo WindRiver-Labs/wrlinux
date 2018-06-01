@@ -27,13 +27,8 @@ PNWHITELIST_cgl-common_append = " \
 
 # For meta-openembedded/meta-python
 PNWHITELIST_meta-python_append = " \
-    python-cffi \
     python-lxml \
     python-paste \
-    python-ply \
-    python-pyasn1 \
-    python-pycparser \
-    python-six \
     python-vcversioner \
 "
 
@@ -46,7 +41,6 @@ PNWHITELIST_networking-layer_append = " \
     geoip \
     geoip-perl \
     ifenslave \
-    inetutils \
     ippool \
     ipvsadm \
     iscsi-initiator-utils \
