@@ -15,7 +15,6 @@ PNWHITELIST_meta-initramfs += ""
 PNWHITELIST_multimedia-layer += ""
 
 PNWHITELIST_networking-layer += " \
-	dnsmasq \
 	freeradius \
 	ipsec-tools \
 	libtalloc \

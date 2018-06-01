@@ -63,7 +63,6 @@ PNWHITELIST_networking-layer_append = " \
     open-isns \
     openl2tp \
     quagga \
-    radvd \
     rdate \
     rdist \
     samba \

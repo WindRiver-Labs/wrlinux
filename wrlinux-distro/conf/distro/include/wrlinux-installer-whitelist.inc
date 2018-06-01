@@ -78,10 +78,6 @@ PNWHITELIST_openembedded-layer += "\
     gnome-doc-utils-stub \
     gnulib \
     isomd5sum \
-    libndp \
-    mozjs \
-    networkmanager \
-    polkit \
     satyr \
     tigervnc \
     uthash \
