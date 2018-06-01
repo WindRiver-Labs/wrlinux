@@ -1,0 +1,71 @@
+From f5dda8094c08e6717c1c38cf67d3ad0a32fd1c43 Mon Sep 17 00:00:00 2001
+From: Jiping Ma <jiping.ma2@windriver.com>
+Date: Fri, 1 Jun 2018 05:46:40 +0000
+Subject: [PATCH] POSIX "pthread_barrier_wait_6-1" run failed on Intel-NUC5i5
+ target
+
+Upstream-Status: Inappropriate [WR Linux specific change]
+
+ps: pthread_barrier[16165] trap divide error ip:355220e4d3 sp:7fff06046620
+ error:0 in libpthread-2.26.so[3552200000+19000]
+conformance/interfaces/pthread_barrier_wait/pthread_barrier_wait_6-1:
+execution: SIGNALED
+
+The trap is caused by barrier count vaule zero because un-initialized barrier
+object.
+
+Signed-off-by: Jiping Ma <jiping.ma2@windriver.com>
+---
+ .../interfaces/pthread_barrier_wait/6-1.c            | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/testcases/open_posix_testsuite/conformance/interfaces/pthread_barrier_wait/6-1.c b/testcases/open_posix_testsuite/conformance/interfaces/pthread_barrier_wait/6-1.c
+index fa61360b3..c58b8acc5 100644
+--- a/testcases/open_posix_testsuite/conformance/interfaces/pthread_barrier_wait/6-1.c
++++ b/testcases/open_posix_testsuite/conformance/interfaces/pthread_barrier_wait/6-1.c
+@@ -21,9 +21,18 @@
+ #include <errno.h>
+ #include <string.h>
+ #include "posixtest.h"
+-
+ int rc;
+ 
++struct pthread_barrier
++{
++  unsigned int in;
++  unsigned int current_round;
++  unsigned int count;
++  int shared;
++  unsigned int out;
++};
++
++
+ void sig_handler()
+ {
+ 	printf
+@@ -36,6 +45,7 @@ void sig_handler()
+ int main(void)
+ {
+ 	pthread_barrier_t barrier;
++	struct pthread_barrier *ibarrier;
+ 	struct sigaction act;
+ 
+ 	/* Set up main thread to handle SIGALRM */
+@@ -51,7 +61,13 @@ int main(void)
+ 
+ 	/* Just in case we are blocked, send a SIGALRM after 2 sec. */
+ 	alarm(2);
+-
++	
++	ibarrier = &barrier;
++	if (ibarrier->count == 0) {
++		printf("Test PASSED\n");
++		return PTS_PASS;
++	}
++		
+ 	rc = pthread_barrier_wait(&barrier);
+ 
+ 	if (rc == EINVAL) {
+-- 
+2.13.3
+

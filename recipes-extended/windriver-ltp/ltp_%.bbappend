@@ -18,7 +18,8 @@ SRC_URI += " file://README \
              file://0016-Fix-invalid-argument-error-for-POSIX-test-case-pi_test.patch \
              file://0017-Change-some-auto-detecting-options-to-configurable-o.patch \
              file://0018-posix-skip-the-test-pthread_barrier_destroy_2-1.patch \
-            "
+	     file://0019-POSIX-pthread_barrier_wait_6-1-run-failed-on-Intel-N.patch \
+	    "
 
 do_compile(){
 	oe_runmake
