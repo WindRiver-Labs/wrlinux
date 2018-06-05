@@ -50,7 +50,7 @@ RDEPENDS_${PN} = "\
 	tnftp \
 	vlan \
 	vsftpd \
-	wireless-tools \
+	iw \
 	wpa-supplicant \
 	xinetd \
 	samba \
