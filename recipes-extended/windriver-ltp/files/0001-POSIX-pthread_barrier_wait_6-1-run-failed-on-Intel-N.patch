@@ -1,0 +1,142 @@
+From 6c7ac4981ece72ae4e05a38e4350dcf008b9d661 Mon Sep 17 00:00:00 2001
+From: Jiping Ma <jiping.ma2@windriver.com>
+Date: Tue, 5 Jun 2018 10:05:40 +0000
+Subject: [PATCH] POSIX "pthread_barrier_wait_6-1" run failed on Intel-NUC5i5
+ target
+
+Upstream-Status: Backported
+
+The test is trying assert that an uninitialised argument is handled gracefully
+however the behavior of the interface is undefined when the argument has not
+been initialised. This test suite is supposed to verify that any given
+implementation conforms to the POSIX specification which by definition does
+not include undefined behavior.
+
+The test is currently failing on Linux with glibc because the process is
+aborting for some reason other than a seg fault.
+
+Due to security concerns, in some cases it is reasonable to assert that some
+forms of behavior, such as a NULL pointer dereference, are not acceptable even
+if the specification allows it. However, in order for the test to run reliably
+across all implementations, we need to be able to handle any other behavior an
+implementation is likely to choose. In this case the type of the argument is
+opaque and so we can't make any reasonable assumptions about how it will be
+handled. So then we have to handle all possible behavior and detect the
+scenarios we consider unacceptable.
+
+We feel this is too much complication for a test which is testing something
+slightly outside of the test suites purpose.
+
+commit b54a54e5881a0f9438ce4a862dee724130a9874f
+
+Signed-off-by: Jiping Ma <jiping.ma2@windriver.com>
+---
+ .../interfaces/pthread_barrier_wait/6-1.c          | 66 ----------------------
+ .../interfaces/pthread_barrier_wait/assertions.xml |  7 ---
+ .../interfaces/pthread_barrier_wait/coverage.txt   |  1 -
+ 3 files changed, 74 deletions(-)
+ delete mode 100644 testcases/open_posix_testsuite/conformance/interfaces/pthread_barrier_wait/6-1.c
+
+diff --git a/testcases/open_posix_testsuite/conformance/interfaces/pthread_barrier_wait/6-1.c b/testcases/open_posix_testsuite/conformance/interfaces/pthread_barrier_wait/6-1.c
+deleted file mode 100644
+index fa61360b3..000000000
+--- a/testcases/open_posix_testsuite/conformance/interfaces/pthread_barrier_wait/6-1.c
++++ /dev/null
+@@ -1,66 +0,0 @@
+-/*
+- * Copyright (c) 2002, Intel Corporation. All rights reserved.
+- * This file is licensed under the GPL license.  For the full content
+- * of this license, see the COPYING file at the top level of this
+- * source tree.
+- *
+- * pthread_barrier_wait()
+- *
+- * The pthread_barrier_wait() function may fail if:
+- * [EINVAL] The value specified by barrier does not refer to an initialized barrier object.
+- *
+- * This case will always pass.
+- */
+-
+-#define _XOPEN_SOURCE 600
+-#include <pthread.h>
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <unistd.h>
+-#include <signal.h>
+-#include <errno.h>
+-#include <string.h>
+-#include "posixtest.h"
+-
+-int rc;
+-
+-void sig_handler()
+-{
+-	printf
+-	    ("main: blocked on barrier wait with an un-initializied barrier object.\n");
+-	printf
+-	    ("Test PASSED: Note*: Expected EINVAL when calling this funtion with an un-initialized barrier object, but standard says 'may' fail.\n");
+-	exit(PTS_PASS);
+-}
+-
+-int main(void)
+-{
+-	pthread_barrier_t barrier;
+-	struct sigaction act;
+-
+-	/* Set up main thread to handle SIGALRM */
+-	act.sa_flags = 0;
+-	act.sa_handler = sig_handler;
+-	sigfillset(&act.sa_mask);
+-	sigaction(SIGALRM, &act, 0);
+-
+-	/* Intialize return code */
+-	rc = 1;
+-
+-	/* Call pthread_barrier_wait while refering to an un-initialized barrier object */
+-
+-	/* Just in case we are blocked, send a SIGALRM after 2 sec. */
+-	alarm(2);
+-
+-	rc = pthread_barrier_wait(&barrier);
+-
+-	if (rc == EINVAL) {
+-		printf("Test PASSED\n");
+-	} else {
+-		printf("return code : %d, %s\n", rc, strerror(rc));
+-		printf
+-		    ("Test PASSED: Note*: Expected EINVAL when calling this funtion with an un-initialized barrier object, but standard says 'may' fail.\n");
+-	}
+-
+-	return PTS_PASS;
+-}
+diff --git a/testcases/open_posix_testsuite/conformance/interfaces/pthread_barrier_wait/assertions.xml b/testcases/open_posix_testsuite/conformance/interfaces/pthread_barrier_wait/assertions.xml
+index ba25fb805..217d547b8 100644
+--- a/testcases/open_posix_testsuite/conformance/interfaces/pthread_barrier_wait/assertions.xml
++++ b/testcases/open_posix_testsuite/conformance/interfaces/pthread_barrier_wait/assertions.xml
+@@ -35,12 +35,5 @@
+   indicate the error.
+   </assertion>
+ 
+-  <assertion id="6" tag="ref:XSH6:31850:31852">
+-  The pthread_barrier_wait( ) function may fail if:
+-  [EINVAL] The value specified by barrier does not refer to an initialized barrier object.
+-
+-  These functions shall not return an error code of EINTR.
+- </assertion>
+-
+ </assertions>
+ 
+diff --git a/testcases/open_posix_testsuite/conformance/interfaces/pthread_barrier_wait/coverage.txt b/testcases/open_posix_testsuite/conformance/interfaces/pthread_barrier_wait/coverage.txt
+index 243c95345..ee8d9ad9a 100644
+--- a/testcases/open_posix_testsuite/conformance/interfaces/pthread_barrier_wait/coverage.txt
++++ b/testcases/open_posix_testsuite/conformance/interfaces/pthread_barrier_wait/coverage.txt
+@@ -6,6 +6,5 @@ Assertion	Tested?
+ 3		YES
+ 4		YES
+ 5		YES
+-6		YES
+ 
+ NOTE:
+-- 
+2.13.3
+
