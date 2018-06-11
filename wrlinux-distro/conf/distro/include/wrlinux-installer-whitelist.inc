@@ -20,20 +20,15 @@ PNWHITELIST_meta-python += "\
     python3-blivet \
     python3-blivetgui \
     python3-coverage \
-    python3-cryptography-vectors \
     python3-dbus \
-    python3-iso8601 \
     python3-langtable \
     python3-meh \
     python3-ntplib \
     python3-ordered-set \
     python3-pid \
-    python3-pluggy \
     python3-prctl \
-    python3-pretend \
     python3-pykickstart \
     python3-pyparted \
-    python3-pytest \
     python3-pytz \
     python3-pyudev \
     python3-requests-file \
