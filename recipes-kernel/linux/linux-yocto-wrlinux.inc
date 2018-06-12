@@ -25,6 +25,9 @@ python linux_yocto_rewrite_uri() {
     if os.path.exists("%s/git/linux-yocto.git" % (d.expand(layer_path))):
         src_uri = src_uri.replace("git://git.yoctoproject.org/linux-yocto.git", "git://%s/git/linux-yocto.git;protocol=file" % (layer_path))
 
+    if os.path.exists("%s/git/linux-yocto-dev.git" % (d.expand(layer_path))):
+        src_uri = src_uri.replace("git://git.yoctoproject.org/linux-yocto-dev.git", "git://%s/git/linux-yocto-dev.git;protocol=file" % (layer_path))
+
     if os.path.exists("%s/git/linux-yocto-%s.git" % (d.expand(layer_path), pv)):
         src_uri = src_uri.replace("git://git.yoctoproject.org/linux-yocto-%s.git" % (pv), "git://%s/git/linux-yocto-%s.git;protocol=file" % (layer_path, pv))
 
