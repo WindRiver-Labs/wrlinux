@@ -13,7 +13,7 @@ SRC_URI_append_rpm-keyring-path = " \
 PACKAGECONFIG[enforcesig] = ",,,"
 OVERRIDES .= "${@['', ':rpm-enforce']['enforcesig' in d.getVar('PACKAGECONFIG', True).split()]}"
 CFLAGS_append_rpm-enforce = " -DMANDATORY_KNOWN_SIG"
-SRC_URI_append_rpm-enforce = " file://0002-check-signature-with-error.patch"
+SRC_URI_append_rpm-enforce = " file://0002-signature-error.patch"
 
 do_install_append_rpm-keyring-path () {
 	mkdir -p ${D}${sysconfdir}/rpm/

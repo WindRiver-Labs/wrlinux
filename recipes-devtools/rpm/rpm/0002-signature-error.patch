@@ -1,0 +1,29 @@
+rpm: require mandatory signature
+
+Cause an error rather than warning if a package only has NOKEY or
+NOTTRUSTED signature.
+
+Upstream-Status: Inappropriate [wrlinux specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Modify to apply to current version of package.c.
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+
+--- a/lib/package.c
++++ b/lib/package.c
+@@ -275,7 +275,12 @@ static rpmRC handlePkgVS(struct rpmsinfo
+     case RPMRC_NOKEY:		/* Public key is unavailable. */
+ 	/* XXX Print NOKEY/NOTTRUSTED warning only once. */
+ 	if (stashKeyid(sinfo->keyid) == 0)
++#ifdef MANDATORY_KNOWN_SIG
++	    lvl = RPMLOG_ERR;
++	    rc = RPMRC_FAIL;
++#else
+ 	    lvl = RPMLOG_WARNING;
++#endif
+ 	break;
+     case RPMRC_NOTFOUND:	/* Signature/digest not present. */
+ 	lvl = RPMLOG_WARNING;
