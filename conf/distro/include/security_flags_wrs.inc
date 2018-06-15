@@ -15,6 +15,7 @@ SECURITY_CFLAGS_pn-gcc_powerpc = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-glibc-initial_powerpc = ""
 SECURITY_CFLAGS_pn-glibc_powerpc = ""
 SECURITY_CFLAGS_pn-libmatchbox_powerpc = "${SECURITY_NO_STACK_CFLAGS}"
+SECURITY_CFLAGS_pn-systemd_powerpc = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-wireshark_powerpc = ""
 SECURITY_CFLAGS_pn-rpm_powerpc64 = ""
 
