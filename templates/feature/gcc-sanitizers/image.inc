@@ -5,5 +5,5 @@ IMAGE_INSTALL += " \
     gcc-sanitizers \
     libasan-dev \
     libubsan-dev \
-    ${LIBX_DEV} \
+    ${@'' if d.getVar('MLPREFIX') else d.getVar('LIBX_DEV')} \
 "
