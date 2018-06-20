@@ -1,0 +1,169 @@
+Kernel Hardening Guide
+======================
+
+This document will provide a quick guide on how to use the various kernel
+hardening features that are currently supported by the upstream Linux kernel.
+It will also explain that various exploits that are mitigated by them. 
+
+Each hardening feature may have an impact to the runtime performance or kernel
+image size.  Enabling or disabling these features is left to the users'
+discretion.
+
+This document may not be able to cover all trivial scenarios, for more
+information, please refer to the materials listed in the reference section
+at the end.
+
+
+1. Stack overflow
+-----------------
+CONFIG_CC_STACKPROTECTOR turns on the "stack-protector" GCC feature. This
+feature puts, at the beginning of functions, a canary value on the stack just
+before the return address, and validates the value just before actually
+returning.  Stack based buffer overflows (that need to overwrite this return
+address) now also overwrite the canary, which gets detected and the attack is
+then neutralized via a kernel panic.
+
+It supports two level of stack protection respectively:
+
+CONFIG_CC_STACKPROTECTOR_REGULAR - -fstack-protector
+Functions will have the stack-protector canary logic added if they have an
+8-byte or larger character array on the stack.
+On an x86 "defconfig" build, this feature adds canary checks to about 3% of all
+kernel functions, which increases kernel code size by about 0.3%.
+
+CONFIG_CC_STACKPROTECTOR_STRONG - -fstack-protector-strong
+Functions will have the stack-protector canary logic added in any of the
+following conditions:
+	- local variable's address used as part of the right hand side of an
+      assignment or function argument
+    - local variable is an array (or union containing an array),
+      regardless of array type or length
+    - uses register local variables
+
+On an x86 "defconfig" build, this feature adds canary checks to about 20% of
+all kernel functions, which increases the kernel code size by about 2%.
+
+2. Heap overflow
+----------------
+CONFIG_HARDENED_USERCOPY checks for obviously wrong memory regions when
+copying memory to/from the kernel (via copy_to_user() and copy_from_user()
+functions) by rejecting memory ranges that are larger than the specified heap
+object, span multiple separately allocates pages, are not on the process stack,
+or are part of the kernel text. This kills entire classes of heap overflow
+exploits and similar kernel memory exposures.
+
+CONFIG_HARDENED_USERCOPY_PAGESPAN extends the check of CONFIG_HARDENED_USERCOPY.
+When a multi-page allocation is done without __GFP_COMP, hardened usercopy will
+reject attempts to copy it. There are, however, several cases of this in the
+kernel that have not all been removed. This config is intended to be used only
+while trying to find such users.
+
+CONFIG_SLAB_FREELIST_RANDOM randomizes the freelist order used on creating new
+pages. This security feature reduces the predictability of the kernel slab
+allocator against heap overflows.
+
+3. Reduce access to syscalls
+----------------------------
+One trivial way to eliminate many syscalls for 64-bit systems is building
+without CONFIG_COMPAT.
+
+CONFIG_X86_VSYSCALL_EMULATION enables emulation of the legacy vsyscall page.
+Disabling it is roughly equivalent to booting with vsyscall=none, except that
+it will also disable the helpful warning if a program tries to use a vsyscall.
+With this option set to N, offending programs will just segfault, citing
+addresses of the form 0xffffffffff600?00.
+
+This option is required by many programs built before 2013, and care should be
+used even with newer programs if set to N.
+
+Disabling this option saves about 7K of kernel size and possibly 4K of additional
+runtime pagetable memory.
+
+4. Information exposure
+-----------------------
+Clearing memory on free can stop attacks where there is no reallocation control.
+CONFIG_PAGE_POISONING fills the pages with poison patterns after free_pages()
+and verify the patterns before alloc_pages. The filling of the memory helps
+reduce the risk of information leaks from freed data. This does have a potential
+performance impact.
+
+5. Kernel Address Space Layout Randomization (KASLR)
+----------------------------------------------------
+By relocating the physical and virtual base address of the kernel at boot-time
+(CONFIG_RANDOMIZE_BASE), attacks needing kernel code will be frustrated.
+
+CONFIG_RANDOMIZE_BASE randomizes the physical address at which the kernel image
+is decompressed and the virtual address where the kernel image is mapped, as a
+security feature that deters exploit attempts relying on knowledge of the
+location of kernel code internals.
+
+CONFIG_RANDOMIZE_MEMORY randomizes the base virtual address of kernel memory
+sections (physical memory mapping, vmalloc & vmemmap). This security feature
+makes exploits relying on predictable memory locations less reliable.
+
+Some userspace applications or kernel features which relies on the kernel
+address information may have issues with randomized addresses. 
+
+6. Direct kernel overwrite
+--------------------------
+CONFIG_STRICT_KERNEL_RWX
+If this is set, kernel text and rodata memory will be made read-only,
+and non-text memory will be made non-executable. This provides
+protection against certain security exploits (e.g. executing the heap
+or modifying text)
+
+CONFIG_STRICT_MODULE_RWX
+If this is set, module text and rodata memory will be made read-only,
+and non-text memory will be made non-executable. This provides
+protection against certain security exploits (e.g. writing to text)
+
+7. Hardware segregation (x86 only)
+----------------------------------
+Supervisor Mode Access Prevention (SMAP) is a feature of some CPU
+implementations such as the Intel Broadwell microarchitecture that allows
+supervisor mode programs to optionally set user-space memory mappings so that
+access to those mappings from supervisor mode will cause a trap. This makes it
+harder for malicious programs to "trick" the kernel into using instructions or
+data from a user-space program.
+
+Supervisor Mode Access Prevention is designed to complement Supervisor Mode
+Execution Prevention (SMEP), which was introduced earlier. SMEP can be used to
+prevent supervisor-mode code from unintentionally executing user-space code.
+SMAP extends this protection to reads and writes.
+
+Without Supervisor Mode Access Prevention, supervisor code usually has full
+read and write access to user-space memory mappings (or has the ability to
+obtain full access). This has led to the development of several security
+exploits, including privilege escalation exploits, which operate by causing the
+kernel to access user-space memory when it did not intend to. Operating systems
+can block these exploits by using SMAP to force unintended user-space memory
+accesses to trigger page faults. Additionally, SMAP can expose flawed kernel
+code which does not follow the intended procedures for accessing user-space
+memory.
+
+However, the use of SMAP in an operating system may lead to a larger kernel size
+and slower user-space memory accesses from supervisor code, because SMAP must be
+temporarily disabled any time supervisor code intends to access user-space
+memory.
+
+To make sure if current CPU supports the features, run:
+cat /proc/cpuinfo |egrep 'smap|smep'
+
+CONFIG_X86_SMAP is enabled by default.
+
+For SMAP, as mentioned in kernel source arch/x86/Kconfig, there is a small
+performance cost if this enabled and turned on; there is also a small increase
+in the kernel size if this is enabled.
+
+For SMEP, there is no claimed evident performance cost found.
+
+8. Meltdown and Spectre
+-----------------------
+CONFIG_PAGE_TABLE_ISOLATION and CONFIG_RETPOLINE are enabled in kernel-hardening
+feature to mitigate Meltdown and Spectre. For more details, please refer to:
+https://www.windriver.com/security/announcements/meltdown-spectre/
+
+Reference
+---------
+Documentation/security/self-protection.txt
+https://kernsec.org/wiki/index.php/Kernel_Self_Protection_Project
