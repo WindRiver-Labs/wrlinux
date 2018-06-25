@@ -33,7 +33,6 @@ RDEPENDS_${PN} = "\
     kmod \
     logrotate \
     mingetty \
-    mktemp \
     ncurses \
     procps \
     psmisc \
