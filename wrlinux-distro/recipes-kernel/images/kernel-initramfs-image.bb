@@ -6,7 +6,10 @@ feature/initramfs-install configured. \
 "
 
 LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
+LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814 \
+                    file://LICENSES/preferred/GPL-2.0;md5=74274e8a218423e49eefdea80bc55038 \
+                    file://LICENSES/exceptions/Linux-syscall-note;md5=c7b2944f1dd0626f04e86dfd9c2680f9 \
+"
 
 EXCLUDE_FROM_WORLD = "1"
 
