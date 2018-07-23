@@ -23,9 +23,6 @@ S = "${WORKDIR}"
 # there maybe more in the future.
 DEFAULT_WALLPAPER ?= "gray"
 
-# mozjs17 does NOT support mips64
-COMPATIBLE_HOST = "^(?!mips64).*"
-
 inherit distro_features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
