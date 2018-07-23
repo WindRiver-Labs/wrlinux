@@ -123,6 +123,15 @@ prepare_test()
   FILE_SIZE="$MB" 
   rm -rf $FILE && touch $FILE
   lmdd label="File $FILE write bandwidth: " of=$FILE move=${FILE_SIZE}m fsync=1 print=3 2>&1
+  FILE_SIZE_BYTE=$((FILE_SIZE * 1024 * 1024))
+  if [ -e "${FILE}" ]; then
+     REAL_SIZE_BYTE=`ls -l $FILE | awk '{print $5}'`
+  else
+     REAL_SIZE_BYTE="0"
+  fi
+  if [ ${REAL_SIZE_BYTE} -lt ${FILE_SIZE_BYTE} ]; then
+     echo "Warning, the file created by lmdd is incomplete, there may be no enough space in \"${FSDIR}\"!"
+  fi
 
   #copy hello to /tmp
   if [ ! -f "/tmp/hello" ]; then
