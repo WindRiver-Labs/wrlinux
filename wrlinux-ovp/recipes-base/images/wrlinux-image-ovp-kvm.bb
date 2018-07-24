@@ -30,7 +30,6 @@ IMAGE_INSTALL += " \
    openvswitch \
    hwloc \
    aufs-util \
-   ceph \
    packagegroup-ovp-debug \
    packagegroup-ovp-lttng-toolchain \
    packagegroup-containers \
