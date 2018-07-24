@@ -95,7 +95,7 @@ do_install() {
     echo "cfg_dir=${NAGIOS_PLUGIN_CONF_DIR}" >> ${D}${NAGIOS_CONF_DIR}/nagios.cfg
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-        cp ${D}${sysconfdir}/init.d/nagios ${D}${sysconfdir}/nagios/nagios-core-startup.sh
+        install -m 755 ${D}${sysconfdir}/init.d/nagios ${D}${sysconfdir}/nagios/nagios-core-startup.sh
         install -d ${D}${systemd_unitdir}/system
         install -m 644 ${WORKDIR}/nagios-core.service ${D}${systemd_unitdir}/system/
         install -d ${D}${sysconfdir}/tmpfiles.d
@@ -106,11 +106,7 @@ do_install() {
     fi
 }
 
-pkg_postinst_${PN}-setup () {
-    if [ "x$D" != "x" ]; then
-        exit 1
-    fi
-
+pkg_postinst_ontarget_${PN}-setup () {
     # Set password for nagiosadmin user
     if [ -z "${NAGIOS_DEFAULT_ADMINUSER_PASSWORD}" ]; then
         htpasswd -c ${NAGIOS_CONF_DIR}/htpasswd.users nagiosadmin
