@@ -8,5 +8,8 @@ nativesdk-glibc-gconv-utf-16 i686_nativesdk 2.27
 nativesdk-libc6 i686_nativesdk 2.27
 nativesdk-libcrypt1 i686_nativesdk 4.0.1
 nativesdk-libgcc1 i686_nativesdk 8.1.0
+nativesdk-libnsl2 i686_nativesdk 1.2.0+git0+37c5ffe303
+nativesdk-libnss-nis2 i686_nativesdk 3.0+git0+d4aea48657
 nativesdk-libstdc++6 i686_nativesdk 8.1.0
+nativesdk-libtirpc3 i686_nativesdk 1.0.3
 nativesdk-patchelf i686_nativesdk 0.9
