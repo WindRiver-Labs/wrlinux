@@ -12,7 +12,7 @@ BUSYBOX_REPLACE_PACKAGES ??= "\
     bzip2 \
     coreutils \
     cpio \
-    debianutils \
+    debianutils-run-parts \
     dhcp-client \
     dhcp-server \
     diffutils \
@@ -33,9 +33,13 @@ BUSYBOX_REPLACE_PACKAGES ??= "\
     patch \
     procps \
     psmisc \
+    sed \
+    tar \
+    time \
     unzip \
     util-linux \
     util-linux-mount \
+    which \
     ${@bb.utils.contains('INCOMPATIBLE_LICENSE', 'GPLv3', '', 'wget', d)} \
     "
 
