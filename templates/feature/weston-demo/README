@@ -1,0 +1,6 @@
+This template is to add support to build a very basic Xwayland
+image with a terminal.
+
+#@TYPE: Wrtemplate
+#@NAME: weston-demo
+#@DESCRIPTION: Enable Xwayland image
