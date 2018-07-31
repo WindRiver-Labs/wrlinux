@@ -1,0 +1,6 @@
+This template is to add support to build a very basic Wayland
+image with a terminal.
+
+#@TYPE: Wrtemplate
+#@NAME: weston-graphics
+#@DESCRIPTION: Enable Wayland image
