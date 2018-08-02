@@ -15,9 +15,6 @@ TOOLCHAIN_HOST_TASK_append_osv-wrlinux = " \
 # use anspass to save and retrieve credentials
 TOOLCHAIN_HOST_TASK_append_osv-wrlinux = " nativesdk-anspass"
 
-# we include perl (in wrlinux-common.inc)
-TOOLCHAIN_HOST_TASK_remove_osv-wrlinux = "nativesdk-buildtools-perl-dummy"
-
 SDK_POSTPROCESS_COMMAND_prepend_osv-wrlinux = " gen_buildtools_delete_target ;"
 
 gen_buildtools_delete_target() {
