@@ -1,0 +1,128 @@
+commit 546d1f77329b2105455f3e534ebc6a99e23454fd
+Author: Aws Ismail <aws.ismail@windriver.com>
+Date:   Sun Dec 9 15:35:16 2012 -0500
+
+    Fix monit's ssl support
+    
+    If SSL support is required monit's configure
+    looks for the location on libssl.so* and
+    libcrypto.so*. Those two libraries currently
+    reside in two different locations. Therefore,
+    giving a single DIR value to --with-ssl-lib-dir
+    will not work.
+    
+    This fix creates a new flag (--with-crypto-lib-dir)
+    to enable the correct location of libcrypto.so*.
+    For example, on a 64-bit system, libcrypto.so* will
+    reside in ${STAGING_BASELIBDIR}, while libssl.so*
+    will reside in ${STAGING_LIBDIR}. Those two values
+    can now be fed to "--with-crypto-lib-dir" and
+    "--with-ssl-libdir", respectively.
+    
+    Upstrea-Status: Inappropriate [embedded specific]
+    
+    Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+
+3/14/2014
+Update it for version 4.9
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+diff --git a/configure.ac b/configure.ac
+index c95b273..ae900c9 100644
+--- a/configure.ac.orig	2014-03-14 12:40:39.758169998 +0800
++++ b/configure.ac	2014-03-14 12:55:50.414169890 +0800
+@@ -542,14 +542,21 @@
+ 
+ # Check for ssl libraries 
+ checkssllibdir() { :
+-    if test "(" -f "$1/libcrypto.so" -o -f "$1/libcrypto.a" -o -f "$1/libcrypto.dylib" ")"  -a \
+-            "(" -f "$1/libssl.so"    -o -f "$1/libssl.a"    -o -f "$1/libssl.dylib" ")" ; then
++    if test "(" -f "$1/libssl.so"    -o -f "$1/libssl.a"    -o -f "$1/libssl.dylib" ")" ; then
+         ssllibdir="$1"
+         return 0
+     fi
+     return 1
+ }
+ 
++checkcryptolibdir() { :
++    if test "(" -f "$1/libcrypto.so" -o -f "$1/libcrypto.a" -o -f "$1/libcrypto.dylib" ")" ; then
++        cryptolibdir="$1"
++        return 0
++    fi
++    return 1
++}
++
+ # Check if we want to have SSL
+ AC_MSG_CHECKING([for SSL support])
+ AC_ARG_WITH(ssl,
+@@ -578,12 +585,15 @@
+         [  --with-ssl-dir=DIR       location of SSL installation],
+         [
+             dnl Check the specified location only
+-            for dir in "$withval" "$withval/include"; do
++            for dir in "$withval" "$withval/usr/include"; do
+             	checksslincldir "$dir"
+             done
+-            for dir in "$withval" "$withval/lib"; do
++            for dir in "$withval" "$withval/usr/lib" "$withval/usr/lib64"; do
+                 checkssllibdir "$dir" && break 2
+             done
++            for dir in "$withval" "$withval/lib" "$withval/lib64"; do
++                checkcryptolibdir "$dir" && break 2
++            done
+         ]
+     )
+ 
+@@ -672,13 +682,35 @@
+     
+     AC_MSG_RESULT([$ssllibdir])
+ 
++    AC_MSG_CHECKING([for Crypto library directory])
++    AC_ARG_WITH(crypto-lib-dir,
++        [  --with-crypto-lib-dir=DIR   location of installed cypto library files],
++        [
++            dnl Check the specified location only
++            checkcryptolibdir "$withval"
++        ]
++    )
++
++    if test -z "$cryptolibdir"; then
++        AC_MSG_RESULT([Not found])
++        echo
++        echo "Couldn't find your Crypto library files."
++        echo "Use --with-crypto-lib-dir option to fix this problem or disable the"
++        echo "SSL support with --without-ssl"
++        echo
++        exit 1
++    fi
++    AC_MSG_RESULT([$cryptolibdir])
++
++
+     AC_DEFINE([HAVE_OPENSSL], 1, [Define to 1 if you have openssl.])
+     AC_SUBST(sslincldir)
+     AC_SUBST(ssllibdir)
++    AC_SUBST(cryptolibdir)
+ fi
+ 
+ # Add SSL includes and libraries
+-if test "$sslincldir" -a "$ssllibdir"
++if test "$sslincldir" -a "$ssllibdir" -a "$cryptolibdir"
+ then
+     if test "x$ARCH" = "xDARWIN"; then
+      # Darwin already knows about ssldirs
+@@ -686,10 +718,10 @@
+     elif test -f "/usr/kerberos/include/krb5.h"; then
+      # Redhat 9 compilation fix:
+      CFLAGS="$CFLAGS -I$sslincldir -I/usr/kerberos/include"
+-     LIBS="$LIBS -L$ssllibdir -lssl -lcrypto"
++     LIBS="$LIBS -L$ssllibdir -lssl -L$cryptolibdir -lcrypto"
+     else
+      CFLAGS="$CFLAGS -I$sslincldir"
+-     LIBS="$LIBS -L$ssllibdir -lssl -lcrypto"
++     LIBS="$LIBS -L$ssllibdir -lssl -L$cryptolibdir -lcrypto"
+     fi
+ fi
+ 

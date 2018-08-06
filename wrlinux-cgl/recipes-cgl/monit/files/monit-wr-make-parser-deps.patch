@@ -1,0 +1,28 @@
+3/14/2014
+Take it from WRLinux 4.3 for monit 4.9
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ Makefile.in |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -175,12 +175,14 @@
+ # thus the off_t doesn't match and monit will crash. To workaround
+ # this problem we need to include our config.h ahead of byacc banner.
+ # Note that bison is not affected and doesn't require this workaround.
+-y.tab.c tokens.h: p.y
++y.tab.c: tokens.h
++tokens.h: p.y
+ 	$(YACC) $(YACCFLAGS) $<
+ 	echo "#include <config.h>" > .y.tab.c
+ 	cat y.tab.c >> .y.tab.c
+ 	$(MV) .y.tab.c y.tab.c
+ 	$(MV) y.tab.h tokens.h
++l.l: tokens.h
+ lex.yy.c: l.l
+ 	$(LEX) $(LEXFLAGS) $<
+ 
