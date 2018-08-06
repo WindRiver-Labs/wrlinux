@@ -1,0 +1,9 @@
+[Unit]
+Description=Monit daemon for system monitoring and error recovery
+After=syslog.target network.target
+
+[Service]
+ExecStart=@BINDIR@/monit -c /etc/monitrc -I
+
+[Install]
+WantedBy=multi-user.target

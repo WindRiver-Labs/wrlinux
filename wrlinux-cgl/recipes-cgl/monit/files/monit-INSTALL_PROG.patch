@@ -1,0 +1,28 @@
+The host INSTALL uses the '-s' option to strip the symbol tables
+of the object. But for the cross-compile environment, the host
+INSTALL can't recognise the format of the target object. So the
+'-s' option must be removed.
+
+Signed-off-by: Jiang Bin <bin.jiang@windriver.com>
+
+3/14/2014
+Take it from WRLinux 4.3 for monit 4.9
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ Makefile.in |    2 +-
+ 1 file changed, 1 insertions(+), 1 deletions(-)
+
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -39,7 +39,7 @@ MODE_CONF       = 600
+ MODE_DIRS       = 755
+ 
+ INSTALL         = @INSTALL@ 
+-INSTALL_PROG    = $(INSTALL) -m $(MODE_PROGS) -s
++INSTALL_PROG    = $(INSTALL) -m $(MODE_PROGS)
+ INSTALL_FILE    = $(INSTALL) -m $(MODE_FILES)
+ INSTALL_DIR     = $(INSTALL) -m $(MODE_DIRS) -d
+ 
