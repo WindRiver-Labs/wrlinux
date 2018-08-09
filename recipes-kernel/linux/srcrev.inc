@@ -87,6 +87,8 @@ SRCREV_machine_kb-standard-qemuarm64 ?= "9184d19fa9ba4a827f4fb6680e16d0e91226410
 LINUX_VERSION_kb-standard-qemuarm64 ?= "4.12.24"
 SRCREV_machine_kb-standard-qemuppc ?= "9184d19fa9ba4a827f4fb6680e16d0e912264108"
 LINUX_VERSION_kb-standard-qemuppc ?= "4.12.24"
+SRCREV_machine_kb-standard-ti-am335x ?= "bb84d3ef336f85d8f796fbe5a600791894c82a47"
+LINUX_VERSION_kb-standard-ti-am335x ?= "4.12.26"
 SRCREV_machine_kb-standard-tiny-base ?= "9184d19fa9ba4a827f4fb6680e16d0e912264108"
 LINUX_VERSION_kb-standard-tiny-base ?= "4.12.24"
 SRCREV_machine_kb-standard-tiny-common-pc ?= "9184d19fa9ba4a827f4fb6680e16d0e912264108"
@@ -110,6 +112,6 @@ LINUX_VERSION_kb-standard-xilinx-sdk2017-04-xilinx-zynqmp ?= "4.12.26"
 
 # yocto-kernel-cache branch entry
 KERNEL_CACHE_BRANCH = "yocto-4.12-wr"
-SRCREV_meta = "a8f7f69155163530503e6db45bf4a9e1c6ea54ac"
+SRCREV_meta = "86c58281fd636894fda74c5355812fb115ad81d3"
 
 LINUX_VERSION = "4.12.24"
