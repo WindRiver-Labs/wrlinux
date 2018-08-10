@@ -6,8 +6,8 @@ IMAGE_INSTALL += "gdb glibc-dbg"
 # Needed by test case for STD.3.1 SCTP - Base Features
 IMAGE_INSTALL += "lksctp-tools-ptest"
 
-# the iscsi testcase needs iscsitarget
-IMAGE_INSTALL += "iscsitarget"
+# the iscsi testcase needs tgt
+IMAGE_INSTALL += "tgt"
 
 # the libevent testcase needs libevent-testing
 IMAGE_INSTALL += "libevent-testing"
