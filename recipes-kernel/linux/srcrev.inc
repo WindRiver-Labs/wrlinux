@@ -27,9 +27,9 @@ SRCREV_machine_kb-standard-intel-x86 ?= "8934e9c653e59d84a752367381b87e52793b004
 LINUX_VERSION_kb-standard-intel-x86 ?= "4.12.26"
 SRCREV_machine_kb-standard-marvell-base ?= "51c8f38d882c6c7197e41c845bc52b76eb9532f9"
 LINUX_VERSION_kb-standard-marvell-base ?= "4.12.26"
-SRCREV_machine_kb-standard-marvell-sdk-17.10.6-base ?= "46373a2007ae1b833c0fc3065e618067b69e4776"
+SRCREV_machine_kb-standard-marvell-sdk-17.10.6-base ?= "6e37df34dfeea838560795e0ac68380773141d51"
 LINUX_VERSION_kb-standard-marvell-sdk-17.10.6-base ?= "4.12.26"
-SRCREV_machine_kb-standard-marvell-sdk-17.10.6-marvell-armada ?= "bccbda403b715559b9d344e6b39df17dbf99486c"
+SRCREV_machine_kb-standard-marvell-sdk-17.10.6-marvell-armada ?= "80cb8915cb7543362fa2b2ad5f6240457c7fac9a"
 LINUX_VERSION_kb-standard-marvell-sdk-17.10.6-marvell-armada ?= "4.12.26"
 SRCREV_machine_kb-standard-mti-malta32 ?= "06c1c5f76e3b2f4ca1280b758410f85fc6e664ea"
 LINUX_VERSION_kb-standard-mti-malta32 ?= "4.12.24"
@@ -112,6 +112,6 @@ LINUX_VERSION_kb-standard-xilinx-sdk2017-04-xilinx-zynqmp ?= "4.12.26"
 
 # yocto-kernel-cache branch entry
 KERNEL_CACHE_BRANCH = "yocto-4.12-wr"
-SRCREV_meta = "93b869083dd717a1bda1b60e660af7c21c5558c8"
+SRCREV_meta = "019675726dc8e3e4afc17b540868febe78048121"
 
 LINUX_VERSION = "4.12.24"
