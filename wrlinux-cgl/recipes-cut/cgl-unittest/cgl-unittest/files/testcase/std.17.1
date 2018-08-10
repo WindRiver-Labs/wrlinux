@@ -9,10 +9,10 @@
 #    1) customize /etc/iscsi/iscsid.conf
 #    2) start iscsi-initiator
 # 2. configure the target
-#    1) prepare the file used to map network storage
-#       for the initiator
-#    2) customize /etc/iet/ietd.conf
-#    3) start iscsitarget
+#    1) start tgtd
+#    2) create iSCSI target (tid 1)
+#    3) add logical Unit (lun 1) to iSCSI target (Target ID 1).
+#    4) publish iSCSI target (tid 1) to all IP address
 # 3. discovery target
 # 4. login to target and check if the block storage maps
 #    successfully
@@ -35,23 +35,19 @@ clean()
 {
 	echo "Clean System..."
 	iscsiadm -m session | grep $CLIENT_IP && iscsiadm --mode node  --targetname \
-		"iqn.2001-04.com.example:storage.disk2.sys1.xyz" --portal "$CLIENT_IP:3260" \
+		"iqn.2017-07.com.hiroom2:disk" --portal "$CLIENT_IP:3260" \
 		--logout
 
 	# clean the setting on the target
 	if [ "$autossh_flag" = true ]; then
 		# stop iscsitarget on target
-		ssh root@$CLIENT_IP -- "ps aux | grep ietd | grep -v grep"
+		ssh root@$CLIENT_IP -- "ps aux | grep tgtd | grep -v grep"
 		if [ $? -eq 0 ]; then
 			ssh root@$CLIENT_IP -- "which systemctl && systemctl stop \
-				iscsitarget || service iscsitarget stop"
+				tgtd || service tgtd stop"
 		fi
-		ssh root@$CLIENT_IP -- "[ -f /etc/iet/ietd.conf.bak ] && \
-			mv -f /etc/iet/ietd.conf.bak /etc/iet/ietd.conf"
-		if [ ! "x$LOOP_DE" = "x" ]; then
-			ssh root@$CLIENT_IP -- "losetup | grep $LOOP_DE \
-				&& losetup -d $LOOP_DE"
-		fi
+		ssh root@$CLIENT_IP -- "tgtadm --lld iscsi --mode target --op show | grep iqn.2017-07.com.hiroom2:disk || \
+			tgtadm --lld iscsi --op delete --mode target --tid 1"
 		ssh root@$CLIENT_IP -- "rm -rf $TMP_DIR"
 	fi
 
@@ -102,34 +98,30 @@ fi
 autossh $CLIENT_IP
 autossh_flag=true
 
-# check if iscsitarget installed correctly on target as
+# check if tgt installed correctly on target as
 # CLIENT_IP specify.
-ssh root@$CLIENT_IP -- "rpm -qa | grep iscsitarget" || \
-	cuterr "Please install iscsitarget correctly on $CLIENT_IP"
+ssh root@$CLIENT_IP -- "rpm -qa | tgt" || \
+	cuterr "Please install tgt correctly on $CLIENT_IP"
+
+# start iscsitarget on target
+ssh root@$CLIENT_IP -- "which systemctl && systemctl restart tgtd || service tgtd restart" \
+	|| cuterr "Failed to restart tgtd on target"
 
 # prepare the file which used to map to partition for initiator on target
 ssh root@$CLIENT_IP -- "mkdir -p $TMP_DIR && dd if=/dev/zero of=$TMP_DIR/p0.img bs=1M count=20" || \
 	cuterr "Failed to prepare the file on target"
 
-# get the free loop device on target
-LOOP_DE=`ssh root@$CLIENT_IP -- "losetup -f"`
-[ "x$LOOP_DE" = "x" ] && cuterr "Failed to find free loop device"
-ssh root@$CLIENT_IP -- "losetup $LOOP_DE $TMP_DIR/p0.img" || \
-	cuterr "Failed to losetup $LOOP_DE"
+# Create iSCSI target (tid 1)
+ssh root@$CLIENT_IP -- "tgtadm --lld iscsi --op new --mode target --tid 1 -T iqn.2017-07.com.hiroom2:disk" || \
+	cuterr "Failed to create iSCSI target"
 
-# customize /etc/iet/ietd.conf on target
-ssh root@$CLIENT_IP -- "cp /etc/iet/ietd.conf /etc/iet/ietd.conf.bak" || \
-	cuterr "Failed to backup /etc/iet/ietd.conf"
-ssh root@$CLIENT_IP -- "echo \"Target iqn.2001-04.com.example:storage.disk2.sys1.xyz\" \
-	>> /etc/iet/ietd.conf"
-ssh root@$CLIENT_IP -- "echo \"IncomingUser iqn.1994-05.com.fedora:windriver 1234567890ab\" \
-	>> /etc/iet/ietd.conf"
-ssh root@$CLIENT_IP -- "echo \"Lun 0 Path=$LOOP_DE,Type=blockio\" \
-	>> /etc/iet/ietd.conf"
+# Add logical Unit (lun 1) to iSCSI target (Target ID 1).
+ssh root@$CLIENT_IP -- "tgtadm --lld iscsi --op new --mode logicalunit --tid 1 --lun 1 -b $TMP_DIR/p0.img" || \
+	cuterr "Failed to add logical Unit (lun 1) to iSCSI target"
 
-# start iscsitarget on target
-ssh root@$CLIENT_IP -- "which systemctl && systemctl restart iscsitarget || service iscsitarget restart" \
-	|| cuterr "Failed to restart iscsitarget on target"
+# publish iSCSI target (tid 1) to all IP address
+ssh root@$CLIENT_IP -- "tgtadm --lld iscsi --op bind --mode target --tid 1 -I ALL" || \
+	cuterr "Failed to publish iSCSI target (tid 1)"
 
 # discovery target
 iscsiadm -m discovery -t sendtargets -p $CLIENT_IP || cuterr "Failed to discovery targets"
@@ -138,7 +130,7 @@ iscsiadm -m discovery -t sendtargets -p $CLIENT_IP || cuterr "Failed to discover
 disk_num1=`fdisk -l | grep "^Disk /dev/" | awk -F: '{print $1}' | awk '{print $2}' | wc -l`
 
 # login to target
-iscsiadm --mode node  --targetname "iqn.2001-04.com.example:storage.disk2.sys1.xyz"  \
+iscsiadm --mode node  --targetname "iqn.2017-07.com.hiroom2:disk"  \
 	--portal "$CLIENT_IP:3260" --login || cuterr "Failed to login to target"
 
 sleep 10
@@ -155,7 +147,7 @@ iscsiadm -m session -s | grep "iSCSI SNMP" || cuterr "Failed to check SNMP stati
 [ $disk_num2 -gt $disk_num1 ] || cuterr "Failed to map network storage for initiator"
 
 # logout to target
-iscsiadm --mode node  --targetname "iqn.2001-04.com.example:storage.disk2.sys1.xyz"  \
+iscsiadm --mode node  --targetname "iqn.2017-07.com.hiroom2:disk"  \
 	--portal "$CLIENT_IP:3260" --logout || cuterr "Failed to logout target"
 
 # check the partition on initiator after logout target
