@@ -42,6 +42,7 @@ PNWHITELIST_openembedded-layer += " \
     mailx \
     mariadb \
     memstat \
+    nmap \
     passwdqc \
     phoronix-test-suite \
     php \
@@ -92,7 +93,6 @@ PNWHITELIST_security += " \
     keynote \
     libgssglue \
     libmhash \
-    nmap \
     samhain-client \
     samhain-server \
     samhain-standalone \
