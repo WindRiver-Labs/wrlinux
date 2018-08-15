@@ -1,0 +1,6 @@
+This template adds ntp 4.2.8p12
+to the filesystem.
+
+To use this template, add the following to your setup line:
+
+    --templates feature/ntp428p12
