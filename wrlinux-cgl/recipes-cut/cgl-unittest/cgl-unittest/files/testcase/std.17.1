@@ -40,7 +40,7 @@ clean()
 
 	# clean the setting on the target
 	if [ "$autossh_flag" = true ]; then
-		# stop iscsitarget on target
+		# stop tgtd on target
 		ssh root@$CLIENT_IP -- "ps aux | grep tgtd | grep -v grep"
 		if [ $? -eq 0 ]; then
 			ssh root@$CLIENT_IP -- "which systemctl && systemctl stop \
@@ -103,7 +103,7 @@ autossh_flag=true
 ssh root@$CLIENT_IP -- "rpm -qa | tgt" || \
 	cuterr "Please install tgt correctly on $CLIENT_IP"
 
-# start iscsitarget on target
+# start tgtd on target
 ssh root@$CLIENT_IP -- "which systemctl && systemctl restart tgtd || service tgtd restart" \
 	|| cuterr "Failed to restart tgtd on target"
 
