@@ -27,6 +27,7 @@ PNWHITELIST_meta-python += "\
     python3-ordered-set \
     python3-pid \
     python3-prctl \
+    python3-pydbus \
     python3-pykickstart \
     python3-pyparted \
     python3-pytz \
@@ -34,6 +35,7 @@ PNWHITELIST_meta-python += "\
     python3-requests-file \
     python3-requests-ftp \
     python3-setuptools-scm \
+    python3-systemd \
     python3-wrapt \
 "
 
