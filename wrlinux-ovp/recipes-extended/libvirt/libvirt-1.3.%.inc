@@ -40,8 +40,9 @@ FILES_${PN}-dbg += "${libdir}/libvirt/lock-driver/.debug"
 #
 
 do_install_append() {
-	echo "unix_sock_group=\"kvm\"" >> ${D}/etc/libvirt/libvirtd.conf
-	echo "unix_sock_rw_perms=\"0776\"" >> ${D}/etc/libvirt/libvirtd.conf
+	CONF_FILE=${D}/etc/libvirt/libvirtd.conf
+	sed -i -e 's/^\(unix_sock_group\ =\ \).*/\1"kvm"/' ${CONF_FILE}
+	sed -i -e 's/^\(unix_sock_rw_perms\ =\ \).*/\1"0776"/' ${CONF_FILE}
 
 	chown -R qemu:qemu ${D}/${localstatedir}/lib/libvirt/qemu
 	echo "d qemu qemu 0755 ${localstatedir}/cache/libvirt/qemu none" \
