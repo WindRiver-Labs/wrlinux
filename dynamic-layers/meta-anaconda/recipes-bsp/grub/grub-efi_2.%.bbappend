@@ -1,16 +1,16 @@
-FILESEXTRAPATHS_prepend_installer := "${THISDIR}/files:"
+FILESEXTRAPATHS_prepend_anaconda := "${THISDIR}/files:"
 
 PXE_UEFI_GRUB_CONF ?= "grub.cfg"
 PXE_UEFI_GRUB_IMAGE ?= "bootx64-pxe.efi"
 
-SRC_URI_append_installer = " file://grub.cfg \
+SRC_URI_append_anaconda = " file://grub.cfg \
 "
 
 do_mkpxeimage() {
     :
 }
 
-do_mkpxeimage_class-target_installer() {
+do_mkpxeimage_class-target_anaconda() {
     cd ${B}
     install -d boot/grub
     if [ -e ${PXE_UEFI_GRUB_CONF} ]; then
@@ -37,7 +37,7 @@ do_mkpxeimage_class-target_installer() {
     rm ${KERNEL_IMAGETYPE} wrlinux-image-installer-initramfs-${MACHINE}.${INITRAMFS_FSTYPES}
 }
 
-do_deploy_append_class-target_installer() {
+do_deploy_append_class-target_anaconda() {
         # Install the modules to deploy, and efi_populate will
         # copy them to grub-efi's search path later
         make -C grub-core install DESTDIR=${DEPLOYDIR} pkglibdir=""
