@@ -1,0 +1,74 @@
+From acb17f0ca1144b5a220fad23f5add8d743902f41 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Fri, 17 Aug 2018 12:35:35 +0800
+Subject: [PATCH] postgresql: fix openssl no des
+
+Upstream-Status: Pending
+
+When openssl disable des with configure option 'no-des', it doesn't provide des
+related header files and functions. That causes postgresql compile failed.
+
+Fix it by checking macro OPENSSL_NO_DES to use openssl des related library
+conditionaly.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+update to version 10.4
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ contrib/pgcrypto/openssl.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/contrib/pgcrypto/openssl.c b/contrib/pgcrypto/openssl.c
+index f71a933..18a2d81 100644
+--- a/contrib/pgcrypto/openssl.c
++++ b/contrib/pgcrypto/openssl.c
+@@ -485,6 +485,8 @@ bf_init(PX_Cipher *c, const uint8 *key, unsigned klen, const uint8 *iv)
+ 	return 0;
+ }
+ 
++
++#ifndef OPENSSL_NO_DES
+ /* DES */
+ 
+ static int
+@@ -522,6 +524,7 @@ ossl_des3_init(PX_Cipher *c, const uint8 *key, unsigned klen, const uint8 *iv)
+ 		memset(od->iv, 0, bs);
+ 	return 0;
+ }
++#endif
+ 
+ /* CAST5 */
+ 
+@@ -668,6 +671,7 @@ static const struct ossl_cipher ossl_bf_cfb = {
+ 	64 / 8, 448 / 8
+ };
+ 
++#ifndef OPENSSL_NO_DES
+ static const struct ossl_cipher ossl_des_ecb = {
+ 	ossl_des_init,
+ 	EVP_des_ecb,
+@@ -691,6 +695,7 @@ static const struct ossl_cipher ossl_des3_cbc = {
+ 	EVP_des_ede3_cbc,
+ 	64 / 8, 192 / 8
+ };
++#endif
+ 
+ static const struct ossl_cipher ossl_cast_ecb = {
+ 	ossl_cast_init,
+@@ -731,10 +736,12 @@ static const struct ossl_cipher_lookup ossl_cipher_types[] = {
+ 	{"bf-cbc", &ossl_bf_cbc},
+ 	{"bf-ecb", &ossl_bf_ecb},
+ 	{"bf-cfb", &ossl_bf_cfb},
++#ifndef OPENSSL_NO_DES
+ 	{"des-ecb", &ossl_des_ecb},
+ 	{"des-cbc", &ossl_des_cbc},
+ 	{"des3-ecb", &ossl_des3_ecb},
+ 	{"des3-cbc", &ossl_des3_cbc},
++#endif
+ 	{"cast5-ecb", &ossl_cast_ecb},
+ 	{"cast5-cbc", &ossl_cast_cbc},
+ 	{"aes-ecb", &ossl_aes_ecb},
+-- 
+2.7.4
+
