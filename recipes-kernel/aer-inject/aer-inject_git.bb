@@ -22,7 +22,7 @@ SRCREV = "9bd5e2c7886fca72f139cd8402488a2235957d41"
 PE = "1"
 PV = "20100310+git${SRCPV}"
 
-DEPENDS = "flex-native"
+DEPENDS = "flex-native bison-native"
 
 S ="${WORKDIR}/git"
 
