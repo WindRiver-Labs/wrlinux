@@ -8,7 +8,7 @@ BUGTRACKER = "https://savannah.nongnu.org/bugs/?group=monit"
 
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=393a5ca445f6965873eca0259a17f833"
-DEPENDS = "openssl ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'libpam', '', d)}"
+DEPENDS = "openssl ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'libpam', '', d)} bison-native"
 
 SRC_URI = "http://ftp.twaren.net/BSD/OpenBSD/distfiles/monit-${PV}.tar.gz \
            file://wr-monit-ssl-fix.patch \
