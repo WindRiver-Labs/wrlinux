@@ -16,11 +16,9 @@ Signed-off-by: Roy Li <rongqing.li@windriver.com>
  policy/modules/system/setrans.te |    2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/policy/modules/system/setrans.te b/policy/modules/system/setrans.te
-index 8e1e27d..e947b21 100644
---- a/policy/modules/system/setrans.te
-+++ b/policy/modules/system/setrans.te
-@@ -49,6 +49,8 @@ manage_files_pattern(setrans_t, setrans_var_run_t, setrans_var_run_t)
+--- refpolicy.orig/policy/modules/system/setrans.te
++++ refpolicy/policy/modules/system/setrans.te
+@@ -56,6 +56,8 @@ manage_files_pattern(setrans_t, setrans_
  manage_sock_files_pattern(setrans_t, setrans_var_run_t, setrans_var_run_t)
  files_pid_filetrans(setrans_t, setrans_var_run_t, { file dir })
  
@@ -29,6 +27,3 @@ index 8e1e27d..e947b21 100644
  kernel_read_kernel_sysctls(setrans_t)
  kernel_read_system_state(setrans_t)
  
--- 
-1.7.10.4
-

@@ -29,11 +29,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/contrib/watchdog.te | 10 ++++++++--
  1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/policy/modules/contrib/watchdog.te b/policy/modules/contrib/watchdog.te
-index 0f13e2b..b42f344 100644
---- a/policy/modules/contrib/watchdog.te
-+++ b/policy/modules/contrib/watchdog.te
-@@ -30,8 +30,9 @@ allow watchdog_t self:fifo_file rw_fifo_file_perms;
+--- refpolicy.orig/policy/modules/contrib/watchdog.te
++++ refpolicy/policy/modules/contrib/watchdog.te
+@@ -30,8 +30,9 @@ allow watchdog_t self:fifo_file rw_fifo_
  allow watchdog_t self:rawip_socket create_socket_perms;
  allow watchdog_t self:tcp_socket { accept listen };
  
@@ -45,7 +43,7 @@ index 0f13e2b..b42f344 100644
  
  manage_files_pattern(watchdog_t, watchdog_var_run_t, watchdog_var_run_t)
  files_pid_filetrans(watchdog_t, watchdog_var_run_t, file)
-@@ -99,3 +100,8 @@ optional_policy(`
+@@ -100,3 +101,8 @@ optional_policy(`
  optional_policy(`
  	udev_read_db(watchdog_t)
  ')
@@ -54,6 +52,3 @@ index 0f13e2b..b42f344 100644
 +	# WRL fix: search /run/systemd/journal (syslogd_var_run_t:s15:c0.c1023)
 +	mls_file_read_all_levels(watchdog_t)
 +')
--- 
-1.9.1
-

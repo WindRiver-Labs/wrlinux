@@ -10,11 +10,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/kernel/filesystem.te |    3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/policy/modules/kernel/filesystem.te b/policy/modules/kernel/filesystem.te
-index 0974902..27a47b2 100644
---- a/policy/modules/kernel/filesystem.te
-+++ b/policy/modules/kernel/filesystem.te
-@@ -179,6 +179,9 @@ files_type(tmpfs_t)
+--- refpolicy.orig/policy/modules/kernel/filesystem.te
++++ refpolicy/policy/modules/kernel/filesystem.te
+@@ -198,6 +198,9 @@ files_type(tmpfs_t)
  files_mountpoint(tmpfs_t)
  files_poly_parent(tmpfs_t)
  
@@ -24,6 +22,3 @@ index 0974902..27a47b2 100644
  # Use a transition SID based on the allocating task SID and the
  # filesystem SID to label inodes in the following filesystem types,
  # and label the filesystem itself with the specified context.
--- 
-1.7.9.5
-

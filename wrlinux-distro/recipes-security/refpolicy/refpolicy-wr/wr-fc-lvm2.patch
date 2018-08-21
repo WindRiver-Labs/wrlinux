@@ -7,11 +7,9 @@ Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
  policy/modules/system/lvm.fc | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/policy/modules/system/lvm.fc b/policy/modules/system/lvm.fc
-index 879bb1e..d4e9d3d 100644
---- a/policy/modules/system/lvm.fc
-+++ b/policy/modules/system/lvm.fc
-@@ -55,6 +56,7 @@ ifdef(`distro_gentoo',`
+--- refpolicy.orig/policy/modules/system/lvm.fc
++++ refpolicy/policy/modules/system/lvm.fc
+@@ -56,6 +56,7 @@ ifdef(`distro_gentoo',`
  /sbin/lvs		--	gen_context(system_u:object_r:lvm_exec_t,s0)
  /sbin/lvscan		--	gen_context(system_u:object_r:lvm_exec_t,s0)
  /sbin/multipathd	--	gen_context(system_u:object_r:lvm_exec_t,s0)
@@ -19,6 +17,3 @@ index 879bb1e..d4e9d3d 100644
  /sbin/multipath\.static	--	gen_context(system_u:object_r:lvm_exec_t,s0)
  /sbin/pvchange		--	gen_context(system_u:object_r:lvm_exec_t,s0)
  /sbin/pvcreate		--	gen_context(system_u:object_r:lvm_exec_t,s0)
--- 
-1.7.11.7
-

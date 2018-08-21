@@ -40,10 +40,8 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/application.te |  3 +++
  4 files changed, 60 insertions(+)
 
-diff --git a/policy/modules/admin/sudo.te b/policy/modules/admin/sudo.te
-index b08db77..267db11 100644
---- a/policy/modules/admin/sudo.te
-+++ b/policy/modules/admin/sudo.te
+--- refpolicy.orig/policy/modules/admin/sudo.te
++++ refpolicy/policy/modules/admin/sudo.te
 @@ -7,3 +7,22 @@ attribute sudodomain;
  
  type sudo_exec_t;
@@ -67,11 +65,9 @@ index b08db77..267db11 100644
 +mls_file_read_all_levels(sysadm_sudo_t)
 +mls_file_read_all_levels(secadm_sudo_t)
 +mls_file_read_all_levels(auditadm_sudo_t)
-diff --git a/policy/modules/kernel/devices.if b/policy/modules/kernel/devices.if
-index e544abc..899f6d0 100644
---- a/policy/modules/kernel/devices.if
-+++ b/policy/modules/kernel/devices.if
-@@ -5031,6 +5031,25 @@ interface(`dev_read_cpu_online',`
+--- refpolicy.orig/policy/modules/kernel/devices.if
++++ refpolicy/policy/modules/kernel/devices.if
+@@ -5087,6 +5087,25 @@ interface(`dev_read_cpu_online',`
  
  ########################################
  ## <summary>
@@ -97,11 +93,9 @@ index e544abc..899f6d0 100644
  ##	Unconfined access to devices.
  ## </summary>
  ## <param name="domain">
-diff --git a/policy/modules/kernel/files.if b/policy/modules/kernel/files.if
-index a792f95..6c0b5a7 100644
---- a/policy/modules/kernel/files.if
-+++ b/policy/modules/kernel/files.if
-@@ -6738,6 +6738,25 @@ interface(`files_unconfined',`
+--- refpolicy.orig/policy/modules/kernel/files.if
++++ refpolicy/policy/modules/kernel/files.if
+@@ -6907,6 +6907,25 @@ interface(`files_unconfined',`
  	typeattribute $1 files_unconfined_type;
  ')
  
@@ -127,10 +121,8 @@ index a792f95..6c0b5a7 100644
  #######################################
  ## <summary>
  ##      Create generic pid directory.
-diff --git a/policy/modules/system/application.te b/policy/modules/system/application.te
-index c6fdab7..fbf4f1e 100644
---- a/policy/modules/system/application.te
-+++ b/policy/modules/system/application.te
+--- refpolicy.orig/policy/modules/system/application.te
++++ refpolicy/policy/modules/system/application.te
 @@ -18,3 +18,6 @@ optional_policy(`
  optional_policy(`
  	sudo_sigchld(application_domain_type)
@@ -138,6 +130,3 @@ index c6fdab7..fbf4f1e 100644
 +
 +# dontaudit attempts to search non security dirs
 +files_dontaudit_search_non_security_dirs(application_domain_type)
--- 
-1.9.1
-

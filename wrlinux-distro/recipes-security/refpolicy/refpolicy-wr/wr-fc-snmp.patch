@@ -10,11 +10,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/contrib/snmp.fc |    2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/policy/modules/contrib/snmp.fc b/policy/modules/contrib/snmp.fc
-index c73fa24..23bf08f 100644
---- a/policy/modules/contrib/snmp.fc
-+++ b/policy/modules/contrib/snmp.fc
-@@ -3,6 +3,8 @@
+--- refpolicy.orig/policy/modules/contrib/snmp.fc
++++ refpolicy/policy/modules/contrib/snmp.fc
+@@ -4,6 +4,8 @@
  /usr/sbin/snmptrap	--	gen_context(system_u:object_r:snmpd_exec_t,s0)
  /usr/sbin/snmptrapd	--	gen_context(system_u:object_r:snmpd_exec_t,s0)
  
@@ -23,6 +21,3 @@ index c73fa24..23bf08f 100644
  /usr/share/snmp/mibs/\.index	--	gen_context(system_u:object_r:snmpd_var_lib_t,s0)
  
  /var/agentx(/.*)?	gen_context(system_u:object_r:snmpd_var_lib_t,s0)
--- 
-1.7.9.5
-

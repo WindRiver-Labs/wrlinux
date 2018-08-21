@@ -16,11 +16,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/init.if | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
-index 29c45d7..ca11ca0 100644
---- a/policy/modules/system/init.if
-+++ b/policy/modules/system/init.if
-@@ -1779,7 +1779,7 @@ interface(`init_dontaudit_rw_utmp',`
+--- refpolicy.orig/policy/modules/system/init.if
++++ refpolicy/policy/modules/system/init.if
+@@ -2328,7 +2328,7 @@ interface(`init_dontaudit_rw_utmp',`
  		type initrc_var_run_t;
  	')
  
@@ -29,6 +27,3 @@ index 29c45d7..ca11ca0 100644
  ')
  
  ########################################
--- 
-1.9.1
-

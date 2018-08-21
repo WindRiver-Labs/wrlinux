@@ -8,10 +8,8 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/contrib/ldap.fc |    4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/policy/modules/contrib/ldap.fc b/policy/modules/contrib/ldap.fc
-index b7e5679..0d035f4 100644
---- a/policy/modules/contrib/ldap.fc
-+++ b/policy/modules/contrib/ldap.fc
+--- refpolicy.orig/policy/modules/contrib/ldap.fc
++++ refpolicy/policy/modules/contrib/ldap.fc
 @@ -1,8 +1,10 @@
  /etc/ldap/slapd\.conf	--	gen_context(system_u:object_r:slapd_etc_t,s0)
  /etc/openldap/certs(/.*)?	gen_context(system_u:object_r:slapd_cert_t,s0)
@@ -23,7 +21,7 @@ index b7e5679..0d035f4 100644
  
  /usr/sbin/slapd	--	gen_context(system_u:object_r:slapd_exec_t,s0)
  
-@@ -11,6 +13,8 @@
+@@ -12,6 +14,8 @@
  
  /var/lib/ldap(/.*)?	gen_context(system_u:object_r:slapd_db_t,s0)
  /var/lib/ldap/replog(/.*)?	gen_context(system_u:object_r:slapd_replog_t,s0)
@@ -32,6 +30,3 @@ index b7e5679..0d035f4 100644
  
  /var/lib/openldap-data(/.*)?	gen_context(system_u:object_r:slapd_db_t,s0)
  /var/lib/openldap-ldbm(/.*)?	gen_context(system_u:object_r:slapd_db_t,s0)
--- 
-1.7.9.5
-

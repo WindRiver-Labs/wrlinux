@@ -22,11 +22,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/logging.te |    1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
-index ecb8553..0050304 100644
---- a/policy/modules/system/logging.te
-+++ b/policy/modules/system/logging.te
-@@ -108,6 +108,7 @@ allow auditctl_t auditd_etc_t:dir list_dir_perms;
+--- refpolicy.orig/policy/modules/system/logging.te
++++ refpolicy/policy/modules/system/logging.te
+@@ -110,6 +110,7 @@ allow auditctl_t auditd_etc_t:dir list_d
  files_getattr_all_dirs(auditctl_t)
  files_getattr_all_files(auditctl_t)
  files_read_etc_files(auditctl_t)
@@ -34,6 +32,3 @@ index ecb8553..0050304 100644
  
  kernel_read_kernel_sysctls(auditctl_t)
  kernel_read_proc_symlinks(auditctl_t)
--- 
-1.7.9.5
-

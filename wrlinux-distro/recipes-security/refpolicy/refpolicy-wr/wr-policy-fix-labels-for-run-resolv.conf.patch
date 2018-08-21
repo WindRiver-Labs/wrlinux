@@ -22,11 +22,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/contrib/networkmanager.te | 5 +++++
  1 file changed, 5 insertions(+)
 
-diff --git a/policy/modules/contrib/networkmanager.te b/policy/modules/contrib/networkmanager.te
-index 9b57543..2b530cd 100644
---- a/policy/modules/contrib/networkmanager.te
-+++ b/policy/modules/contrib/networkmanager.te
-@@ -90,6 +90,11 @@ manage_dirs_pattern(NetworkManager_t, NetworkManager_var_run_t, NetworkManager_v
+--- refpolicy.orig/policy/modules/contrib/networkmanager.te
++++ refpolicy/policy/modules/contrib/networkmanager.te
+@@ -91,6 +91,11 @@ manage_dirs_pattern(NetworkManager_t, Ne
  manage_files_pattern(NetworkManager_t, NetworkManager_var_run_t, NetworkManager_var_run_t)
  manage_sock_files_pattern(NetworkManager_t, NetworkManager_var_run_t, NetworkManager_var_run_t)
  files_pid_filetrans(NetworkManager_t, NetworkManager_var_run_t, { dir file sock_file })
@@ -38,6 +36,3 @@ index 9b57543..2b530cd 100644
  
  can_exec(NetworkManager_t, { NetworkManager_exec_t wpa_cli_exec_t NetworkManager_tmp_t })
  
--- 
-2.11.0
-

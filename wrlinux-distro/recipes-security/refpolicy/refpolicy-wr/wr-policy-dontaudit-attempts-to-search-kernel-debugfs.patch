@@ -21,11 +21,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/kernel/domain.te | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/policy/modules/kernel/domain.te b/policy/modules/kernel/domain.te
-index 62a8911..2ff2d2f 100644
---- a/policy/modules/kernel/domain.te
-+++ b/policy/modules/kernel/domain.te
-@@ -100,6 +100,7 @@ kernel_read_proc_symlinks(domain)
+--- refpolicy.orig/policy/modules/kernel/domain.te
++++ refpolicy/policy/modules/kernel/domain.te
+@@ -95,6 +95,7 @@ kernel_read_proc_symlinks(domain)
  # a keyring
  kernel_dontaudit_search_key(domain)
  kernel_dontaudit_link_key(domain)
@@ -33,6 +31,3 @@ index 62a8911..2ff2d2f 100644
  
  # create child processes in the domain
  allow domain self:process { fork sigchld };
--- 
-1.9.1
-

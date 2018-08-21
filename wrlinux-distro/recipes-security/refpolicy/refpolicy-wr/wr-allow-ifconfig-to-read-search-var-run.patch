@@ -15,11 +15,9 @@ Signed-off-by: Michel Thebeau <michel.thebeau@windriver.com>
  policy/modules/system/sysnetwork.te |    1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/policy/modules/system/sysnetwork.te b/policy/modules/system/sysnetwork.te
-index ed363e1..8a20cad 100644
---- a/policy/modules/system/sysnetwork.te
-+++ b/policy/modules/system/sysnetwork.te
-@@ -281,6 +281,7 @@ domain_use_interactive_fds(ifconfig_t)
+--- refpolicy.orig/policy/modules/system/sysnetwork.te
++++ refpolicy/policy/modules/system/sysnetwork.te
+@@ -312,6 +312,7 @@ domain_use_interactive_fds(ifconfig_t)
  
  files_read_etc_files(ifconfig_t)
  files_read_etc_runtime_files(ifconfig_t)
@@ -27,6 +25,3 @@ index ed363e1..8a20cad 100644
  
  fs_getattr_xattr_fs(ifconfig_t)
  fs_search_auto_mountpoints(ifconfig_t)
--- 
-1.7.9.7
-

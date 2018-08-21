@@ -10,18 +10,13 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/admin/netutils.fc |    1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/policy/modules/admin/netutils.fc b/policy/modules/admin/netutils.fc
-index f2ed3dc..5587180 100644
---- a/policy/modules/admin/netutils.fc
-+++ b/policy/modules/admin/netutils.fc
+--- refpolicy.orig/policy/modules/admin/netutils.fc
++++ refpolicy/policy/modules/admin/netutils.fc
 @@ -4,6 +4,7 @@
  
  /sbin/arping		--	gen_context(system_u:object_r:netutils_exec_t,s0)
  /bin/arping		--	gen_context(system_u:object_r:netutils_exec_t,s0)
 +/usr/sbin/arping\.iputils	--	gen_context(system_u:object_r:netutils_exec_t,s0)
  
+ /usr/bin/arping		--	gen_context(system_u:object_r:netutils_exec_t,s0)
  /usr/bin/lft		--	gen_context(system_u:object_r:traceroute_exec_t,s0)
- /usr/bin/nmap		--	gen_context(system_u:object_r:traceroute_exec_t,s0)
--- 
-1.7.9.5
-

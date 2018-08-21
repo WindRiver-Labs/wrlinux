@@ -12,11 +12,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  config/file_contexts.subs_dist | 5 +++++
  1 file changed, 5 insertions(+)
 
-diff --git a/config/file_contexts.subs_dist b/config/file_contexts.subs_dist
-index ee5b433..5d86351 100644
---- a/config/file_contexts.subs_dist
-+++ b/config/file_contexts.subs_dist
-@@ -29,3 +29,8 @@
+--- refpolicy.orig/config/file_contexts.subs_dist
++++ refpolicy/config/file_contexts.subs_dist
+@@ -35,3 +35,8 @@
  /usr/lib/busybox/bin /bin
  /usr/lib/busybox/sbin /sbin
  /usr/lib/busybox/usr /usr
@@ -25,6 +23,3 @@ index ee5b433..5d86351 100644
 +/etc/systemd/system /usr/lib/systemd/system
 +/lib/systemd /usr/lib/systemd
 +/root /home/root
--- 
-1.9.1
-

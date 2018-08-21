@@ -10,11 +10,9 @@ Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
  policy/modules/kernel/devices.if | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/policy/modules/kernel/devices.if b/policy/modules/kernel/devices.if
-index d820975..e97ca02 100644
---- a/policy/modules/kernel/devices.if
-+++ b/policy/modules/kernel/devices.if
-@@ -2063,7 +2063,7 @@ interface(`dev_dontaudit_setattr_framebuffer_dev',`
+--- refpolicy.orig/policy/modules/kernel/devices.if
++++ refpolicy/policy/modules/kernel/devices.if
+@@ -2162,7 +2162,7 @@ interface(`dev_dontaudit_setattr_framebu
  #
  interface(`dev_read_framebuffer',`
  	gen_require(`
@@ -23,6 +21,3 @@ index d820975..e97ca02 100644
  	')
  
  	read_chr_files_pattern($1, device_t, framebuf_device_t)
--- 
-1.7.11.7
-

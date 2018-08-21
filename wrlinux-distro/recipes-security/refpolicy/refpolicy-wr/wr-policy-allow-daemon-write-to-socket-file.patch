@@ -30,11 +30,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/init.te | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
-index 1ea0532..c7a1ace 100644
---- a/policy/modules/system/init.te
-+++ b/policy/modules/system/init.te
-@@ -190,6 +190,10 @@ seutil_read_config(init_t)
+--- refpolicy.orig/policy/modules/system/init.te
++++ refpolicy/policy/modules/system/init.te
+@@ -195,6 +195,10 @@ seutil_read_config(init_t)
  
  miscfiles_read_localization(init_t)
  
@@ -45,6 +43,3 @@ index 1ea0532..c7a1ace 100644
  ifdef(`init_systemd',`
  	# handle instances where an old labeled init script is encountered.
  	typeattribute init_t init_run_all_scripts_domain;
--- 
-1.9.1
-

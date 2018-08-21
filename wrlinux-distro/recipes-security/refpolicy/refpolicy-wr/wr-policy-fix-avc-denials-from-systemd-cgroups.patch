@@ -60,13 +60,11 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/systemd.te | 16 ++++++++++++++++
  1 file changed, 16 insertions(+)
 
-diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
-index 681f766..aa7b674 100644
---- a/policy/modules/system/systemd.te
-+++ b/policy/modules/system/systemd.te
-@@ -124,6 +124,22 @@ logging_send_syslog_msg(systemd_cgroups_t)
+--- refpolicy.orig/policy/modules/system/systemd.te
++++ refpolicy/policy/modules/system/systemd.te
+@@ -165,6 +165,22 @@ files_read_etc_files(systemd_backlight_t
  
- kernel_dgram_send(systemd_cgroups_t)
+ udev_read_pid_files(systemd_backlight_t)
  
 +allow systemd_cgroups_t self:capability net_admin;
 +# read the process state (/proc/pid) of init
@@ -86,7 +84,4 @@ index 681f766..aa7b674 100644
 +
  #######################################
  #
- # locale local policy
--- 
-1.9.1
-
+ # Binfmt local policy

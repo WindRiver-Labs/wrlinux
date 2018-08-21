@@ -17,12 +17,10 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/contrib/alsa.te |    4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/policy/modules/contrib/alsa.te b/policy/modules/contrib/alsa.te
-index 901a6d3..b6ab166 100644
---- a/policy/modules/contrib/alsa.te
-+++ b/policy/modules/contrib/alsa.te
-@@ -59,6 +59,10 @@ dev_read_sound(alsa_t)
- dev_read_sysfs(alsa_t)
+--- refpolicy.orig/policy/modules/contrib/alsa.te
++++ refpolicy/policy/modules/contrib/alsa.te
+@@ -76,6 +76,10 @@ dev_read_sysfs(alsa_t)
+ dev_read_urand(alsa_t)
  dev_write_sound(alsa_t)
  
 +# add alsa_t to attribute mlsfileread, this allows alsactl
@@ -32,6 +30,3 @@ index 901a6d3..b6ab166 100644
  files_read_usr_files(alsa_t)
  files_search_var_lib(alsa_t)
  
--- 
-1.7.9.5
-

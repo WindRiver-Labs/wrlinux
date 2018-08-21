@@ -21,11 +21,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/setrans.te | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/policy/modules/system/setrans.te b/policy/modules/system/setrans.te
-index a1f8c77..9a7c8f1 100644
---- a/policy/modules/system/setrans.te
-+++ b/policy/modules/system/setrans.te
-@@ -37,7 +37,7 @@ ifdef(`enable_mls',`
+--- refpolicy.orig/policy/modules/system/setrans.te
++++ refpolicy/policy/modules/system/setrans.te
+@@ -40,7 +40,7 @@ ifdef(`enable_mls',`
  # setrans local policy
  #
  
@@ -34,6 +32,3 @@ index a1f8c77..9a7c8f1 100644
  allow setrans_t self:process { setrlimit getcap setcap signal_perms };
  allow setrans_t self:unix_stream_socket create_stream_socket_perms;
  allow setrans_t self:unix_dgram_socket create_socket_perms;
--- 
-1.9.1
-

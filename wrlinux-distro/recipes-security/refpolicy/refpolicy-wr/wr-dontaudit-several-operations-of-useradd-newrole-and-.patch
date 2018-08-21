@@ -16,11 +16,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/systemd.te     |  3 +++
  5 files changed, 48 insertions(+)
 
-diff --git a/policy/modules/admin/usermanage.te b/policy/modules/admin/usermanage.te
-index 65a1186..def8386 100644
---- a/policy/modules/admin/usermanage.te
-+++ b/policy/modules/admin/usermanage.te
-@@ -358,6 +358,8 @@ userdom_dontaudit_search_user_home_content(passwd_t)
+--- refpolicy.orig/policy/modules/admin/usermanage.te
++++ refpolicy/policy/modules/admin/usermanage.te
+@@ -358,6 +358,8 @@ userdom_dontaudit_search_user_home_conte
  
  mls_file_read_all_levels(passwd_t)
  
@@ -29,10 +27,8 @@ index 65a1186..def8386 100644
  optional_policy(`
  	nscd_run(passwd_t, passwd_roles)
  ')
-diff --git a/policy/modules/system/authlogin.if b/policy/modules/system/authlogin.if
-index 16659cb..e8e27c0 100644
---- a/policy/modules/system/authlogin.if
-+++ b/policy/modules/system/authlogin.if
+--- refpolicy.orig/policy/modules/system/authlogin.if
++++ refpolicy/policy/modules/system/authlogin.if
 @@ -1011,6 +1011,25 @@ interface(`auth_manage_var_auth',`
  	allow $1 var_auth_t:lnk_file rw_lnk_file_perms;
  ')
@@ -59,10 +55,8 @@ index 16659cb..e8e27c0 100644
  ########################################
  ## <summary>
  ##	Read PAM PID files.
-diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
-index 44b7564..86d388e 100644
---- a/policy/modules/system/init.if
-+++ b/policy/modules/system/init.if
+--- refpolicy.orig/policy/modules/system/init.if
++++ refpolicy/policy/modules/system/init.if
 @@ -2200,6 +2200,25 @@ interface(`init_getattr_utmp',`
  	allow $1 initrc_var_run_t:file getattr;
  ')
@@ -89,11 +83,9 @@ index 44b7564..86d388e 100644
  ########################################
  ## <summary>
  ##	Read utmp.
-diff --git a/policy/modules/system/selinuxutil.te b/policy/modules/system/selinuxutil.te
-index 4b9b693..21a297d 100644
---- a/policy/modules/system/selinuxutil.te
-+++ b/policy/modules/system/selinuxutil.te
-@@ -288,6 +288,8 @@ miscfiles_read_localization(newrole_t)
+--- refpolicy.orig/policy/modules/system/selinuxutil.te
++++ refpolicy/policy/modules/system/selinuxutil.te
+@@ -291,6 +291,8 @@ miscfiles_read_localization(newrole_t)
  
  seutil_libselinux_linked(newrole_t)
  
@@ -102,7 +94,7 @@ index 4b9b693..21a297d 100644
  # for some PAM modules and for cwd
  userdom_dontaudit_search_user_home_content(newrole_t)
  userdom_search_user_home_dirs(newrole_t)
-@@ -501,6 +503,9 @@ seutil_get_semanage_read_lock(semanage_t)
+@@ -504,6 +506,9 @@ seutil_get_semanage_read_lock(semanage_t
  # netfilter_contexts:
  seutil_manage_default_contexts(semanage_t)
  
@@ -112,11 +104,9 @@ index 4b9b693..21a297d 100644
  # Handle pp files created in homedir and /tmp
  userdom_read_user_home_content_files(semanage_t)
  userdom_read_user_tmp_files(semanage_t)
-diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
-index f4e22b2..8f0d014 100644
---- a/policy/modules/system/systemd.te
-+++ b/policy/modules/system/systemd.te
-@@ -258,6 +258,9 @@ domain_read_all_domains_state(systemd_logind_t)
+--- refpolicy.orig/policy/modules/system/systemd.te
++++ refpolicy/policy/modules/system/systemd.te
+@@ -328,6 +328,9 @@ domain_read_all_domains_state(systemd_lo
  userdom_manage_all_user_tmp_content(systemd_logind_t)
  userdom_mounton_tmp_dirs(systemd_logind_t)
  
@@ -126,6 +116,3 @@ index f4e22b2..8f0d014 100644
  optional_policy(`
  	dbus_system_bus_client(systemd_logind_t)
  	dbus_connect_system_bus(systemd_logind_t)
--- 
-1.9.1
-

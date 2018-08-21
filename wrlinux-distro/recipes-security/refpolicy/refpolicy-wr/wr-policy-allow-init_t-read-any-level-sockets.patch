@@ -19,17 +19,12 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/init.te | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
-index d5bad82..0c46841 100644
---- a/policy/modules/system/init.te
-+++ b/policy/modules/system/init.te
-@@ -1108,3 +1108,6 @@ mls_file_upgrade(init_t)
+--- refpolicy.orig/policy/modules/system/init.te
++++ refpolicy/policy/modules/system/init.te
+@@ -1119,3 +1119,6 @@ mls_file_upgrade(init_t)
  
  # Get all service status (systemd)
  init_get_system_status(init_t)
 +
 +# MLS trusted for reading from sockets at any level
 +mls_socket_read_all_levels(init_t)
--- 
-1.9.1
-

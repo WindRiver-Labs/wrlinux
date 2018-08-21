@@ -39,11 +39,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/systemd.te | 6 ++++++
  2 files changed, 7 insertions(+)
 
-diff --git a/policy/modules/contrib/dbus.te b/policy/modules/contrib/dbus.te
-index 14f94a7..0deb0fe 100644
---- a/policy/modules/contrib/dbus.te
-+++ b/policy/modules/contrib/dbus.te
-@@ -144,6 +144,7 @@ userdom_dontaudit_use_unpriv_user_fds(system_dbusd_t)
+--- refpolicy.orig/policy/modules/contrib/dbus.te
++++ refpolicy/policy/modules/contrib/dbus.te
+@@ -144,6 +144,7 @@ userdom_dontaudit_use_unpriv_user_fds(sy
  userdom_dontaudit_search_user_home_dirs(system_dbusd_t)
  
  systemd_write_inherited_logind_sessions_pipes(system_dbusd_t)
@@ -51,11 +49,9 @@ index 14f94a7..0deb0fe 100644
  
  optional_policy(`
  	bluetooth_stream_connect(system_dbusd_t)
-diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
-index 240de81..86cb1cf 100644
---- a/policy/modules/system/systemd.te
-+++ b/policy/modules/system/systemd.te
-@@ -283,6 +283,7 @@ kernel_read_kernel_sysctls(systemd_logind_t)
+--- refpolicy.orig/policy/modules/system/systemd.te
++++ refpolicy/policy/modules/system/systemd.te
+@@ -322,6 +322,7 @@ kernel_read_kernel_sysctls(systemd_login
  fs_mount_tmpfs(systemd_logind_t)
  auth_manage_var_auth(systemd_logind_t)
  mls_file_read_all_levels(systemd_logind_t)
@@ -63,7 +59,7 @@ index 240de81..86cb1cf 100644
  
  domain_read_all_domains_state(systemd_logind_t)
  
-@@ -297,6 +298,11 @@ optional_policy(`
+@@ -336,6 +337,11 @@ optional_policy(`
  	dbus_connect_system_bus(systemd_logind_t)
  ')
  
@@ -75,6 +71,3 @@ index 240de81..86cb1cf 100644
  #########################################
  #
  # Resolved local policy
--- 
-2.11.0
-

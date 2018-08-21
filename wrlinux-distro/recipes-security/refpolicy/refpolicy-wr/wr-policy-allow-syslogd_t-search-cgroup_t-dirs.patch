@@ -27,11 +27,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/logging.te | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
-index 784aa1d..33a5c13 100644
---- a/policy/modules/system/logging.te
-+++ b/policy/modules/system/logging.te
-@@ -508,6 +508,7 @@ files_var_lib_filetrans(syslogd_t, syslogd_var_lib_t, { file dir })
+--- refpolicy.orig/policy/modules/system/logging.te
++++ refpolicy/policy/modules/system/logging.te
+@@ -501,6 +501,7 @@ files_var_lib_filetrans(syslogd_t, syslo
  fs_getattr_all_fs(syslogd_t)
  fs_search_auto_mountpoints(syslogd_t)
  fs_search_tmpfs(syslogd_t)
@@ -39,6 +37,3 @@ index 784aa1d..33a5c13 100644
  
  mls_file_read_all_levels(syslogd_t)
  mls_file_write_all_levels(syslogd_t) # Need to be able to write to /var/run/ and /var/log directories
--- 
-2.13.3
-

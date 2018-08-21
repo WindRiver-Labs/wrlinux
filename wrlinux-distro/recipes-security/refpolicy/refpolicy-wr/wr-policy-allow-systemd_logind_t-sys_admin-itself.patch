@@ -20,11 +20,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/systemd.te | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
-index 61f331e..edebc0b 100644
---- a/policy/modules/system/systemd.te
-+++ b/policy/modules/system/systemd.te
-@@ -181,7 +181,7 @@ optional_policy(`
+--- refpolicy.orig/policy/modules/system/systemd.te
++++ refpolicy/policy/modules/system/systemd.te
+@@ -250,7 +250,7 @@ optional_policy(`
  # Logind local policy
  #
  
@@ -33,6 +31,3 @@ index 61f331e..edebc0b 100644
  allow systemd_logind_t self:process { getcap setfscreate };
  allow systemd_logind_t self:netlink_kobject_uevent_socket create_socket_perms;
  allow systemd_logind_t self:unix_dgram_socket create_socket_perms;
--- 
-1.9.1
-

@@ -24,11 +24,9 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  policy/modules/system/getty.te        |  1 +
  7 files changed, 24 insertions(+), 3 deletions(-)
 
-diff --git a/policy/modules/contrib/remotelogin.te b/policy/modules/contrib/remotelogin.te
-index ae30871..2dba73a 100644
---- a/policy/modules/contrib/remotelogin.te
-+++ b/policy/modules/contrib/remotelogin.te
-@@ -69,6 +69,7 @@ userdom_use_unpriv_users_fds(remote_login_t)
+--- refpolicy.orig/policy/modules/contrib/remotelogin.te
++++ refpolicy/policy/modules/contrib/remotelogin.te
+@@ -69,6 +69,7 @@ userdom_use_unpriv_users_fds(remote_logi
  userdom_search_user_home_content(remote_login_t)
  userdom_signal_unpriv_users(remote_login_t)
  userdom_spec_domtrans_unpriv_users(remote_login_t)
@@ -36,31 +34,25 @@ index ae30871..2dba73a 100644
  
  tunable_policy(`use_nfs_home_dirs',`
  	fs_read_nfs_files(remote_login_t)
-diff --git a/policy/modules/contrib/rlogin.fc b/policy/modules/contrib/rlogin.fc
-index f111877..b18e341 100644
---- a/policy/modules/contrib/rlogin.fc
-+++ b/policy/modules/contrib/rlogin.fc
-@@ -3,6 +3,4 @@ HOME_DIR/\.rlogin	--	gen_context(system_u:object_r:rlogind_home_t,s0)
+--- refpolicy.orig/policy/modules/contrib/rlogin.fc
++++ refpolicy/policy/modules/contrib/rlogin.fc
+@@ -3,6 +3,4 @@ HOME_DIR/\.rlogin	--	gen_context(system_
  
  /usr/kerberos/sbin/klogind	--	gen_context(system_u:object_r:rlogind_exec_t,s0)
  
 -/usr/lib/telnetlogin	--	gen_context(system_u:object_r:rlogind_exec_t,s0)
 -
  /usr/sbin/in\.rlogind	--	gen_context(system_u:object_r:rlogind_exec_t,s0)
-diff --git a/policy/modules/contrib/telnet.fc b/policy/modules/contrib/telnet.fc
-index 3d7d07a..728874d 100644
---- a/policy/modules/contrib/telnet.fc
-+++ b/policy/modules/contrib/telnet.fc
+--- refpolicy.orig/policy/modules/contrib/telnet.fc
++++ refpolicy/policy/modules/contrib/telnet.fc
 @@ -1,3 +1,5 @@
  /usr/sbin/in\.telnetd	--	gen_context(system_u:object_r:telnetd_exec_t,s0)
  
  /usr/kerberos/sbin/telnetd	--	gen_context(system_u:object_r:telnetd_exec_t,s0)
 +
 +/usr/lib/telnetlogin	--	gen_context(system_u:object_r:telnetd_exec_t,s0)
-diff --git a/policy/modules/contrib/telnet.te b/policy/modules/contrib/telnet.te
-index 0e70d1f..74b50f3 100644
---- a/policy/modules/contrib/telnet.te
-+++ b/policy/modules/contrib/telnet.te
+--- refpolicy.orig/policy/modules/contrib/telnet.te
++++ refpolicy/policy/modules/contrib/telnet.te
 @@ -71,6 +71,7 @@ fs_getattr_xattr_fs(telnetd_t)
  
  auth_rw_login_records(telnetd_t)
@@ -69,10 +61,8 @@ index 0e70d1f..74b50f3 100644
  
  init_rw_utmp(telnetd_t)
  
-diff --git a/policy/modules/system/authlogin.fc b/policy/modules/system/authlogin.fc
-index c8bca17..4f93f27 100644
---- a/policy/modules/system/authlogin.fc
-+++ b/policy/modules/system/authlogin.fc
+--- refpolicy.orig/policy/modules/system/authlogin.fc
++++ refpolicy/policy/modules/system/authlogin.fc
 @@ -1,5 +1,5 @@
  
 -/bin/login		--	gen_context(system_u:object_r:login_exec_t,s0)
@@ -80,11 +70,9 @@ index c8bca17..4f93f27 100644
  /bin/login\.shadow	--	gen_context(system_u:object_r:login_exec_t,s0)
  /bin/login\.tinylogin	--	gen_context(system_u:object_r:login_exec_t,s0)
  
-diff --git a/policy/modules/system/authlogin.if b/policy/modules/system/authlogin.if
-index 8db3c19..8356df0 100644
---- a/policy/modules/system/authlogin.if
-+++ b/policy/modules/system/authlogin.if
-@@ -197,6 +197,24 @@ interface(`auth_login_entry_type',`
+--- refpolicy.orig/policy/modules/system/authlogin.if
++++ refpolicy/policy/modules/system/authlogin.if
+@@ -180,6 +180,24 @@ interface(`auth_login_entry_type',`
  
  ########################################
  ## <summary>
@@ -109,11 +97,9 @@ index 8db3c19..8356df0 100644
  ##	Make the specified type usable as a
  ##	login file.
  ## </summary>
-diff --git a/policy/modules/system/getty.te b/policy/modules/system/getty.te
-index 2e6e30a..a3f67b6 100644
---- a/policy/modules/system/getty.te
-+++ b/policy/modules/system/getty.te
-@@ -92,6 +92,7 @@ term_setattr_unallocated_ttys(getty_t)
+--- refpolicy.orig/policy/modules/system/getty.te
++++ refpolicy/policy/modules/system/getty.te
+@@ -85,6 +85,7 @@ term_setattr_unallocated_ttys(getty_t)
  term_setattr_console(getty_t)
  
  auth_rw_login_records(getty_t)
@@ -121,6 +107,3 @@ index 2e6e30a..a3f67b6 100644
  
  init_rw_utmp(getty_t)
  init_use_script_ptys(getty_t)
--- 
-1.9.1
-

@@ -22,18 +22,12 @@ Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
  create mode 100644 policy/modules/contrib/crash.if
  create mode 100644 policy/modules/contrib/crash.te
 
-diff --git a/policy/modules/contrib/crash.fc b/policy/modules/contrib/crash.fc
-new file mode 100644
-index 0000000..55c6632
 --- /dev/null
-+++ b/policy/modules/contrib/crash.fc
++++ refpolicy/policy/modules/contrib/crash.fc
 @@ -0,0 +1 @@
 +/usr/bin/crash.*	--	gen_context(system_u:object_r:crash_exec_t,s0)
-diff --git a/policy/modules/contrib/crash.if b/policy/modules/contrib/crash.if
-new file mode 100644
-index 0000000..36e73a4
 --- /dev/null
-+++ b/policy/modules/contrib/crash.if
++++ refpolicy/policy/modules/contrib/crash.if
 @@ -0,0 +1,46 @@
 +## <summary>Kernel crash dumping mechanism</summary>
 +
@@ -81,11 +75,8 @@ index 0000000..36e73a4
 +
 +	crash_domtrans($1)
 +')
-diff --git a/policy/modules/contrib/crash.te b/policy/modules/contrib/crash.te
-new file mode 100644
-index 0000000..9e1db72
 --- /dev/null
-+++ b/policy/modules/contrib/crash.te
++++ refpolicy/policy/modules/contrib/crash.te
 @@ -0,0 +1,58 @@
 +policy_module(crash, 1.0.0)
 +
@@ -145,11 +136,9 @@ index 0000000..9e1db72
 +
 +mls_file_read_to_clearance(crash_t)
 +mls_file_write_to_clearance(crash_t)
-diff --git a/policy/modules/roles/sysadm.te b/policy/modules/roles/sysadm.te
-index 342ce5b..cee455d 100644
---- a/policy/modules/roles/sysadm.te
-+++ b/policy/modules/roles/sysadm.te
-@@ -122,6 +122,10 @@ optional_policy(`
+--- refpolicy.orig/policy/modules/roles/sysadm.te
++++ refpolicy/policy/modules/roles/sysadm.te
+@@ -267,6 +267,10 @@ optional_policy(`
  ')
  
  optional_policy(`
@@ -160,6 +149,3 @@ index 342ce5b..cee455d 100644
  	clockspeed_run_cli(sysadm_t, sysadm_r)
  ')
  
--- 
-1.7.11.7
-

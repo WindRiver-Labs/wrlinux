@@ -23,11 +23,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/contrib/samba.te |    6 ++++++
  1 file changed, 6 insertions(+)
 
-diff --git a/policy/modules/contrib/samba.te b/policy/modules/contrib/samba.te
-index 54b89a6..0cd86ee 100644
---- a/policy/modules/contrib/samba.te
-+++ b/policy/modules/contrib/samba.te
-@@ -308,6 +308,10 @@ allow smbd_t nmbd_var_run_t:file read_file_perms;
+--- refpolicy.orig/policy/modules/contrib/samba.te
++++ refpolicy/policy/modules/contrib/samba.te
+@@ -317,6 +317,10 @@ allow smbd_t nmbd_var_run_t:file read_fi
  stream_connect_pattern(smbd_t, nmbd_var_run_t, nmbd_var_run_t, nmbd_t)
  
  kernel_getattr_core_if(smbd_t)
@@ -38,7 +36,7 @@ index 54b89a6..0cd86ee 100644
  kernel_getattr_message_if(smbd_t)
  kernel_read_network_state(smbd_t)
  kernel_read_fs_sysctls(smbd_t)
-@@ -515,6 +519,8 @@ manage_files_pattern(nmbd_t, nmbd_var_run_t, nmbd_var_run_t)
+@@ -524,6 +528,8 @@ manage_files_pattern(nmbd_t, nmbd_var_ru
  manage_sock_files_pattern(nmbd_t, nmbd_var_run_t, nmbd_var_run_t)
  files_pid_filetrans(nmbd_t, nmbd_var_run_t, { dir file sock_file })
  filetrans_pattern(nmbd_t, smbd_var_run_t, nmbd_var_run_t, dir)
@@ -47,6 +45,3 @@ index 54b89a6..0cd86ee 100644
  
  read_files_pattern(nmbd_t, samba_etc_t, samba_etc_t)
  read_lnk_files_pattern(nmbd_t, samba_etc_t, samba_etc_t)
--- 
-1.7.9.5
-

@@ -13,12 +13,10 @@ Signed-off-by: Roy Li <rongqing.li@windriver.com>
  policy/modules/roles/sysadm.te |    4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/policy/modules/roles/sysadm.te b/policy/modules/roles/sysadm.te
-index 5674b36..1c092dd 100644
---- a/policy/modules/roles/sysadm.te
-+++ b/policy/modules/roles/sysadm.te
-@@ -436,6 +436,10 @@ optional_policy(`
- 	yam_run(sysadm_t, sysadm_r)
+--- refpolicy.orig/policy/modules/roles/sysadm.te
++++ refpolicy/policy/modules/roles/sysadm.te
+@@ -1245,6 +1245,10 @@ optional_policy(`
+ 	kerberos_exec_kadmind(sysadm_t)
  ')
  
 +optional_policy(`
@@ -28,6 +26,3 @@ index 5674b36..1c092dd 100644
  ifndef(`distro_redhat',`
  	optional_policy(`
  		auth_role(sysadm_r, sysadm_t)
--- 
-1.7.10.4
-

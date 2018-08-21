@@ -14,17 +14,12 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/init.te | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
-index c6ff0fb..d7cd0dd 100644
---- a/policy/modules/system/init.te
-+++ b/policy/modules/system/init.te
-@@ -1105,3 +1105,6 @@ allow init_t self:capability2 block_suspend;
+--- refpolicy.orig/policy/modules/system/init.te
++++ refpolicy/policy/modules/system/init.te
+@@ -1116,3 +1116,6 @@ allow init_t self:capability2 block_susp
  # MLS trusted for lowering/raising the level of files
  mls_file_downgrade(init_t)
  mls_file_upgrade(init_t)
 +
 +# Get all service status (systemd)
 +init_get_system_status(init_t)
--- 
-1.9.1
-

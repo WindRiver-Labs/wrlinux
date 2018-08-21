@@ -17,11 +17,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/contrib/postfix.te |    2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/policy/modules/contrib/postfix.te b/policy/modules/contrib/postfix.te
-index 986bc4c..c7f4bce 100644
---- a/policy/modules/contrib/postfix.te
-+++ b/policy/modules/contrib/postfix.te
-@@ -215,6 +215,8 @@ allow postfix_master_t { postfix_postdrop_exec_t postfix_postqueue_exec_t }:file
+--- refpolicy.orig/policy/modules/contrib/postfix.te
++++ refpolicy/policy/modules/contrib/postfix.te
+@@ -221,6 +221,8 @@ allow postfix_master_t { postfix_postdro
  
  allow postfix_master_t postfix_prng_t:file rw_file_perms;
  
@@ -30,6 +28,3 @@ index 986bc4c..c7f4bce 100644
  manage_dirs_pattern(postfix_master_t, postfix_spool_t, postfix_spool_t)
  manage_files_pattern(postfix_master_t, postfix_spool_t, postfix_spool_t)
  files_spool_filetrans(postfix_master_t, postfix_spool_t, dir)
--- 
-1.7.9.5
-

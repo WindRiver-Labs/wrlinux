@@ -10,12 +10,10 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/roles/sysadm.te |    4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/policy/modules/roles/sysadm.te b/policy/modules/roles/sysadm.te
-index 3d5924b..9706d65 100644
---- a/policy/modules/roles/sysadm.te
-+++ b/policy/modules/roles/sysadm.te
-@@ -444,6 +444,10 @@ optional_policy(`
-       cron_admin_role(sysadm_r, sysadm_t)
+--- refpolicy.orig/policy/modules/roles/sysadm.te
++++ refpolicy/policy/modules/roles/sysadm.te
+@@ -1241,6 +1241,10 @@ optional_policy(`
+ 	zebra_admin(sysadm_t, sysadm_r)
  ')
  
 +optional_policy(`
@@ -25,6 +23,3 @@ index 3d5924b..9706d65 100644
  ifndef(`distro_redhat',`
  	optional_policy(`
  		auth_role(sysadm_r, sysadm_t)
--- 
-1.7.9.5
-

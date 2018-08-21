@@ -9,9 +9,9 @@ Upstream-Status: Pending
 Signed-off-by: Joe Slater <jslater@windriver.com>
 
 
---- a/policy/modules/system/selinuxutil.te
-+++ b/policy/modules/system/selinuxutil.te
-@@ -450,6 +450,8 @@ allow semanage_t policy_config_t:file rw
+--- refpolicy.orig/policy/modules/system/selinuxutil.te
++++ refpolicy/policy/modules/system/selinuxutil.te
+@@ -453,6 +453,8 @@ filetrans_pattern(semanage_t, selinux_co
  
  allow semanage_t semanage_tmp_t:dir manage_dir_perms;
  allow semanage_t semanage_tmp_t:file manage_file_perms;
@@ -19,4 +19,4 @@ Signed-off-by: Joe Slater <jslater@windriver.com>
 +
  files_tmp_filetrans(semanage_t, semanage_tmp_t, { file dir })
  
- manage_dirs_pattern(semanage_t, semanage_var_lib_t, semanage_var_lib_t)
+ kernel_read_system_state(semanage_t)

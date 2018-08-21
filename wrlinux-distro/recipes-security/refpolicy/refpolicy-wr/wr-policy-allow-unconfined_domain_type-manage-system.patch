@@ -24,11 +24,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/kernel/domain.te | 11 +++++++++++
  1 file changed, 11 insertions(+)
 
-diff --git a/policy/modules/kernel/domain.te b/policy/modules/kernel/domain.te
-index b9b0794..fe35529 100644
---- a/policy/modules/kernel/domain.te
-+++ b/policy/modules/kernel/domain.te
-@@ -190,6 +190,17 @@ allow unconfined_domain_type domain:key *;
+--- refpolicy.orig/policy/modules/kernel/domain.te
++++ refpolicy/policy/modules/kernel/domain.te
+@@ -193,6 +193,17 @@ allow unconfined_domain_type domain:key
  # receive from all domains over labeled networking
  domain_all_recvfrom_all_domains(unconfined_domain_type)
  
@@ -46,6 +44,3 @@ index b9b0794..fe35529 100644
  tunable_policy(`domain_fd_use',`
  	# Allow all domains to use fds past to them
  	allow domain domain:fd use;
--- 
-1.9.1
-

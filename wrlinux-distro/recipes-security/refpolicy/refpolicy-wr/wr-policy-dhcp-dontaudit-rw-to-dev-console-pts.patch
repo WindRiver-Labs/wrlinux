@@ -39,23 +39,19 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/contrib/dhcp.te |    1 +
  2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/policy/modules/contrib/dhcp.fc b/policy/modules/contrib/dhcp.fc
-index 8182c48..98e8321 100644
---- a/policy/modules/contrib/dhcp.fc
-+++ b/policy/modules/contrib/dhcp.fc
-@@ -3,6 +3,6 @@
+--- refpolicy.orig/policy/modules/contrib/dhcp.fc
++++ refpolicy/policy/modules/contrib/dhcp.fc
+@@ -5,6 +5,6 @@
  /usr/sbin/dhcpd.*	--	gen_context(system_u:object_r:dhcpd_exec_t,s0)
  
  /var/lib/dhcpd(/.*)?	gen_context(system_u:object_r:dhcpd_state_t,s0)
 -/var/lib/dhcp(3)?/dhcpd\.leases.*	--	gen_context(system_u:object_r:dhcpd_state_t,s0)
 +/var/lib/dhcp(3)?/dhcpd(6)?\.leases.*	--	gen_context(system_u:object_r:dhcpd_state_t,s0)
  
- /var/run/dhcpd(6)?\.pid	--	gen_context(system_u:object_r:dhcpd_var_run_t,s0)
-diff --git a/policy/modules/contrib/dhcp.te b/policy/modules/contrib/dhcp.te
-index 98a24b9..23eeba5 100644
---- a/policy/modules/contrib/dhcp.te
-+++ b/policy/modules/contrib/dhcp.te
-@@ -108,6 +108,7 @@ sysnet_read_dhcp_config(dhcpd_t)
+ /run/dhcpd(6)?\.pid	--	gen_context(system_u:object_r:dhcpd_var_run_t,s0)
+--- refpolicy.orig/policy/modules/contrib/dhcp.te
++++ refpolicy/policy/modules/contrib/dhcp.te
+@@ -111,6 +111,7 @@ sysnet_read_dhcp_config(dhcpd_t)
  
  userdom_dontaudit_use_unpriv_user_fds(dhcpd_t)
  userdom_dontaudit_search_user_home_dirs(dhcpd_t)
@@ -63,6 +59,3 @@ index 98a24b9..23eeba5 100644
  
  tunable_policy(`dhcpd_use_ldap',`
  	sysnet_use_ldap(dhcpd_t)
--- 
-1.7.9.5
-

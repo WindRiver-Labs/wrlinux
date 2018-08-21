@@ -74,11 +74,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/systemd.te   |  9 ++++++++
  7 files changed, 85 insertions(+), 2 deletions(-)
 
-diff --git a/policy/modules/contrib/dbus.te b/policy/modules/contrib/dbus.te
-index 3408bc9..4c2de74 100644
---- a/policy/modules/contrib/dbus.te
-+++ b/policy/modules/contrib/dbus.te
-@@ -143,6 +143,8 @@ seutil_read_default_contexts(system_dbusd_t)
+--- refpolicy.orig/policy/modules/contrib/dbus.te
++++ refpolicy/policy/modules/contrib/dbus.te
+@@ -143,6 +143,8 @@ seutil_read_default_contexts(system_dbus
  userdom_dontaudit_use_unpriv_user_fds(system_dbusd_t)
  userdom_dontaudit_search_user_home_dirs(system_dbusd_t)
  
@@ -87,10 +85,8 @@ index 3408bc9..4c2de74 100644
  optional_policy(`
  	bluetooth_stream_connect(system_dbusd_t)
  ')
-diff --git a/policy/modules/services/ssh.if b/policy/modules/services/ssh.if
-index 3fda887..05f91b3 100644
---- a/policy/modules/services/ssh.if
-+++ b/policy/modules/services/ssh.if
+--- refpolicy.orig/policy/modules/services/ssh.if
++++ refpolicy/policy/modules/services/ssh.if
 @@ -181,7 +181,7 @@ template(`ssh_server_template', `
  	type $1_var_run_t;
  	files_pid_file($1_var_run_t)
@@ -100,11 +96,9 @@ index 3fda887..05f91b3 100644
  	allow $1_t self:fifo_file rw_fifo_file_perms;
  	allow $1_t self:process { signal getsched setsched setrlimit setexec setkeycreate };
  	allow $1_t self:tcp_socket create_stream_socket_perms;
-diff --git a/policy/modules/services/ssh.te b/policy/modules/services/ssh.te
-index 90eddca..3bd6a63 100644
---- a/policy/modules/services/ssh.te
-+++ b/policy/modules/services/ssh.te
-@@ -256,6 +256,7 @@ manage_dirs_pattern(sshd_t, sshd_tmp_t, sshd_tmp_t)
+--- refpolicy.orig/policy/modules/services/ssh.te
++++ refpolicy/policy/modules/services/ssh.te
+@@ -256,6 +256,7 @@ manage_dirs_pattern(sshd_t, sshd_tmp_t,
  manage_files_pattern(sshd_t, sshd_tmp_t, sshd_tmp_t)
  manage_sock_files_pattern(sshd_t, sshd_tmp_t, sshd_tmp_t)
  files_tmp_filetrans(sshd_t, sshd_tmp_t, { dir file sock_file })
@@ -112,10 +106,8 @@ index 90eddca..3bd6a63 100644
  
  kernel_search_key(sshd_t)
  kernel_link_key(sshd_t)
-diff --git a/policy/modules/system/authlogin.if b/policy/modules/system/authlogin.if
-index 4a6796e..d813401 100644
---- a/policy/modules/system/authlogin.if
-+++ b/policy/modules/system/authlogin.if
+--- refpolicy.orig/policy/modules/system/authlogin.if
++++ refpolicy/policy/modules/system/authlogin.if
 @@ -56,6 +56,7 @@ interface(`auth_use_pam',`
  	auth_rw_faillog($1)
  	auth_exec_pam($1)
@@ -138,7 +130,7 @@ index 4a6796e..d813401 100644
  ')
  
  ########################################
-@@ -1855,3 +1863,23 @@ interface(`auth_unconfined',`
+@@ -1873,3 +1881,23 @@ interface(`auth_unconfined',`
  	typeattribute $1 can_write_shadow_passwords;
  	typeattribute $1 can_relabelto_shadow_passwords;
  ')
@@ -162,10 +154,8 @@ index 4a6796e..d813401 100644
 +	allow $1 lastlog_t:file create;
 +	logging_log_filetrans($1, lastlog_t, file, "lastlog")
 +')
-diff --git a/policy/modules/system/systemd.fc b/policy/modules/system/systemd.fc
-index b6a8656..167b715 100644
---- a/policy/modules/system/systemd.fc
-+++ b/policy/modules/system/systemd.fc
+--- refpolicy.orig/policy/modules/system/systemd.fc
++++ refpolicy/policy/modules/system/systemd.fc
 @@ -49,7 +49,7 @@
  
  /run/systemd/resolve(/.*)?  gen_context(system_u:object_r:systemd_resolved_var_run_t,s0)
@@ -175,10 +165,8 @@ index b6a8656..167b715 100644
  /run/systemd/users(/.*)?	gen_context(system_u:object_r:systemd_logind_var_run_t,s0)
  /run/systemd/inhibit(/.*)?	gen_context(system_u:object_r:systemd_logind_var_run_t,s0)
  /run/tmpfiles\.d/kmod.conf	gen_context(system_u:object_r:systemd_kmod_conf_t,s0)
-diff --git a/policy/modules/system/systemd.if b/policy/modules/system/systemd.if
-index 35cc69f..fee64a5 100644
---- a/policy/modules/system/systemd.if
-+++ b/policy/modules/system/systemd.if
+--- refpolicy.orig/policy/modules/system/systemd.if
++++ refpolicy/policy/modules/system/systemd.if
 @@ -95,6 +95,9 @@ interface(`systemd_dbus_chat_logind',`
  
  	allow $1 systemd_logind_t:dbus send_msg;
@@ -233,10 +221,8 @@ index 35cc69f..fee64a5 100644
 +	allow $1 systemd_logind_t:fd use;
 +	allow $1 systemd_logind_sessions_t:fifo_file write;
 +')
-diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
-index 17afc50..dae0d61 100644
---- a/policy/modules/system/systemd.te
-+++ b/policy/modules/system/systemd.te
+--- refpolicy.orig/policy/modules/system/systemd.te
++++ refpolicy/policy/modules/system/systemd.te
 @@ -122,6 +122,10 @@ type systemd_kmod_conf_t;
  files_config_file(systemd_kmod_conf_t)
  init_daemon_domain(systemd_tmpfiles_t, systemd_tmpfiles_exec_t)
@@ -248,7 +234,7 @@ index 17afc50..dae0d61 100644
  #
  # Unit file types
  #
-@@ -245,6 +249,11 @@ files_search_pids(systemd_logind_t)
+@@ -261,6 +265,11 @@ files_search_pids(systemd_logind_t)
  
  kernel_read_kernel_sysctls(systemd_logind_t)
  
@@ -260,6 +246,3 @@ index 17afc50..dae0d61 100644
  auth_manage_faillog(systemd_logind_t)
  
  dev_rw_sysfs(systemd_logind_t)
--- 
-2.13.3
-

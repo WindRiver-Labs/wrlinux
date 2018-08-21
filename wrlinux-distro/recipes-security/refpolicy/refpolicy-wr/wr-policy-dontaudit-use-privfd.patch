@@ -16,11 +16,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/init.te | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
-index a5114a9..d64cca7 100644
---- a/policy/modules/system/init.te
-+++ b/policy/modules/system/init.te
-@@ -1144,3 +1144,7 @@ tunable_policy(`daemons_use_tty',`
+--- refpolicy.orig/policy/modules/system/init.te
++++ refpolicy/policy/modules/system/init.te
+@@ -1155,3 +1155,7 @@ tunable_policy(`daemons_use_tty',`
  	term_dontaudit_use_all_ttys(daemon)
  	term_dontaudit_use_all_ptys(daemon)
   ')
@@ -28,6 +26,3 @@ index a5114a9..d64cca7 100644
 +# dontaudit attempts to inherit file descriptors from domains with
 +# interactive programs.
 +domain_dontaudit_use_interactive_fds(daemon)
--- 
-1.9.1
-

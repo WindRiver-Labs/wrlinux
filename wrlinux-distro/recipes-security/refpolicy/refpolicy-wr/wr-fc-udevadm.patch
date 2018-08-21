@@ -12,11 +12,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/udev.fc |    2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/policy/modules/system/udev.fc b/policy/modules/system/udev.fc
-index 491bb23..d05520d 100644
---- a/policy/modules/system/udev.fc
-+++ b/policy/modules/system/udev.fc
-@@ -23,6 +23,8 @@ ifdef(`distro_debian',`
+--- refpolicy.orig/policy/modules/system/udev.fc
++++ refpolicy/policy/modules/system/udev.fc
+@@ -24,6 +24,8 @@ ifdef(`distro_debian',`
  /sbin/udevstart	--	gen_context(system_u:object_r:udev_exec_t,s0)
  /sbin/wait_for_sysfs -- gen_context(system_u:object_r:udev_exec_t,s0)
  
@@ -25,6 +23,3 @@ index 491bb23..d05520d 100644
  ifdef(`distro_redhat',`
  /sbin/start_udev --	gen_context(system_u:object_r:udev_exec_t,s0)
  ')
--- 
-1.7.9.5
-

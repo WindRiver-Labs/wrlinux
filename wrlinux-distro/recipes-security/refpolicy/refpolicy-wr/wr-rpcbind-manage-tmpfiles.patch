@@ -50,11 +50,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/contrib/rpcbind.te | 7 +++++++
  1 file changed, 7 insertions(+)
 
-diff --git a/policy/modules/contrib/rpcbind.te b/policy/modules/contrib/rpcbind.te
-index 7dcc7cb..0f05fb3 100644
---- a/policy/modules/contrib/rpcbind.te
-+++ b/policy/modules/contrib/rpcbind.te
-@@ -76,6 +76,13 @@ miscfiles_read_localization(rpcbind_t)
+--- refpolicy.orig/policy/modules/contrib/rpcbind.te
++++ refpolicy/policy/modules/contrib/rpcbind.te
+@@ -78,6 +78,13 @@ miscfiles_read_localization(rpcbind_t)
  mls_socket_read_all_levels(rpcbind_t)
  mls_socket_write_all_levels(rpcbind_t)
  
@@ -68,6 +66,3 @@ index 7dcc7cb..0f05fb3 100644
  ifdef(`distro_debian',`
  	term_dontaudit_use_unallocated_ttys(rpcbind_t)
  ')
--- 
-1.9.1
-

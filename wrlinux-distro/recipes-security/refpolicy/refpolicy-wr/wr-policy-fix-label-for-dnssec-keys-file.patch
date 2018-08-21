@@ -21,11 +21,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/init.te  |  6 ++++++
  2 files changed, 25 insertions(+)
 
-diff --git a/policy/modules/contrib/bind.if b/policy/modules/contrib/bind.if
-index 1e974ca..ec2abf7 100644
---- a/policy/modules/contrib/bind.if
-+++ b/policy/modules/contrib/bind.if
-@@ -156,6 +156,25 @@ interface(`bind_read_dnssec_keys',`
+--- refpolicy.orig/policy/modules/contrib/bind.if
++++ refpolicy/policy/modules/contrib/bind.if
+@@ -157,6 +157,25 @@ interface(`bind_read_dnssec_keys',`
  
  ########################################
  ## <summary>
@@ -51,11 +49,9 @@ index 1e974ca..ec2abf7 100644
  ##	Read bind named configuration files.
  ## </summary>
  ## <param name="domain">
-diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
-index d64cca7..8cae3f7 100644
---- a/policy/modules/system/init.te
-+++ b/policy/modules/system/init.te
-@@ -574,6 +574,12 @@ userdom_read_user_home_content_files(initrc_t)
+--- refpolicy.orig/policy/modules/system/init.te
++++ refpolicy/policy/modules/system/init.te
+@@ -584,6 +584,12 @@ userdom_read_user_home_content_files(ini
  # started from init should be placed in their own domain.
  userdom_use_user_terminals(initrc_t)
  
@@ -66,8 +62,5 @@ index d64cca7..8cae3f7 100644
 +')
 +
  ifdef(`distro_debian',`
- 	dev_setattr_generic_dirs(initrc_t)
+ 	kernel_getattr_core_if(initrc_t)
  
--- 
-1.9.1
-

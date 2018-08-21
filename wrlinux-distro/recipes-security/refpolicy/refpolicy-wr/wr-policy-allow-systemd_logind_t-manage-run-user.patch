@@ -27,10 +27,8 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/userdomain.te |  3 ++
  4 files changed, 69 insertions(+)
 
-diff --git a/policy/modules/system/authlogin.if b/policy/modules/system/authlogin.if
-index bcf0963..16659cb 100644
---- a/policy/modules/system/authlogin.if
-+++ b/policy/modules/system/authlogin.if
+--- refpolicy.orig/policy/modules/system/authlogin.if
++++ refpolicy/policy/modules/system/authlogin.if
 @@ -61,6 +61,8 @@ interface(`auth_use_pam',`
  	logging_send_audit_msgs($1)
  	logging_send_syslog_msg($1)
@@ -40,11 +38,9 @@ index bcf0963..16659cb 100644
  	optional_policy(`
  		dbus_system_bus_client($1)
  
-diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
-index 4810bbf..6dfe016 100644
---- a/policy/modules/system/systemd.te
-+++ b/policy/modules/system/systemd.te
-@@ -279,6 +279,9 @@ fs_mount_tmpfs(systemd_logind_t)
+--- refpolicy.orig/policy/modules/system/systemd.te
++++ refpolicy/policy/modules/system/systemd.te
+@@ -318,6 +318,9 @@ fs_mount_tmpfs(systemd_logind_t)
  auth_manage_var_auth(systemd_logind_t)
  mls_file_read_all_levels(systemd_logind_t)
  
@@ -54,11 +50,9 @@ index 4810bbf..6dfe016 100644
  optional_policy(`
  	dbus_system_bus_client(systemd_logind_t)
  	dbus_connect_system_bus(systemd_logind_t)
-diff --git a/policy/modules/system/userdomain.if b/policy/modules/system/userdomain.if
-index c106a25..688c53f 100644
---- a/policy/modules/system/userdomain.if
-+++ b/policy/modules/system/userdomain.if
-@@ -3830,3 +3830,64 @@ interface(`userdom_dbus_send_all_users',`
+--- refpolicy.orig/policy/modules/system/userdomain.if
++++ refpolicy/policy/modules/system/userdomain.if
+@@ -3835,3 +3835,64 @@ interface(`userdom_dbus_send_all_users',
  
  	allow $1 userdomain:dbus send_msg;
  ')
@@ -123,11 +117,9 @@ index c106a25..688c53f 100644
 +	files_search_tmp($1)
 +	allow $1 user_tmp_t:dir search_dir_perms;
 +')
-diff --git a/policy/modules/system/userdomain.te b/policy/modules/system/userdomain.te
-index 0f3db57..661dc7e 100644
---- a/policy/modules/system/userdomain.te
-+++ b/policy/modules/system/userdomain.te
-@@ -107,6 +107,9 @@ typealias user_tmp_t alias { staff_untrusted_content_tmp_t sysadm_untrusted_cont
+--- refpolicy.orig/policy/modules/system/userdomain.te
++++ refpolicy/policy/modules/system/userdomain.te
+@@ -107,6 +107,9 @@ typealias user_tmp_t alias { staff_untru
  files_tmp_file(user_tmp_t)
  userdom_user_home_content(user_tmp_t)
  
@@ -137,6 +129,3 @@ index 0f3db57..661dc7e 100644
  type user_tmpfs_t alias { staff_tmpfs_t sysadm_tmpfs_t secadm_tmpfs_t auditadm_tmpfs_t unconfined_tmpfs_t };
  files_tmpfs_file(user_tmpfs_t)
  userdom_user_home_content(user_tmpfs_t)
--- 
-2.11.0
-

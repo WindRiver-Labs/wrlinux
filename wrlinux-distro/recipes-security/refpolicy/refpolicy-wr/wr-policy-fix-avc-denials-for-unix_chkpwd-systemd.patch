@@ -35,11 +35,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/systemd.te   | 3 +++
  2 files changed, 5 insertions(+)
 
-diff --git a/policy/modules/system/authlogin.te b/policy/modules/system/authlogin.te
-index 873072a..d6ec5c2 100644
---- a/policy/modules/system/authlogin.te
-+++ b/policy/modules/system/authlogin.te
-@@ -131,6 +131,8 @@ seutil_dontaudit_use_newrole_fds(chkpwd_t)
+--- refpolicy.orig/policy/modules/system/authlogin.te
++++ refpolicy/policy/modules/system/authlogin.te
+@@ -131,6 +131,8 @@ seutil_dontaudit_use_newrole_fds(chkpwd_
  
  userdom_use_user_terminals(chkpwd_t)
  
@@ -48,11 +46,9 @@ index 873072a..d6ec5c2 100644
  ifdef(`distro_ubuntu',`
  	optional_policy(`
  		unconfined_domain(chkpwd_t)
-diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
-index 8f0d014..ddb546c 100644
---- a/policy/modules/system/systemd.te
-+++ b/policy/modules/system/systemd.te
-@@ -312,6 +312,8 @@ mls_file_read_all_levels(systemd_tmpfiles_t)
+--- refpolicy.orig/policy/modules/system/systemd.te
++++ refpolicy/policy/modules/system/systemd.te
+@@ -417,6 +417,8 @@ mls_file_read_all_levels(systemd_tmpfile
  mls_file_downgrade(systemd_tmpfiles_t)
  mls_file_upgrade(systemd_tmpfiles_t)
  
@@ -61,11 +57,8 @@ index 8f0d014..ddb546c 100644
  tunable_policy(`systemd_tmpfiles_manage_all',`
  	# systemd-tmpfiles can be configured to manage anything.
  	# have a last-resort option for users to do this.
-@@ -338,3 +340,4 @@ init_rw_pipes(systemd_passwd_agent_t)
+@@ -443,3 +445,4 @@ init_rw_pipes(systemd_passwd_agent_t)
  init_create_pid_dirs(systemd_passwd_agent_t)
  init_read_utmp(systemd_passwd_agent_t)
  init_stream_connect(systemd_passwd_agent_t)
 +kernel_read_system_state(systemd_passwd_agent_t)
--- 
-1.9.1
-

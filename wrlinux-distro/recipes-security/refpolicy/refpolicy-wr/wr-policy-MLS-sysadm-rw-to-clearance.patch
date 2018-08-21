@@ -18,13 +18,11 @@ Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
  policy/modules/roles/sysadm.te | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/policy/modules/roles/sysadm.te b/policy/modules/roles/sysadm.te
-index cee455d..85ff145 100644
---- a/policy/modules/roles/sysadm.te
-+++ b/policy/modules/roles/sysadm.te
+--- refpolicy.orig/policy/modules/roles/sysadm.te
++++ refpolicy/policy/modules/roles/sysadm.te
 @@ -29,6 +29,9 @@ corecmd_exec_shell(sysadm_t)
  
- mls_process_read_up(sysadm_t)
+ mls_process_read_all_levels(sysadm_t)
  
 +mls_file_read_to_clearance(sysadm_t)
 +mls_process_write_to_clearance(sysadm_t)
@@ -32,6 +30,3 @@ index cee455d..85ff145 100644
  ubac_process_exempt(sysadm_t)
  ubac_file_exempt(sysadm_t)
  ubac_fd_exempt(sysadm_t)
--- 
-1.7.11.7
-

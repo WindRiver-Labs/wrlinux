@@ -16,10 +16,8 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/authlogin.te |  4 ++++
  2 files changed, 24 insertions(+)
 
-diff --git a/policy/modules/system/authlogin.if b/policy/modules/system/authlogin.if
-index e8e27c0..38fd6f9 100644
---- a/policy/modules/system/authlogin.if
-+++ b/policy/modules/system/authlogin.if
+--- refpolicy.orig/policy/modules/system/authlogin.if
++++ refpolicy/policy/modules/system/authlogin.if
 @@ -105,9 +105,11 @@ interface(`auth_use_pam',`
  interface(`auth_login_pgm_domain',`
  	gen_require(`
@@ -57,10 +55,8 @@ index e8e27c0..38fd6f9 100644
  #######################################
  ## <summary>
  ##      Manage create logins log.
-diff --git a/policy/modules/system/authlogin.te b/policy/modules/system/authlogin.te
-index f80dfcb..873072a 100644
---- a/policy/modules/system/authlogin.te
-+++ b/policy/modules/system/authlogin.te
+--- refpolicy.orig/policy/modules/system/authlogin.te
++++ refpolicy/policy/modules/system/authlogin.te
 @@ -17,6 +17,7 @@ attribute can_read_shadow_passwords;
  attribute can_write_shadow_passwords;
  attribute can_relabelto_shadow_passwords;
@@ -69,13 +65,10 @@ index f80dfcb..873072a 100644
  
  type auth_cache_t;
  logging_log_file(auth_cache_t)
-@@ -464,3 +465,6 @@ optional_policy(`
+@@ -462,3 +463,6 @@ optional_policy(`
  	samba_read_var_files(nsswitch_domain)
  	samba_dontaudit_write_var_files(nsswitch_domain)
  ')
 +
 +# manage keys for all user domains
 +userdom_manage_all_users_keys(login_pgm)
--- 
-1.9.1
-

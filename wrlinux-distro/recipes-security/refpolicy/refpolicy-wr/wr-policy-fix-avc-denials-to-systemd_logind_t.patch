@@ -49,10 +49,8 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/userdomain.if |  2 ++
  3 files changed, 25 insertions(+)
 
-diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
-index dadd1e3..5e0e742 100644
---- a/policy/modules/system/init.if
-+++ b/policy/modules/system/init.if
+--- refpolicy.orig/policy/modules/system/init.if
++++ refpolicy/policy/modules/system/init.if
 @@ -864,6 +864,24 @@ interface(`init_system_start',`
  
  ########################################
@@ -78,12 +76,10 @@ index dadd1e3..5e0e742 100644
  ##	Enable all systemd services (systemd).
  ## </summary>
  ## <param name="domain">
-diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
-index edebc0b..dab7f44 100644
---- a/policy/modules/system/systemd.te
-+++ b/policy/modules/system/systemd.te
-@@ -211,6 +211,8 @@ dev_setattr_sound_dev(systemd_logind_t)
- files_read_etc_files(systemd_logind_t)
+--- refpolicy.orig/policy/modules/system/systemd.te
++++ refpolicy/policy/modules/system/systemd.te
+@@ -284,6 +284,8 @@ files_read_etc_files(systemd_logind_t)
+ fs_read_efivarfs_files(systemd_logind_t)
  
  fs_getattr_tmpfs(systemd_logind_t)
 +fs_list_tmpfs(systemd_logind_t)
@@ -91,7 +87,7 @@ index edebc0b..dab7f44 100644
  
  storage_getattr_removable_dev(systemd_logind_t)
  storage_setattr_removable_dev(systemd_logind_t)
-@@ -240,6 +242,9 @@ userdom_use_user_ttys(systemd_logind_t)
+@@ -310,6 +312,9 @@ userdom_use_user_ttys(systemd_logind_t)
  
  init_get_system_status(systemd_logind_t)
  init_system_start(systemd_logind_t)
@@ -101,11 +97,9 @@ index edebc0b..dab7f44 100644
  init_dgram_send(systemd_logind_t)
  init_write_pid_socket(systemd_logind_t)
  kernel_read_system_state(systemd_logind_t)
-diff --git a/policy/modules/system/userdomain.if b/policy/modules/system/userdomain.if
-index 2c179db..0c75cad 100644
---- a/policy/modules/system/userdomain.if
-+++ b/policy/modules/system/userdomain.if
-@@ -3475,6 +3475,7 @@ interface(`userdom_dbus_send_all_users',`
+--- refpolicy.orig/policy/modules/system/userdomain.if
++++ refpolicy/policy/modules/system/userdomain.if
+@@ -3849,6 +3849,7 @@ interface(`userdom_dbus_send_all_users',
  interface(`userdom_manage_all_user_tmp_content',`
  	gen_require(`
  		attribute user_tmp_type;
@@ -113,7 +107,7 @@ index 2c179db..0c75cad 100644
  	')
  
  	manage_dirs_pattern($1, user_tmp_type, user_tmp_type)
-@@ -3483,6 +3484,7 @@ interface(`userdom_manage_all_user_tmp_content',`
+@@ -3857,6 +3858,7 @@ interface(`userdom_manage_all_user_tmp_c
  	manage_sock_files_pattern($1, user_tmp_type, user_tmp_type)
  	manage_fifo_files_pattern($1, user_tmp_type, user_tmp_type)
  	files_search_tmp($1)
@@ -121,6 +115,3 @@ index 2c179db..0c75cad 100644
  ')
  
  #######################################
--- 
-1.9.1
-

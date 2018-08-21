@@ -19,11 +19,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/init.te | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
-index f3eeec2..0c2f16f 100644
---- a/policy/modules/system/init.te
-+++ b/policy/modules/system/init.te
-@@ -200,7 +200,7 @@ ifdef(`init_systemd',`
+--- refpolicy.orig/policy/modules/system/init.te
++++ refpolicy/policy/modules/system/init.te
+@@ -205,7 +205,7 @@ ifdef(`init_systemd',`
  	typeattribute init_t init_run_all_scripts_domain;
  
  	allow init_t self:process { getcap getsched setsched setpgid setfscreate setsockcreate setcap setrlimit };
@@ -32,6 +30,3 @@ index f3eeec2..0c2f16f 100644
  	allow init_t self:netlink_kobject_uevent_socket create_socket_perms;
  	allow init_t self:netlink_route_socket create_netlink_socket_perms;
  	allow init_t self:netlink_selinux_socket create_socket_perms;
--- 
-2.11.0
-

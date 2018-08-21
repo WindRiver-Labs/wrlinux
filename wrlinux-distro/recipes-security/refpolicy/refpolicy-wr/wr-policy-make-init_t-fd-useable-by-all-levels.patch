@@ -41,18 +41,13 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/init.te | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
-index 8cae3f7..ef8097d 100644
---- a/policy/modules/system/init.te
-+++ b/policy/modules/system/init.te
-@@ -173,6 +173,7 @@ mls_file_read_all_levels(init_t)
+--- refpolicy.orig/policy/modules/system/init.te
++++ refpolicy/policy/modules/system/init.te
+@@ -174,6 +174,7 @@ mls_file_read_all_levels(init_t)
  mls_file_write_all_levels(init_t)
  mls_process_write_all_levels(init_t)
  mls_fd_use_all_levels(init_t)
 +mls_fd_share_all_levels(init_t)
  
- selinux_set_all_booleans(init_t)
- 
--- 
-1.9.1
-
+ # the following one is needed for libselinux:is_selinux_enabled()
+ # otherwise the call fails and sysvinit tries to load the policy

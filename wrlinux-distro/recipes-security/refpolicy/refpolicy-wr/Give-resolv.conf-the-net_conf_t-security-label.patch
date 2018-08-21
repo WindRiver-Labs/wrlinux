@@ -14,11 +14,9 @@ Signed-off-by: Roy Li <rongqing.li@windriver.com>
  policy/modules/system/sysnetwork.te |    2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/policy/modules/system/sysnetwork.te b/policy/modules/system/sysnetwork.te
-index bf040e3..be0e49b 100644
---- a/policy/modules/system/sysnetwork.te
-+++ b/policy/modules/system/sysnetwork.te
-@@ -70,6 +70,8 @@ manage_files_pattern(dhcpc_t, dhcpc_var_run_t, dhcpc_var_run_t)
+--- refpolicy.orig/policy/modules/system/sysnetwork.te
++++ refpolicy/policy/modules/system/sysnetwork.te
+@@ -72,6 +72,8 @@ manage_files_pattern(dhcpc_t, dhcpc_var_
  create_dirs_pattern(dhcpc_t, dhcpc_var_run_t, dhcpc_var_run_t)
  files_pid_filetrans(dhcpc_t, dhcpc_var_run_t, { file dir })
  
@@ -27,6 +25,3 @@ index bf040e3..be0e49b 100644
  # Allow read/write to /etc/resolv.conf and /etc/ntp.conf. Note that any files
  # in /etc created by dhcpcd will be labelled net_conf_t.
  sysnet_manage_config(dhcpc_t)
--- 
-1.7.10.4
-

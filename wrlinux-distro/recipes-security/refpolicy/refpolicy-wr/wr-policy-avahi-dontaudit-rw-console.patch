@@ -12,11 +12,9 @@ Signed-off-by: Roy Li <rongqing.li@windriver.com>
  policy/modules/contrib/avahi.te |    1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/policy/modules/contrib/avahi.te b/policy/modules/contrib/avahi.te
-index 95ae264..93b62d0 100644
---- a/policy/modules/contrib/avahi.te
-+++ b/policy/modules/contrib/avahi.te
-@@ -90,6 +90,7 @@ sysnet_domtrans_ifconfig(avahi_t)
+--- refpolicy.orig/policy/modules/contrib/avahi.te
++++ refpolicy/policy/modules/contrib/avahi.te
+@@ -94,6 +94,7 @@ sysnet_domtrans_ifconfig(avahi_t)
  sysnet_manage_config(avahi_t)
  sysnet_etc_filetrans_config(avahi_t)
  
@@ -24,6 +22,3 @@ index 95ae264..93b62d0 100644
  userdom_dontaudit_use_unpriv_user_fds(avahi_t)
  userdom_dontaudit_search_user_home_dirs(avahi_t)
  
--- 
-1.7.10.4
-

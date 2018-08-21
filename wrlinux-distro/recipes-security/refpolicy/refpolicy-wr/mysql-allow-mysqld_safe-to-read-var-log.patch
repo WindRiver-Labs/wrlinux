@@ -13,11 +13,9 @@ Signed-off-by: Roy Li <rongqing.li@windriver.com>
  policy/modules/contrib/mysql.te | 6 ++++++
  1 file changed, 6 insertions(+)
 
-diff --git a/policy/modules/contrib/mysql.te b/policy/modules/contrib/mysql.te
-index a819fa5..e418b89 100644
---- a/policy/modules/contrib/mysql.te
-+++ b/policy/modules/contrib/mysql.te
-@@ -162,6 +162,12 @@ allow mysqld_safe_t self:capability { chown dac_override fowner kill };
+--- refpolicy.orig/policy/modules/contrib/mysql.te
++++ refpolicy/policy/modules/contrib/mysql.te
+@@ -165,6 +165,12 @@ allow mysqld_safe_t self:capability { ch
  allow mysqld_safe_t self:process { setsched getsched setrlimit };
  allow mysqld_safe_t self:fifo_file rw_fifo_file_perms;
  
@@ -30,6 +28,3 @@ index a819fa5..e418b89 100644
  allow mysqld_safe_t mysqld_t:process signull;
  
  read_lnk_files_pattern(mysqld_safe_t, mysqld_db_t, mysqld_db_t)
--- 
-1.9.1
-

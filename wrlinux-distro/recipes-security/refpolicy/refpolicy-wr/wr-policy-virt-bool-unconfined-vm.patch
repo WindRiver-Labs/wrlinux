@@ -15,13 +15,11 @@ Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
  policy/modules/system/unconfined.if |   19 +++++++++++++++++++
  2 files changed, 33 insertions(+)
 
-diff --git a/policy/modules/contrib/virt.te b/policy/modules/contrib/virt.te
-index b8ad946..c2777a9 100644
---- a/policy/modules/contrib/virt.te
-+++ b/policy/modules/contrib/virt.te
-@@ -47,6 +47,14 @@ gen_tunable(virt_use_sysfs, false)
- ## </desc>
- gen_tunable(virt_use_usb, true)
+--- refpolicy.orig/policy/modules/contrib/virt.te
++++ refpolicy/policy/modules/contrib/virt.te
+@@ -95,6 +95,14 @@ roleattribute system_r virt_bridgehelper
+ attribute_role svirt_lxc_domain_roles;
+ roleattribute system_r svirt_lxc_domain_roles;
  
 +## <desc>
 +## <p>
@@ -32,10 +30,10 @@ index b8ad946..c2777a9 100644
 +gen_tunable(virt_allow_unconfined_vm, false)
 +
  virt_domain_template(svirt)
- role system_r types svirt_t;
+ virt_domain_template(svirt_prot_exec)
  
-@@ -396,6 +404,12 @@ optional_policy(`
- 	unconfined_domain(virtd_t)
+@@ -446,6 +454,12 @@ tunable_policy(`virt_use_vfio',`
+ 	dev_rw_vfio_dev(svirt_t)
  ')
  
 +optional_policy(`
@@ -46,11 +44,9 @@ index b8ad946..c2777a9 100644
 +
  ########################################
  #
- # virtual domains common policy
-diff --git a/policy/modules/system/unconfined.if b/policy/modules/system/unconfined.if
-index db7aabb..f1bcb1e 100644
---- a/policy/modules/system/unconfined.if
-+++ b/policy/modules/system/unconfined.if
+ # virtd local policy
+--- refpolicy.orig/policy/modules/system/unconfined.if
++++ refpolicy/policy/modules/system/unconfined.if
 @@ -587,3 +587,22 @@ interface(`unconfined_dbus_connect',`
  
  	allow $1 unconfined_t:dbus acquire_svc;
@@ -74,6 +70,3 @@ index db7aabb..f1bcb1e 100644
 +
 +	allow $1 unconfined_t:process transition;
 +')
--- 
-1.7.9.5
-

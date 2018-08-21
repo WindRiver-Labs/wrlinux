@@ -85,10 +85,8 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/systemd.if | 18 ++++++++++++++++++
  5 files changed, 83 insertions(+)
 
-diff --git a/policy/modules/kernel/files.if b/policy/modules/kernel/files.if
-index 5bd7566..168d123 100644
---- a/policy/modules/kernel/files.if
-+++ b/policy/modules/kernel/files.if
+--- refpolicy.orig/policy/modules/kernel/files.if
++++ refpolicy/policy/modules/kernel/files.if
 @@ -6906,3 +6906,22 @@ interface(`files_unconfined',`
  
  	typeattribute $1 files_unconfined_type;
@@ -112,10 +110,8 @@ index 5bd7566..168d123 100644
 +	allow $1 var_t:dir search_dir_perms;
 +	allow $1 var_run_t:dir create_dir_perms;
 +')
-diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
-index b7d9932..3e951e7 100644
---- a/policy/modules/system/init.te
-+++ b/policy/modules/system/init.te
+--- refpolicy.orig/policy/modules/system/init.te
++++ refpolicy/policy/modules/system/init.te
 @@ -271,6 +271,8 @@ ifdef(`init_systemd',`
  
  	# systemd_socket_activated policy
@@ -138,10 +134,8 @@ index b7d9932..3e951e7 100644
  	optional_policy(`
  		dbus_system_bus_client(init_t)
  		dbus_connect_system_bus(init_t)
-diff --git a/policy/modules/system/logging.if b/policy/modules/system/logging.if
-index b160159..de26249 100644
---- a/policy/modules/system/logging.if
-+++ b/policy/modules/system/logging.if
+--- refpolicy.orig/policy/modules/system/logging.if
++++ refpolicy/policy/modules/system/logging.if
 @@ -1132,3 +1132,22 @@ interface(`logging_admin',`
  	logging_admin_audit($1, $2)
  	logging_admin_syslog($1, $2)
@@ -165,11 +159,9 @@ index b160159..de26249 100644
 +	files_search_pids($1)
 +	stream_connect_pattern($1, syslogd_var_run_t, syslogd_var_run_t, syslogd_t)
 +')
-diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
-index 255bbac..f76abb8 100644
---- a/policy/modules/system/logging.te
-+++ b/policy/modules/system/logging.te
-@@ -401,6 +401,8 @@ allow syslogd_t self:tcp_socket create_stream_socket_perms;
+--- refpolicy.orig/policy/modules/system/logging.te
++++ refpolicy/policy/modules/system/logging.te
+@@ -402,6 +402,8 @@ allow syslogd_t self:tcp_socket create_s
  allow syslogd_t syslog_conf_t:file read_file_perms;
  allow syslogd_t syslog_conf_t:lnk_file read_file_perms;
  
@@ -178,8 +170,8 @@ index 255bbac..f76abb8 100644
  # Create and bind to /dev/log or /var/run/log.
  allow syslogd_t devlog_t:sock_file manage_sock_file_perms;
  files_pid_filetrans(syslogd_t, devlog_t, sock_file)
-@@ -427,6 +429,9 @@ files_search_var_lib(syslogd_t)
- manage_files_pattern(syslogd_t, syslogd_var_run_t, syslogd_var_run_t)
+@@ -429,6 +431,9 @@ manage_files_pattern(syslogd_t, syslogd_
+ manage_sock_files_pattern(syslogd_t, syslogd_var_run_t, syslogd_var_run_t)
  files_pid_filetrans(syslogd_t, syslogd_var_run_t, file)
  
 +# manage dirs /var/run/systemd/{streams, journal}
@@ -188,7 +180,7 @@ index 255bbac..f76abb8 100644
  kernel_read_system_state(syslogd_t)
  kernel_read_network_state(syslogd_t)
  kernel_read_kernel_sysctls(syslogd_t)
-@@ -488,8 +493,10 @@ files_var_lib_filetrans(syslogd_t, syslogd_var_lib_t, { file dir })
+@@ -490,8 +495,10 @@ files_var_lib_filetrans(syslogd_t, syslo
  
  fs_getattr_all_fs(syslogd_t)
  fs_search_auto_mountpoints(syslogd_t)
@@ -199,7 +191,7 @@ index 255bbac..f76abb8 100644
  mls_trusted_object(syslogd_t) # Other process need to have the right to connectto/sendto /dev/log
  
  term_write_console(syslogd_t)
-@@ -504,9 +511,11 @@ term_write_all_ttys(syslogd_t)
+@@ -512,9 +519,11 @@ term_use_all_ptys(syslogd_t)
  auth_use_nsswitch(syslogd_t)
  
  init_use_fds(syslogd_t)
@@ -211,7 +203,7 @@ index 255bbac..f76abb8 100644
  
  miscfiles_read_localization(syslogd_t)
  
-@@ -528,6 +537,16 @@ ifdef(`init_systemd',`
+@@ -536,6 +545,16 @@ ifdef(`init_systemd',`
  	init_dgram_send(syslogd_t)
  
  	udev_read_pid_files(syslogd_t)
@@ -228,10 +220,8 @@ index 255bbac..f76abb8 100644
  ')
  
  ifdef(`distro_gentoo',`
-diff --git a/policy/modules/system/systemd.if b/policy/modules/system/systemd.if
-index 705cbaa..35cc69f 100644
---- a/policy/modules/system/systemd.if
-+++ b/policy/modules/system/systemd.if
+--- refpolicy.orig/policy/modules/system/systemd.if
++++ refpolicy/policy/modules/system/systemd.if
 @@ -190,3 +190,21 @@ interface(`systemd_start_power_units',`
  
  	allow $1 power_unit_t:service start;
@@ -254,6 +244,3 @@ index 705cbaa..35cc69f 100644
 +
 +	allow $1 systemd_unit_t:dir getattr;
 +')
--- 
-2.13.3
-
