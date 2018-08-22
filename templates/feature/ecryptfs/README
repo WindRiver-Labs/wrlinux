@@ -1,0 +1,6 @@
+This template adds ecryptfs (A userspace daemon that runs as the user perform file operations under the eCryptfs mount point)
+to the filesystem.
+
+To use this template, add the following to your setup line:
+
+    --templates feature/ecryptfs
