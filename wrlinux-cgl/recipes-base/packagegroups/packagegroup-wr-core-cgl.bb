@@ -33,15 +33,10 @@ NUMACTL = "numactl"
 NUMACTL_arm = ""
 NUMACTL_armeb = ""
 
-#  Temporarily exclude becase libqb causes a prelink failure.
-#	corosync \
-#	pacemaker \
-#	ocfs2-tools \
-#	crmsh \
-#
 RDEPENDS_${PN} = "\
 	boost \
 	cluster-glue \
+	corosync \
 	${CRASH} \
 	device-mapper-multipath \
 	drbd-utils \
@@ -57,8 +52,11 @@ RDEPENDS_${PN} = "\
 	lvm2 \
 	monit \
 	${NUMACTL} \
+	ocfs2-tools \
 	openhpi \
 	openl2tp \
+	pacemaker \
+	crmsh \
 	passwdqc \
 	postgresql \
 	quagga \
