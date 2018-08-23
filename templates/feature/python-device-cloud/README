@@ -1,11 +1,5 @@
-This feature enables python device cloud agent.
-
-To enable it, add
-
---templates feature/python-device-cloud
-
-as a setup option.
+This feature is no longer supported
 
 #@TYPE: Wrtemplate
 #@NAME: python-device-cloud
-#@DESCRIPTION: Enable python device cloud agent.
+#@DESCRIPTION: No longer supported
