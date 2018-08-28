@@ -20,14 +20,13 @@ EXTRA_OECONF += "--with-qemu-user=qemu \
 #
 PACKAGECONFIG = "qemu lxc test remote macvtap libvirtd udev yajl \
 		 python ebtables fuse iproute2 \
-		 firewalld gnutls libpcap \
+		 firewalld libpcap \
 		 ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux', '', d)} \
 		 ${@bb.utils.contains('KARCH', 'arm', '', 'numactl', d)} \
 		"
 
 PACKAGECONFIG[apparmor-profiles] = "--with-apparmor-profiles, --without-apparmor-profiles,"
 PACKAGECONFIG[firewalld] = "--with-firewalld, --without-firewalld,"
-PACKAGECONFIG[gnutls] = "--with-gnutls, --without-gnutls,gnutls,gnutls"
 PACKAGECONFIG[libpcap] = "--with-libpcap, --without-libpcap,libpcap,libpcap"
 PACKAGECONFIG[numad] = "--with-numad, --without-numad,"
 
