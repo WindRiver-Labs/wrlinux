@@ -1,7 +1,7 @@
-From b443171ca2e55ba5db1f260af4e05aa66a9ae966 Mon Sep 17 00:00:00 2001
-From: Nam Ninh <nam.ninh@windriver.com>
-Date: Mon, 2 Feb 2015 12:42:19 -0500
-Subject: [PATCH 17/18] qemu: inject NMI in i6300esb watchdog timer
+From 89958a2ac4111fa098be735dd18e457b70b7ee16 Mon Sep 17 00:00:00 2001
+From: "Hongzhi.Song" <hongzhi.song@windriver.com>
+Date: Thu, 23 Aug 2018 22:32:43 -0400
+Subject: [PATCH] qemu: inject NMI in i6300esb watchdog timer
 
 Inject the NMI to the guest instance of the current qemu if the WDT is
 triggered and expired. The other guests will not receive the NMI if
@@ -11,19 +11,23 @@ before the reboot happens in stage 2.
 Signed-off-by: Nam Ninh <nam.ninh@windriver.com>
 Upstream-Status: Pending
 Signed-off-by: He Zhe <zhe.he@windriver.com>
+
+modify header file due to the version is update
+qmp-commands.h -> qapi/qapi-commands-misc.h
+Signed-off-by: Hongzhi.Song <hongzhi.song@windriver.com>
 ---
  hw/watchdog/wdt_i6300esb.c | 5 +++++
  1 file changed, 5 insertions(+)
 
 diff --git a/hw/watchdog/wdt_i6300esb.c b/hw/watchdog/wdt_i6300esb.c
-index 49b3cd18..626c6834 100644
+index e596b08..7fa613b 100644
 --- a/hw/watchdog/wdt_i6300esb.c
 +++ b/hw/watchdog/wdt_i6300esb.c
 @@ -26,6 +26,7 @@
  #include "sysemu/watchdog.h"
  #include "hw/hw.h"
  #include "hw/pci/pci.h"
-+#include "qmp-commands.h"
++#include "qapi/qapi-commands-misc.h"
  
  /*#define I6300ESB_DEBUG 1*/
  
@@ -46,5 +50,5 @@ index 49b3cd18..626c6834 100644
          /* Start the second stage. */
          i6300esb_restart_timer(d, 2);
 -- 
-2.11.0
+2.8.1
 

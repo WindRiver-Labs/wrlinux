@@ -1,0 +1,2247 @@
+From 75c9d5419b0f0abd23a85ee4fab8a5a3ec6d6b9b Mon Sep 17 00:00:00 2001
+From: "Hongzhi.Song" <hongzhi.song@windriver.com>
+Date: Tue, 28 Aug 2018 05:05:59 -0400
+Subject: [PATCH] qemu: Forward port OVP10 patches
+
+Issue: LIN1018-156
+
+Remove following patches related to pci-assign which has been removed
+from qemu. [Upstream ID ab37bfc7d64141]
+ qemu-update-msi-affinity-in-pci-assign-passthrough-d.patch
+ 0001-pci-assign-Remove.patch
+ pci-assign-Make-host-irq-to-vcpu-affinity.patch
+ Fix-vcpuaffine-feature-test-mask.patch
+
+Fix the conflict of context of other patches.
+ 0001-qemu-inject-NMI-in-i6300esb-watchdog-timer.patch
+ 0001-qemu-kvm-Add-options-to-pin-and-prioritize-vcpus.patch
+
+Signed-off-by: Hongzhi.Song <hongzhi.song@windriver.com>
+---
+ .../0001-qemu-migration-compute-with-pages.patch   | 102 -------
+ ...-virtqueue-processing-if-device-is-broken.patch | 151 ---------
+ .../0002-migration-compression-cache-free.patch    | 110 -------
+ ...o-handle-virtqueue_get_avail_bytes-errors.patch |  70 -----
+ ...igration-thread-affinity-and-priority-qmp.patch | 336 ---------------------
+ ...-virtio-handle-virtqueue_num_heads-errors.patch |  69 -----
+ ...4-virtio-handle-virtqueue_get_head-errors.patch |  88 ------
+ .../Fix-vcpuaffine-feature-test-mask.patch         |  50 ---
+ .../qemu-2.7.0/apic-fixup-fallthrough-to-PIC.patch |  49 ---
+ .../cpus-Store-VCPUs-tid-in-var-run-file.patch     |  82 -----
+ .../migration-add-notification-via-vmipc.patch     | 166 ----------
+ ...pci-assign-Make-host-irq-to-vcpu-affinity.patch | 262 ----------------
+ .../qemu-add-trace-events-for-do_device_add.patch  |  79 -----
+ ...emu-inject-NMI-in-i6300esb-watchdog-timer.patch |  50 ---
+ ...m-Add-options-to-pin-and-prioritize-vcpus.patch | 144 ---------
+ .../qemu-kvm-drop-cross-from-pkg-config.patch      |  36 ---
+ ...-msi-affinity-in-pci-assign-passthrough-d.patch |  56 ----
+ .../recipes-devtools/qemu/qemu-ovp-2.7.0.inc       |  93 ------
+ .../recipes-devtools/qemu/qemu-ovp-3.0.0.inc       |  53 ++++
+ .../recipes-devtools/qemu/qemu_2.7.0.bbappend      |   4 -
+ .../recipes-devtools/qemu/qemu_3.0.0.bbappend      |   4 +
+ 21 files changed, 57 insertions(+), 1997 deletions(-)
+ delete mode 100644 wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0001-qemu-migration-compute-with-pages.patch
+ delete mode 100644 wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0001-virtio-stop-virtqueue-processing-if-device-is-broken.patch
+ delete mode 100644 wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0002-migration-compression-cache-free.patch
+ delete mode 100644 wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0002-virtio-handle-virtqueue_get_avail_bytes-errors.patch
+ delete mode 100644 wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0003-migration-thread-affinity-and-priority-qmp.patch
+ delete mode 100644 wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0003-virtio-handle-virtqueue_num_heads-errors.patch
+ delete mode 100644 wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0004-virtio-handle-virtqueue_get_head-errors.patch
+ delete mode 100644 wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/Fix-vcpuaffine-feature-test-mask.patch
+ delete mode 100644 wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/apic-fixup-fallthrough-to-PIC.patch
+ delete mode 100644 wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/cpus-Store-VCPUs-tid-in-var-run-file.patch
+ delete mode 100644 wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/migration-add-notification-via-vmipc.patch
+ delete mode 100644 wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/pci-assign-Make-host-irq-to-vcpu-affinity.patch
+ delete mode 100644 wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/qemu-add-trace-events-for-do_device_add.patch
+ delete mode 100644 wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/qemu-inject-NMI-in-i6300esb-watchdog-timer.patch
+ delete mode 100644 wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/qemu-kvm-Add-options-to-pin-and-prioritize-vcpus.patch
+ delete mode 100644 wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/qemu-kvm-drop-cross-from-pkg-config.patch
+ delete mode 100644 wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/qemu-update-msi-affinity-in-pci-assign-passthrough-d.patch
+ delete mode 100644 wrlinux-ovp/recipes-devtools/qemu/qemu-ovp-2.7.0.inc
+ create mode 100644 wrlinux-ovp/recipes-devtools/qemu/qemu-ovp-3.0.0.inc
+ delete mode 100644 wrlinux-ovp/recipes-devtools/qemu/qemu_2.7.0.bbappend
+ create mode 100644 wrlinux-ovp/recipes-devtools/qemu/qemu_3.0.0.bbappend
+
+diff --git a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0001-qemu-migration-compute-with-pages.patch b/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0001-qemu-migration-compute-with-pages.patch
+deleted file mode 100644
+index e772fd5..0000000
+--- a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0001-qemu-migration-compute-with-pages.patch
++++ /dev/null
+@@ -1,102 +0,0 @@
+-From 4bb2d512c565df90066fac6beeb30c6c8ecd18af Mon Sep 17 00:00:00 2001
+-From: Mark Asselstine <mark.asselstine@windriver.com>
+-Date: Wed, 17 Dec 2014 18:51:52 +0000
+-Subject: [PATCH 08/18] qemu migration compute with pages
+-
+-This patch is rebased for qemu-2.4, based on Mark Asselstine's patch for
+-qemu-2.2.
+-
+-Signed-off-by: Yunguo Wei <yunguo.wei@windriver.com>
+-[Adjust code context]
+-Upstream-Status: Pending
+-Signed-off-by: He Zhe <zhe.he@windriver.com>
+----
+- migration/migration.c  | 17 +++++++++++++++--
+- migration/ram.c        |  4 ++--
+- migration/trace-events |  3 ++-
+- 3 files changed, 19 insertions(+), 5 deletions(-)
+-
+-diff --git a/migration/migration.c b/migration/migration.c
+-index 955d5ee3..82d0ed85 100644
+---- a/migration/migration.c
+-+++ b/migration/migration.c
+-@@ -1714,6 +1714,8 @@ static void *migration_thread(void *opaque)
+-     bool entered_postcopy = false;
+-     /* The active state we expect to be in; ACTIVE or POSTCOPY_ACTIVE */
+-     enum MigrationStatus current_active_state = MIGRATION_STATUS_ACTIVE;
+-+    uint64_t page_rate = 0;
+-+    static uint64_t page_count =0;
+- 
+-     rcu_register_thread();
+- 
+-@@ -1792,18 +1794,29 @@ static void *migration_thread(void *opaque)
+-             uint64_t transferred_bytes = qemu_ftell(s->to_dst_file) -
+-                                          initial_bytes;
+-             uint64_t time_spent = current_time - initial_time;
+-+
+-+            if (migrate_use_xbzrle()) {
+-+                page_rate = (norm_mig_pages_transferred() + xbzrle_mig_pages_transferred()) - page_count;
+-+                page_count = norm_mig_pages_transferred() + xbzrle_mig_pages_transferred();
+-+            } else {
+-+                page_rate = norm_mig_pages_transferred()-page_count;
+-+                page_count = norm_mig_pages_transferred();
+-+            }
+-+
+-             double bandwidth = (double)transferred_bytes / time_spent;
+--            max_size = bandwidth * migrate_max_downtime() / 1000000;
+-+            double page_bandwidth = page_rate / time_spent;
+-+            max_size = page_bandwidth * migrate_max_downtime() / 1000000;
+- 
+-             s->mbps = (((double) transferred_bytes * 8.0) /
+-                     ((double) time_spent / 1000.0)) / 1000.0 / 1000.0;
+- 
+-             trace_migrate_transferred(transferred_bytes, time_spent,
+--                                      bandwidth, max_size);
+-+                                      bandwidth, max_size, page_rate);
+-             /* if we haven't sent anything, we don't want to recalculate
+-                10000 is a small enough number for our purposes */
+-             if (s->dirty_bytes_rate && transferred_bytes > 10000) {
+-                 s->expected_downtime = s->dirty_bytes_rate / bandwidth;
+-+                trace_migrate_info(s->expected_downtime, pending_size);
+-             }
+- 
+-             qemu_file_reset_rate_limit(s->to_dst_file);
+-diff --git a/migration/ram.c b/migration/ram.c
+-index a3d70c4c..1e7b8402 100644
+---- a/migration/ram.c
+-+++ b/migration/ram.c
+-@@ -2067,7 +2067,7 @@ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
+- {
+-     uint64_t remaining_size;
+- 
+--    remaining_size = ram_save_remaining() * TARGET_PAGE_SIZE;
+-+    remaining_size = ram_save_remaining();
+- 
+-     if (!migration_in_postcopy(migrate_get_current()) &&
+-         remaining_size < max_size) {
+-@@ -2076,7 +2076,7 @@ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
+-         migration_bitmap_sync();
+-         rcu_read_unlock();
+-         qemu_mutex_unlock_iothread();
+--        remaining_size = ram_save_remaining() * TARGET_PAGE_SIZE;
+-+        remaining_size = ram_save_remaining();
+-     }
+- 
+-     /* We can do postcopy, and all the data is postcopiable */
+-diff --git a/migration/trace-events b/migration/trace-events
+-index dfee75ab..c009303b 100644
+---- a/migration/trace-events
+-+++ b/migration/trace-events
+-@@ -98,7 +98,8 @@ migrate_global_state_post_load(const char *state) "loaded state: %s"
+- migrate_global_state_pre_save(const char *state) "saved state: %s"
+- migration_thread_low_pending(uint64_t pending) "%" PRIu64
+- migrate_state_too_big(void) ""
+--migrate_transferred(uint64_t tranferred, uint64_t time_spent, double bandwidth, uint64_t size) "transferred %" PRIu64 " time_spent %" PRIu64 " bandwidth %g max_size %" PRId64
+-+migrate_transferred(uint64_t tranferred, uint64_t time_spent, double bandwidth, uint64_t size, uint64_t page_rate) "transferred %" PRIu64 " time_spent %" PRIu64 " bandwidth %g max_size %" PRId64 "page_rate %" PRIu64
+-+migrate_info(uint64_t expected_downtime, uint64_t pending_size) "expected_downtime %" PRIu64 " pending_size %" PRIu64 " bytes"
+- process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
+- process_incoming_migration_co_postcopy_end_main(void) ""
+- migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
+--- 
+-2.11.0
+-
+diff --git a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0001-virtio-stop-virtqueue-processing-if-device-is-broken.patch b/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0001-virtio-stop-virtqueue-processing-if-device-is-broken.patch
+deleted file mode 100644
+index 6bb5b81..0000000
+--- a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0001-virtio-stop-virtqueue-processing-if-device-is-broken.patch
++++ /dev/null
+@@ -1,151 +0,0 @@
+-From 681a8faa4362c4a37a0977b6d8893e0dc65eb585 Mon Sep 17 00:00:00 2001
+-From: Shan Hai <shan.hai@windriver.com>
+-Date: Fri, 19 Aug 2016 10:25:11 +0800
+-Subject: [PATCH 11/18] virtio: stop virtqueue processing if device is broken
+-
+-QEMU prints an error message and exits when the device enters an invalid
+-state.  Terminating the process is heavy-handed.  The guest may still be
+-able to function even if there is a bug in a virtio guest driver.
+-
+-Moreover, exiting is a bug in nested virtualization where a nested guest
+-could DoS other nested guests by killing a pass-through virtio device.
+-I don't think this configuration is possible today but it is likely in
+-the future.
+-
+-If the broken flag is set, do not process virtqueues or write back used
+-descriptors.  The broken flag can be cleared again by resetting the
+-device.
+-
+-Commit take from [PATCH v3 03/10] of "virtio: avoid exit() when device
+-        enters invalid states" found at
+-https://lists.gnu.org/archive/html/qemu-devel/2016-04/msg01978.html
+-
+-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+-Signed-off-by: Shan Hai <shan.hai@windriver.com>
+-[Adjust code context]
+-Upstream-Status: Backport [f5ed36635d8fa73feb66fe12b3b9c2ed90a1adbe] 
+-Signed-off-by: He Zhe <zhe.he@windriver.com>
+----
+- hw/virtio/virtio.c         | 35 +++++++++++++++++++++++++++++++++++
+- include/hw/virtio/virtio.h |  3 +++
+- 2 files changed, 38 insertions(+)
+-
+-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+-index d61146dd..39d1b13f 100644
+---- a/hw/virtio/virtio.c
+-+++ b/hw/virtio/virtio.c
+-@@ -281,6 +281,10 @@ void virtqueue_fill(VirtQueue *vq, const VirtQueueElement *elem,
+- 
+-     virtqueue_unmap_sg(vq, elem, len);
+- 
+-+    if (unlikely(vq->vdev->broken)) {
+-+        return;
+-+    }
+-+
+-     idx = (idx + vq->used_idx) % vq->vring.num;
+- 
+-     uelem.id = elem->index;
+-@@ -291,6 +295,12 @@ void virtqueue_fill(VirtQueue *vq, const VirtQueueElement *elem,
+- void virtqueue_flush(VirtQueue *vq, unsigned int count)
+- {
+-     uint16_t old, new;
+-+
+-+    if (unlikely(vq->vdev->broken)) {
+-+        vq->inuse -= count;
+-+        return;
+-+    }
+-+
+-     /* Make sure buffer is written before we update index. */
+-     smp_wmb();
+-     trace_virtqueue_flush(vq, count);
+-@@ -560,6 +570,10 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)
+-     struct iovec iov[VIRTQUEUE_MAX_SIZE];
+-     VRingDesc desc;
+- 
+-+    if (unlikely(vdev->broken)) {
+-+        return NULL;
+-+    }
+-+
+-     if (virtio_queue_empty(vq)) {
+-         return NULL;
+-     }
+-@@ -724,6 +738,10 @@ static void virtio_notify_vector(VirtIODevice *vdev, uint16_t vector)
+-     BusState *qbus = qdev_get_parent_bus(DEVICE(vdev));
+-     VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
+- 
+-+    if (unlikely(vdev->broken)) {
+-+        return;
+-+    }
+-+
+-     if (k->notify) {
+-         k->notify(qbus->parent, vector);
+-     }
+-@@ -807,6 +825,7 @@ void virtio_reset(void *opaque)
+-         k->reset(vdev);
+-     }
+- 
+-+    vdev->broken = false;
+-     vdev->guest_features = 0;
+-     vdev->queue_sel = 0;
+-     vdev->status = 0;
+-@@ -1114,6 +1133,10 @@ static void virtio_queue_notify_vq(VirtQueue *vq)
+-     if (vq->vring.desc && vq->handle_output) {
+-         VirtIODevice *vdev = vq->vdev;
+- 
+-+        if (unlikely(vdev->broken)) {
+-+            return;
+-+        }
+-+
+-         trace_virtio_queue_notify(vdev, vq - vdev->vq, vq);
+-         vq->handle_output(vdev, vq);
+-     }
+-@@ -1735,6 +1758,7 @@ void virtio_init(VirtIODevice *vdev, const char *name,
+-     vdev->config_vector = VIRTIO_NO_VECTOR;
+-     vdev->vq = g_malloc0(sizeof(VirtQueue) * VIRTIO_QUEUE_MAX);
+-     vdev->vm_running = runstate_is_running();
+-+    vdev->broken = false;
+-     for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
+-         vdev->vq[i].vector = VIRTIO_NO_VECTOR;
+-         vdev->vq[i].vdev = vdev;
+-@@ -1921,6 +1945,17 @@ void virtio_device_set_child_bus_name(VirtIODevice *vdev, char *bus_name)
+-     vdev->bus_name = g_strdup(bus_name);
+- }
+- 
+-+void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
+-+{
+-+    va_list ap;
+-+
+-+    va_start(ap, fmt);
+-+    error_vreport(fmt, ap);
+-+    va_end(ap);
+-+
+-+    vdev->broken = true;
+-+}
+-+
+- static void virtio_device_realize(DeviceState *dev, Error **errp)
+- {
+-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+-diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+-index d2490c19..0cdc7d87 100644
+---- a/include/hw/virtio/virtio.h
+-+++ b/include/hw/virtio/virtio.h
+-@@ -87,6 +87,7 @@ struct VirtIODevice
+-     VirtQueue *vq;
+-     uint16_t device_id;
+-     bool vm_running;
+-+    bool broken; /* device in invalid state, needs reset */
+-     VMChangeStateEntry *vmstate;
+-     char *bus_name;
+-     uint8_t device_endian;
+-@@ -135,6 +136,8 @@ void virtio_init(VirtIODevice *vdev, const char *name,
+-                          uint16_t device_id, size_t config_size);
+- void virtio_cleanup(VirtIODevice *vdev);
+- 
+-+void virtio_error(VirtIODevice *vdev, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
+-+
+- /* Set the child bus name. */
+- void virtio_device_set_child_bus_name(VirtIODevice *vdev, char *bus_name);
+- 
+--- 
+-2.11.0
+-
+diff --git a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0002-migration-compression-cache-free.patch b/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0002-migration-compression-cache-free.patch
+deleted file mode 100644
+index 5a9d1b3..0000000
+--- a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0002-migration-compression-cache-free.patch
++++ /dev/null
+@@ -1,110 +0,0 @@
+-From 17fd1b4adf6ccb342913407d68f0207300b3f4fc Mon Sep 17 00:00:00 2001
+-From: Mark Asselstine <mark.asselstine@windriver.com>
+-Date: Wed, 17 Dec 2014 18:57:13 +0000
+-Subject: [PATCH 09/18] migration compression cache free
+-
+-This patch is rebased for qemu-2.4, based on Mark Asselstine's patch for
+-qemu-2.2.
+-
+-Signed-off-by: Yunguo Wei <yunguo.wei@windriver.com>
+-[Adjust code context
+- Use ram_migration_cleanup instead of migration_end which has been removed]
+-Upstream-Status: Pending
+-Signed-off-by: He Zhe <zhe.he@windriver.com>
+----
+- include/migration/vmstate.h |  1 +
+- include/sysemu/sysemu.h     |  1 +
+- migration/migration.c       |  5 +++++
+- migration/ram.c             |  6 ++++++
+- migration/savevm.c          | 11 +++++++++++
+- 5 files changed, 24 insertions(+)
+-
+-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+-index 1638ee57..7cf2f211 100644
+---- a/include/migration/vmstate.h
+-+++ b/include/migration/vmstate.h
+-@@ -40,6 +40,7 @@ typedef struct SaveVMHandlers {
+-     void (*set_params)(const MigrationParams *params, void * opaque);
+-     SaveStateHandler *save_state;
+- 
+-+    void (*free)(void *opaque);
+-     void (*cleanup)(void *opaque);
+-     int (*save_live_complete_postcopy)(QEMUFile *f, void *opaque);
+-     int (*save_live_complete_precopy)(QEMUFile *f, void *opaque);
+-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+-index ee7c7608..d819e1ac 100644
+---- a/include/sysemu/sysemu.h
+-+++ b/include/sysemu/sysemu.h
+-@@ -113,6 +113,7 @@ int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy);
+- void qemu_savevm_state_cleanup(void);
+- void qemu_savevm_state_complete_postcopy(QEMUFile *f);
+- void qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only);
+-+void qemu_savevm_state_free(void);
+- void qemu_savevm_state_pending(QEMUFile *f, uint64_t max_size,
+-                                uint64_t *res_non_postcopiable,
+-                                uint64_t *res_postcopiable);
+-diff --git a/migration/migration.c b/migration/migration.c
+-index 82d0ed85..27218812 100644
+---- a/migration/migration.c
+-+++ b/migration/migration.c
+-@@ -1856,6 +1856,11 @@ static void *migration_thread(void *opaque)
+-             }
+-         }
+-     }
+-+
+-+    if(s->state == MIGRATION_STATUS_COMPLETED) {
+-+        qemu_savevm_state_free();
+-+    }
+-+
+-     qemu_bh_schedule(s->cleanup_bh);
+-     qemu_mutex_unlock_iothread();
+- 
+-diff --git a/migration/ram.c b/migration/ram.c
+-index 1e7b8402..4f72de34 100644
+---- a/migration/ram.c
+-+++ b/migration/ram.c
+-@@ -1436,6 +1436,11 @@ static void ram_migration_cleanup(void *opaque)
+-     XBZRLE_cache_unlock();
+- }
+- 
+-+static void ram_migration_free(void *opaque)
+-+{
+-+    ram_migration_cleanup(opaque);
+-+}
+-+
+- static void reset_ram_globals(void)
+- {
+-     last_seen_block = NULL;
+-@@ -2586,6 +2591,7 @@ static SaveVMHandlers savevm_ram_handlers = {
+-     .save_live_pending = ram_save_pending,
+-     .load_state = ram_load,
+-     .cleanup = ram_migration_cleanup,
+-+    .free = ram_migration_free,
+- };
+- 
+- void ram_mig_init(void)
+-diff --git a/migration/savevm.c b/migration/savevm.c
+-index 33a2911e..8d16185b 100644
+---- a/migration/savevm.c
+-+++ b/migration/savevm.c
+-@@ -1142,6 +1142,17 @@ void qemu_savevm_state_cleanup(void)
+-     }
+- }
+- 
+-+void qemu_savevm_state_free(void)
+-+{
+-+    SaveStateEntry *se;
+-+
+-+    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+-+        if (se->ops && se->ops->free) {
+-+            se->ops->free(se->opaque);
+-+        }
+-+    }
+-+}
+-+
+- static int qemu_savevm_state(QEMUFile *f, Error **errp)
+- {
+-     int ret;
+--- 
+-2.11.0
+-
+diff --git a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0002-virtio-handle-virtqueue_get_avail_bytes-errors.patch b/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0002-virtio-handle-virtqueue_get_avail_bytes-errors.patch
+deleted file mode 100644
+index d1a3963..0000000
+--- a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0002-virtio-handle-virtqueue_get_avail_bytes-errors.patch
++++ /dev/null
+@@ -1,70 +0,0 @@
+-From bb72ef4eabbcfda82a8205c5d3ecc41e1a83340b Mon Sep 17 00:00:00 2001
+-From: Shan Hai <shan.hai@windriver.com>
+-Date: Thu, 4 Aug 2016 10:40:08 +0800
+-Subject: [PATCH 12/18] virtio: handle virtqueue_get_avail_bytes() errors
+-
+-If the vring is invalid, tell the caller no bytes are available and mark
+-the device broken.
+-
+-Commit take from [PATCH v3 06/10] of "virtio: avoid exit() when device
+-        enters invalid states" found at
+-https://lists.gnu.org/archive/html/qemu-devel/2016-04/msg01978.html
+-
+-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+-Signed-off-by: Shan Hai <shan.hai@windriver.com>
+-[Adjust code context]
+-Upstream-Status: Backport [d65abf85e7e5fce31905eaea322ef2ea26e5f2db]
+-Signed-off-by: He Zhe <zhe.he@windriver.com>
+----
+- hw/virtio/virtio.c | 17 +++++++++++------
+- 1 file changed, 11 insertions(+), 6 deletions(-)
+-
+-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+-index 39d1b13f..14fe6c40 100644
+---- a/hw/virtio/virtio.c
+-+++ b/hw/virtio/virtio.c
+-@@ -404,14 +404,14 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
+- 
+-         if (desc.flags & VRING_DESC_F_INDIRECT) {
+-             if (desc.len % sizeof(VRingDesc)) {
+--                error_report("Invalid size for indirect buffer table");
+--                exit(1);
+-+                virtio_error(vdev, "Invalid size for indirect buffer table");
+-+                goto err;
+-             }
+- 
+-             /* If we've got too many, that implies a descriptor loop. */
+-             if (num_bufs >= max) {
+--                error_report("Looped descriptor");
+--                exit(1);
+-+                virtio_error(vdev, "Looped descriptor");
+-+                goto err;
+-             }
+- 
+-             /* loop over the indirect descriptor table */
+-@@ -425,8 +425,8 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
+-         do {
+-             /* If we've got too many, that implies a descriptor loop. */
+-             if (++num_bufs > max) {
+--                error_report("Looped descriptor");
+--                exit(1);
+-+                virtio_error(vdev, "Looped descriptor");
+-+                goto err;
+-             }
+- 
+-             if (desc.flags & VRING_DESC_F_WRITE) {
+-@@ -451,6 +451,11 @@ done:
+-     if (out_bytes) {
+-         *out_bytes = out_total;
+-     }
+-+    return;
+-+
+-+err:
+-+    in_total = out_total = 0;
+-+    goto done;
+- }
+- 
+- int virtqueue_avail_bytes(VirtQueue *vq, unsigned int in_bytes,
+--- 
+-2.11.0
+-
+diff --git a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0003-migration-thread-affinity-and-priority-qmp.patch b/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0003-migration-thread-affinity-and-priority-qmp.patch
+deleted file mode 100644
+index cbe6444..0000000
+--- a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0003-migration-thread-affinity-and-priority-qmp.patch
++++ /dev/null
+@@ -1,336 +0,0 @@
+-From b01f284b98f3703cd1a8ce87b6f9ee9e2a3c77ac Mon Sep 17 00:00:00 2001
+-From: Mark Asselstine <mark.asselstine@windriver.com>
+-Date: Wed, 17 Dec 2014 19:27:52 +0000
+-Subject: [PATCH 10/18] migration thread affinity and priority qmp
+-
+-This patch is rebased for qemu-2.4, based on Mark Asselstine's patch for
+-qemu-2.2
+-
+-Signed-off-by: Yunguo Wei <yunguo.wei@windriver.com>
+-[Adjust code context
+- "input_" has been removed from qmp_marshal_input_migrate_set_thread_cpumask]
+-Upstream-Status: Pending
+-Signed-off-by: He Zhe <zhe.he@windriver.com>
+----
+- hmp-commands.hx        | 33 ++++++++++++++++++++++++++++-
+- hmp.c                  | 27 ++++++++++++++++++++++++
+- hmp.h                  |  2 ++
+- migration/migration.c  | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++
+- migration/trace-events |  1 +
+- qapi-schema.json       | 30 ++++++++++++++++++++++++++
+- qmp-commands.hx        | 48 ++++++++++++++++++++++++++++++++++++++++++
+- 7 files changed, 197 insertions(+), 1 deletion(-)
+-
+-diff --git a/hmp-commands.hx b/hmp-commands.hx
+-index 848efee5..3a375560 100644
+---- a/hmp-commands.hx
+-+++ b/hmp-commands.hx
+-@@ -1056,6 +1056,38 @@ once migration finished successfully.  Only implemented for SPICE.
+- ETEXI
+- 
+-     {
+-+        .name       = "migrate_set_thread_cpumask",
+-+        .args_type  = "value:o",
+-+        .params     = "value",
+-+        .help       = "Set CPU mask for the migration thread."
+-+                      "Defaults to CPU 0 if no mask is specified",
+-+        .mhandler.cmd = hmp_migrate_set_thread_cpumask,
+-+    },
+-+
+-+STEXI
+-+@item migrate_set_thread_cpumask @var{value}
+-+@findex migrate_set_thread_cpumask
+-+Set CPU mask for the migration thread
+-+ETEXI
+-+
+-+    {
+-+        .name       = "migrate_set_thread_priority",
+-+        .args_type  = "value:o",
+-+        .params     = "value",
+-+        .help       = "Set real time priority for the the migration thread."
+-+	              "Defaults to no change migration thread priority if not"
+-+                      "specified or out of range. Range [1-99].Scheduling"
+-+                      "policy will always be- SCHED_FIFO",
+-+        .mhandler.cmd = hmp_migrate_set_thread_priority,
+-+    },
+-+
+-+STEXI
+-+@item migrate_set_thread_priority @var{value}
+-+@findex migrate_set_thread_priority
+-+Set real time priority for the the migration thread
+-+ETEXI
+-+
+-+    {
+-         .name       = "dump-guest-memory",
+-         .args_type  = "paging:-p,detach:-d,zlib:-z,lzo:-l,snappy:-s,filename:F,begin:i?,length:i?",
+-         .params     = "[-p] [-d] [-z|-l|-s] filename [begin length]",
+-@@ -1070,7 +1102,6 @@ ETEXI
+-         .mhandler.cmd = hmp_dump_guest_memory,
+-     },
+- 
+--
+- STEXI
+- @item dump-guest-memory [-p] @var{filename} @var{begin} @var{length}
+- @item dump-guest-memory [-z|-l|-s] @var{filename}
+-diff --git a/hmp.c b/hmp.c
+-index cc2056e9..e5072c97 100644
+---- a/hmp.c
+-+++ b/hmp.c
+-@@ -1211,6 +1211,33 @@ void hmp_migrate_set_cache_size(Monitor *mon, const QDict *qdict)
+-     }
+- }
+- 
+-+void hmp_migrate_set_thread_cpumask(Monitor *mon, const QDict *qdict)
+-+{
+-+    int64_t value = qdict_get_int(qdict, "value");
+-+    Error *err = NULL;
+-+    
+-+    qmp_migrate_set_thread_cpumask(value, &err);
+-+    if (err) {
+-+        monitor_printf(mon, "%s\n", error_get_pretty(err));
+-+        error_free(err);
+-+        return;
+-+    }
+-+}
+-+
+-+void hmp_migrate_set_thread_priority(Monitor *mon, const QDict *qdict)
+-+{
+-+    int64_t value = qdict_get_int(qdict, "value");
+-+    Error *err = NULL;
+-+     
+-+    
+-+    qmp_migrate_set_thread_priority(value, &err);
+-+    if (err) {
+-+        monitor_printf(mon, "%s\n", error_get_pretty(err));
+-+        error_free(err);
+-+        return;
+-+    }
+-+}
+-+
+- void hmp_migrate_set_speed(Monitor *mon, const QDict *qdict)
+- {
+-     int64_t value = qdict_get_int(qdict, "value");
+-diff --git a/hmp.h b/hmp.h
+-index 0876ec03..03341ca6 100644
+---- a/hmp.h
+-+++ b/hmp.h
+-@@ -68,6 +68,8 @@ void hmp_migrate_set_speed(Monitor *mon, const QDict *qdict);
+- void hmp_migrate_set_capability(Monitor *mon, const QDict *qdict);
+- void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict);
+- void hmp_migrate_set_cache_size(Monitor *mon, const QDict *qdict);
+-+void hmp_migrate_set_thread_cpumask(Monitor *mon, const QDict *qdict);
+-+void hmp_migrate_set_thread_priority(Monitor *mon, const QDict *qdict);
+- void hmp_client_migrate_info(Monitor *mon, const QDict *qdict);
+- void hmp_migrate_start_postcopy(Monitor *mon, const QDict *qdict);
+- void hmp_set_password(Monitor *mon, const QDict *qdict);
+-diff --git a/migration/migration.c b/migration/migration.c
+-index 27218812..a4da35d9 100644
+---- a/migration/migration.c
+-+++ b/migration/migration.c
+-@@ -37,6 +37,17 @@
+- #include "io/channel-buffer.h"
+- #include "io/channel-tls.h"
+- 
+-+#include <sched.h>
+-+
+-+//#define DEBUG
+-+
+-+#if DEBUG
+-+#define DPRINTF(fmt, ...) \
+-+        printf(fmt, ## __VA_ARGS__)
+-+#else
+-+#define DPRINTF(fmt, ...)
+-+#endif
+-+
+- #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttling */
+- 
+- /* Amount of time to allocate to each "chunk" of bandwidth-throttled
+-@@ -61,6 +72,11 @@
+- static NotifierList migration_state_notifiers =
+-     NOTIFIER_LIST_INITIALIZER(migration_state_notifiers);
+- 
+-+/* variables for pinning the migration thread to a CPU and assing the 
+-+ * realtime priority to it */
+-+static uint64_t migrate_thread_cpumask=0;
+-+static uint64_t migrate_thread_priority=0;
+-+
+- static bool deferred_incoming;
+- 
+- /*
+-@@ -1158,6 +1174,32 @@ void qmp_migrate_set_cache_size(int64_t value, Error **errp)
+-     s->xbzrle_cache_size = new_size;
+- }
+- 
+-+void qmp_migrate_set_thread_cpumask(int64_t value, Error **errp)
+-+{
+-+    /* Check for truncation */
+-+    if (value != (size_t)value) {
+-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "Migration thread CPU Mask",
+-+                  "exceeding address space");
+-+        return;
+-+    }
+-+    /*resize the value */
+-+    value >>= 20; /*Magic */
+-+    migrate_thread_cpumask = value; 
+-+}
+-+
+-+void qmp_migrate_set_thread_priority(int64_t value, Error **errp)
+-+{
+-+    /* Check for truncation */
+-+    if (value != (size_t)value) {
+-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "Migration thread Priority",
+-+                  "exceeding address space");
+-+        return;
+-+    }
+-+    /*resize the value */
+-+    value >>= 20;
+-+    migrate_thread_priority = value;
+-+}
+-+
+- int64_t qmp_query_migrate_cache_size(Error **errp)
+- {
+-     return migrate_xbzrle_cache_size();
+-@@ -1717,6 +1759,20 @@ static void *migration_thread(void *opaque)
+-     uint64_t page_rate = 0;
+-     static uint64_t page_count =0;
+- 
+-+    /* Bind Migration thread to the processor specified by the user */
+-+    if (sched_setaffinity(0, sizeof(migrate_thread_cpumask), (cpu_set_t *)&migrate_thread_cpumask) <0) {
+-+        DPRINTF("Error setting user input affinity. Switching to default.\n");
+-+    }
+-+
+-+    /* Change the realtime priority of the migration thread specified by the user */
+-+    struct sched_param schedp;
+-+    memset(&schedp, 0, sizeof(schedp));
+-+    schedp.sched_priority = migrate_thread_priority;
+-+    if (sched_setscheduler(0, SCHED_FIFO, &schedp) < 0)
+-+         DPRINTF("Error setting user input priority. Switching to default.\n");
+-+
+-+    trace_migrate_thread(migrate_thread_cpumask, migrate_thread_priority);
+-+
+-     rcu_register_thread();
+- 
+-     qemu_savevm_state_header(s->to_dst_file);
+-@@ -1857,6 +1913,7 @@ static void *migration_thread(void *opaque)
+-         }
+-     }
+- 
+-+    /* free the memory resources allocated for the migration */
+-     if(s->state == MIGRATION_STATUS_COMPLETED) {
+-         qemu_savevm_state_free();
+-     }
+-diff --git a/migration/trace-events b/migration/trace-events
+-index c009303b..81ecab54 100644
+---- a/migration/trace-events
+-+++ b/migration/trace-events
+-@@ -100,6 +100,7 @@ migration_thread_low_pending(uint64_t pending) "%" PRIu64
+- migrate_state_too_big(void) ""
+- migrate_transferred(uint64_t tranferred, uint64_t time_spent, double bandwidth, uint64_t size, uint64_t page_rate) "transferred %" PRIu64 " time_spent %" PRIu64 " bandwidth %g max_size %" PRId64 "page_rate %" PRIu64
+- migrate_info(uint64_t expected_downtime, uint64_t pending_size) "expected_downtime %" PRIu64 " pending_size %" PRIu64 " bytes"
+-+migrate_thread(uint64_t migrate_thread_cpumask, uint64_t migrate_thread_priority) "migration Thread pinned to %" PRIu64 "with Priority %" PRIu64
+- process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
+- process_incoming_migration_co_postcopy_end_main(void) ""
+- migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
+-diff --git a/qapi-schema.json b/qapi-schema.json
+-index 5658723b..5f1f4588 100644
+---- a/qapi-schema.json
+-+++ b/qapi-schema.json
+-@@ -1832,6 +1832,36 @@
+- { 'command': 'migrate_set_speed', 'data': {'value': 'int'} }
+- 
+- ##
+-+# @migrate_set_thread_cpumask
+-+#
+-+# Set migration thread CPU mask.
+-+#
+-+# @value: CPU mask.
+-+#
+-+# Returns: nothing on success
+-+#
+-+# Notes: A value lesser than zero will be automatically round up to zero.
+-+#
+-+# Since: 0.14.0
+-+##
+-+{ 'command': 'migrate_set_thread_cpumask', 'data': {'value': 'int'} }
+-+
+-+##
+-+# @migrate_set_thread_priority
+-+#
+-+# Set migration thread Real Timer priority mask.
+-+#
+-+# @value: Thread Priority.
+-+#
+-+# Returns: nothing on success
+-+#
+-+# Notes: A value lesser than zero will be automatically round up to zero.
+-+#
+-+# Since: 0.14.0
+-+##
+-+{ 'command': 'migrate_set_thread_priority', 'data': {'value': 'int'} }
+-+
+-+##
+- # @migrate-set-cache-size
+- #
+- # Set XBZRLE cache size
+-diff --git a/qmp-commands.hx b/qmp-commands.hx
+-index 6866264e..8a106358 100644
+---- a/qmp-commands.hx
+-+++ b/qmp-commands.hx
+-@@ -784,6 +784,54 @@ Example:
+- EQMP
+- 
+-     {
+-+        .name       = "migrate_set_thread_cpumask",
+-+        .args_type  = "value:o",
+-+        .mhandler.cmd_new = qmp_marshal_migrate_set_thread_cpumask
+-+    },
+-+
+-+SQMP
+-+migrate_set_thread_cpumask
+-+--------------------------
+-+
+-+Set CPU mask for the migration thread. Defaults to CPU 0 if no mask is specified.
+-+
+-+Arguments:
+-+
+-+- "value": CPU mask (json-int)
+-+
+-+Example:
+-+
+-+-> { "execute": "migrate_set_thread_cpumask", "arguments": { "value": 128 } }
+-+<- { "return": {} }
+-+
+-+EQMP
+-+   
+-+    {
+-+        .name       = "migrate_set_thread_priority",
+-+        .args_type  = "value:o",
+-+        .mhandler.cmd_new = qmp_marshal_migrate_set_thread_priority
+-+    },
+-+
+-+SQMP
+-+migrate_set_thread_priority
+-+---------------------------
+-+
+-+Set real time priority for the the migration thread. Defaults to no change migration 
+-+thread priority if not specified or out of range. Range [1-99].Scheduling policy 
+-+will always be - SCHED_FIFO".
+-+
+-+Arguments:
+-+
+-+- "value": Migration thread priority (json-int)
+-+
+-+Example:
+-+
+-+-> { "execute": "migrate_set_thread_priority", "arguments": { "value": 96 } }
+-+<- { "return": {} }
+-+
+-+EQMP
+-+
+-+    {
+-         .name       = "migrate_set_speed",
+-         .args_type  = "value:o",
+-         .mhandler.cmd_new = qmp_marshal_migrate_set_speed,
+--- 
+-2.11.0
+-
+diff --git a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0003-virtio-handle-virtqueue_num_heads-errors.patch b/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0003-virtio-handle-virtqueue_num_heads-errors.patch
+deleted file mode 100644
+index 292b74c..0000000
+--- a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0003-virtio-handle-virtqueue_num_heads-errors.patch
++++ /dev/null
+@@ -1,69 +0,0 @@
+-From 88f1ab06e0b54621da5a868eaa085a360121f892 Mon Sep 17 00:00:00 2001
+-From: Shan Hai <shan.hai@windriver.com>
+-Date: Thu, 4 Aug 2016 10:49:17 +0800
+-Subject: [PATCH 13/18] virtio: handle virtqueue_num_heads() errors
+-
+-If the avail ring index is bogus virtqueue_num_heads() must return
+--EINVAL.
+-
+-The only caller is virtqueue_get_avail_bytes().  Return saying no bytes
+-are available when virtqueue_num_heads() fails.
+-
+-Commit take from [PATCH v3 09/10] of "virtio: avoid exit() when device
+-        enters invalid states" found at
+-https://lists.gnu.org/archive/html/qemu-devel/2016-04/msg01978.html
+-
+-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+-Signed-off-by: Shan Hai <shan.hai@windriver.com>
+-[Adjust code context]
+-Upstream-Status: Backport [4355c1abcaedd64a18d627284a3b7e54acb00714]
+-Signed-off-by: He Zhe <zhe.he@windriver.com>
+----
+- hw/virtio/virtio.c | 12 +++++++++---
+- 1 file changed, 9 insertions(+), 3 deletions(-)
+-
+-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+-index 14fe6c40..690b6a50 100644
+---- a/hw/virtio/virtio.c
+-+++ b/hw/virtio/virtio.c
+-@@ -325,9 +325,9 @@ static int virtqueue_num_heads(VirtQueue *vq, unsigned int idx)
+- 
+-     /* Check it isn't doing very strange things with descriptor numbers. */
+-     if (num_heads > vq->vring.num) {
+--        error_report("Guest moved used index from %u to %u",
+-+        virtio_error(vq->vdev, "Guest moved used index from %u to %u",
+-                      idx, vq->shadow_avail_idx);
+--        exit(1);
+-+        return -EINVAL;
+-     }
+-     /* On success, callers read a descriptor at vq->last_avail_idx.
+-      * Make sure descriptor read does not bypass avail index read. */
+-@@ -385,11 +385,12 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
+- {
+-     unsigned int idx;
+-     unsigned int total_bufs, in_total, out_total;
+-+    int rc;
+- 
+-     idx = vq->last_avail_idx;
+- 
+-     total_bufs = in_total = out_total = 0;
+--    while (virtqueue_num_heads(vq, idx)) {
+-+    while ((rc = virtqueue_num_heads(vq, idx)) > 0) {
+-         VirtIODevice *vdev = vq->vdev;
+-         unsigned int max, num_bufs, indirect = 0;
+-         VRingDesc desc;
+-@@ -444,6 +445,11 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
+-         else
+-             total_bufs++;
+-     }
+-+
+-+    if (rc < 0) {
+-+        goto err;
+-+    }
+-+
+- done:
+-     if (in_bytes) {
+-         *in_bytes = in_total;
+--- 
+-2.11.0
+-
+diff --git a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0004-virtio-handle-virtqueue_get_head-errors.patch b/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0004-virtio-handle-virtqueue_get_head-errors.patch
+deleted file mode 100644
+index 7a22020..0000000
+--- a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/0004-virtio-handle-virtqueue_get_head-errors.patch
++++ /dev/null
+@@ -1,88 +0,0 @@
+-From 78bcc5ee6d12b9a148d83a66287141783155bb8a Mon Sep 17 00:00:00 2001
+-From: Shan Hai <shan.hai@windriver.com>
+-Date: Thu, 4 Aug 2016 10:55:23 +0800
+-Subject: [PATCH 14/18] virtio: handle virtqueue_get_head() errors
+-
+-Stop processing the vring if virtqueue_get_head() fetches an
+-out-of-bounds head index.
+-
+-Commit take from [PATCH v3 10/10] of "virtio: avoid exit() when device
+-        enters invalid states" found at
+-https://lists.gnu.org/archive/html/qemu-devel/2016-04/msg01978.html
+-
+-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+-Signed-off-by: Shan Hai <shan.hai@windriver.com>
+-[Adjust code context]
+-Upstream-Status: Backport [fb1131b674e492a5f91abd77b9fcc9a9e2b88eb7]
+-Signed-off-by: He Zhe <zhe.he@windriver.com>
+----
+- hw/virtio/virtio.c | 28 ++++++++++++++++++----------
+- 1 file changed, 18 insertions(+), 10 deletions(-)
+-
+-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+-index 690b6a50..4c18a849 100644
+---- a/hw/virtio/virtio.c
+-+++ b/hw/virtio/virtio.c
+-@@ -338,21 +338,20 @@ static int virtqueue_num_heads(VirtQueue *vq, unsigned int idx)
+-     return num_heads;
+- }
+- 
+--static unsigned int virtqueue_get_head(VirtQueue *vq, unsigned int idx)
+-+static bool virtqueue_get_head(VirtQueue *vq, unsigned int idx,
+-+                               unsigned int *head)
+- {
+--    unsigned int head;
+--
+-     /* Grab the next descriptor number they're advertising, and increment
+-      * the index we've seen. */
+--    head = vring_avail_ring(vq, idx % vq->vring.num);
+-+    *head = vring_avail_ring(vq, idx % vq->vring.num);
+- 
+-     /* If their number is silly, that's a fatal mistake. */
+--    if (head >= vq->vring.num) {
+--        error_report("Guest says index %u is available", head);
+--        exit(1);
+-+    if (*head >= vq->vring.num) {
+-+        virtio_error(vq->vdev, "Guest says index %u is available", *head);
+-+        return false;
+-     }
+- 
+--    return head;
+-+    return true;
+- }
+- 
+- static unsigned virtqueue_read_next_desc(VirtIODevice *vdev, VRingDesc *desc,
+-@@ -399,7 +398,11 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
+- 
+-         max = vq->vring.num;
+-         num_bufs = total_bufs;
+--        i = virtqueue_get_head(vq, idx++);
+-+
+-+        if (!virtqueue_get_head(vq, idx++, &i)) {
+-+            goto err;
+-+        }
+-+
+-         desc_pa = vq->vring.desc;
+-         vring_desc_read(vdev, &desc, desc_pa, i);
+- 
+-@@ -602,11 +605,16 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)
+-         exit(1);
+-     }
+- 
+--    i = head = virtqueue_get_head(vq, vq->last_avail_idx++);
+-+    if (!virtqueue_get_head(vq, vq->last_avail_idx++, &head)) {
+-+        return NULL;
+-+    }
+-+
+-     if (virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX)) {
+-         vring_set_avail_event(vq, vq->last_avail_idx);
+-     }
+- 
+-+    i = head;
+-+
+-     vring_desc_read(vdev, &desc, desc_pa, i);
+-     if (desc.flags & VRING_DESC_F_INDIRECT) {
+-         if (desc.len % sizeof(VRingDesc)) {
+--- 
+-2.11.0
+-
+diff --git a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/Fix-vcpuaffine-feature-test-mask.patch b/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/Fix-vcpuaffine-feature-test-mask.patch
+deleted file mode 100644
+index 0506acc..0000000
+--- a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/Fix-vcpuaffine-feature-test-mask.patch
++++ /dev/null
+@@ -1,50 +0,0 @@
+-From d8fb92dc3bf2695d992bf2e8877cb09b44ae8d62 Mon Sep 17 00:00:00 2001
+-From: Jim Somerville <Jim.Somerville@windriver.com>
+-Date: Mon, 14 Apr 2014 17:54:32 -0400
+-Subject: [PATCH 07/18] Fix vcpuaffine feature test mask
+-
+-Also disable the feature by default
+-
+-Signed-off-by: Jim Somerville <Jim.Somerville@windriver.com>
+-[ywei: fix context conflict in
+-	hw/i386/kvm/pci-assign.c]
+-Signed-off-by: Yunguo Wei <yunguo.wei@windriver.com>
+-Upstream-Status: Pending
+-Signed-off-by: He Zhe <zhe.he@windriver.com>
+----
+- hw/i386/kvm/pci-assign.c | 5 +++--
+- 1 file changed, 3 insertions(+), 2 deletions(-)
+-
+-diff --git a/hw/i386/kvm/pci-assign.c b/hw/i386/kvm/pci-assign.c
+-index 8d33b68b..24865f50 100644
+---- a/hw/i386/kvm/pci-assign.c
+-+++ b/hw/i386/kvm/pci-assign.c
+-@@ -83,6 +83,7 @@ typedef struct AssignedDevRegion {
+- 
+- #define ASSIGNED_DEVICE_PREFER_MSI_MASK (1 << ASSIGNED_DEVICE_PREFER_MSI_BIT)
+- #define ASSIGNED_DEVICE_SHARE_INTX_MASK (1 << ASSIGNED_DEVICE_SHARE_INTX_BIT)
+-+#define ASSIGNED_DEVICE_VCPU_AFFINITY_MASK (1 << ASSIGNED_DEVICE_VCPU_AFFINITY_BIT)
+- 
+- typedef struct MSIXTableEntry {
+-     uint32_t addr_lo;
+-@@ -1584,7 +1585,7 @@ static void kvm_msix_update_affinity(AssignedDevice *dev, int entry, int dest)
+-     int irq, fd, i;
+-     cpu_set_t *msk;
+- 
+--    if (!(dev->features & ASSIGNED_DEVICE_VCPU_AFFINITY_BIT))
+-+    if (!(dev->features & ASSIGNED_DEVICE_VCPU_AFFINITY_MASK))
+-         return;
+- 
+-     irq = assign_query_msix_irq(dev, entry);
+-@@ -1936,7 +1937,7 @@ static Property assigned_dev_properties[] = {
+-     DEFINE_PROP_BIT("share_intx", AssignedDevice, features,
+-                     ASSIGNED_DEVICE_SHARE_INTX_BIT, true),
+-     DEFINE_PROP_BIT("vcpuaffine", AssignedDevice, features,
+--                        ASSIGNED_DEVICE_VCPU_AFFINITY_BIT, true),
+-+                        ASSIGNED_DEVICE_VCPU_AFFINITY_BIT, false),
+-     DEFINE_PROP_STRING("configfd", AssignedDevice, configfd_name),
+-     DEFINE_PROP_END_OF_LIST(),
+- };
+--- 
+-2.11.0
+-
+diff --git a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/apic-fixup-fallthrough-to-PIC.patch b/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/apic-fixup-fallthrough-to-PIC.patch
+deleted file mode 100644
+index 1c88412..0000000
+--- a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/apic-fixup-fallthrough-to-PIC.patch
++++ /dev/null
+@@ -1,49 +0,0 @@
+-From bef93bb81588b5323a52d2e1886f2a77b64a976b Mon Sep 17 00:00:00 2001
+-From: Mark Asselstine <mark.asselstine@windriver.com>
+-Date: Tue, 26 Feb 2013 11:43:28 -0500
+-Subject: [PATCH 03/18] apic: fixup fallthrough to PIC
+-
+-Commit 0e21e12bb311c4c1095d0269dc2ef81196ccb60a [Don't route PIC
+-interrupts through the local APIC if the local APIC config says so.]
+-missed a check to ensure the local APIC is enabled. Since if the local
+-APIC is disabled it doesn't matter what the local APIC config says.
+-
+-If this check isn't done and the guest has disabled the local APIC the
+-guest will receive a general protection fault, similar to what is seen
+-here:
+-
+-https://lists.gnu.org/archive/html/qemu-devel/2012-12/msg02304.html
+-
+-The GPF is caused by an attempt to service interrupt 0xffffffff. This
+-comes about since cpu_get_pic_interrupt() calls apic_accept_pic_intr()
+-(with the local APIC disabled apic_get_interrupt() returns -1).
+-apic_accept_pic_intr() returns 0 and thus the interrupt number which
+-is returned from cpu_get_pic_interrupt(), and which is attempted to be
+-serviced, is -1.
+-
+-Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+-Signed-off-by: Michael Barabanov <michael.barabanov@windriver.com>
+-[ Adjust code context ]
+-Upstream-Status: Submitted [openembedded-core@lists.openembedded.org
+-on 20170809]
+-Signed-off-by: He Zhe <zhe.he@windriver.com>
+----
+- hw/intc/apic.c | 2 +-
+- 1 file changed, 1 insertion(+), 1 deletion(-)
+-
+-diff --git a/hw/intc/apic.c b/hw/intc/apic.c
+-index 45887d99..c5ae4087 100644
+---- a/hw/intc/apic.c
+-+++ b/hw/intc/apic.c
+-@@ -587,7 +587,7 @@ int apic_accept_pic_intr(DeviceState *dev)
+-     APICCommonState *s = APIC_COMMON(dev);
+-     uint32_t lvt0;
+- 
+--    if (!s)
+-+    if (!s || !(s->spurious_vec & APIC_SV_ENABLE))
+-         return -1;
+- 
+-     lvt0 = s->lvt[APIC_LVT_LINT0];
+--- 
+-2.11.0
+-
+diff --git a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/cpus-Store-VCPUs-tid-in-var-run-file.patch b/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/cpus-Store-VCPUs-tid-in-var-run-file.patch
+deleted file mode 100644
+index bfa5dc0..0000000
+--- a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/cpus-Store-VCPUs-tid-in-var-run-file.patch
++++ /dev/null
+@@ -1,82 +0,0 @@
+-From 045d0237b057e117228bcc41d5a7f74591dcbd9e Mon Sep 17 00:00:00 2001
+-From: Thomas Gleixner <tglx@linutronix.de>
+-Date: Thu, 31 May 2012 13:21:04 +0200
+-Subject: [PATCH 05/18] cpus: Store VCPUs tid in /var/run/ file
+-
+-Store the TID of each VCPU in /var/run/kvm/$VMNAME/vcpu$N
+-
+-No proper way to unlink them yet. Let userspace deal with that.
+-
+-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+-Signed-off-by: Yang Shi <yang.shi@windriver.com>
+-Signed-off-by: Paul Barrette <paul.barrette@windriver.com>
+-Signed-off-by: Michael Barabanov <michael.barabanov@windriver.com>
+-Upstream-Status: Pending
+-Signed-off-by: He Zhe <zhe.he@windriver.com>
+----
+- cpus.c | 35 +++++++++++++++++++++++++++++++++++
+- 1 file changed, 35 insertions(+)
+-
+-diff --git a/cpus.c b/cpus.c
+-index 2b1fe3c1..2ab447ad 100644
+---- a/cpus.c
+-+++ b/cpus.c
+-@@ -54,6 +54,7 @@
+- #ifdef CONFIG_LINUX
+- 
+- #include <sys/prctl.h>
+-+#include <linux/unistd.h>
+- 
+- #ifndef PR_MCE_KILL
+- #define PR_MCE_KILL 33
+-@@ -844,6 +845,38 @@ static void qemu_kvm_eat_signals(CPUState *cpu)
+-     } while (sigismember(&chkset, SIG_IPI) || sigismember(&chkset, SIGBUS));
+- }
+- 
+-+#define gettid() syscall(__NR_gettid)
+-+
+-+static void qemu_kvm_store_tid(CPUState *env)
+-+{
+-+    char fname[256];
+-+    FILE *f;
+-+
+-+    if (!qemu_name)
+-+        return;
+-+
+-+    sprintf(fname, "/var/run/kvm/%s/vcpu%d", qemu_name, env->cpu_index);
+-+    f = fopen(fname, "w");
+-+    if (!f)
+-+        return;
+-+    fprintf(f, "%ld\n", gettid());
+-+    fclose(f);
+-+}
+-+
+-+#if 0
+-+/* TODO: Find a proper place to remove the vcpu files */
+-+static void qemu_kvm_remove_tid(CPUState *env)
+-+{
+-+    char fname[256];
+-+
+-+    if (!qemu_name)
+-+        return;
+-+
+-+    sprintf(fname, "/var/run/kvm/%s/vcpu%d", qemu_name, env->cpu_index);
+-+    unlink(fname);
+-+}
+-+#endif
+-+
+- #else /* !CONFIG_LINUX */
+- 
+- static void qemu_init_sigbus(void)
+-@@ -1120,6 +1153,8 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
+-         exit(1);
+-     }
+- 
+-+    qemu_kvm_store_tid(cpu);
+-+
+-     qemu_kvm_init_cpu_signals(cpu);
+- 
+-     qemu_kvm_vcpu_sched_init(cpu);
+--- 
+-2.11.0
+-
+diff --git a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/migration-add-notification-via-vmipc.patch b/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/migration-add-notification-via-vmipc.patch
+deleted file mode 100644
+index 0705d3d..0000000
+--- a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/migration-add-notification-via-vmipc.patch
++++ /dev/null
+@@ -1,166 +0,0 @@
+-From a740d4ed96845b0ff8cd0caf485cd601679f8031 Mon Sep 17 00:00:00 2001
+-From: Jim Somerville <Jim.Somerville@windriver.com>
+-Date: Wed, 17 Sep 2014 16:41:31 -0400
+-Subject: [PATCH 16/18] migration add notification via vmipc
+-
+-Migration start and end are sent to any listeners
+-using vmipc.
+-
+-This is configurable and can be enabled/disabled.
+-
+-Signed-off-by: Jim Somerville <Jim.Somerville@windriver.com>
+-[ywei: rebase to qemu-2.4]
+-Signed-off-by: Yunguo Wei <yunguo.wei@windriver.com>
+-[Adjust code context]
+-Upstream-Status: Pending
+-Signed-off-by: He Zhe <zhe.he@windriver.com>
+----
+- configure             | 18 ++++++++++++++++++
+- migration/migration.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+- 2 files changed, 64 insertions(+)
+-
+-diff --git a/configure b/configure
+-index 02647107..50ee6ec7 100755
+---- a/configure
+-+++ b/configure
+-@@ -320,6 +320,7 @@ vhdx=""
+- numa=""
+- tcmalloc="no"
+- jemalloc="no"
+-+vmipc=""
+- 
+- # parse CC options first
+- for opt do
+-@@ -1140,6 +1141,10 @@ for opt do
+-   ;;
+-   --disable-vhdx) vhdx="no"
+-   ;;
+-+  --enable-vmipc) vmipc="yes"
+-+  ;;
+-+  --disable-vmipc) vmipc="no"
+-+  ;;
+-   --disable-numa) numa="no"
+-   ;;
+-   --enable-numa) numa="yes"
+-@@ -1380,6 +1385,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+-   libssh2         ssh block device support
+-   vhdx            support for the Microsoft VHDX image format
+-   numa            libnuma support
+-+  vmipc           virtual machine ipc support
+-   tcmalloc        tcmalloc support
+-   jemalloc        jemalloc support
+- 
+-@@ -4447,6 +4453,13 @@ if compile_prog "" "" ; then
+- fi
+- 
+- ########################################
+-+# check if vmipc is available.
+-+if test "$vmipc" = "yes" ; then
+-+  vmipc_libs="-lvmipc"
+-+  LIBS="$vmipc_libs $LIBS"
+-+fi
+-+
+-+########################################
+- # check if ccache is interfering with
+- # semantic analysis of macros
+- 
+-@@ -4894,6 +4907,7 @@ echo "lzo support       $lzo"
+- echo "snappy support    $snappy"
+- echo "bzip2 support     $bzip2"
+- echo "NUMA host support $numa"
+-+echo "vmipc             $vmipc"
+- echo "tcmalloc support  $tcmalloc"
+- echo "jemalloc support  $jemalloc"
+- echo "avx2 optimization $avx2_opt"
+-@@ -5554,6 +5568,10 @@ if test "$gcov" = "yes" ; then
+-   echo "GCOV=$gcov_tool" >> $config_host_mak
+- fi
+- 
+-+if test "$vmipc" = "yes" ; then
+-+  echo "CONFIG_VMIPC=y" >> $config_host_mak
+-+fi
+-+
+- # use included Linux headers
+- if test "$linux" = "yes" ; then
+-   mkdir -p linux-headers
+-diff --git a/migration/migration.c b/migration/migration.c
+-index a4da35d9..b67eec00 100644
+---- a/migration/migration.c
+-+++ b/migration/migration.c
+-@@ -39,6 +39,10 @@
+- 
+- #include <sched.h>
+- 
+-+#ifdef CONFIG_VMIPC
+-+#include "vmipc.h"
+-+#endif
+-+
+- //#define DEBUG
+- 
+- #if DEBUG
+-@@ -357,6 +361,10 @@ static void process_incoming_migration_bh(void *opaque)
+-      */
+-     qemu_announce_self();
+- 
+-+#ifdef CONFIG_VMIPC
+-+    send_migration_msg(MIGRATION_END);
+-+#endif
+-+
+-     /* If global state section was not received or we are in running
+-        state, we need to obey autostart. Any other state is set with
+-        runstate_set. */
+-@@ -432,6 +440,40 @@ static void process_incoming_migration_co(void *opaque)
+-     qemu_bh_schedule(mis->bh);
+- }
+- 
+-+#ifdef CONFIG_VMIPC
+-+static char vm1_shm_path[] = "/dev/shm/kvm_shmem";
+-+
+-+static ivshm_addr vm[MAX_NUM_VM];
+-+
+-+static void send_migration_msg(int migration_state)
+-+{
+-+    void *memptr = NULL;
+-+    vmipc_msg_t txmsg;
+-+
+-+    /* map in the shared memory */
+-+    memptr = ivshm_open(vm1_shm_path, IPC_TOTAL_MEM_SIZE, 0, 0);
+-+    if (memptr == (void *)-1) {
+-+       /* Missing the infrastructure, so this routine is just a nop */
+-+       return;
+-+    }
+-+    ivshm_clean(memptr, IPC_BUF_SIZE*2);
+-+    /* Only 1 VM capable for now */
+-+    vm[0].buf_local = (char *)(memptr);
+-+    vm[0].buf_remote = (char *)((char *)memptr + IPC_BUF_SIZE);
+-+
+-+    ipc_init(vm[0].buf_local, IPC_BUF_SIZE);
+-+    ipc_init(vm[0].buf_remote, IPC_BUF_SIZE);
+-+
+-+    memset(&txmsg, 0, sizeof(vmipc_msg_t));
+-+    txmsg.size = sizeof(int);  /* Only 1 int in message */
+-+    txmsg.reported_vm_state = migration_state;
+-+    txmsg.type = 0;
+-+    ipc_write(vm[0].buf_local, vm[0].buf_remote, (ipc_msg_t *) & txmsg);
+-+    /* unmap shared memory */
+-+    ivshm_close(memptr, IPC_TOTAL_MEM_SIZE);
+-+}  
+-+#endif
+-+
+- void migration_fd_process_incoming(QEMUFile *f)
+- {
+-     Coroutine *co = qemu_coroutine_create(process_incoming_migration_co, f);
+-@@ -1771,6 +1813,10 @@ static void *migration_thread(void *opaque)
+-     if (sched_setscheduler(0, SCHED_FIFO, &schedp) < 0)
+-          DPRINTF("Error setting user input priority. Switching to default.\n");
+- 
+-+#ifdef CONFIG_VMIPC
+-+    send_migration_msg(MIGRATION_START);
+-+#endif
+-+
+-     trace_migrate_thread(migrate_thread_cpumask, migrate_thread_priority);
+- 
+-     rcu_register_thread();
+--- 
+-2.11.0
+-
+diff --git a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/pci-assign-Make-host-irq-to-vcpu-affinity.patch b/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/pci-assign-Make-host-irq-to-vcpu-affinity.patch
+deleted file mode 100644
+index 7594065..0000000
+--- a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/pci-assign-Make-host-irq-to-vcpu-affinity.patch
++++ /dev/null
+@@ -1,262 +0,0 @@
+-From 9bfc5d928c845fe760db170e7deb7c23c1d4c094 Mon Sep 17 00:00:00 2001
+-From: Jim Somerville <Jim.Somerville@windriver.com>
+-Date: Mon, 14 Apr 2014 16:43:05 -0400
+-Subject: [PATCH 06/18] pci-assign: Make host irq to vcpu affinity
+-
+-    Based upon qemu-kvm commit 1ba2612d057ea34f505bb1d0ee9601aef705ca6d
+-    [
+-     If a guest sets the affinity of a assigned device interrupt to a
+-     particular vcpu and the vcpu is pinned to a physical core, then direct
+-     the host interrupt to that physical core to avoid IPIs.
+-
+-     Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+-    ]
+-
+-Signed-off-by: Jim Somerville <Jim.Somerville@windriver.com>
+-[ywei: fix context conflicts in:
+-	include/standard-headers/linux/pci_regs.h
+-	hw/i386/kvm/pci-assign.c
+-]
+-Signed-off-by: Yunguo Wei <yunguo.wei@windriver.com>
+-[Adjust code context]
+-Upstream-Status: Pending
+-Signed-off-by: He Zhe <zhe.he@windriver.com>
+----
+- cpus.c                                    |  5 ++
+- hw/i386/kvm/pci-assign.c                  | 89 ++++++++++++++++++++++++++++++-
+- include/standard-headers/linux/pci_regs.h |  3 ++
+- include/sysemu/cpus.h                     |  1 +
+- linux-headers/linux/kvm.h                 |  7 +++
+- 5 files changed, 103 insertions(+), 2 deletions(-)
+-
+-diff --git a/cpus.c b/cpus.c
+-index 2ab447ad..8bbd8dc5 100644
+---- a/cpus.c
+-+++ b/cpus.c
+-@@ -918,6 +918,11 @@ static void qemu_kvm_init_cpu_signals(CPUState *cpu)
+- static cpu_set_t vcpu_affinity[1024];
+- static int vcpu_priority[1024];
+- 
+-+cpu_set_t *qemu_kvm_vcpu_get_affinity(int vcpu)
+-+{
+-+	return vcpu_affinity + vcpu;
+-+}
+-+
+- static void qemu_kvm_vcpu_sched_init(CPUState *env)
+- {
+-     int idx = env->cpu_index;
+-diff --git a/hw/i386/kvm/pci-assign.c b/hw/i386/kvm/pci-assign.c
+-index 87dcbdd5..8d33b68b 100644
+---- a/hw/i386/kvm/pci-assign.c
+-+++ b/hw/i386/kvm/pci-assign.c
+-@@ -36,6 +36,7 @@
+- #include "hw/pci/msi.h"
+- #include "kvm_i386.h"
+- #include "hw/pci/pci-assign.h"
+-+#include "sysemu/cpus.h"
+- 
+- /* From linux/ioport.h */
+- #define IORESOURCE_IO       0x00000100  /* Resource type */
+-@@ -75,8 +76,10 @@ typedef struct AssignedDevRegion {
+-     PCIRegion *region;
+- } AssignedDevRegion;
+- 
+--#define ASSIGNED_DEVICE_PREFER_MSI_BIT  0
+--#define ASSIGNED_DEVICE_SHARE_INTX_BIT  1
+-+
+-+#define ASSIGNED_DEVICE_PREFER_MSI_BIT		0
+-+#define ASSIGNED_DEVICE_SHARE_INTX_BIT		1
+-+#define ASSIGNED_DEVICE_VCPU_AFFINITY_BIT	2
+- 
+- #define ASSIGNED_DEVICE_PREFER_MSI_MASK (1 << ASSIGNED_DEVICE_PREFER_MSI_BIT)
+- #define ASSIGNED_DEVICE_SHARE_INTX_MASK (1 << ASSIGNED_DEVICE_SHARE_INTX_BIT)
+-@@ -119,6 +122,8 @@ typedef struct AssignedDevice {
+-     uint8_t emulate_config_write[PCI_CONFIG_SPACE_SIZE];
+-     int msi_virq_nr;
+-     int *msi_virq;
+-+    int msix_host_irqs[64];
+-+    uint32_t msix_host_affinity[64];
+-     MSIXTableEntry *msix_table;
+-     hwaddr msix_table_addr;
+-     uint16_t msix_table_size;
+-@@ -949,6 +954,10 @@ static void assigned_dev_update_irq_routing(PCIDevice *dev)
+-     }
+- }
+- 
+-+static void kvm_msix_update_affinity(AssignedDevice *dev, int entry, int dest);
+-+
+-+static bool assigned_dev_msix_masked(MSIXTableEntry *entry);
+-+
+- static void assigned_dev_update_msi(PCIDevice *pci_dev)
+- {
+-     AssignedDevice *assigned_dev = PCI_ASSIGN(pci_dev);
+-@@ -1137,6 +1146,22 @@ static void assigned_dev_update_msix(PCIDevice *pci_dev)
+-         assigned_dev->intx_route.mode = PCI_INTX_DISABLED;
+-         assigned_dev->intx_route.irq = -1;
+-         assigned_dev->assigned_irq_type = ASSIGNED_IRQ_MSIX;
+-+        {
+-+            /* Assign affinity to all the enabled irqs
+-+               for the assigned device.
+-+             */
+-+            MSIXTableEntry *entry = assigned_dev->msix_table;
+-+            int i;
+-+
+-+            for (i = 0; i < assigned_dev->msix_max; i++, entry++) {
+-+                if (assigned_dev_msix_masked(entry)) {
+-+                    continue;
+-+                }
+-+                kvm_msix_update_affinity(assigned_dev, i,
+-+                   (entry->addr_lo & MSI_ADDR_DEST_ID_MASK)
+-+                   >> MSI_ADDR_DEST_ID_SHIFT);
+-+            }
+-+        }
+-     } else {
+-         Error *local_err = NULL;
+- 
+-@@ -1154,6 +1179,14 @@ static uint32_t assigned_dev_pci_read_config(PCIDevice *pci_dev,
+-     uint32_t virt_val = pci_default_read_config(pci_dev, address, len);
+-     uint32_t real_val, emulate_mask, full_emulation_mask;
+- 
+-+    if (assigned_dev->cap.available & ASSIGNED_DEVICE_CAP_MSI) {
+-+        uint32_t msi_start = pci_dev->msi_cap;
+-+        uint32_t msi_end = msi_start + PCI_MSI_DATA_64 + 3;
+-+
+-+	if (address >= msi_start && (address + len) < msi_end)
+-+            return virt_val;
+-+    }
+-+
+-     emulate_mask = 0;
+-     memcpy(&emulate_mask, assigned_dev->emulate_config_read + address, len);
+-     emulate_mask = le32_to_cpu(emulate_mask);
+-@@ -1532,6 +1565,53 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
+-     return 0;
+- }
+- 
+-+static int assign_query_msix_irq(AssignedDevice *dev, int entry)
+-+{
+-+    if (dev->msix_host_irqs[entry] <= 0) {
+-+        struct kvm_assigned_msix_query_irq query;
+-+
+-+        query.assigned_dev_id = dev->dev_id;
+-+        query.entry = entry;
+-+        dev->msix_host_irqs[entry] =
+-+                  kvm_vm_ioctl(kvm_state, KVM_ASSIGN_QUERY_IRQ, &query);
+-+    }
+-+    return dev->msix_host_irqs[entry];
+-+}
+-+
+-+static void kvm_msix_update_affinity(AssignedDevice *dev, int entry, int dest)
+-+{
+-+    char buf[16], fnam[256];
+-+    int irq, fd, i;
+-+    cpu_set_t *msk;
+-+
+-+    if (!(dev->features & ASSIGNED_DEVICE_VCPU_AFFINITY_BIT))
+-+        return;
+-+
+-+    irq = assign_query_msix_irq(dev, entry);
+-+    if (irq <= 0)
+-+        return;
+-+
+-+    msk = qemu_kvm_vcpu_get_affinity(dest);
+-+    if (!CPU_COUNT(msk))
+-+        return;
+-+
+-+    for (i = 0; i < CPU_SETSIZE; i++) {
+-+        if (CPU_ISSET(i, msk))
+-+             break;
+-+    }
+-+
+-+    sprintf(buf, "%d\n", i);
+-+    sprintf(fnam, "/proc/irq/%d/smp_affinity_list", irq);
+-+    fd = open(fnam, O_RDWR);
+-+    if (fd < 0)
+-+        return;
+-+    i = write(fd, buf, strlen(buf));
+-+    if (i < 0)
+-+        perror("irq affinity setting failed");
+-+    close(fd);
+-+    dev->msix_host_affinity[entry] = dest;
+-+}
+-+
+- static uint64_t
+- assigned_dev_msix_mmio_read(void *opaque, hwaddr addr,
+-                             unsigned size)
+-@@ -1606,6 +1686,7 @@ static void assigned_dev_msix_mmio_write(void *opaque, hwaddr addr,
+-                     error_report("Error updating irq routing entry (%d)", ret);
+-                 }
+-                 kvm_irqchip_commit_routes(kvm_state);
+-+                kvm_msix_update_affinity(adev, i, (entry->addr_lo & MSI_ADDR_DEST_ID_MASK) >> MSI_ADDR_DEST_ID_SHIFT);
+-             }
+-         }
+-     }
+-@@ -1813,6 +1894,8 @@ static void assigned_realize(struct PCIDevice *pci_dev, Error **errp)
+-         goto assigned_out;
+-     }
+- 
+-+    memset(dev->msix_host_affinity, 0xff, sizeof(dev->msix_host_affinity));
+-+
+-     assigned_dev_load_option_rom(dev);
+- 
+-     return;
+-@@ -1852,6 +1935,8 @@ static Property assigned_dev_properties[] = {
+-                     ASSIGNED_DEVICE_PREFER_MSI_BIT, false),
+-     DEFINE_PROP_BIT("share_intx", AssignedDevice, features,
+-                     ASSIGNED_DEVICE_SHARE_INTX_BIT, true),
+-+    DEFINE_PROP_BIT("vcpuaffine", AssignedDevice, features,
+-+                        ASSIGNED_DEVICE_VCPU_AFFINITY_BIT, true),
+-     DEFINE_PROP_STRING("configfd", AssignedDevice, configfd_name),
+-     DEFINE_PROP_END_OF_LIST(),
+- };
+-diff --git a/include/standard-headers/linux/pci_regs.h b/include/standard-headers/linux/pci_regs.h
+-index 40409512..bf593dd9 100644
+---- a/include/standard-headers/linux/pci_regs.h
+-+++ b/include/standard-headers/linux/pci_regs.h
+-@@ -309,6 +309,9 @@
+- #define PCI_MSI_MASK_64		16	/* Mask bits register for 64-bit devices */
+- #define PCI_MSI_PENDING_64	20	/* Pending intrs for 64-bit devices */
+- 
+-+#define MSI_ADDR_DEST_ID_SHIFT	12
+-+#define MSI_ADDR_DEST_ID_MASK	0x00ffff0
+-+
+- /* MSI-X registers */
+- #define PCI_MSIX_FLAGS		2	/* Message Control */
+- #define  PCI_MSIX_FLAGS_QSIZE	0x07FF	/* Table size */
+-diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
+-index 8db8a3dd..baa8c012 100644
+---- a/include/sysemu/cpus.h
+-+++ b/include/sysemu/cpus.h
+-@@ -27,6 +27,7 @@ void cpu_synchronize_all_post_init(void);
+- 
+- void qtest_clock_warp(int64_t dest);
+- void vcpu_parse(const char *optarg);
+-+cpu_set_t *qemu_kvm_vcpu_get_affinity(int vcpu);
+- 
+- #ifndef CONFIG_USER_ONLY
+- /* vl.c */
+-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+-index e60e21ba..55e25aa4 100644
+---- a/linux-headers/linux/kvm.h
+-+++ b/linux-headers/linux/kvm.h
+-@@ -1037,6 +1037,8 @@ struct kvm_arm_device_addr {
+- 	__u64 addr;
+- };
+- 
+-+#define KVM_ASSIGN_QUERY_IRQ      _IO(KVMIO,  0xe8)
+-+
+- /*
+-  * Device control API, available with KVM_CAP_DEVICE_CTRL
+-  */
+-@@ -1313,4 +1315,9 @@ struct kvm_assigned_msix_entry {
+- 	__u16 padding[3];
+- };
+- 
+-+struct kvm_assigned_msix_query_irq {
+-+	__u32 assigned_dev_id;
+-+	__u32 entry;
+-+};
+-+
+- #endif /* __LINUX_KVM_H */
+--- 
+-2.11.0
+-
+diff --git a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/qemu-add-trace-events-for-do_device_add.patch b/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/qemu-add-trace-events-for-do_device_add.patch
+deleted file mode 100644
+index cc44496..0000000
+--- a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/qemu-add-trace-events-for-do_device_add.patch
++++ /dev/null
+@@ -1,79 +0,0 @@
+-From d1408204aedc6522c56f908e2ba20c9cddaa009c Mon Sep 17 00:00:00 2001
+-From: Paul Barrette <paul.barrette@windriver.com>
+-Date: Thu, 1 May 2014 16:47:21 -0400
+-Subject: [PATCH 15/18] qemu: add trace events for do_device_add
+-
+-Add trace events for qmp_device_add.
+-
+-Signed-off-by: Paul Barrette <paul.barrette@windriver.com>
+-[ywei: rename do_device_add to qmp_device_add as upstream API changed]
+-Signed-off-by: Yunguo Wei <yunguo.wei@windriver.com>
+-[Adjust code context
+- Remove ";" from qmp_device_add_* lines]
+-Upstream-Status: Pending
+-Signed-off-by: He Zhe <zhe.he@windriver.com>
+----
+- hw/intc/trace-events | 7 +++++++
+- qdev-monitor.c       | 6 ++++++
+- 2 files changed, 13 insertions(+)
+-
+-diff --git a/hw/intc/trace-events b/hw/intc/trace-events
+-index f12192c0..036cb98f 100644
+---- a/hw/intc/trace-events
+-+++ b/hw/intc/trace-events
+-@@ -3,6 +3,13 @@
+- # hw/intc/apic_common.c
+- cpu_set_apic_base(uint64_t val) "%016"PRIx64
+- cpu_get_apic_base(uint64_t val) "%016"PRIx64
+-+
+-+# qdev-monitor.c
+-+qmp_device_add_enter(void *qdict, void **ret_data, void **errp) "qdict %p ret_data %p errp %p"
+-+qmp_device_add_error(void *qdict, void **ret_data, void **errp) "qdict %p ret_data %p errp %p"
+-+qmp_device_add_fast_return(void *qdict, void **ret_data, void **errp) "qdict %p ret_data %p errp %p"
+-+qmp_device_add_return(void *qdict, void **ret_data, void **errp) "qdict %p ret_data %p errp %p"
+-+
+- # coalescing
+- apic_report_irq_delivered(int apic_irq_delivered) "coalescing %d"
+- apic_reset_irq_delivered(int apic_irq_delivered) "old coalescing %d"
+-diff --git a/qdev-monitor.c b/qdev-monitor.c
+-index e19617fa..51c145df 100644
+---- a/qdev-monitor.c
+-+++ b/qdev-monitor.c
+-@@ -28,6 +28,7 @@
+- #include "qemu/config-file.h"
+- #include "qemu/error-report.h"
+- #include "qemu/help_option.h"
+-+#include "trace.h"
+- 
+- /*
+-  * Aliases were a bad idea from the start.  Let's keep them
+-@@ -784,21 +785,26 @@ void qmp_device_add(QDict *qdict, QObject **ret_data, Error **errp)
+-     DeviceState *dev;
+- 
+-     opts = qemu_opts_from_qdict(qemu_find_opts("device"), qdict, &local_err);
+-+    trace_qmp_device_add_enter(qdict, ret_data, errp);
+-     if (local_err) {
+-         error_propagate(errp, local_err);
+-+        trace_qmp_device_add_error(qdict, ret_data, errp);
+-         return;
+-     }
+-     if (!monitor_cur_is_qmp() && qdev_device_help(opts)) {
+-         qemu_opts_del(opts);
+-+        trace_qmp_device_add_fast_return(qdict, ret_data, errp);
+-         return;
+-     }
+-     dev = qdev_device_add(opts, &local_err);
+-     if (!dev) {
+-         error_propagate(errp, local_err);
+-         qemu_opts_del(opts);
+-+        trace_qmp_device_add_error(qdict, ret_data, errp);
+-         return;
+-     }
+-     object_unref(OBJECT(dev));
+-+    trace_qmp_device_add_return(qdict, ret_data, errp);
+- }
+- 
+- void qmp_device_del(const char *id, Error **errp)
+--- 
+-2.11.0
+-
+diff --git a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/qemu-inject-NMI-in-i6300esb-watchdog-timer.patch b/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/qemu-inject-NMI-in-i6300esb-watchdog-timer.patch
+deleted file mode 100644
+index f47ac0c..0000000
+--- a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/qemu-inject-NMI-in-i6300esb-watchdog-timer.patch
++++ /dev/null
+@@ -1,50 +0,0 @@
+-From b443171ca2e55ba5db1f260af4e05aa66a9ae966 Mon Sep 17 00:00:00 2001
+-From: Nam Ninh <nam.ninh@windriver.com>
+-Date: Mon, 2 Feb 2015 12:42:19 -0500
+-Subject: [PATCH 17/18] qemu: inject NMI in i6300esb watchdog timer
+-
+-Inject the NMI to the guest instance of the current qemu if the WDT is
+-triggered and expired. The other guests will not receive the NMI if
+-the timer is not enabled or expired. The injection is in stage 1
+-before the reboot happens in stage 2.
+-
+-Signed-off-by: Nam Ninh <nam.ninh@windriver.com>
+-Upstream-Status: Pending
+-Signed-off-by: He Zhe <zhe.he@windriver.com>
+----
+- hw/watchdog/wdt_i6300esb.c | 5 +++++
+- 1 file changed, 5 insertions(+)
+-
+-diff --git a/hw/watchdog/wdt_i6300esb.c b/hw/watchdog/wdt_i6300esb.c
+-index 49b3cd18..626c6834 100644
+---- a/hw/watchdog/wdt_i6300esb.c
+-+++ b/hw/watchdog/wdt_i6300esb.c
+-@@ -26,6 +26,7 @@
+- #include "sysemu/watchdog.h"
+- #include "hw/hw.h"
+- #include "hw/pci/pci.h"
+-+#include "qmp-commands.h"
+- 
+- /*#define I6300ESB_DEBUG 1*/
+- 
+-@@ -179,6 +180,7 @@ static void i6300esb_reset(DeviceState *dev)
+- static void i6300esb_timer_expired(void *vp)
+- {
+-     I6300State *d = vp;
+-+    Error *errp = NULL;
+- 
+-     i6300esb_debug("stage %d\n", d->stage);
+- 
+-@@ -192,6 +194,9 @@ static void i6300esb_timer_expired(void *vp)
+-             fprintf(stderr, "i6300esb_timer_expired: I would send SMI here if I knew how (XXX)\n");
+-             break;
+-         }
+-+        /* Always send NMI at the end of stage 1 */
+-+        fprintf(stderr, "i6300esb_timer_expired: inject nmi \n");
+-+        qmp_inject_nmi(&errp);
+- 
+-         /* Start the second stage. */
+-         i6300esb_restart_timer(d, 2);
+--- 
+-2.11.0
+-
+diff --git a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/qemu-kvm-Add-options-to-pin-and-prioritize-vcpus.patch b/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/qemu-kvm-Add-options-to-pin-and-prioritize-vcpus.patch
+deleted file mode 100644
+index d2bcb5b..0000000
+--- a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/qemu-kvm-Add-options-to-pin-and-prioritize-vcpus.patch
++++ /dev/null
+@@ -1,144 +0,0 @@
+-From 1e35abb97d8c77c0ca27f7dd4adb430828db02c6 Mon Sep 17 00:00:00 2001
+-From: Thomas Gleixner <tglx@linutronix.de>
+-Date: Thu, 7 Mar 2013 15:12:56 -0800
+-Subject: [PATCH 04/18] qemu-kvm: Add options to pin and prioritize vcpus
+-
+-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+-Signed-off-by: Yang Shi <yang.shi@windriver.com>
+-Signed-off-by: Paul Barrette <paul.barrette@windriver.com>
+-Signed-off-by: Michael Barabanov <michael.barabanov@windriver.com>
+-[Pb: cpus.h in new location for 1.4.2]
+-Signed-off-by: Yunguo Wei <michael.barabanov@windriver.com>
+-[ywei: fix context conflict in vl.c and cpus.h]
+-
+-[Adjust code context]
+-Upstream-Status: Pending
+-Signed-off-by: He Zhe <zhe.he@windriver.com>
+----
+- cpus.c                | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++
+- include/sysemu/cpus.h |  1 +
+- qemu-options.hx       |  8 ++++++++
+- vl.c                  |  3 +++
+- 4 files changed, 67 insertions(+)
+-
+-diff --git a/cpus.c b/cpus.c
+-index 84c3520d..2b1fe3c1 100644
+---- a/cpus.c
+-+++ b/cpus.c
+-@@ -880,6 +880,59 @@ static void qemu_kvm_init_cpu_signals(CPUState *cpu)
+-     }
+- }
+- 
+-+#include <sched.h>
+-+
+-+static cpu_set_t vcpu_affinity[1024];
+-+static int vcpu_priority[1024];
+-+
+-+static void qemu_kvm_vcpu_sched_init(CPUState *env)
+-+{
+-+    int idx = env->cpu_index;
+-+
+-+    if (CPU_COUNT(&vcpu_affinity[idx])) {
+-+        if (sched_setaffinity(0, sizeof(cpu_set_t), &vcpu_affinity[idx]) < 0)
+-+             fprintf(stderr,"Setting CPU affinity of VCPU %u to %llx failed with %d\n",
+-+		     idx, *((unsigned long long *) &vcpu_affinity[idx]), errno);
+-+    }
+-+
+-+    if (vcpu_priority[idx] > 0) {
+-+        struct sched_param schedp;
+-+
+-+        memset(&schedp, 0, sizeof(schedp));
+-+        schedp.sched_priority = vcpu_priority[idx];
+-+        if (sched_setscheduler(0, SCHED_FIFO, &schedp) < 0)
+-+            fprintf(stderr, "Setting priority of VCPU %u to %u failed with %d\n",
+-+                    idx, vcpu_priority[idx], errno);
+-+    }
+-+}
+-+
+-+void vcpu_parse(const char *optarg)
+-+{
+-+    unsigned long long affinity;
+-+    int i, cpuid;
+-+    char option[128];
+-+    char *endptr;
+-+
+-+    cpuid = strtoul(optarg, &endptr, 10);
+-+    if (endptr != optarg) {
+-+        if (*endptr == ',') {
+-+            endptr++;
+-+        }
+-+    }
+-+    if (get_param_value(option, 128, "affinity", endptr) != 0) {
+-+        affinity = strtoull(option, NULL, 16);
+-+        for (i = 0; i < 8 * sizeof(unsigned long long); i++) {
+-+            if (affinity & (1ULL << i))
+-+                CPU_SET(i, &vcpu_affinity[cpuid]);
+-+        }
+-+    }
+-+    if (get_param_value(option, 128, "prio", endptr) != 0)
+-+        vcpu_priority[cpuid] = strtoul(option, NULL, 10);
+-+
+-+    fprintf(stderr, "vcpu %d: affinity %llx prio %d\n", cpuid,
+-+	    *((unsigned long long*) &vcpu_affinity[cpuid]), vcpu_priority[cpuid]);
+-+}
+-+
+- #else /* _WIN32 */
+- static void qemu_kvm_init_cpu_signals(CPUState *cpu)
+- {
+-@@ -1069,6 +1122,8 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
+- 
+-     qemu_kvm_init_cpu_signals(cpu);
+- 
+-+    qemu_kvm_vcpu_sched_init(cpu);
+-+
+-     /* signal CPU creation */
+-     cpu->created = true;
+-     qemu_cond_signal(&qemu_cpu_cond);
+-diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
+-index fe992a89..8db8a3dd 100644
+---- a/include/sysemu/cpus.h
+-+++ b/include/sysemu/cpus.h
+-@@ -26,6 +26,7 @@ void cpu_synchronize_all_post_reset(void);
+- void cpu_synchronize_all_post_init(void);
+- 
+- void qtest_clock_warp(int64_t dest);
+-+void vcpu_parse(const char *optarg);
+- 
+- #ifndef CONFIG_USER_ONLY
+- /* vl.c */
+-diff --git a/qemu-options.hx b/qemu-options.hx
+-index a71aaf8e..875a9bb4 100644
+---- a/qemu-options.hx
+-+++ b/qemu-options.hx
+-@@ -473,6 +473,14 @@ STEXI
+- @table @option
+- ETEXI
+- 
+-+DEF("vcpu", HAS_ARG, QEMU_OPTION_vcpu,
+-+    "-vcpu n[,affinity=cpumask][,prio=prio] Pin and/or prioritize a vcpu\n", QEMU_ARCH_ALL)
+-+STEXI
+-+@item -vcpu @var{opts}
+-+@findex -vcpu
+-+Pin vcpu(s) to physical cores and set a realtime priority.
+-+ETEXI
+-+
+- DEF("fda", HAS_ARG, QEMU_OPTION_fda,
+-     "-fda/-fdb file  use 'file' as floppy disk 0/1 image\n", QEMU_ARCH_ALL)
+- DEF("fdb", HAS_ARG, QEMU_OPTION_fdb, "", QEMU_ARCH_ALL)
+-diff --git a/vl.c b/vl.c
+-index b3c80d50..429faacc 100644
+---- a/vl.c
+-+++ b/vl.c
+-@@ -3699,6 +3699,9 @@ int main(int argc, char **argv, char **envp)
+-                     exit(1);
+-                 }
+-                 break;
+-+            case QEMU_OPTION_vcpu:
+-+                vcpu_parse(optarg);
+-+                break;
+-             case QEMU_OPTION_vnc:
+-                 vnc_parse(optarg, &error_fatal);
+-                 break;
+--- 
+-2.11.0
+-
+diff --git a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/qemu-kvm-drop-cross-from-pkg-config.patch b/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/qemu-kvm-drop-cross-from-pkg-config.patch
+deleted file mode 100644
+index 04d4838..0000000
+--- a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/qemu-kvm-drop-cross-from-pkg-config.patch
++++ /dev/null
+@@ -1,36 +0,0 @@
+-From becc9567d6ddd51caa98cdfbc0cf5abd58cb10fa Mon Sep 17 00:00:00 2001
+-From: Mark Asselstine <mark.asselstine@windriver.com>
+-Date: Thu, 14 Jun 2012 10:31:15 -0400
+-Subject: [PATCH 01/18] qemu-kvm: drop 'cross' from pkg-config
+-
+-Since we use a sysroot instead of a combined set of -config files
+-we can go right at pkg-config and drop the 'cross'. Without this
+-change we would get an error like the following:
+-
+-Error: pkg-config binary 'x86_64-wrs-linux-pkg-config' not found
+-
+-Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+-[ Adjust code context ]
+-Upstream-Status: Inappropriate [upstream has switched to recipe
+-specific sysroot which does not have this problem]
+-Signed-off-by: He Zhe <zhe.he@windriver.com>
+----
+- configure | 2 +-
+- 1 file changed, 1 insertion(+), 1 deletion(-)
+-
+-diff --git a/configure b/configure
+-index 0d26c47d..02647107 100755
+---- a/configure
+-+++ b/configure
+-@@ -376,7 +376,7 @@ ld="${LD-${cross_prefix}ld}"
+- nm="${NM-${cross_prefix}nm}"
+- strip="${STRIP-${cross_prefix}strip}"
+- windres="${WINDRES-${cross_prefix}windres}"
+--pkg_config_exe="${PKG_CONFIG-${cross_prefix}pkg-config}"
+-+pkg_config_exe="${PKG_CONFIG-pkg-config}"
+- query_pkg_config() {
+-     "${pkg_config_exe}" ${QEMU_PKG_CONFIG_FLAGS} "$@"
+- }
+--- 
+-2.11.0
+-
+diff --git a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/qemu-update-msi-affinity-in-pci-assign-passthrough-d.patch b/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/qemu-update-msi-affinity-in-pci-assign-passthrough-d.patch
+deleted file mode 100644
+index 3c056d7..0000000
+--- a/wrlinux-ovp/recipes-devtools/qemu/qemu-2.7.0/qemu-update-msi-affinity-in-pci-assign-passthrough-d.patch
++++ /dev/null
+@@ -1,56 +0,0 @@
+-From 40cbbb1fdd087f2f02b617bc164bd238fd7ba595 Mon Sep 17 00:00:00 2001
+-From: Nam Ninh <nam.ninh@windriver.com>
+-Date: Thu, 26 Feb 2015 14:37:19 -0500
+-Subject: [PATCH 18/18] qemu: update msi affinity in pci-assign passthrough
+- device
+-
+-Issue: OVP-2305
+-
+-When intlat test is run in OVP affined guest, the IRQs are
+-affined to vCPU1 on the guest which is pinned to physical
+-core 2, so all Altera FPGA IRQs should be on core 2 on the
+-host. However, we observed the IRQs are moved to another
+-core dirrent than core 2 when the test is started. The problem
+-is in qemu where MSI affinity is not updated to the right core
+-in assigned_dev_update_msi_msg.
+-
+-Signed-off-by: Nam Ninh <nam.ninh@windriver.com>
+-[ywei: rebase to qemu 2.4 ]
+-Signed-off-by: Yunguo Wei <yunguo.wei@windriver.com>
+-[Adjust code context
+- Add pci_dev as parameter to kvm_irqchip_update_msi_route according to upstream]
+-Upstream-Status: Pending
+-Signed-off-by: He Zhe <zhe.he@windriver.com>
+----
+- hw/i386/kvm/pci-assign.c | 10 ++++++++--
+- 1 file changed, 8 insertions(+), 2 deletions(-)
+-
+-diff --git a/hw/i386/kvm/pci-assign.c b/hw/i386/kvm/pci-assign.c
+-index 24865f50..39a7d758 100644
+---- a/hw/i386/kvm/pci-assign.c
+-+++ b/hw/i386/kvm/pci-assign.c
+-@@ -1018,13 +1018,19 @@ static void assigned_dev_update_msi_msg(PCIDevice *pci_dev)
+-     uint8_t ctrl_byte = pci_get_byte(pci_dev->config + pci_dev->msi_cap +
+-                                      PCI_MSI_FLAGS);
+- 
+-+    MSIMessage msg;
+-+    uint32_t dest;
+-+
+-     if (assigned_dev->assigned_irq_type != ASSIGNED_IRQ_MSI ||
+-         !(ctrl_byte & PCI_MSI_FLAGS_ENABLE)) {
+-         return;
+-     }
+- 
+--    kvm_irqchip_update_msi_route(kvm_state, assigned_dev->msi_virq[0],
+--                                 msi_get_message(pci_dev, 0), pci_dev);
+-+    msg = msi_get_message(pci_dev, 0);
+-+    kvm_irqchip_update_msi_route(kvm_state, assigned_dev->msi_virq[0], msg, pci_dev);
+-+    dest = ((uint32_t)msg.address & MSI_ADDR_DEST_ID_MASK) >> MSI_ADDR_DEST_ID_SHIFT;
+-+    kvm_msix_update_affinity(assigned_dev, 0, dest);
+-+
+-     kvm_irqchip_commit_routes(kvm_state);
+- }
+- 
+--- 
+-2.11.0
+-
+diff --git a/wrlinux-ovp/recipes-devtools/qemu/qemu-ovp-2.7.0.inc b/wrlinux-ovp/recipes-devtools/qemu/qemu-ovp-2.7.0.inc
+deleted file mode 100644
+index 99c9d53..0000000
+--- a/wrlinux-ovp/recipes-devtools/qemu/qemu-ovp-2.7.0.inc
++++ /dev/null
+@@ -1,93 +0,0 @@
+-#
+-# Copyright (C) 2012-2014,2016 Wind River Systems, Inc.
+-#
+-
+-# qemu-native should not depend on these packages
+-DEPENDS_qemu_append = " dtc pixman util-linux vmipc"
+-EXTRA_OECONF_append += "--disable-sdl --enable-fdt --with-system-pixman --disable-smartcard"
+-
+-FILESEXTRAPATHS_append := "${THISDIR}/${PN}-${PV}"
+-
+-CFLAGS_append += "-I${STAGING_INCDIR}/glib-2.0 -I${STAGING_LIBDIR}/glib-2.0/include "
+-
+-# carry over patches from 1.3.0
+-SRC_URI += "\
+-           file://qemu-kvm-drop-cross-from-pkg-config.patch \
+-           file://apic-fixup-fallthrough-to-PIC.patch \
+-          "
+-
+-# carry over cpu affinity patches from 1.3.0
+-SRC_URI += " \
+-        file://qemu-kvm-Add-options-to-pin-and-prioritize-vcpus.patch \
+-        file://cpus-Store-VCPUs-tid-in-var-run-file.patch \
+-        file://pci-assign-Make-host-irq-to-vcpu-affinity.patch \
+-        file://Fix-vcpuaffine-feature-test-mask.patch \
+-"
+-
+-# add Intel migration timing calculation patches
+-SRC_URI += "\
+-	file://0001-qemu-migration-compute-with-pages.patch \
+-	file://0002-migration-compression-cache-free.patch \
+-	file://0003-migration-thread-affinity-and-priority-qmp.patch \
+-"
+-
+-# add fixes from qemu mailing list
+-# https://lists.gnu.org/archive/html/qemu-devel/2016-04/msg01978.html
+-SRC_URI += "\
+-        file://0001-virtio-stop-virtqueue-processing-if-device-is-broken.patch \
+-        file://0002-virtio-handle-virtqueue_get_avail_bytes-errors.patch \
+-        file://0003-virtio-handle-virtqueue_num_heads-errors.patch \
+-        file://0004-virtio-handle-virtqueue_get_head-errors.patch \
+-"
+-
+-# WRL toolchain defines OE_TOOLCHAIN_MACHINE, e.g. intel-xeon-core.
+-# Previously, that var was used for referencing the path to DPDK
+-# in sysroot.  But external toolchains do not define
+-# OE_TOOLCHAIN_MACHINE.  Extract the machine type from
+-# PKG_CONFIG_SYSROOT_DIR path, pull out the last word in the path.
+-MACHINE_TYPE := "`echo ${PKG_CONFIG_SYSROOT_DIR} | sed 's/^.*\/\(.[^\/]*$\)/\1/'`"
+-EXTRA_OECONF_append = " --cross-prefix=${TARGET_PREFIX} "
+-EXTRA_OECONF_append = " --disable-sdl --enable-fdt --with-system-pixman --disable-smartcard "
+-EXTRA_OECONF_append = " --disable-vmipc "
+-
+-PACKAGECONFIG[spice] = "--enable-spice,--disable-spice,spice,"
+-PACKAGECONFIG[cap-ng] = "--enable-cap-ng,--disable-cap-ng,libcap-ng,"
+-PACKAGECONFIG[linux-aio] = "--enable-linux-aio,--disable-linux-aio,libaio,"
+-PACKAGECONFIG[xfsctl] = "--enable-xfsctl,--disable-xfsctl,xfsprogs,"
+-PACKAGECONFIG[glusterfs] = "--enable-glusterfs,--disable-glusterfs,glusterfs,"
+-PACKAGECONFIG[bluez] = "--enable-bluez,--disable-bluez,bluez4,"
+-PACKAGECONFIG[attr] = "--enable-attr,--disable-attr,attr,"
+-PACKAGECONFIG[virtfs] = "--enable-virtfs --enable-attr,--disable-virtfs,attr libcap,"
+-PACKAGECONFIG[rbd] = "--enable-rbd,--disable-rbd,ceph,ceph"
+-PACKAGECONFIG[vhost] = "--enable-vhost-net,--disable-vhost-net,,"
+-PACKAGECONFIG[ust] = "--enable-trace-backend=ust,--enable-trace-backend=nop,lttng-ust,"
+-PACKAGECONFIG[pie] = "--enable-pie,--disable-pie,,"
+-PACKAGECONFIG[snappy] = "--enable-snappy,--disable-snappy,snappy,"
+-
+-# disable gl support for kvm
+-PACKAGECONFIG[gl] = ",,,"
+-
+-PACKAGECONFIG ?= "cap-ng linux-aio xfsctl attr \
+-                  virtfs fdt rbd glusterfs\
+-                  vhost pie \
+-                 " 
+-
+-# This is making sure qemu-native independs on spice-native
+-# as spice-native is not provided
+-PACKAGECONFIG_append_x86-64_class-target = " spice"
+-
+-SRC_URI += "\
+-    file://qemu-add-trace-events-for-do_device_add.patch \
+-    file://migration-add-notification-via-vmipc.patch \
+-    file://qemu-inject-NMI-in-i6300esb-watchdog-timer.patch \
+-    file://qemu-update-msi-affinity-in-pci-assign-passthrough-d.patch \
+-    "
+-
+-RDEPENDS_${PN}_class-nativesdk += "nativesdk-python-core"
+-
+-# needed for libvirt
+-do_install_append () {
+-    cd ${D}${bindir}
+-    arch=`echo ${TARGET_ARCH} | sed 's/i[456]86/i386/' | sed 's/powerpc/ppc/'`
+-    ln -sf qemu-system-${arch} kvm
+-}
+diff --git a/wrlinux-ovp/recipes-devtools/qemu/qemu-ovp-3.0.0.inc b/wrlinux-ovp/recipes-devtools/qemu/qemu-ovp-3.0.0.inc
+new file mode 100644
+index 0000000..5023c2f
+--- /dev/null
++++ b/wrlinux-ovp/recipes-devtools/qemu/qemu-ovp-3.0.0.inc
+@@ -0,0 +1,53 @@
++#
++# Copyright (C) 2018 Wind River Systems, Inc.
++#
++
++# qemu-native should not depend on these packages
++DEPENDS_qemu_append = " dtc pixman util-linux"
++EXTRA_OECONF_append += "--disable-sdl --enable-fdt --disable-smartcard --cross-prefix=${TARGET_PREFIX}"
++
++FILESEXTRAPATHS_append := "${THISDIR}/files"
++
++CFLAGS_append += "-I${STAGING_INCDIR}/glib-2.0 -I${STAGING_LIBDIR}/glib-2.0/include "
++
++# carry over cpu affinity patches from 1.3.0
++SRC_URI += " \
++        file://qemu-kvm-drop-cross-from-pkg-config.patch \
++        file://0001-qemu-kvm-Add-options-to-pin-and-prioritize-vcpus.patch \
++        file://0001-qemu-inject-NMI-in-i6300esb-watchdog-timer.patch \
++"
++
++PACKAGECONFIG[spice] = "--enable-spice,--disable-spice,spice,"
++PACKAGECONFIG[cap-ng] = "--enable-cap-ng,--disable-cap-ng,libcap-ng,"
++PACKAGECONFIG[linux-aio] = "--enable-linux-aio,--disable-linux-aio,libaio,"
++PACKAGECONFIG[xfsctl] = "--enable-xfsctl,--disable-xfsctl,xfsprogs,"
++PACKAGECONFIG[glusterfs] = "--enable-glusterfs,--disable-glusterfs,glusterfs,"
++PACKAGECONFIG[bluez] = "--enable-bluez,--disable-bluez,bluez4,"
++PACKAGECONFIG[attr] = "--enable-attr,--disable-attr,attr,"
++PACKAGECONFIG[virtfs] = "--enable-virtfs --enable-attr,--disable-virtfs,attr libcap,"
++PACKAGECONFIG[rbd] = "--enable-rbd,--disable-rbd,ceph,ceph"
++PACKAGECONFIG[vhost] = "--enable-vhost-net,--disable-vhost-net,,"
++PACKAGECONFIG[ust] = "--enable-trace-backend=ust,--enable-trace-backend=nop,lttng-ust,"
++PACKAGECONFIG[pie] = "--enable-pie,--disable-pie,,"
++PACKAGECONFIG[snappy] = "--enable-snappy,--disable-snappy,snappy,"
++
++# disable gl support for kvm
++PACKAGECONFIG[gl] = ",,,"
++
++PACKAGECONFIG ?= "cap-ng linux-aio xfsctl attr \
++                  virtfs fdt glusterfs \
++                  vhost pie alsa kvm \
++                 " 
++
++# This is making sure qemu-native independs on spice-native
++# as spice-native is not provided
++PACKAGECONFIG_append_x86-64_class-target = " spice"
++
++RDEPENDS_${PN}_class-nativesdk += "nativesdk-python-core"
++
++# needed for libvirt
++do_install_append () {
++    cd ${D}${bindir}
++    arch=`echo ${TARGET_ARCH} | sed 's/i[456]86/i386/' | sed 's/powerpc/ppc/'`
++    ln -sf qemu-system-${arch} kvm
++}
+diff --git a/wrlinux-ovp/recipes-devtools/qemu/qemu_2.7.0.bbappend b/wrlinux-ovp/recipes-devtools/qemu/qemu_2.7.0.bbappend
+deleted file mode 100644
+index c837519..0000000
+--- a/wrlinux-ovp/recipes-devtools/qemu/qemu_2.7.0.bbappend
++++ /dev/null
+@@ -1,4 +0,0 @@
+-OVP_INCLUDE = ""
+-OVP_INCLUDE_wrlinux-ovp = "qemu-ovp-2.7.0.inc"
+-
+-require ${OVP_INCLUDE}
+diff --git a/wrlinux-ovp/recipes-devtools/qemu/qemu_3.0.0.bbappend b/wrlinux-ovp/recipes-devtools/qemu/qemu_3.0.0.bbappend
+new file mode 100644
+index 0000000..3cd3c03
+--- /dev/null
++++ b/wrlinux-ovp/recipes-devtools/qemu/qemu_3.0.0.bbappend
+@@ -0,0 +1,4 @@
++OVP_INCLUDE = "qemu-ovp-3.0.0.inc"
++OVP_INCLUDE_wrlinux-ovp = "qemu-ovp-3.0.0.inc"
++
++require ${OVP_INCLUDE}
+-- 
+2.8.1
+

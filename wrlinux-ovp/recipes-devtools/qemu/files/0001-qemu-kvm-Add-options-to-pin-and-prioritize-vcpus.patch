@@ -1,0 +1,239 @@
+From 26ca8b45a544a604292680c544ef4814a44a9230 Mon Sep 17 00:00:00 2001
+From: "Hongzhi.Song" <hongzhi.song@windriver.com>
+Date: Thu, 23 Aug 2018 23:17:07 -0400
+Subject: [PATCH] qemu-kvm: Add options to pin and prioritize vcpus
+
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Signed-off-by: Yang Shi <yang.shi@windriver.com>
+Signed-off-by: Paul Barrette <paul.barrette@windriver.com>
+Signed-off-by: Michael Barabanov <michael.barabanov@windriver.com>
+[Pb: cpus.h in new location for 1.4.2]
+Signed-off-by: Yunguo Wei <michael.barabanov@windriver.com>
+[ywei: fix context conflict in vl.c and cpus.h]
+
+[Adjust code context]
+Upstream-Status: Pending
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+
+[fix context conflict]
+Upstream-Status: Pending
+Signed-off-by: Hongzhi.Song <hongzhi.song@windriver.com>
+---
+ cpus.c                | 146 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ include/sysemu/cpus.h |   1 +
+ qemu-options.hx       |   8 +++
+ vl.c                  |   3 ++
+ 4 files changed, 158 insertions(+)
+
+diff --git a/cpus.c b/cpus.c
+index b5844b7..28b7612 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1185,6 +1185,150 @@ static void qemu_wait_io_event(CPUState *cpu)
+     qemu_wait_io_event_common(cpu);
+ }
+ 
++#include <sched.h>
++
++static cpu_set_t vcpu_affinity[1024];
++static int vcpu_priority[1024];
++
++/*
++ * Extracts the name of an option from the parameter string (p points at the
++ * first byte of the option name)
++ *
++ * The option name is delimited by delim (usually , or =) or the string end
++ * and is copied into buf. If the option name is longer than buf_size, it is
++ * truncated. buf is always zero terminated.
++ *
++ * The return value is the position of the delimiter/zero byte after the option
++ * name in p.
++ */
++static const char *wr_get_opt_name(char *buf, int buf_size, const char *p, char delim)
++{
++    char *q;
++
++    q = buf;
++    while (*p != '\0' && *p != delim) {
++        if (q && (q - buf) < buf_size - 1)
++            *q++ = *p;
++        p++;
++    }
++    if (q)
++        *q = '\0';
++
++    return p;
++}
++
++/*
++ * Extracts the value of an option from the parameter string p (p points at the
++ * first byte of the option value)
++ *
++ * This function is comparable to get_opt_name with the difference that the
++ * delimiter is fixed to be comma which starts a new option. To specify an
++ * option value that contains commas, double each comma.
++ */
++static const char *wr_get_opt_value(char *buf, int buf_size, const char *p)
++{
++    char *q;
++
++    q = buf;
++    while (*p != '\0') {
++        if (*p == ',') {
++            if (*(p + 1) != ',')
++                break;
++            p++;
++        }
++        if (q && (q - buf) < buf_size - 1)
++            *q++ = *p;
++        p++;
++    }
++    if (q)
++        *q = '\0';
++
++    return p;
++}
++
++static int wr_get_next_param_value(char *buf, int buf_size,
++                         const char *tag, const char **pstr)
++{
++    const char *p;
++    char option[128];
++
++    p = *pstr;
++    for(;;) {
++        p = wr_get_opt_name(option, sizeof(option), p, '=');
++        if (*p != '=')
++            break;
++        p++;
++        if (!strcmp(tag, option)) {
++            *pstr = wr_get_opt_value(buf, buf_size, p);
++            if (**pstr == ',') {
++                (*pstr)++;
++            }
++            return strlen(buf);
++        } else {
++            p = wr_get_opt_value(NULL, 0, p);
++        }
++        if (*p != ',')
++            break;
++        p++;
++    }
++    return 0;
++}
++
++static int wr_get_param_value(char *buf, int buf_size,
++                    const char *tag, const char *str)
++{
++    return wr_get_next_param_value(buf, buf_size, tag, &str);
++}
++
++static void qemu_kvm_vcpu_sched_init(CPUState *env)
++{
++    int idx = env->cpu_index;
++
++    if (CPU_COUNT(&vcpu_affinity[idx])) {
++        if (sched_setaffinity(0, sizeof(cpu_set_t), &vcpu_affinity[idx]) < 0)
++             fprintf(stderr,"Setting CPU affinity of VCPU %u to %llx failed with %d\n",
++		     idx, *((unsigned long long *) &vcpu_affinity[idx]), errno);
++    }
++
++    if (vcpu_priority[idx] > 0) {
++        struct sched_param schedp;
++
++        memset(&schedp, 0, sizeof(schedp));
++        schedp.sched_priority = vcpu_priority[idx];
++        if (sched_setscheduler(0, SCHED_FIFO, &schedp) < 0)
++            fprintf(stderr, "Setting priority of VCPU %u to %u failed with %d\n",
++                    idx, vcpu_priority[idx], errno);
++    }
++}
++
++void vcpu_parse(const char *optarg)
++{
++    unsigned long long affinity;
++    int i, cpuid;
++    char option[128];
++    char *endptr;
++
++    cpuid = strtoul(optarg, &endptr, 10);
++    if (endptr != optarg) {
++        if (*endptr == ',') {
++            endptr++;
++        }
++    }
++    if (wr_get_param_value(option, 128, "affinity", endptr) != 0) {
++        affinity = strtoull(option, NULL, 16);
++        for (i = 0; i < 8 * sizeof(unsigned long long); i++) {
++            if (affinity & (1ULL << i))
++                CPU_SET(i, &vcpu_affinity[cpuid]);
++        }
++    }
++    if (wr_get_param_value(option, 128, "prio", endptr) != 0)
++        vcpu_priority[cpuid] = strtoul(option, NULL, 10);
++
++    fprintf(stderr, "vcpu %d: affinity %llx prio %d\n", cpuid,
++	    *((unsigned long long*) &vcpu_affinity[cpuid]), vcpu_priority[cpuid]);
++}
++
++
+ static void *qemu_kvm_cpu_thread_fn(void *arg)
+ {
+     CPUState *cpu = arg;
+@@ -1206,6 +1350,8 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
+ 
+     kvm_init_cpu_signals(cpu);
+ 
++    qemu_kvm_vcpu_sched_init(cpu);
++
+     /* signal CPU creation */
+     cpu->created = true;
+     qemu_cond_signal(&qemu_cpu_cond);
+diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
+index 731756d..a6e000c 100644
+--- a/include/sysemu/cpus.h
++++ b/include/sysemu/cpus.h
+@@ -30,6 +30,7 @@ void cpu_synchronize_all_post_init(void);
+ void cpu_synchronize_all_pre_loadvm(void);
+ 
+ void qtest_clock_warp(int64_t dest);
++void vcpu_parse(const char *optarg);
+ 
+ #ifndef CONFIG_USER_ONLY
+ /* vl.c */
+diff --git a/qemu-options.hx b/qemu-options.hx
+index b1bf0f4..c88bda7 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -591,6 +591,14 @@ STEXI
+ @table @option
+ ETEXI
+ 
++DEF("vcpu", HAS_ARG, QEMU_OPTION_vcpu,
++    "-vcpu n[,affinity=cpumask][,prio=prio] Pin and/or prioritize a vcpu\n", QEMU_ARCH_ALL)
++STEXI
++@item -vcpu @var{opts}
++@findex -vcpu
++Pin vcpu(s) to physical cores and set a realtime priority.
++ETEXI
++
+ DEF("fda", HAS_ARG, QEMU_OPTION_fda,
+     "-fda/-fdb file  use 'file' as floppy disk 0/1 image\n", QEMU_ARCH_ALL)
+ DEF("fdb", HAS_ARG, QEMU_OPTION_fdb, "", QEMU_ARCH_ALL)
+diff --git a/vl.c b/vl.c
+index 16b913f..4520299 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3650,6 +3650,9 @@ int main(int argc, char **argv, char **envp)
+                     exit(1);
+                 }
+                 break;
++            case QEMU_OPTION_vcpu:
++                vcpu_parse(optarg);
++                break;
+             case QEMU_OPTION_vnc:
+                 vnc_parse(optarg, &error_fatal);
+                 break;
+-- 
+2.8.1
+
