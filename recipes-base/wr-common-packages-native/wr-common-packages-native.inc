@@ -100,6 +100,7 @@ DEPENDS = "\
     libxrandr-native \
     libxrender-native \
     libxslt-native \
+    llvm-native \
     lz4-native \
     lzip-native \
     lzo-native \
