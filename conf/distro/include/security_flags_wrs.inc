@@ -1,3 +1,4 @@
+# Base on oe-core security flags
 include conf/distro/include/security_flags.inc
 
 # To override for multilib, use SECURITY_CFLAGS_pn-<pkg>_pn-<mlib>-<pkg>.
@@ -6,7 +7,6 @@ include conf/distro/include/security_flags.inc
 #
 
 # These really should be in security_flags.inc
-SECURITY_NO_FORTIFY_CFLAGS ?= "-fstack-protector-all -pie -fpie"
 SECURITY_NO_STACK_CFLAGS ?= "-pie -fpie ${lcl_maybe_fortify}"
 
 # Deal with ppc specific linker failures when using the cflags
@@ -19,13 +19,21 @@ SECURITY_CFLAGS_pn-systemd_powerpc = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-wireshark_powerpc = ""
 SECURITY_CFLAGS_pn-rpm_powerpc64 = ""
 
+# No _FORTIFY_SOURCE in CLFAGS
+lcl_maybe_fortify_pn-c-ares = ""
+lcl_maybe_fortify_pn-curl = ""
+lcl_maybe_fortify_pn-openjdk-7 = ""
+lcl_maybe_fortify_pn-openjdk-8 = ""
+lcl_maybe_fortify_pn-relayd = ""
+lcl_maybe_fortify_pn-libunwind = ""
+lcl_maybe_fortify_pn-pth = ""
+
 SECURITY_CFLAGS_pn-aspell = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-atkmm = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-autofs = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-beecrypt = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-btrfs-tools = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-busybox = "${SECURITY_NO_PIE_CFLAGS}"
-SECURITY_CFLAGS_pn-c-ares = "${SECURITY_NO_FORTIFY_CFLAGS}"
 SECURITY_CFLAGS_pn-cairomm = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-ceph = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-collectd = "${SECURITY_NO_PIE_CFLAGS}"
@@ -33,7 +41,6 @@ SECURITY_CFLAGS_pn-corosync = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-criu = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-cups = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-curlpp = ""
-SECURITY_CFLAGS_pn-curl = "${SECURITY_NO_FORTIFY_CFLAGS}"
 SECURITY_CFLAGS_pn-dconf = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-db = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-device-mapper-multipath = "${SECURITY_NO_PIE_CFLAGS}"
@@ -62,7 +69,6 @@ SECURITY_CFLAGS_pn-gstreamer1.0-plugins-good = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-gtkmm = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-gzip = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-harfbuzz = "${SECURITY_NO_PIE_CFLAGS}"
-#SECURITY_CFLAGS_pn-iasl = "${SECURITY_NO_FORTIFY_CFLAGS} ${@base_conditional('DEBUG_BUILD','1','','-D_FORTIFY_SOURCE=2',d)}"
 SECURITY_CFLAGS_pn-imagemagick = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-insserv = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-iptables = "${SECURITY_NO_PIE_CFLAGS}"
@@ -103,8 +109,6 @@ SECURITY_CFLAGS_pn-net-tools = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-nagios-core = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-openais = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-openhpi = "${SECURITY_NO_PIE_CFLAGS}"
-SECURITY_CFLAGS_pn-openjdk-7 = "${SECURITY_NO_FORTIFY_CFLAGS}"
-SECURITY_CFLAGS_pn-openjdk-8 = "${SECURITY_NO_FORTIFY_CFLAGS}"
 SECURITY_CFLAGS_pn-openldap = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-openl2tp = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-opensaf = "${SECURITY_NO_PIE_CFLAGS}"
@@ -131,7 +135,6 @@ SECURITY_CFLAGS_pn-python = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-python-smartpm = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-python-snimpy = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-python-twisted = "${SECURITY_NO_PIE_CFLAGS}"
-SECURITY_CFLAGS_pn-relayd = "${SECURITY_NO_FORTIFY_CFLAGS}"
 SECURITY_CFLAGS_pn-rng-tools = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-rrdtool = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-sed = "${SECURITY_NO_PIE_CFLAGS}"
@@ -151,9 +154,6 @@ SECURITY_CFLAGS_pn-xerces-c = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-zeromq = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-zlib = "${SECURITY_NO_PIE_CFLAGS}"
 
-# Analysis tools needing relaxed security cflags
-SECURITY_CFLAGS_pn-libunwind = "${SECURITY_NO_FORTIFY_CFLAGS}"
-SECURITY_CFLAGS_pn-pth = "${SECURITY_NO_FORTIFY_CFLAGS}"
 SECURITY_CFLAGS_pn-wdbagent-ptrace = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-wr-opagent = "${SECURITY_NO_PIE_CFLAGS}"
 
