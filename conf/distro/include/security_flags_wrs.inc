@@ -7,11 +7,8 @@ include conf/distro/include/security_flags.inc
 #
 
 # Deal with ppc specific linker failures when using the cflags
-SECURITY_CFLAGS_pn-gcc-cross_powerpc = "${SECURITY_NO_PIE_CFLAGS}"
-SECURITY_CFLAGS_pn-gcc_powerpc = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-glibc-initial_powerpc = ""
 SECURITY_CFLAGS_pn-glibc_powerpc = ""
-SECURITY_CFLAGS_pn-systemd_powerpc = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-wireshark_powerpc = ""
 SECURITY_CFLAGS_pn-rpm_powerpc64 = ""
 SECURITY_STACK_PROTECTOR_pn-libmatchbox_powerpc = ""
