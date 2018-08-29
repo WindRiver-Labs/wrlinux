@@ -6,18 +6,15 @@ include conf/distro/include/security_flags.inc
 # multilib variants, too.
 #
 
-# These really should be in security_flags.inc
-SECURITY_NO_STACK_CFLAGS ?= "-pie -fpie ${lcl_maybe_fortify}"
-
 # Deal with ppc specific linker failures when using the cflags
 SECURITY_CFLAGS_pn-gcc-cross_powerpc = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-gcc_powerpc = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-glibc-initial_powerpc = ""
 SECURITY_CFLAGS_pn-glibc_powerpc = ""
-SECURITY_CFLAGS_pn-libmatchbox_powerpc = "${SECURITY_NO_STACK_CFLAGS}"
 SECURITY_CFLAGS_pn-systemd_powerpc = "${SECURITY_NO_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-wireshark_powerpc = ""
 SECURITY_CFLAGS_pn-rpm_powerpc64 = ""
+SECURITY_STACK_PROTECTOR_pn-libmatchbox_powerpc = ""
 
 # No _FORTIFY_SOURCE in CLFAGS
 lcl_maybe_fortify_pn-c-ares = ""
