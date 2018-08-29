@@ -1,4 +1,4 @@
-From 61b8b92fad71a2c38db71da4ff146af40f00c0ad Mon Sep 17 00:00:00 2001
+From 711a5872536bddd463ad43b6131c93295b2ae14e Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Fri, 4 Mar 2016 01:52:02 -0500
 Subject: [PATCH] wr-policy: allow initrc_t start systemd_unit_t service
@@ -81,8 +81,10 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/systemd.te    | 18 ++++++++++++++++++
  6 files changed, 69 insertions(+)
 
---- refpolicy.orig/policy/modules/kernel/devices.te
-+++ refpolicy/policy/modules/kernel/devices.te
+diff --git a/policy/modules/kernel/devices.te b/policy/modules/kernel/devices.te
+index 37dceb4..8585526 100644
+--- a/policy/modules/kernel/devices.te
++++ b/policy/modules/kernel/devices.te
 @@ -21,6 +21,7 @@ files_mountpoint(device_t)
  files_associate_tmp(device_t)
  fs_xattr_type(device_t)
@@ -91,8 +93,10 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  
  #
  # Type for /dev/agpgart
---- refpolicy.orig/policy/modules/system/init.if
-+++ refpolicy/policy/modules/system/init.if
+diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
+index 90b2480..c624a68 100644
+--- a/policy/modules/system/init.if
++++ b/policy/modules/system/init.if
 @@ -2543,6 +2543,43 @@ interface(`init_stop_all_units',`
  	allow $1 systemdunit:service stop;
  ')
@@ -137,8 +141,10 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  #######################################
  ## <summary>
  ##	Reload all systemd units.
---- refpolicy.orig/policy/modules/system/init.te
-+++ refpolicy/policy/modules/system/init.te
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index 5004c17..20b9b14 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
 @@ -784,6 +784,8 @@ ifdef(`init_systemd',`
  	init_rw_stream_sockets(initrc_t)
  	init_get_all_units_status(initrc_t)
@@ -148,8 +154,10 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  
  	# Create /etc/audit.rules.prev after firstboot remediation
  	logging_manage_audit_config(initrc_t)
---- refpolicy.orig/policy/modules/system/locallogin.fc
-+++ refpolicy/policy/modules/system/locallogin.fc
+diff --git a/policy/modules/system/locallogin.fc b/policy/modules/system/locallogin.fc
+index 06b5de6..9023860 100644
+--- a/policy/modules/system/locallogin.fc
++++ b/policy/modules/system/locallogin.fc
 @@ -1,5 +1,6 @@
  
  /sbin/sulogin		--	gen_context(system_u:object_r:sulogin_exec_t,s0)
@@ -157,9 +165,11 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  /sbin/sushell		--	gen_context(system_u:object_r:sulogin_exec_t,s0)
  
  /usr/sbin/sulogin	--	gen_context(system_u:object_r:sulogin_exec_t,s0)
---- refpolicy.orig/policy/modules/system/locallogin.te
-+++ refpolicy/policy/modules/system/locallogin.te
-@@ -227,6 +227,7 @@ allow sulogin_t self:msgq create_msgq_pe
+diff --git a/policy/modules/system/locallogin.te b/policy/modules/system/locallogin.te
+index 8e35567..976a595 100644
+--- a/policy/modules/system/locallogin.te
++++ b/policy/modules/system/locallogin.te
+@@ -227,6 +227,7 @@ allow sulogin_t self:msgq create_msgq_perms;
  allow sulogin_t self:msg { send receive };
  
  kernel_read_system_state(sulogin_t)
@@ -167,9 +177,9 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  # because file systems are not mounted:
  kernel_dontaudit_search_unlabeled(sulogin_t)
  
-@@ -251,6 +252,15 @@ userdom_use_user_ptys(sulogin_t)
- 
- sysadm_shell_domtrans(sulogin_t)
+@@ -268,6 +269,15 @@ ifdef(`sulogin_no_pam', `
+ 	selinux_compute_user_contexts(sulogin_t)
+ ')
  
 +dev_getattr_all_chr_files(sulogin_t)
 +dev_getattr_all_blk_files(sulogin_t)
@@ -180,12 +190,14 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 +term_use_generic_ptys(sulogin_t)
 +term_use_all_ttys(sulogin_t)
 +
- # suse and debian do not use pam with sulogin...
- ifdef(`distro_suse', `define(`sulogin_no_pam')')
- ifdef(`distro_debian', `define(`sulogin_no_pam')')
---- refpolicy.orig/policy/modules/system/systemd.te
-+++ refpolicy/policy/modules/system/systemd.te
-@@ -420,3 +420,21 @@ tunable_policy(`systemd_tmpfiles_manage_
+ optional_policy(`
+ 	nis_use_ypbind(sulogin_t)
+ ')
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 1246875..927ec3a 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -420,3 +420,21 @@ tunable_policy(`systemd_tmpfiles_manage_all',`
  	files_relabel_non_security_dirs(systemd_tmpfiles_t)
  	files_relabel_non_security_files(systemd_tmpfiles_t)
  ')
@@ -207,3 +219,6 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 +init_create_pid_dirs(systemd_passwd_agent_t)
 +init_read_utmp(systemd_passwd_agent_t)
 +init_stream_connect(systemd_passwd_agent_t)
+-- 
+2.7.4
+

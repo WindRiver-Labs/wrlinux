@@ -35,9 +35,7 @@ index 6503fff..b7d9932 100644
  # systemd related allow rules
  allow kernel_t init_t:process dyntransition;
  allow devpts_t device_t:filesystem associate;
--allow init_t self:capability2 block_suspend;
-\ No newline at end of file
-+allow init_t self:capability2 block_suspend;
+ allow init_t self:capability2 block_suspend;
 +
 +# MLS trusted for lowering/raising the level of files
 +mls_file_downgrade(init_t)
