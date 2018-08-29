@@ -1,0 +1,260 @@
+From 5a6d6831428d59e00fd302712377a200a923bb1c Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 4 Feb 2016 02:10:15 -0500
+Subject: [PATCH] wr-policy-fix-systemd-journal-failure
+
+Fix avc denials:
+
+* Patches ported from Fedora 22:
+
+Reference sources: selinux-policy-3.13.1-128.21.fc22.src.rpm
+Changes come from: policy-f22-base.patch
+
+  avc: denied { transition } for pid=377 comm="(rsyslogd)" \
+  path="/usr/sbin/rsyslogd" dev="hda" ino=26171 \
+  scontext=system_u:system_r:init_t:s0-s15:c0.c1023 \
+  tcontext=system_u:system_r:syslogd_t:s15:c0.c1023 \
+  tclass=process permissive=1
+
+  avc: denied { status } for auid=n/a uid=0 gid=0 \
+  path="/lib/systemd/system/graphical.target" \
+  cmdline="/lib/systemd/systemd-update-utmp runlevel" \
+  scontext=system_u:system_r:init_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:systemd_unit_t:s0 tclass=service \
+  exe="/lib/systemd/systemd"
+
+  avc: denied { sys_ptrace } for pid=90 comm="systemd-journal" \
+  capability=19 \
+  scontext=system_u:system_r:syslogd_t:s15:c0.c1023 \
+  tcontext=system_u:system_r:syslogd_t:s15:c0.c1023 \
+  tclass=capability permissive=1
+
+  avc: denied { getattr read } for pid=90 comm="systemd-journal" \
+  path="socket:[8254]" dev="sockfs" ino=8254 \
+  scontext=system_u:system_r:syslogd_t:s15:c0.c1023 \
+  tcontext=system_u:system_r:syslogd_t:s15:c0.c1023 \
+  tclass=netlink_audit_socket permissive=1
+
+  avc: denied { create } for pid=62 comm="systemd-journal" \
+  name="streams" \
+  scontext=system_u:system_r:syslogd_t:s15:c0.c1023 \
+  tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 \
+  tclass=dir permissive=1
+
+  avc: denied { search } for pid=78 comm="systemd-journal" \
+  name="/" dev="tmpfs" ino=9001 \
+  scontext=system_u:system_r:syslogd_t:s15:c0.c1023 \
+  tcontext=system_u:object_r:tmpfs_t:s0 \
+  tclass=dir permissive=1
+
+  avc: denied { sendto shutdown } for pid=90 comm="systemd-journal" \
+  path="/run/systemd/notify" \
+  scontext=system_u:system_r:syslogd_t:s15:c0.c1023 \
+  tcontext=system_u:system_r:init_t:s0-s15:c0.c1023 \
+  tclass=unix_dgram_socket permissive=1
+  ...
+
+* WRL fixes - ported from CGP7:
+
+  avc: denied { write } for pid=707 comm="systemd-journal" \
+  name="journal" dev="tmpfs" ino=8212 \
+  scontext=root:sysadm_r:sysadm_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 \
+  tclass=dir permissive=1
+
+  avc: denied { remove_name add_name } for pid=707 \
+  comm="systemd-journal" name="stdout" dev="tmpfs" ino=17373 \
+  scontext=root:sysadm_r:sysadm_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 \
+  tclass=dir permissive=1
+
+  avc: denied { create } for pid=62 comm="systemd-journal" name="log" \
+  scontext=system_u:system_r:syslogd_t:s15:c0.c1023 \
+  tcontext=system_u:object_r:var_run_t:s15:c0.c1023 \
+  tclass=dir permissive=1
+  ...
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/kernel/files.if   | 19 +++++++++++++++++++
+ policy/modules/system/init.te    |  8 ++++++++
+ policy/modules/system/logging.if | 19 +++++++++++++++++++
+ policy/modules/system/logging.te | 19 +++++++++++++++++++
+ policy/modules/system/systemd.if | 18 ++++++++++++++++++
+ 5 files changed, 83 insertions(+)
+
+diff --git a/policy/modules/kernel/files.if b/policy/modules/kernel/files.if
+index ac25ad0..bb5b3b5 100644
+--- a/policy/modules/kernel/files.if
++++ b/policy/modules/kernel/files.if
+@@ -6925,3 +6925,22 @@ interface(`systemd_service_allow_kernel_files_domain_to_tmp_t',`
+ 
+ 	allow $1 tmp_t:lnk_file getattr;
+ ')
++
++#######################################
++## <summary>
++##      Create generic pid directory.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`files_create_var_run_dirs',`
++	gen_require(`
++		type var_t, var_run_t;
++	')
++
++	allow $1 var_t:dir search_dir_perms;
++	allow $1 var_run_t:dir create_dir_perms;
++')
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index ab56889..d9b0b90 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -271,6 +271,8 @@ ifdef(`init_systemd',`
+ 
+ 	# systemd_socket_activated policy
+ 	mls_socket_write_all_levels(init_t)
++	# MLS trusted for setting the level of processes it executes
++	mls_process_set_level(init_t)
+ 
+ 	selinux_compute_create_context(init_t)
+ 	selinux_compute_access_vector(init_t)
+@@ -293,6 +295,12 @@ ifdef(`init_systemd',`
+ 		systemd_dbus_chat_logind(init_t)
+ 	')
+ 
++	# get status, start, stop, reload generic systemd units
++	init_get_all_units_status(init_t)
++	init_start_all_units(init_t)
++	init_stop_all_units(init_t)
++	init_reload_all_units(init_t)
++
+ 	optional_policy(`
+ 		dbus_system_bus_client(init_t)
+ 		dbus_connect_system_bus(init_t)
+diff --git a/policy/modules/system/logging.if b/policy/modules/system/logging.if
+index b160159..de26249 100644
+--- a/policy/modules/system/logging.if
++++ b/policy/modules/system/logging.if
+@@ -1132,3 +1132,22 @@ interface(`logging_admin',`
+ 	logging_admin_audit($1, $2)
+ 	logging_admin_syslog($1, $2)
+ ')
++
++########################################
++## <summary>
++##      Connect to the syslog control unix stream socket.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`logging_stream_connect_syslog',`
++	gen_require(`
++		type syslogd_t, syslogd_var_run_t;
++	')
++
++	files_search_pids($1)
++	stream_connect_pattern($1, syslogd_var_run_t, syslogd_var_run_t, syslogd_t)
++')
+diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
+index d28ea8b..4cfab67 100644
+--- a/policy/modules/system/logging.te
++++ b/policy/modules/system/logging.te
+@@ -403,6 +403,8 @@ allow syslogd_t self:tcp_socket create_stream_socket_perms;
+ allow syslogd_t syslog_conf_t:file read_file_perms;
+ allow syslogd_t syslog_conf_t:lnk_file read_file_perms;
+ 
++allow syslogd_t self:netlink_audit_socket { r_netlink_socket_perms nlmsg_write };
++
+ # Create and bind to /dev/log or /var/run/log.
+ allow syslogd_t devlog_t:sock_file manage_sock_file_perms;
+ files_pid_filetrans(syslogd_t, devlog_t, sock_file)
+@@ -430,6 +432,9 @@ manage_files_pattern(syslogd_t, syslogd_var_run_t, syslogd_var_run_t)
+ manage_sock_files_pattern(syslogd_t, syslogd_var_run_t, syslogd_var_run_t)
+ files_pid_filetrans(syslogd_t, syslogd_var_run_t, file)
+ 
++# manage dirs /var/run/systemd/{streams, journal}
++manage_dirs_pattern(syslogd_t, syslogd_var_run_t, syslogd_var_run_t)
++
+ kernel_read_system_state(syslogd_t)
+ kernel_read_network_state(syslogd_t)
+ kernel_read_kernel_sysctls(syslogd_t)
+@@ -491,8 +496,10 @@ files_var_lib_filetrans(syslogd_t, syslogd_var_lib_t, { file dir })
+ 
+ fs_getattr_all_fs(syslogd_t)
+ fs_search_auto_mountpoints(syslogd_t)
++fs_search_tmpfs(syslogd_t)
+ 
+ mls_file_write_all_levels(syslogd_t) # Need to be able to write to /var/run/ and /var/log directories
++mls_socket_write_all_levels(syslogd_t) # Neet to be able to sendto dgram
+ mls_trusted_object(syslogd_t) # Other process need to have the right to connectto/sendto /dev/log
+ 
+ term_write_console(syslogd_t)
+@@ -513,9 +520,11 @@ term_use_all_ptys(syslogd_t)
+ auth_use_nsswitch(syslogd_t)
+ 
+ init_use_fds(syslogd_t)
++mls_fd_use_all_levels(syslogd_t)
+ 
+ # cjp: this doesnt make sense
+ logging_send_syslog_msg(syslogd_t)
++logging_set_loginuid(syslogd_t)
+ 
+ miscfiles_read_localization(syslogd_t)
+ 
+@@ -537,6 +546,16 @@ ifdef(`init_systemd',`
+ 	init_dgram_send(syslogd_t)
+ 
+ 	udev_read_pid_files(syslogd_t)
++	systemd_getattr_unit_dirs(syslogd_t)
++
++	# WRL fix:
++	# allow to create, read, write, delete /run/log/journal*
++	files_create_var_run_dirs(syslogd_t)
++	gen_require(`
++		type var_run_t;
++	')
++	allow syslogd_t var_run_t:file { read write open getattr setattr unlink };
++	allow syslogd_t var_run_t:dir { rmdir };
+ ')
+ 
+ ifdef(`distro_gentoo',`
+diff --git a/policy/modules/system/systemd.if b/policy/modules/system/systemd.if
+index a714b60..c36a604 100644
+--- a/policy/modules/system/systemd.if
++++ b/policy/modules/system/systemd.if
+@@ -232,3 +232,21 @@ interface(`systemd_service_lib_function',`
+ 	allow initrc_t $1:file execmod;
+ 
+ ')
++
++#####################################
++## <summary>
++##      Allow domain to getattr all systemd unit directories.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`systemd_getattr_unit_dirs',`
++	gen_require(`
++		attribute systemd_unit_t;
++	')
++
++	allow $1 systemd_unit_t:dir getattr;
++')
+-- 
+2.7.4
+

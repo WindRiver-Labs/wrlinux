@@ -4,6 +4,4 @@
 
 POLICY_NAME = "wr-minimum"
 
-SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'file://refpolicy-minimum-reformat-upstream-patches.patch', '', d)}"
-
-include refpolicy_wr.inc
+include refpolicy-minimum_wr.inc
