@@ -100,7 +100,7 @@ autossh_flag=true
 
 # check if tgt installed correctly on target as
 # CLIENT_IP specify.
-ssh root@$CLIENT_IP -- "rpm -qa | tgt" || \
+ssh root@$CLIENT_IP -- "rpm -qa | grep tgt" || \
 	cuterr "Please install tgt correctly on $CLIENT_IP"
 
 # start tgtd on target
