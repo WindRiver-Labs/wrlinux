@@ -83,7 +83,7 @@ BB_SIGNATURE_HANDLER ?= 'OEBasicHash'
 LICENSE_FLAGS_WHITELIST += "commercial_windriver"
 
 # QA check settings - a little stricter than the OE-Core defaults
-WARN_TO_ERROR_QA = "already-stripped compile-host-path install-host-path \
+WARN_TO_ERROR_QA ?= "already-stripped compile-host-path install-host-path \
                     pn-overrides staticdev useless-rpaths"
 WARN_QA_remove = "${WARN_TO_ERROR_QA}"
 ERROR_QA_append = " ${WARN_TO_ERROR_QA}"
