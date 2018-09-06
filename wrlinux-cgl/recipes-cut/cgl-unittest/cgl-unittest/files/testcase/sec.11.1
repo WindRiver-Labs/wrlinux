@@ -10,8 +10,7 @@
 # 2, stop tracing and clear trace file record.
 # 3, set funtion tracer and only trace the functions.
 # related to file operation such as do_sys_open,
-# SyS_read, SyS_write, SyS_close, SyS_unlink(SyS_unlinkat)
-# and SyS_chmod(SyS_fchmodat).
+# ksys_read, ksys_write, __close_fd, do_unlinkat
 # 4, run a test program which open file, read file,
 # write file, close file, change file attribute and
 # remove file.
@@ -59,27 +58,23 @@ echo 0 > tracing_on
 echo > trace
 
 # set the tracing function
-# SyS_open to track file open
-# SyS_read to track file read
-# SyS_write to track file write
-# SyS_close to track file close
-# SyS_unlink to track file remove
-# SyS_chmod to track file attributes change
+# do_sys_open to track file open
+# ksys_read to track file read
+# ksys_write to track file write
+# __close_fd to track file close
+# do_unlinkat to track file remove
+# do_fchmodat to track file attributes change
 echo > set_ftrace_filter 
 # In multilib env, the open function in kernel is
 # compat_SyS_open, and SyS_open in non-multilib env,
 # and both SyS_open and compat_SyS_open will 
 # continue to call do_sys_open
 echo do_sys_open > set_ftrace_filter
-echo SyS_read >>  set_ftrace_filter
-echo SyS_write >>  set_ftrace_filter
-echo SyS_close >>  set_ftrace_filter
-echo SyS_unlink >>  set_ftrace_filter
-# add specified SyS_unlink as SyS_unlinkat for cav-octeontx board
-echo SyS_unlinkat >>  set_ftrace_filter
-echo SyS_chmod >>  set_ftrace_filter
-# add specified SyS_chmod as SyS_fchmodat for cav-octeontx board
-echo SyS_fchmodat >>  set_ftrace_filter
+echo ksys_read >>  set_ftrace_filter
+echo ksys_write >>  set_ftrace_filter
+echo __close_fd >>  set_ftrace_filter
+echo do_unlinkat >>  set_ftrace_filter
+echo do_fchmodat >>  set_ftrace_filter
 
 # start the tracing
 echo 1 > tracing_on
@@ -96,15 +91,9 @@ then
 fi
 # add to check do_sys_open
 cat trace|grep file_test-${pid_f}|grep do_sys_open || cutfail
-cat trace|grep file_test-${pid_f}|grep SyS_read || cutfail
-cat trace|grep file_test-${pid_f}|grep SyS_write || cutfail
-cat trace|grep file_test-${pid_f}|grep SyS_close || cutfail
-arch=`uname -m`
-if [ "$arch" == "aarch64" ]; then
-    cat trace|grep file_test-${pid_f}|grep SyS_unlinkat || cutfail
-    cat trace|grep file_test-${pid_f}|grep SyS_fchmodat || cutfail
-else
-    cat trace|grep file_test-${pid_f}|grep SyS_unlink || cutfail
-    cat trace|grep file_test-${pid_f}|grep SyS_chmod || cutfail
-fi
+cat trace|grep file_test-${pid_f}|grep ksys_read || cutfail
+cat trace|grep file_test-${pid_f}|grep ksys_write || cutfail
+cat trace|grep file_test-${pid_f}|grep __close_fd || cutfail
+cat trace|grep file_test-${pid_f}|grep do_fchmodat || cutfail
+cat trace|grep file_test-${pid_f}|grep do_unlinkat || cutfail
 cutpass
