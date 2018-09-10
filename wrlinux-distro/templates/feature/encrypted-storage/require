@@ -3,5 +3,4 @@
 #
 
 feature/tpm2
-feature/initramfs
-feature/initramfs-install
+feature/efi-secure-boot
