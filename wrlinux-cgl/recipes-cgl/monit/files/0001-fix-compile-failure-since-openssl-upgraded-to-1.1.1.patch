@@ -1,0 +1,121 @@
+From 5138ff0294b22043bf915ab0c7daa50ea1cb00dc Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 10 Sep 2018 21:41:58 +0800
+Subject: [PATCH] fix compile failure since openssl upgraded to 1.1.1
+
+Since commit `f0e0fd5 Make many X509_xxx types opaque' and
+`6ddbb4c X509_STORE_CTX accessors.' applied in openssl,
+there is a compile failure
+[snip]
+|ssl.c:822:15: error: storage size of 'found_cert' isn't known
+|   X509_OBJECT found_cert;
+|               ^~~~~~~~~~
+|ssl.c:824:46: error: dereferencing pointer to incomplete type
+'X509_STORE_CTX' {aka 'struct x509_store_ctx_st'}
+|   X509_NAME_oneline(X509_get_subject_name(ctx->current_cert), subject,
+[snip]
+
+Refer above commits to tweak ssl reference.
+
+Upstream-Status: Inappropriate [wrlinux specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ ssl.c | 36 +++++++++++++++++++++---------------
+ 1 file changed, 21 insertions(+), 15 deletions(-)
+
+diff --git a/ssl.c b/ssl.c
+index 5c102a0..b8501ff 100644
+--- a/ssl.c
++++ b/ssl.c
+@@ -667,9 +667,11 @@ ssl_connection *new_ssl_connection(char *clientpemfile, int sslversion) {
+     ssl->method = SSLv2_client_method();
+     break;
+ #endif
++# ifndef OPENSSL_NO_SSL3_METHOD
+   case SSL_VERSION_SSLV3:
+     ssl->method = SSLv3_client_method();
+     break;
++#endif
+ 
+   case SSL_VERSION_TLS:
+     ssl->method = TLSv1_client_method();
+@@ -819,26 +821,30 @@ static int verify_init(ssl_server_connection *ssl_server) {
+ static int verify_callback(int preverify_ok, X509_STORE_CTX *ctx) {
+ 
+   char subject[STRLEN];
+-  X509_OBJECT found_cert;
++  X509_OBJECT *found_cert;
+ 
+-  X509_NAME_oneline(X509_get_subject_name(ctx->current_cert), subject,
++  X509_NAME_oneline(X509_get_subject_name(X509_STORE_CTX_get_current_cert(ctx)),
++                    subject,
+                     STRLEN-1);
+ 
+   if(!preverify_ok && !check_preverify(ctx))
+     return 0;
+ 
+-  if(ctx->error_depth==0 &&
+-     X509_STORE_get_by_subject(ctx, X509_LU_X509,
+-			       X509_get_subject_name(ctx->current_cert), 
+-			       &found_cert)!=1)
++  if(X509_STORE_CTX_get_error_depth(ctx) == 0)
+   {
++    found_cert = X509_STORE_CTX_get_obj_by_subject(ctx, X509_LU_X509,
++                                                   X509_get_subject_name(X509_STORE_CTX_get_current_cert(ctx)));
++    if (found_cert == NULL)
++    {
+ 
+-    LogError("%s: SSL connection rejected. No matching certificate found -- %s\n",
+-             prog, SSLERROR);
+-    return 0;
++      LogError("%s: SSL connection rejected. No matching certificate found -- %s\n",
++               prog, SSLERROR);
++      return 0;
+ 
++    }
+   }
+ 
++  X509_OBJECT_free(found_cert);
+   return 1; 
+ 
+ }
+@@ -850,29 +856,29 @@ static int verify_callback(int preverify_ok, X509_STORE_CTX *ctx) {
+  */
+ static int check_preverify(X509_STORE_CTX *ctx) {
+ 
+-  if ((ctx->error != X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT) &&
+-      (ctx->error != X509_V_ERR_INVALID_PURPOSE))
++  if ((X509_STORE_CTX_get_error(ctx) != X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT) &&
++      (X509_STORE_CTX_get_error(ctx) != X509_V_ERR_INVALID_PURPOSE))
+   {
+     /* Remote site specified a certificate, but it's not correct */
+     LogError("%s: SSL connection rejected because certificate verification has failed -- error %i\n", 
+-             prog, ctx->error);
++             prog, X509_STORE_CTX_get_error(ctx));
+     /* Reject connection */
+     return FALSE;
+   } 
+ 
+   if(allow_self_certification && 
+-     (ctx->error == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT))
++     (X509_STORE_CTX_get_error(ctx) == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT))
+   {
+     /* Let's accept self signed certs for the moment! */
+     LogInfo("%s: SSL connection accepted with self signed certificate!\n",
+             prog);
+-    ctx->error=0;
++    X509_STORE_CTX_set_error(ctx, X509_V_OK);
+     return TRUE;
+   } 
+ 
+   /* Reject connection */
+   LogError("%s: SSL connection rejected because certificate verification has failed -- error %i!\n", 
+-           prog, ctx->error);
++           prog, X509_STORE_CTX_get_error(ctx));
+   return FALSE;
+ 
+ 
+-- 
+2.7.4
+
