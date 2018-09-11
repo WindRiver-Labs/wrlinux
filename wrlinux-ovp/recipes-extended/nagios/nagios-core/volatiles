@@ -1,2 +1,0 @@
-d nagios nagios 0755 /var/nagios none
-d nagios nagios 0755 /var/run/nagios none
