@@ -1,0 +1,111 @@
+From 10f9aa5dc26513c04361b4c2c631a18dc63692bd Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Tue, 11 Sep 2018 10:54:13 +0800
+Subject: [PATCH] Include 'openssl/des.h' conditionally in case openssl des is
+ disabled.
+
+Upstream-Status: Pending
+
+Include 'openssl/des.h' conditionally in case openssl des is disabled.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ common/crypto-compat.c | 2 ++
+ common/crypto-compat.h | 4 ++++
+ plugins/ntlm.c         | 4 ++++
+ saslauthd/lak.c        | 2 ++
+ 4 files changed, 12 insertions(+)
+
+diff --git a/common/crypto-compat.c b/common/crypto-compat.c
+index f4717b6..3e8f176 100644
+--- a/common/crypto-compat.c
++++ b/common/crypto-compat.c
+@@ -213,6 +213,7 @@ int DSA_SIG_set0(DSA_SIG *sig, BIGNUM *r, BIGNUM *s)
+     return 1;
+ }
+ 
++#ifndef OPENSSL_NO_ECDSA
+ void ECDSA_SIG_get0(const ECDSA_SIG *sig, const BIGNUM **pr, const BIGNUM **ps)
+ {
+     if (pr != NULL)
+@@ -231,6 +232,7 @@ int ECDSA_SIG_set0(ECDSA_SIG *sig, BIGNUM *r, BIGNUM *s)
+     sig->s = s;
+     return 1;
+ }
++#endif
+ 
+ void DH_get0_pqg(const DH *dh,
+                  const BIGNUM **p, const BIGNUM **q, const BIGNUM **g)
+diff --git a/common/crypto-compat.h b/common/crypto-compat.h
+index 73424ad..a3bf8e3 100644
+--- a/common/crypto-compat.h
++++ b/common/crypto-compat.h
+@@ -11,7 +11,9 @@
+ 
+ #include <openssl/rsa.h>
+ #include <openssl/dsa.h>
++#ifndef OPENSSL_NO_ECDSA
+ #include <openssl/ecdsa.h>
++#endif
+ #include <openssl/dh.h>
+ #include <openssl/evp.h>
+ #include <openssl/hmac.h>
+@@ -31,8 +33,10 @@ int DSA_set0_key(DSA *d, BIGNUM *pub_key, BIGNUM *priv_key);
+ void DSA_SIG_get0(const DSA_SIG *sig, const BIGNUM **pr, const BIGNUM **ps);
+ int DSA_SIG_set0(DSA_SIG *sig, BIGNUM *r, BIGNUM *s);
+ 
++#ifndef OPENSSL_NO_ECDSA
+ void ECDSA_SIG_get0(const ECDSA_SIG *sig, const BIGNUM **pr, const BIGNUM **ps);
+ int ECDSA_SIG_set0(ECDSA_SIG *sig, BIGNUM *r, BIGNUM *s);
++#endif
+ 
+ void DH_get0_pqg(const DH *dh, const BIGNUM **p, const BIGNUM **q, const BIGNUM **g);
+ int DH_set0_pqg(DH *dh, BIGNUM *p, BIGNUM *q, BIGNUM *g);
+diff --git a/plugins/ntlm.c b/plugins/ntlm.c
+index fc0d89f..75f9c2f 100644
+--- a/plugins/ntlm.c
++++ b/plugins/ntlm.c
+@@ -76,7 +76,9 @@
+ #include <openssl/md4.h>
+ #include <openssl/md5.h>
+ #include <openssl/hmac.h>
++#ifndef OPENSSL_NO_DES
+ #include <openssl/des.h>
++#endif
+ #include <openssl/opensslv.h>
+ #if (OPENSSL_VERSION_NUMBER >= 0x0090700f) && \
+      !defined(OPENSSL_ENABLE_OLD_DES_SUPPORT)
+@@ -329,6 +331,7 @@ static int unload_buffer(const sasl_utils_t *utils, const u_char *buf,
+     return SASL_OK;
+ }
+ 
++#ifndef OPENSSL_NO_DES
+ /*
+  * NTLM encryption/authentication routines per section 2.10 of
+  * draft-leach-cifs-v1-spec-02
+@@ -364,6 +367,7 @@ static void E(unsigned char *out, unsigned char *K, unsigned Klen,
+ 	}
+     }
+ }
++#endif
+ 
+ static unsigned char *P16_lm(unsigned char *P16, sasl_secret_t *passwd,
+ 			     const sasl_utils_t *utils __attribute__((unused)),
+diff --git a/saslauthd/lak.c b/saslauthd/lak.c
+index 6c88a2c..9874298 100644
+--- a/saslauthd/lak.c
++++ b/saslauthd/lak.c
+@@ -52,7 +52,9 @@
+ #define OPENSSL_DISABLE_OLD_DES_SUPPORT
+ #endif
+ #include <openssl/evp.h>
++#ifndef OPENSSL_NO_DES
+ #include <openssl/des.h>
++#endif
+ 
+ /* for legacy libcrypto support */
+ #include "crypto-compat.h"
+-- 
+2.13.3
+
