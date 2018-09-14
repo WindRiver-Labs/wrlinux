@@ -13,4 +13,5 @@ SECURITY_CFLAGS_pn-vdso-test = ""
 # LDFLAGS and upstream oe-core refuse to remove var-SECURITY_STACK_PROTECTOR
 # from LDFLAGS
 SECURITY_LDFLAGS_remove_pn-libsign = "-fstack-protector-strong"
+SECURITY_LDFLAGS_remove_pn-cryptfs-tpm2 = "-fstack-protector-strong"
 
