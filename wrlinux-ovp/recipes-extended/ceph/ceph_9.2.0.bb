@@ -27,7 +27,7 @@ SRC_URI_append_arm = " file://0001-Explicitly-disable-neon-support-on-arm.patch"
 SRC_URI[md5sum] = "5e875e2c3eb16d1876c930121f96f466"
 SRC_URI[sha256sum] = "3a3d9cece76b7205afa5ba4943bf183e5063225cf3c901215d9042593b73fc7f"
 
-inherit autotools python-dir autotools-brokensep setuptools systemd
+inherit python-dir autotools-brokensep setuptools systemd
 
 DEPENDS = "boost curl fcgi fuse keyutils leveldb libaio snappy \
            libedit libxml2 nss util-linux udev xfsprogs \
@@ -66,8 +66,9 @@ PRIVATE_IP ?= ""
 export BUILD_SYS
 export HOST_SYS
 
-do_configure_prepend () {
+do_configure () {
     ./autogen.sh
+    autotools_do_configure
 }
 
 do_compile_prepend() {
