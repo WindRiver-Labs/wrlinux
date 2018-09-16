@@ -41,6 +41,7 @@ DEPENDS = "\
     font-util-native \
     fontconfig-native \
     freetype-native \
+    fribidi-native \
     gconf-native \
     gdbm-native \
     gdk-pixbuf-native \
@@ -100,7 +101,6 @@ DEPENDS = "\
     libxrandr-native \
     libxrender-native \
     libxslt-native \
-    llvm-native \
     lz4-native \
     lzip-native \
     lzo-native \
