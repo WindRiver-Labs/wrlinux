@@ -38,6 +38,8 @@ RDEPENDS_${PN} = " \
     tcf-agent \
     usbutils \
     watchdog \
+    crda \
+    wireless-regdb \
     ${@bb.utils.contains('INCOMPATIBLE_LICENSE', 'GPLv3+', '', 'parted', d)} \
     "
 RRECOMMENDS_${PN} = " \

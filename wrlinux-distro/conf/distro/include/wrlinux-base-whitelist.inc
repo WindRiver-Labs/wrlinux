@@ -22,6 +22,8 @@ PNWHITELIST_networking-layer += " \
     netcat-openbsd \
     postfix \
     tcpdump \
+    crda \
+    wireless-regdb \
 "
 
 PNWHITELIST_openembedded-layer += " \
@@ -79,6 +81,8 @@ PNWHITELIST_meta-python += " \
     python3-pytz \
     nativesdk-python3-beautifulsoup4 \
     nativesdk-python3-pytz \
+    python-m2crypto \
+    python-typing \
 "
 
 PNWHITELIST_webserver += " \
