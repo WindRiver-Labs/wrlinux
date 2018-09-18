@@ -1,0 +1,34 @@
+From 8d77f3a5b7ecf83d6bba7ee26603552a7650ef26 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Mon, 17 Sep 2018 09:08:03 +0800
+Subject: [PATCH] wr policy: fix path for policycoreutils commands
+
+The commands semodule, setsebool and run_init are moved from /usr/sbin
+to /sbin in meta-selinux commit b1dac7e2b26f869c991c6492aa7fa18eaa4b47f6
+So we need to update the policy for these commands.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/selinuxutil.fc | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/policy/modules/system/selinuxutil.fc b/policy/modules/system/selinuxutil.fc
+index b1d3f42..edda087 100644
+--- a/policy/modules/system/selinuxutil.fc
++++ b/policy/modules/system/selinuxutil.fc
+@@ -24,7 +24,10 @@
+ #
+ /sbin/load_policy		--	gen_context(system_u:object_r:load_policy_exec_t,s0)
+ /sbin/restorecon		--	gen_context(system_u:object_r:setfiles_exec_t,s0)
++/sbin/run_init		--	gen_context(system_u:object_r:run_init_exec_t,s0)
+ /sbin/setfiles.*		--	gen_context(system_u:object_r:setfiles_exec_t,s0)
++/sbin/setsebool		--	gen_context(system_u:object_r:semanage_exec_t,s0)
++/sbin/semodule		--	gen_context(system_u:object_r:semanage_exec_t,s0)
+ 
+ #
+ # /usr
+-- 
+2.13.3
+

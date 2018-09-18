@@ -128,6 +128,7 @@ SRC_URI += "file://wr-policy-getty-console.patch \
             file://0001-Allow-systemd_logind_t-relabelto-user_runt.patch \
             file://wr-policy-allow-nmbd_t-read-all-level-files.patch \
             file://0001-wr-policy-fix-labels-for-resolv.conf.patch \
+            file://wr-policy-fix-path-for-policycoreutils-commands.patch \
            "
 
 # Backport from upstream
