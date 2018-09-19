@@ -12,3 +12,5 @@ RPROVIDES_${PN}-doc += "openssl-doc"
 RPROVIDES_${PN}-staticdev += "openssl-staticdev"
 RPROVIDES_${PN}-locale += "openssl-locale"
 
+PACKAGE_PREPROCESS_FUNCS_remove = "openssl_package_preprocess"
+
