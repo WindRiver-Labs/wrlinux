@@ -38,8 +38,8 @@ INSTALL_BUNDLE    = "${@'1' if d.getVar('INITRAMFS_IMAGE', True) and \
 
 FILES_${PN} = "/boot/*"
 ALLOW_EMPTY_${PN} = "1"
-INITRAMFS_BASE_NAME = "${KERNEL_IMAGETYPE}-initramfs-${PV}-${PR}-${MACHINE}-${DATETIME}"
-INITRAMFS_BASE_NAME[vardepsexclude] = "DATETIME"
+INITRAMFS_NAME = "${KERNEL_IMAGETYPE}-initramfs-${PV}-${PR}-${MACHINE}-${DATETIME}"
+INITRAMFS_NAME[vardepsexclude] = "DATETIME"
 INITRAMFS_EXT_NAME = "-${KERNEL_VERSION}"
 
 python __anonymous () {
