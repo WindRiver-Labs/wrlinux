@@ -50,7 +50,7 @@ the target prior to executing DPDK processes:
 Bind Intel devices to igb_uio:
 
 	# ifconfig ethX down
-	# /opt/dpdk/sbin/dpdk-devbind --bind=igb_uio 07:00.0
+	# /usr/sbin/dpdk-devbind --bind=igb_uio 07:00.0
 
 NOTE: This test method need two intel ethernet (e1000e/igb/ixgbe) ports,
 please do this step on each port.
@@ -71,7 +71,7 @@ to /proc/sys/vm/nr_hugepages.
 
 The environment can be tested with:
 
-       # /opt/dpdk/app/test -c 0xffff -n 1
+       # /usr/share/test/test -c 0xffff -n 1
 
 Alternatively you may run test with no options to get information on
 available command line options. This will start a RTE shell which you
