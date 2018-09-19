@@ -58,6 +58,9 @@ clean()
     echo "Finish"
 }
 
+# skip the test if both 32-bit and 64-bit openl2tp installed
+openl2tp_num=`rpm -qa | grep  openl2tp | grep -v ptest | wc -l`
+[ ${openl2tp_num} -ne 1 ] && cutna "Multiple openl2tp version installed"
 # check openl2tp related kernel config
 zcat /proc/config.gz | grep CONFIG_L2TP=y  || cutna "Configure CONFIG_L2TP=y first"
 zcat /proc/config.gz | grep CONFIG_PPPOL2TP=m  || cutna "Configure CONFIG_PPPOL2TP=m first"
@@ -107,7 +110,9 @@ modprobe  l2tp_ppp
 lsmod | grep l2tp_ppp || cuterr "Failed to load module l2tp_ppp"
 
 # start openl2tpd
-ppp_path=`rpm -ql openl2tp | grep ppp_null.so`
+# get the correct ppp_null.so location in mutilib env
+openl2tp_pak=`rpm -qa | grep  openl2tp | grep -v ptest`
+ppp_path=`rpm -ql ${openl2tp_pak} | grep ppp_null.so`
 /usr/sbin/openl2tpd -d all -D -f -p ${ppp_path} &
 
 # prepare the test env
