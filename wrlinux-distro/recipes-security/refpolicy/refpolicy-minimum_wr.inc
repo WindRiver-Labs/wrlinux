@@ -129,6 +129,7 @@ SRC_URI += "file://wr-policy-getty-console.patch \
             file://wr-policy-allow-nmbd_t-read-all-level-files.patch \
             file://0001-wr-policy-fix-labels-for-resolv.conf.patch \
             file://wr-policy-fix-path-for-policycoreutils-commands.patch \
+            file://wr-policy-add-path-for-mke2fs.-and-tune2fs.patch \
            "
 
 # Backport from upstream
