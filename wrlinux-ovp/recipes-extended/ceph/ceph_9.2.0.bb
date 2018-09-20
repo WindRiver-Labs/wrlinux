@@ -22,6 +22,7 @@ SRC_URI = "\
 	file://ceph.conf \
 	file://ceph-skip-host-distribution-check.patch \
 	file://0001-include-acconfig.h-to-avoid-static_assert-error.patch \
+	file://0002-fix-to-build-with-boost-1.68.patch \
 "
 SRC_URI_append_arm = " file://0001-Explicitly-disable-neon-support-on-arm.patch"
 
