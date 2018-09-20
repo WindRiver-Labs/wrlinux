@@ -122,4 +122,4 @@ LINUX_VERSION_kb-standard-xilinx-sdk2017-04-xilinx-zynqmp ?= "4.12.29"
 KERNEL_CACHE_BRANCH = "yocto-4.12-wr"
 SRCREV_meta = "4ce72782558645afe85fdd5adb6536921071d8ae"
 
-LINUX_VERSION = "4.12.24"
+LINUX_VERSION = "4.12.29"
