@@ -46,7 +46,6 @@ FLUXDATA_LABEL=
 FACTORY_BACKUP_LABEL="_b"
 #This is assumed backup root label, and it might be changed later
 BACKUP_ROOT_LABEL=
-#BACKUP_ROOT_LABEL="${ROOT_LABEL}${FACTORY_BACKUP_LABEL}"
 
 TMP_DIR="/tmp"
 TMP_MNT="/tmpmnt"
@@ -74,7 +73,7 @@ TPM_EVICT_OPT="-e"
 #FLUXDATA_DEVNAME=""
 
 ROOT_RESTORE_DONE_INDICATIOR="/home/.luks.init.done"
-ROOT_BACKUP_DIR="${tmp}"
+ROOT_BACKUP_DIR="$TMP_DIR"
 ROOT_BACKUP_FILE="rootfs.tgz"
 
 MOUNT_FLAG="rw,noatime,iversion"
@@ -194,7 +193,7 @@ detect_tpm_chip() {
 
     [ -n "$ret_absent" ] && eval $ret_absent=$tpm_absent
 
-    print_info "TPM device /dev/$_name detected. ywei"
+    print_info "TPM device /dev/$_name detected."
 
     return 0
 }
@@ -205,22 +204,19 @@ get_dev_from_label() {
 }
 
 luks_detect() {
-
     # return if no partition labeled as "luksxxx"
     [ -z "${LUKS_LABEL_TO_BE_CREATED}" ] && return 0
 
-    print_verbose "LUKS_LABEL_TO_BE_CREATED is : ${LUKS_LABEL_TO_BE_CREATED}"
-
-    /bin/sh
     # retrieve root_backup label
-    echo ${LUKS_LABEL_TO_BE_CREATED} |grep ${BACKUP_ROOT_LABEL}
-    [ $? = 0 ] || {
-        # case for root_label="otaroot_b", we should set backup_root_label="otaroot"
-        BACKUP_ROOT_LABEL=${BACKUP_ROOT_LABEL%"${FACTORY_BACKUP_LABEL}"}
-    }
+    if [ -n "${BACKUP_ROOT_LABEL}" ]; then
+        echo ${LUKS_LABEL_TO_BE_CREATED} |grep ${BACKUP_ROOT_LABEL}
+        [ $? = 0 ] || {
+            # case for root_label="otaroot_b", we should set backup_root_label="otaroot"
+            BACKUP_ROOT_LABEL=${BACKUP_ROOT_LABEL%"${FACTORY_BACKUP_LABEL}"}
+        }
+    fi
 
     for luks_label in ${LUKS_LABEL_TO_BE_CREATED}; do
-	print_info "$luks_label: ${LUKS_PREFIX_LABEL}${ROOT_LABEL}"
 	if [ "$luks_label" = "${LUKS_PREFIX_LABEL}${ROOT_LABEL}" ]; then
 	    ROOT_IS_LUKS=1
 	    continue
@@ -232,9 +228,7 @@ luks_detect() {
 	fi
 
 	if [ "$luks_label" = "${LUKS_PREFIX_LABEL}${FLUXDATA_LABEL}" -a  -n "${FLUXDATA_LABEL}" ]; then
-	    #FLUXDATA_DEVNAME=$(get_dev_from_label ${LUKS_PREFIX_LABEL}${FLUXDATA_LABEL})
 	    FLUXDATA_IS_LUKS=1
-	    #print_verbose "${LUKS_PREFIX_LABEL}${FLUXDATA_LABEL}, fluxdata_devname: ${FLUXDATA_DEVNAME} is found."
 	    continue
 	fi
     done
@@ -243,12 +237,10 @@ luks_detect() {
 # create LUKS
 _luks_create() {
     luks_label_name=$1
-    #print_verbose "luks_label_name: ${luks_label_name}"
     label_name=${luks_label_name##*"${LUKS_PREFIX_LABEL}"}
     luks_rawdev_path=$(get_dev_from_label $luks_label_name)
     fs_type=`blkid -t LABEL="$luks_label_name" -s TYPE | awk -F: '{ print $2 }' | cut -f 2 -d "\""`
 
-    #print_verbose "luks_label_name: ${luks_label_name}, label_name: ${label_name}, luks_rawdev_path: ${luks_rawdev_path}, fs_type: ${fs_type}"
     existing_luks=$(blkid -s TYPE | grep crypto_LUKS | wc -l)
     if [ $existing_luks -ne 0 ]; then
 	# do not evict previous keys if there is LUKS partition existing on the board
@@ -258,7 +250,7 @@ _luks_create() {
     # generate random seeds
     [ -e ${TMP_DIR}/rngd.pid ] || rngd -r /dev/urandom --pid ${TMP_DIR}/rngd.pid
 
-    cmd="luks-setup.sh -f $TPM_EVICT_OPT -d ${luks_rawdev_path} -n ${LUKS_PREFIX_LABEL}_${luks_rawdev_path##*/}"
+    cmd="luks-setup.sh -f $TPM_EVICT_OPT -d ${luks_rawdev_path} -n ${LUKS_PREFIX_LABEL}${luks_rawdev_path##*/}"
     cmd="echo Y | $cmd"
     eval "$cmd"
 
@@ -270,7 +262,7 @@ _luks_create() {
 	exit 0
     }
 
-    mkfs.${fs_type} /dev/mapper/${LUKS_PREFIX_LABEL}_${luks_rawdev_path##*/} -L ${label_name}
+    mkfs.${fs_type} /dev/mapper/${LUKS_PREFIX_LABEL}${luks_rawdev_path##*/} -L ${label_name}
     udevadm trigger && partprobe && sync
 
     return 0
@@ -280,12 +272,8 @@ _luks_create() {
 # create LUKS for fluxdata
 luks_create_fluxdata() {
     if [ $FLUXDATA_IS_LUKS -eq 1 ]; then
-
-	print_verbose "Creating LUKS for LABEL=${FLUXDATA_LABEL}"
 	_luks_create ${LUKS_PREFIX_LABEL}${FLUXDATA_LABEL}
-
 	[ $? -eq 0 ] || return 1
-
     fi
 
     return 0 
@@ -293,19 +281,14 @@ luks_create_fluxdata() {
 
 # backup non-encrypted root partition on fluxdata partition
 _luks_backup_root() {
-    print_verbose "First, mapping non-encrypted root partition $ROOT_DEVNAME on ${TMP_MNT_ROOT}..."
     # map non-encrypted root
-    /bin/sh
     _luks_mount_label ${LUKS_PREFIX_LABEL}${ROOT_LABEL} $TMP_MNT_ROOT || return 1
 
-    #print_verbose "Then, mapping fluxdata partition LABEL=${FLUXDATA_LABEL} on ${TMP_MNT_FLUXDATA}..."
-    # map fluxdata()
     [ -n "${FLUXDATA_LABEL}" ] && {
         _luks_mount_label ${FLUXDATA_LABEL} $TMP_MNT_FLUXDATA || return 1
     }
 
-    print_verbose "Backing up rootfs..."
-    /bin/sh
+    print_verbose "Backing up root partition before creating LUKS"
     # backup rootfs on fluxdata partition
     cd ${TMP_MNT_ROOT}
     tar  cf - ./ -P --xattrs --xattrs-include=* | pv -s $(($(du -sk ./ | awk '{print $1}') * 1024)) | gzip > ${ROOT_BACKUP_DIR}/${ROOT_BACKUP_FILE}
@@ -315,13 +298,14 @@ _luks_backup_root() {
 }
 
 _luks_restore_root() {
+
     _luks_mount_label ${ROOT_LABEL} $TMP_MNT_ROOT || return 1
 
-    if [ -n ${BACKUP_ROOT_LABEL} ]; then
+    if [ -n "${BACKUP_ROOT_LABEL}" ]; then
         _luks_mount_label ${BACKUP_ROOT_LABEL} $TMP_MNT_BACKUP_ROOT || return 1
     fi
 
-    if [ -n ${BACKUP_ROOT_LABEL} ]; then
+    if [ -n "${FLUXDATA_LABEL}" ]; then
         _luks_mount_label ${FLUXDATA_LABEL} $TMP_MNT_FLUXDATA || return 1
     fi
 
@@ -331,7 +315,7 @@ _luks_restore_root() {
     pv ${ROOT_BACKUP_DIR}/${ROOT_BACKUP_FILE} | tar xpzf  - --warning=no-timestamp --numeric-owner --xattrs --xattrs-include=* -C ./
     cd /  && touch $TMP_MNT_ROOT/${ROOT_RESTORE_DONE_INDICATIOR} && sync
     
-    if [ -n ${BACKUP_ROOT_LABEL} ]; then
+    if [ -n "${BACKUP_ROOT_LABEL}" ]; then
         print_verbose "Restoring stand-by root partition on LUKS"
         cd ${TMP_MNT_BACKUP_ROOT}
         # restore rootfs
@@ -379,17 +363,14 @@ luks_check_restore_root() {
 
 # LABEL=FLUXDATA is assumed to be ready at this moment
 luks_create_root() {
-    /bin/sh
     [ $ROOT_IS_LUKS -eq 0 ] && return 0
-
     
     _luks_backup_root || return 1
 
     print_verbose "Creating LUKS for root partition..."
-    /bin/sh
     _luks_create ${LUKS_PREFIX_LABEL}${ROOT_LABEL} || return 1
 
-    if [ -n ${BACKUP_ROOT_LABEL} ]; then
+    if [ -n "${BACKUP_ROOT_LABEL}" ]; then
         print_verbose "Creating LUKS for backup root partition..."
         _luks_create ${LUKS_PREFIX_LABEL}${BACKUP_ROOT_LABEL} || return 1
     fi
@@ -419,7 +400,6 @@ luks_create_others() {
 
 luks_create() {
 
-    print_info "creating luks... FLUXDATA_IS_LUKS is: $FLUXDATA_IS_LUKS, ROOT_IS_LUKS: $ROOT_IS_LUKS"
     [ $FLUXDATA_IS_LUKS -eq 1 ] && luks_create_fluxdata 
     [ $ROOT_IS_LUKS -eq 1 ] && luks_create_root
 
@@ -516,8 +496,10 @@ luks_map_all () {
 
     luks_rawdevs="$(blkid -s TYPE | grep crypto_LUKS | awk -F: '{ print $1 }')"
 
+    [ -z "${luks_rawdevs}" ] && return 0
+
     for luks_rawdev in ${luks_rawdevs}; do
-	ls /dev/mapper/* |grep -q /dev/mapper/${LUKS_PREFIX_LABEL}_${luks_rawdev##*/} || {
+	ls /dev/mapper/* |grep -q /dev/mapper/${LUKS_PREFIX_LABEL}${luks_rawdev##*/} || {
 	    _luks_map ${luks_rawdev}
 	    [ $? -eq 0 ] || return 1
 	}
@@ -559,6 +541,7 @@ luks_relabel_all() {
 
 luks_restore_fluxdata() {
 
+    [ -z "${FLUXDATA_LABEL}" ] && return 0
     _luks_mount_label ${ROOT_LABEL} ${TMP_MNT_ROOT} || return 1 
 
     _luks_mount_label ${FLUXDATA_LABEL} ${TMP_MNT_FLUXDATA} || return 1 
@@ -571,18 +554,15 @@ luks_restore_fluxdata() {
 }
 
 scan_part() {
-    echo "ROOT_LABEL: ${ROOT_LABEL}"
 
     ROOT_LABEL=${ROOT_LABEL##*LABEL=}
-    echo "ROOT_LABEL: ${ROOT_LABEL}"
-    /bin/sh
     [ -z "${ROOT_LABEL}" ] && {
         echo "No root partition specified, aborting..."
 	exit 1
     } || {
         TMP_MNT_ROOT="$TMP_MNT/${ROOT_LABEL}"
-        BACKUP_ROOT_LABEL="${ROOT_LABEL}${FACTORY_BACKUP_LABEL}"
-        TMP_MNT_BACKUP_ROOT="$TMP_MNT/${BACKUP_ROOT_LABEL}"
+        #BACKUP_ROOT_LABEL="${ROOT_LABEL}${FACTORY_BACKUP_LABEL}"
+        #TMP_MNT_BACKUP_ROOT="$TMP_MNT/${BACKUP_ROOT_LABEL}"
     }
 
     [ ! -z "$FLUXDATA_LABEL" ] && {
@@ -594,10 +574,7 @@ scan_part() {
 
 }
 
-echo "ROOT_LABEL: ${ROOT_LABEL} fdafdsafsadfsd"
-/bin/sh
 
-echo "Now we are going to scan part"
 scan_part
 
 detect_tpm_chip
@@ -607,7 +584,6 @@ if [ $? -eq 0 ]; then
     [ -z "${LUKS_LABEL_TO_BE_CREATED}" ] || luks_create
 
     luks_map_all && {
-	print_verbose "LUKS mapping done"
 	umount_dir ${TMP_MNT_ROOT}
 	umount_dir ${TMP_MNT_FLUXDATA}
 	sync && rm -rf $TMP_MNT

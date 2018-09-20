@@ -36,16 +36,13 @@ try_to_mount_rootfs() {
     mount -o "$mount_flags" "$ROOTFS_DEV" "$ROOTFS_MOUNT" \
         2>/dev/null && return 0
 
-    [ -x /init.luks ] &&
-        /init.luks "$ROOTFS_MOUNT" "$ROOTFS_DEV" \
-            "$mount_flags" && return 0
-
     return 1
 }
 
-echo "Waiting for root device to be ready ..."
+echo "Waiting for rootfs to be ready ..."
 
 while [ 1 ]; do
+    [ -x /init.luks ] && /init.luks
     try_to_mount_rootfs && break
     sleep 0.1
 done
