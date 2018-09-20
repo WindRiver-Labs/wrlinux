@@ -21,6 +21,7 @@ SRC_URI = "\
 	http://download.ceph.com/tarballs/ceph-${PV}.tar.gz \
 	file://ceph.conf \
 	file://ceph-skip-host-distribution-check.patch \
+	file://0001-include-acconfig.h-to-avoid-static_assert-error.patch \
 "
 SRC_URI_append_arm = " file://0001-Explicitly-disable-neon-support-on-arm.patch"
 
@@ -73,6 +74,9 @@ do_configure () {
 
 do_compile_prepend() {
     cd ./src/ceph-detect-init/
+    echo "" >> ${S}/src/acconfig.h
+    echo "/* disable static_assert as a workaround for gcc8 */" >> ${S}/src/acconfig.h
+    echo "#define static_assert(...)" >> ${S}/src/acconfig.h
 }
 
 

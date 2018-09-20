@@ -1,0 +1,31 @@
+From 93a34ac32e5136a0815e284b677dd16e0239e4aa Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Thu, 20 Sep 2018 13:12:53 +0800
+Subject: [PATCH 1/2] include acconfig.h to avoid static_assert error
+
+Upstream will not compile such an old version with gcc8, so mark this
+patch as 'WRLinux Specific'.
+
+Upstream-Status: Inappropriate [WRLinux Specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/osd/PGBackend.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/osd/PGBackend.cc b/src/osd/PGBackend.cc
+index f42e6be..924966e 100644
+--- a/src/osd/PGBackend.cc
++++ b/src/osd/PGBackend.cc
+@@ -15,7 +15,7 @@
+  *
+  */
+ 
+-
++#include "acconfig.h"
+ #include "common/errno.h"
+ #include "ReplicatedBackend.h"
+ #include "ECBackend.h"
+-- 
+2.7.4
+
