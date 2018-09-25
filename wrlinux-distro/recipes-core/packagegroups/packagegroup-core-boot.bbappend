@@ -15,3 +15,6 @@ RDEPENDS_${PN}_append_osv-wrlinux = " wr-init"
 # packages, e.g. busybox or bash+busybox-oe-min.
 # The following only works with the RPM backend...
 FILERDEPENDS_${PN}_osv-wrlinux = "/bin/sh /usr/bin/run-parts /sbin/start-stop-daemon /sbin/ifup"
+
+# override the default in package-core-boot.bb
+EFI_PROVIDER ??= "${@bb.utils.contains('INCOMPATIBLE_LICENSE', 'GPLv3', '', 'grub-efi', d)}"
