@@ -19,6 +19,7 @@ SRC_URI = "http://ftp.twaren.net/BSD/OpenBSD/distfiles/monit-${PV}.tar.gz \
            file://monit.service \
            file://0001-disable-SSLv2.patch \
            file://0001-fix-compile-failure-since-openssl-upgraded-to-1.1.1.patch \
+           file://0001-support-musl.patch \
           "
 
 SRC_URI[md5sum] = "bcbaab776a54d1e34e3a057c925de9ca"
