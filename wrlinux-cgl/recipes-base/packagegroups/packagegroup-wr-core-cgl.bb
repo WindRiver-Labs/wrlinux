@@ -42,7 +42,6 @@ RDEPENDS_${PN} = "\
 	drbd-utils \
 	ecryptfs-utils \
 	edac-utils \
-	eventlog \
 	freediameter \
 	ippool \
 	iscsi-initiator-utils \
