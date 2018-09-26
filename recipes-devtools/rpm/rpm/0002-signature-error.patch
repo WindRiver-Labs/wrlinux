@@ -11,19 +11,31 @@ Modify to apply to current version of package.c.
 
 Signed-off-by: Joe Slater <joe.slater@windriver.com>
 
+Modify to apply to current version of package.c.
+Use sinfo->rc instead of the undeclared rc.
 
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ lib/package.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/lib/package.c b/lib/package.c
+index 081123d..73bdf53 100644
 --- a/lib/package.c
 +++ b/lib/package.c
-@@ -275,7 +275,12 @@ static rpmRC handlePkgVS(struct rpmsinfo
+@@ -278,7 +278,12 @@ static int handlePkgVS(struct rpmsinfo_s *sinfo, void *cbdata)
      case RPMRC_NOKEY:		/* Public key is unavailable. */
  	/* XXX Print NOKEY/NOTTRUSTED warning only once. */
  	if (stashKeyid(sinfo->keyid) == 0)
 +#ifdef MANDATORY_KNOWN_SIG
 +	    lvl = RPMLOG_ERR;
-+	    rc = RPMRC_FAIL;
++	    sinfo->rc = RPMRC_FAIL;
 +#else
  	    lvl = RPMLOG_WARNING;
 +#endif
  	break;
      case RPMRC_NOTFOUND:	/* Signature/digest not present. */
  	lvl = RPMLOG_WARNING;
+-- 
+2.7.4
+
