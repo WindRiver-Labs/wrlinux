@@ -29,7 +29,6 @@ PNWHITELIST_networking-layer += " \
 PNWHITELIST_openembedded-layer += " \
     agent-proxy-native \
     bonnie++ \
-    eventlog \
     fbset \
     fbset-modes \
     iotop \
