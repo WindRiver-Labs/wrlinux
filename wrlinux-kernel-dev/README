@@ -25,7 +25,7 @@ Building with the wrlinux-kernel-dev layer
 1. Add this layer and a corresponding BSP layer to your build's
    conf/bblayers.conf file
 
-2. Add ENABLE_KERNEL_DEV = '1' to your conf/bblayers.conf
+2. Add ENABLE_KERNEL_DEV = '1' to your conf/local.conf
    
 3. Add the desired feature templates to your conf/local.conf file
    WRTEMPLATE variable.

@@ -1,8 +1,8 @@
 Notes and Limitations:
 ======================
 
-When the linux-libc-headers-windriver package is enabled, it adds the ability
-to use the linux-windriver kernel as the source for libc-headers. When
+When the linux-libc-headers-custom package is enabled, it adds the ability
+to use the customized kernel as the source for libc-headers. When
 enabling this feature, the user is knowingly clobbering the supported and
 tested toolchain headers and does so at their own risk.
     
@@ -23,6 +23,15 @@ changes.
 The exported headers are used for both sysroot and SDK population and are
 generated from the kernel's "headers_install" target.
 
+Usage:
+======
 Add the lines to local.conf to enable it:
-PREFERRED_PROVIDER_linux-libc-headers = "linux-libc-headers-windriver"
-PREFERRED_PROVIDER_nativesdk-linux-libc-headers = "nativesdk-linux-libc-headers-windriver"
+PREFERRED_PROVIDER_linux-libc-headers = "linux-libc-headers-custom"
+PREFERRED_PROVIDER_nativesdk-linux-libc-headers = "nativesdk-linux-libc-headers-custom"
+ENABLE_KERNEL_DEV = '1'
+
+Add the full path of the layer to bblayers.conf:
+wrlinux/wrlinux-kernel-dev
+
+Header files will finally be packaged into linux-libc-headers-custom-dev. To populate it into rootfs:
+IMAGE_INSTALL_append = " linux-libc-headers-custom-dev"
