@@ -78,3 +78,6 @@ COMPATIBLE_MACHINE = "(^$)"
 
 # pick up feature handlers
 require linux-windriver-handlers.inc
+
+# Allow production of customer userspace headers
+require wkd-linux-yocto-headers.inc
