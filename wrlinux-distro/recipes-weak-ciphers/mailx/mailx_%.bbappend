@@ -4,4 +4,4 @@
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
-SRC_URI_append = " file://mailx-openssl-no-des.patch"
+SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'openssl-no-weak-ciphers', 'file://mailx-openssl-no-des.patch', '', d)}"

@@ -4,6 +4,6 @@
 
 FILESEXTRAPATHS_prepend_osv-wrlinux := "${THISDIR}/${BPN}:"
 
-SRC_URI_append_osv-wrlinux = " file://openssl-no-des.patch"
+SRC_URI_append_osv-wrlinux = " ${@bb.utils.contains('DISTRO_FEATURES', 'openssl-no-weak-ciphers', 'file://openssl-no-des.patch', '', d)}"
 
 PACKAGECONFIG_remove_osv-wrlinux = "${@bb.utils.contains('DISTRO_FEATURES', 'openssl-no-weak-ciphers', 'des', '', d)}"

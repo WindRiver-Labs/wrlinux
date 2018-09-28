@@ -4,4 +4,4 @@
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
-SRC_URI_append = " file://pppd-disable-MS-CHAP-authentication-support.patch"
+SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'openssl-no-weak-ciphers', 'file://pppd-disable-MS-CHAP-authentication-support.patch', '', d)}"
