@@ -1,0 +1,85 @@
+From 481538a1dfd83302400a522862412100fa1b8b30 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Fri, 28 Sep 2018 09:57:37 +0800
+Subject: [PATCH] fix compileation failure if openssl disables ecXXX weak
+ ciphers
+
+Upstream-Status: Pending
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ configure.ac                         | 7 +++----
+ openbsd-compat/libressl-api-compat.c | 4 +++-
+ openbsd-compat/openssl-compat.h      | 2 ++
+ 3 files changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 664c78b..9e59a2f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3070,10 +3070,6 @@ if test "x$openssl" = "xyes" ; then
+ 	COMMENT_OUT_ECC="#no ecc#"
+ 	TEST_SSH_ECC=no
+ 
+-	if test x$enable_nistp256 = x1 || test x$enable_nistp384 = x1 || \
+-	    test x$enable_nistp521 = x1; then
+-		AC_DEFINE(OPENSSL_HAS_ECC, [1], [OpenSSL has ECC])
+-	fi
+ 	if test x$enable_nistp256 = x1; then
+ 		AC_DEFINE([OPENSSL_HAS_NISTP256], [1],
+ 		    [libcrypto has NID_X9_62_prime256v1])
+@@ -3106,6 +3102,9 @@ if test "x$openssl" = "xyes" ; then
+ 			ecdsa-sha2-nistp521-cert-v01@openssh.com"
+ 	fi
+ 
++	TEST_SSH_ECC=no
++	COMMENT_OUT_ECC="#no ecc#"
++
+ 	AC_SUBST([TEST_SSH_ECC])
+ 	AC_SUBST([COMMENT_OUT_ECC])
+ else
+diff --git a/openbsd-compat/libressl-api-compat.c b/openbsd-compat/libressl-api-compat.c
+index de3e64a..eeda3c4 100644
+--- a/openbsd-compat/libressl-api-compat.c
++++ b/openbsd-compat/libressl-api-compat.c
+@@ -417,7 +417,8 @@ DSA_SIG_set0(DSA_SIG *sig, BIGNUM *r, BIGNUM *s)
+ }
+ #endif /* HAVE_DSA_SIG_SET0 */
+ 
+-#ifndef HAVE_ECDSA_SIG_GET0
++#if defined(OPENSSL_HAS_ECC)
++#ifndef HAVE_ECDSA_SIG_GET0 
+ void
+ ECDSA_SIG_get0(const ECDSA_SIG *sig, const BIGNUM **pr, const BIGNUM **ps)
+ {
+@@ -442,6 +443,7 @@ ECDSA_SIG_set0(ECDSA_SIG *sig, BIGNUM *r, BIGNUM *s)
+ 	return 1;
+ }
+ #endif /* HAVE_ECDSA_SIG_SET0 */
++#endif
+ 
+ #ifndef HAVE_DH_GET0_PQG
+ void
+diff --git a/openbsd-compat/openssl-compat.h b/openbsd-compat/openssl-compat.h
+index 9e0264c..27836c9 100644
+--- a/openbsd-compat/openssl-compat.h
++++ b/openbsd-compat/openssl-compat.h
+@@ -161,6 +161,7 @@ void DSA_SIG_get0(const DSA_SIG *sig, const BIGNUM **pr, const BIGNUM **ps);
+ int DSA_SIG_set0(DSA_SIG *sig, BIGNUM *r, BIGNUM *s);
+ #endif /* DSA_SIG_SET0 */
+ 
++#if defined(OPENSSL_HAS_ECC)
+ #ifndef HAVE_ECDSA_SIG_GET0
+ void ECDSA_SIG_get0(const ECDSA_SIG *sig, const BIGNUM **pr, const BIGNUM **ps);
+ #endif /* HAVE_ECDSA_SIG_GET0 */
+@@ -168,6 +169,7 @@ void ECDSA_SIG_get0(const ECDSA_SIG *sig, const BIGNUM **pr, const BIGNUM **ps);
+ #ifndef HAVE_ECDSA_SIG_SET0
+ int ECDSA_SIG_set0(ECDSA_SIG *sig, BIGNUM *r, BIGNUM *s);
+ #endif /* HAVE_ECDSA_SIG_SET0 */
++#endif
+ 
+ #ifndef HAVE_DH_GET0_PQG
+ void DH_get0_pqg(const DH *dh, const BIGNUM **p, const BIGNUM **q,
+-- 
+2.7.4
+
