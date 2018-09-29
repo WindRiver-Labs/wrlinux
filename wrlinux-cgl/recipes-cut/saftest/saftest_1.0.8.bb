@@ -26,6 +26,7 @@ SRC_URI = "\
 	file://saftest-clear-more-random-stack-variables.patch \
 	file://saftest-delay-to-ensure-events-added.patch \
 	file://makefile-add-ldflags.patch \
+	file://0001-fix-build-failures.patch \
 	"
 
 SRC_URI[md5sum] = "af9da2a206739adfe0536aefab776289"
