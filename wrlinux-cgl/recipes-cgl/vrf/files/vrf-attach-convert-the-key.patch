@@ -1,0 +1,62 @@
+From 2e4a55303f66b8299cb3228a0b65c4e2c51f3c70 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <Mingli.Yu@windriver.com>
+Date: Fri, 28 Sep 2018 15:37:58 +0800
+Subject: [PATCH] vrf-attach: convert the key
+
+After lxc upgrade to 3.0.0, need to
+use lxc-update-config to convert the
+key to fix the gap
+
+Upstream-Status: Inappropriate [no upstream]
+
+Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
+---
+ src/vrf-attach    |  2 ++
+ src/vrf-helper.in | 14 ++++++++++++++
+ 2 files changed, 16 insertions(+)
+
+diff --git a/src/vrf-attach b/src/vrf-attach
+index 603dbfd..b63f2fd 100755
+--- a/src/vrf-attach
++++ b/src/vrf-attach
+@@ -132,6 +132,7 @@ interface_attach () {
+           vrf_get_pid $VRF_NAME
+   
+           #0 prepare for new interfaces
++          vrf_file_convert $TMP_VRF_FILE
+           startup_start_action $TMP_VRF_FILE
+   
+           #1 get attach1 actions
+@@ -165,6 +166,7 @@ for debug purpose.\n"
+     if [ $NUM_IFS -ne 0 -o $UPDATE_LXC_VRF_FILE -eq 1 ]; then
+         cat $TMP_VRF_FILE >> $VRF_FILE
+     fi
++    vrf_file_convert $VRF_FILE
+     if [ -e $TMP_VRF_FILE ]; then
+         rm $TMP_VRF_FILE
+     fi
+diff --git a/src/vrf-helper.in b/src/vrf-helper.in
+index 1b44bb1..4acf00e 100755
+--- a/src/vrf-helper.in
++++ b/src/vrf-helper.in
+@@ -1705,3 +1705,17 @@ startup_stop_action () {
+     return 0
+ }
+ 
++vrf_file_convert() {
++    local config_file=$1
++    # need to change the configuration key after lxc upgrade to 3.0.0
++    which lxc-update-config > /dev/null 2>&1
++    if [ $? -eq 0 ]; then
++	lxc-update-config -c $config_file
++	if [ $? -ne 0 ]; then
++	    echo "Failed to convert $config_file"
++	    exit 1
++	fi
++	# ${VRF_FILE}.backup is the previous config copy which genenated by lxc-update-config
++	[ -f ${config_file}.backup ] && rm -rf ${config_file}.backup
++    fi
++}
+-- 
+2.7.4
+

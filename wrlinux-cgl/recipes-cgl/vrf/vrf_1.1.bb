@@ -17,6 +17,9 @@ SRC_URI    = "file://vrf-1.1.tgz \
               file://vrf-create-add-the-mount-entry-for-tmp.patch \
               file://vrf-start-specify-the-delimiter-to-be-n-for-xargs.patch \
               file://vrf-stop-do-the-startup_stop_action-with-runtime-con.patch \
+              file://vrf-attach-convert-the-key.patch \
+              file://vrf-helper.in-down-device-before-change-its-name.patch \
+              file://vrf-attach-make-interface-attach-when-vrf-stops.patch \
 "
 
 

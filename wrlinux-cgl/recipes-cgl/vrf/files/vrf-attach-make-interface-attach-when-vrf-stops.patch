@@ -1,0 +1,62 @@
+From d2fa702a18d85ebdc80cfc0aace38060f2f2fd22 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <Mingli.Yu@windriver.com>
+Date: Sat, 29 Sep 2018 17:06:53 +0800
+Subject: [PATCH] vrf-attach: make interface attach when vrf stops
+
+Issue: LIN1018-2507
+
+When vrf is in running status, it's error-prone
+and comes some error message as below:
+Cannot find device "eth0_1.0"
+failed to set interface eth0_1.0 to new name veth4
+Cannot find device "veth4"
+failed to set ipaddr 10.10.12.1/24 on interface veth4
+Cannot find device "veth4"
+failed to set interface veth4 up
+
+Add the check for vrf status and make it
+attach only when vrf in stopped status
+
+Upstream-Status: Inappropriate [no upstream]
+
+Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
+---
+ src/vrf-attach    | 9 +++++++--
+ src/vrf-helper.in | 1 +
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/src/vrf-attach b/src/vrf-attach
+index b63f2fd..9d55ea3 100755
+--- a/src/vrf-attach
++++ b/src/vrf-attach
+@@ -191,8 +191,13 @@ VRF_STATE=
+ vrf_get_state $VRF_NAME
+ #4.interface config if needed
+ if [ $NETCONFIG -ne 0 ]; then
+-    interface_config
+-    interface_attach
++    if [ "$VRF_STATE" != "STOPPED" ]; then
++        echo "Please stop $VRF_NAME first"
++        exit $VRF_FAIL_ATTACH
++    else
++        interface_config
++        interface_attach
++    fi
+ fi
+ 
+ #5.attach command to the VRF
+diff --git a/src/vrf-helper.in b/src/vrf-helper.in
+index 6cb0d8d..0a4a677 100755
+--- a/src/vrf-helper.in
++++ b/src/vrf-helper.in
+@@ -418,6 +418,7 @@ initialize_env () {
+ 
+     VRF_FAIL_START=100
+     VRF_FAIL_CREATE=100
++    VRF_FAIL_ATTACH=101
+ 
+ #config file pattern
+     INF_CONFIG_START_PATTERN_PHY="# PHYSICAL "
+-- 
+2.7.4
+

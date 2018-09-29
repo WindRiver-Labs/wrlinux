@@ -1,0 +1,51 @@
+From 5ba4feef4bb504926db6c9f7c71f689927f184ba Mon Sep 17 00:00:00 2001
+From: Mingli Yu <Mingli.Yu@windriver.com>
+Date: Sat, 29 Sep 2018 16:01:06 +0800
+Subject: [PATCH] vrf-helper.in: down device before change its name
+
+Sometimes there comes error when change
+device name
+ # ip link set dev3 name eth1
+ RTNETLINK answers: Device or resource busy
+
+It can result in vrf-start fails and
+update the script to down the device first
+and then change its name
+
+Print the error to screen to let it's
+easy to debug
+
+Upstream-Status: Inappropriate [no upstream]
+
+Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
+---
+ src/vrf-helper.in | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/src/vrf-helper.in b/src/vrf-helper.in
+index 4acf00e..6cb0d8d 100755
+--- a/src/vrf-helper.in
++++ b/src/vrf-helper.in
+@@ -1459,11 +1459,16 @@ link_type_choose () {
+                 echo "# STOP1: ifindex=$orig_index" >> $TMP_VRF_FILE
+                 echo "# STOP1: ip link set \`ip link | grep mtu | \
+ cut -d'<' -f1 | sed 's/:[[:space:]]*$//' | grep -w "$ifindex: " | \
+-cut -d' ' -f2-\` name dev$ifindex \
+-2> /dev/null" >> $TMP_VRF_FILE
++cut -d' ' -f2-\` down" >> $TMP_VRF_FILE
++                echo "# STOP1: ip link set \`ip link | grep mtu | \
++cut -d'<' -f1 | sed 's/:[[:space:]]*$//' | grep -w "$ifindex: " | \
++cut -d' ' -f2-\` name dev$ifindex" >> $TMP_VRF_FILE
++                echo "# STOP2: ip link set \`ip link | grep mtu | \
++cut -d'<' -f1 | sed 's/:[[:space:]]*$//' | grep -w "$ifindex: " | \
++cut -d' ' -f2-\` down" >> $TMP_VRF_FILE
+                 echo "# STOP2: ip link set \`ip link | grep mtu | \
+ cut -d'<' -f1 | sed 's/:[[:space:]]*$//' | grep -w "$ifindex: " | \
+-cut -d' ' -f2-\` name $host_link 2> /dev/null" >> $TMP_VRF_FILE
++cut -d' ' -f2-\` name $host_link" >> $TMP_VRF_FILE
+                 ;;
+ 
+ 	    "VLAN")
+-- 
+2.7.4
+
