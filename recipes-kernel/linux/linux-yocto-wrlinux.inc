@@ -23,17 +23,17 @@ python linux_yocto_rewrite_uri() {
 
     # Replace the kernel URI.
     if os.path.exists("%s/git/linux-yocto.git" % (d.expand(layer_path))):
-        src_uri = src_uri.replace("git://git.yoctoproject.org/linux-yocto.git", "git://%s/git/linux-yocto.git;protocol=file" % (layer_path))
+        src_uri = src_uri.replace("git://git.yoctoproject.org/linux-yocto.git", "git://${LAYER_PATH_wrlinux}/git/linux-yocto.git;protocol=file")
 
     if os.path.exists("%s/git/linux-yocto-dev.git" % (d.expand(layer_path))):
-        src_uri = src_uri.replace("git://git.yoctoproject.org/linux-yocto-dev.git", "git://%s/git/linux-yocto-dev.git;protocol=file" % (layer_path))
+        src_uri = src_uri.replace("git://git.yoctoproject.org/linux-yocto-dev.git", "git://${LAYER_PATH_wrlinux}/git/linux-yocto-dev.git;protocol=file")
 
     if os.path.exists("%s/git/linux-yocto-%s.git" % (d.expand(layer_path), pv)):
-        src_uri = src_uri.replace("git://git.yoctoproject.org/linux-yocto-%s.git" % (pv), "git://%s/git/linux-yocto-%s.git;protocol=file" % (layer_path, pv))
+        src_uri = src_uri.replace("git://git.yoctoproject.org/linux-yocto-%s.git" % (pv), "git://${LAYER_PATH_wrlinux}/git/linux-yocto-%s.git;protocol=file" % pv)
 
     # Replace the kernel-cache URI.
     if os.path.exists("%s/git/yocto-kernel-cache.git" % d.expand(layer_path)):
-        src_uri = src_uri.replace("git://git.yoctoproject.org/yocto-kernel-cache", "git://%s/git/yocto-kernel-cache.git;protocol=file" % layer_path)
+        src_uri = src_uri.replace("git://git.yoctoproject.org/yocto-kernel-cache", "git://${LAYER_PATH_wrlinux}/git/yocto-kernel-cache.git;protocol=file")
 
         # The kernel-cache branch is hard coded by oe-core.  We need to make this adjutable.
         if d.getVar("KERNEL_CACHE_BRANCH_%s" % pv):
