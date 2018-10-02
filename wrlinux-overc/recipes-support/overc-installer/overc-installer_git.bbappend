@@ -20,7 +20,7 @@ python overc_installer_rewrite_uri() {
 
     # Replace the kernel URI.
     if os.path.exists("%s/git/overc-installer.git" % (d.expand(layer_path))):
-        src_uri = src_uri.replace("git://github.com/OverC/overc-installer.git;branch=master-oci", "git://%s/git/overc-installer.git;branch=master-oci;protocol=file" % (layer_path))
+        src_uri = src_uri.replace("git://github.com/OverC/overc-installer.git;branch=master-oci", "git://${LAYER_PATH_wrlinux-overc}/git/overc-installer.git;branch=master-oci;protocol=file")
 
     d.setVar("SRC_URI", src_uri)
 }
