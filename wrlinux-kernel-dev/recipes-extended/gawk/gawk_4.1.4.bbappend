@@ -12,5 +12,5 @@ FILES_${PN} += "/bin/awk"
 
 do_install_append() {
     install -d ${D}/bin
-    ln -sf ${D}/usr/bin/awk ${D}/bin/awk
+    ln -sf /usr/bin/awk ${D}/bin/awk
 }
