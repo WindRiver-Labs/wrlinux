@@ -47,7 +47,6 @@ RDEPENDS_${PN}-utils = "\
 
 RDEPENDS_${PN}-trust = "\
 	gnupg \
-	${@bb.utils.contains('BBFILE_COLLECTIONS', 'security', 'keynote', '', d)} \
         "
 
 RDEPENDS_${PN}-access = "\

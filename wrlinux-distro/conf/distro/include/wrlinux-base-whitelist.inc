@@ -92,7 +92,6 @@ PNWHITELIST_xfce-layer += ""
 
 PNWHITELIST_security += " \
     ecryptfs-utils \
-    keynote \
     libgssglue \
     libmhash \
     samhain-client \
