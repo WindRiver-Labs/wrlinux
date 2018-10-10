@@ -17,7 +17,7 @@ ALLOW_EMPTY_${PN} = "1"
 
 inherit distro_features_check
 # rdepends on packagegroup-core-lsb-runtime-add which rdepends on mkfontdir
-REQUIRED_DISTRO_FEATURES = "x11"
+REQUIRED_DISTRO_FEATURES = "x11 opengl pam"
 
 RDEPENDS_${PN} = " \
     packagegroup-core-lsb-runtime-add \

@@ -17,7 +17,7 @@ ALLOW_EMPTY_${PN} = "1"
 
 inherit distro_features_check
 # rdepends on packagegroup-core-lsb-desktop which rdepends on libx*
-REQUIRED_DISTRO_FEATURES = "x11"
+REQUIRED_DISTRO_FEATURES = "x11 opengl pam"
 
 RDEPENDS_${PN} = " \
     jpeg \
