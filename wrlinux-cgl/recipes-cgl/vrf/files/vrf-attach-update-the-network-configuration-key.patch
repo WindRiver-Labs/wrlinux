@@ -1,0 +1,215 @@
+From c83c21f0c55c8038ba1b124d2efed2964405e183 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <Mingli.Yu@windriver.com>
+Date: Wed, 10 Oct 2018 16:34:10 +0800
+Subject: [PATCH] vrf-attach: update the network configuration key
+
+After lxc upgrade to 3.0.0, the configuration
+key changes a lot, we use lxc-update-config
+to convert the key to fix the gap.
+
+But after create one vrf via vrf-create, the
+user may use vrf-attach to attach new network
+device and lxc-update-config cannot handle
+smoothly especially for network configuration
+when both new keys and old keys exist as the
+network device has order index in new keys
+management.
+
+Manually convert the network configuration
+key to fix the gap when both the new and
+old network configuration key exist.
+
+Upstream-Status: Inappropriate [no upstream]
+
+Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
+---
+ src/vrf-attach    |  4 +++
+ src/vrf-helper.in | 87 +++++++++++++++++++++++++++++++++++++++++++++----------
+ 2 files changed, 76 insertions(+), 15 deletions(-)
+
+diff --git a/src/vrf-attach b/src/vrf-attach
+index 9d55ea3..c2db152 100755
+--- a/src/vrf-attach
++++ b/src/vrf-attach
+@@ -90,10 +90,14 @@ interface_config () {
+ 
+     #default no delete
+     UPDATE_LXC_VRF_FILE=0
++    # get network id in $VRF_FILE
++    network_id=`sed -n -e '/lxc.net.*name/p' $VRF_FILE|awk -F. '{print $3}'| tail -n 1`
++    [ ! -z $network_id ] && network_id=$(($network_id+1))
+     >$TMP_VRF_FILE
+     while [ $DONE -ne 1 ]; do
+         network_conf_main_menu attach
+         DONE=$?
++        [ ! -z $network_id ] && network_id=$(($network_id+1))
+     done
+ 
+     #add or delete
+diff --git a/src/vrf-helper.in b/src/vrf-helper.in
+index c52dc3c..eacfe78 100755
+--- a/src/vrf-helper.in
++++ b/src/vrf-helper.in
+@@ -884,14 +884,22 @@ network_conf_add () {
+     DONE=$?
+     [ $DONE -ne 0 ] && return $DONE
+ 
+-    echo "lxc.network.name=$IF_NAME" >> $TMP_VRF_FILE
++    if [ -z $network_id ]; then
++        echo "lxc.network.name=$IF_NAME" >> $TMP_VRF_FILE
++    else
++        echo "lxc.net.$network_id.name=$IF_NAME" >> $TMP_VRF_FILE
++    fi
+ 
+     IPV4_ADDR=
+     ipv4_address_input
+     DONE=$?
+ 
+     if [ -n "$IPV4_ADDR" ]; then
+-        echo "lxc.network.ipv4=$IPV4_ADDR" >> $TMP_VRF_FILE
++        if [ -z $network_id ]; then
++            echo "lxc.network.ipv4=$IPV4_ADDR" >> $TMP_VRF_FILE
++        else
++            echo "lxc.net.$network_id.ipv4.address=$IPV4_ADDR" >> $TMP_VRF_FILE
++        fi
+     fi
+     # write the physical host interface to the config file
+     # if MACVLAN is selected, create the host MACVLAN interface
+@@ -1018,7 +1026,11 @@ network_delete_interface_ext () {
+     delete_run_script1=$(mktemp /tmp/vrf.delete_interface1.$$.XXXXXX)
+ 
+     debug_log -e "delete_interface_ext $1 $2\n"
+-    exp="^lxc.network.type="
++    if [ -z $network_id ]; then
++        exp="^lxc.network.type="
++    else
++        exp="^lxc.net.*.type="
++    fi
+     #delete the configuration code for this interface
+     #up to # PHYSICAL|MAPPED
+     start=$(grep --line-number -e "^$INF_CONFIG_START_PATTERN_PHY" \
+@@ -1404,8 +1416,13 @@ macvlan_type_choose () {
+                 ;;
+             "PRIVATE"|"VEPA"|"BRIDGE")
+                 echo "$INF_CONFIG_START_PATTERN_MAP($host_link)" >> $TMP_VRF_FILE
+-                echo "lxc.network.type=macvlan" >> $TMP_VRF_FILE
+-                echo "lxc.network.macvlan.mode=$MACVLAN_TYPE" >> $TMP_VRF_FILE
++                if [ -z $network_id ]; then
++                    echo "lxc.network.type=macvlan" >> $TMP_VRF_FILE
++                    echo "lxc.network.macvlan.mode=$MACVLAN_TYPE" >> $TMP_VRF_FILE
++                else
++                    echo "lxc.net.$network_id.type=macvlan" >> $TMP_VRF_FILE
++                    echo "lxc.net.$network_id.macvlan.mode=$MACVLAN_TYPE" >> $TMP_VRF_FILE
++                fi
+                 ;;
+ 	    *)
+                 echo "Invalid selection"
+@@ -1453,7 +1470,11 @@ link_type_choose () {
+                     continue
+                 fi
+                 echo "$INF_CONFIG_START_PATTERN_PHY($host_link)" >> $TMP_VRF_FILE
+-                echo "lxc.network.type=phys" >> $TMP_VRF_FILE
++                if [ -z $network_id ]; then
++                    echo "lxc.network.type=phys" >> $TMP_VRF_FILE
++                else
++                    echo "lxc.net.$network_id.type=phys" >> $TMP_VRF_FILE
++                fi
+                         # due to a bug in LXC we need to ensure the device is renamed
+                         # back to its original name on the host when the
+                         # VRF is stopped
+@@ -1478,8 +1499,15 @@ cut -d' ' -f2-\` name $host_link" >> $TMP_VRF_FILE
+ 	    "VLAN")
+                 echo -n "Enter VLAN ID for the VRF interface: "
+                 read VLAN_ID
++                if [ -z $network_id ]; then
++                    VLAN_TYPE_PATTERN="lxc.network.type=vlan"
++                    VLAN_ID_PATTERN="lxc.network.vlan.id=$VLAN_ID"
++                else
++                    VLAN_TYPE_PATTERN="lxc.net.*.type=vlan"
++                    VLAN_ID_PATTERN="lxc.net.*.vlan.id=$VLAN_ID"
++                fi
+                 vlan_exist=$(sed -n -e "/^$INF_CONFIG_START_PATTERN_MAP($host_link)/{N; N; \
+-s/$INF_CONFIG_START_PATTERN_MAP($host_link)\nlxc.network.type=vlan\nlxc.network.vlan.id=$VLAN_ID/yes/p}" \
++s/$INF_CONFIG_START_PATTERN_MAP($host_link)\n$VLAN_TYPE_PATTERN\n$VLAN_ID_PATTERN/yes/p}" \
+                              $VRF_SYSCONFDIR/config.* \
+                              $TMP_VRF_FILE 2> /dev/null)
+                 if [ "yes" = "$vlan_exist" ];
+@@ -1490,8 +1518,13 @@ assigned for $host_link"
+                     continue
+                 fi
+                 echo "$INF_CONFIG_START_PATTERN_MAP($host_link)" >> $TMP_VRF_FILE
+-                echo "lxc.network.type=vlan" >> $TMP_VRF_FILE
+-                echo "lxc.network.vlan.id=$VLAN_ID" >> $TMP_VRF_FILE
++                if [ -z $network_id ]; then
++                    echo "lxc.network.type=vlan" >> $TMP_VRF_FILE
++                    echo "lxc.network.vlan.id=$VLAN_ID" >> $TMP_VRF_FILE
++                else
++                    echo "lxc.net.$network_id.type=vlan" >> $TMP_VRF_FILE
++                    echo "lxc.net.$network_id.vlan.id=$VLAN_ID" >> $TMP_VRF_FILE
++                fi
+                 ;;
+ 
+ 	    "MACVLAN")
+@@ -1603,9 +1636,17 @@ network_link_write () {
+             echo "# ATTACH1: ip link set ${curname} up 2>/dev/null" >> $TMP_VRF_FILE
+             network_link_attach $curname $curname $IF_NAME $IPV4_ADDR
+         fi
+-        echo "lxc.network.link=${HOST_LINK}" >> $TMP_VRF_FILE
++        if [ -z $network_id ]; then
++            echo "lxc.network.link=${HOST_LINK}" >> $TMP_VRF_FILE
++        else
++            echo "lxc.net.$network_id.link=${HOST_LINK}" >> $TMP_VRF_FILE
++        fi
+         # ensure the link is up when the VRF starts
+-        echo "lxc.network.flags=up" >> $TMP_VRF_FILE
++        if [ -z $network_id ]; then
++            echo "lxc.network.flags=up" >> $TMP_VRF_FILE
++        else
++            echo "lxc.net.$network_id.flags=up" >> $TMP_VRF_FILE
++        fi
+ #        echo "# DESTROY: ip link del ${curname} 2> /dev/null" >> $TMP_VRF_FILE
+         echo "$INF_CONFIG_END_PATTERN_MAP ${HOST_LINK} --> $IF_NAME $IPV4_ADDR ($NETTYPE)" \
+ 	     >> $TMP_VRF_FILE
+@@ -1626,9 +1667,17 @@ network_link_write () {
+         fi
+ 
+         #when start: lxc will handle its creation
+-        echo "lxc.network.link=$HOST_LINK" >> $TMP_VRF_FILE
++        if [ -z $network_id ]; then
++            echo "lxc.network.link=$HOST_LINK" >> $TMP_VRF_FILE
++        else
++            echo "lxc.net.$network_id.link=$HOST_LINK" >> $TMP_VRF_FILE
++        fi
+         # ensure the link is up when the VRF starts
+-        echo "lxc.network.flags=up" >> $TMP_VRF_FILE
++        if [ -z $network_id ]; then
++            echo "lxc.network.flags=up" >> $TMP_VRF_FILE
++        else
++            echo "lxc.net.$network_id.flags=up" >> $TMP_VRF_FILE
++        fi
+         echo "$INF_CONFIG_END_PATTERN_MAP $HOST_LINK --> $IF_NAME $IPV4_ADDR ("$NETTYPE""$VLAN_ID")" >> $TMP_VRF_FILE
+ 
+     elif [ "$NETTYPE" = "PHYSICAL" ]; then
+@@ -1647,9 +1696,17 @@ network_link_write () {
+             network_link_attach dev${orig_index} dev${orig_index} $IF_NAME $IPV4_ADDR
+         fi
+ 
+-        echo "lxc.network.link=dev${orig_index}" >> $TMP_VRF_FILE
++        if [ -z $network_id ]; then
++            echo "lxc.network.link=dev${orig_index}" >> $TMP_VRF_FILE
++        else
++            echo "lxc.net.$network_id.link=dev${orig_index}" >> $TMP_VRF_FILE
++        fi
+         # ensure the link is up when the VRF starts
+-        echo "lxc.network.flags=up" >> $TMP_VRF_FILE
++        if [ -z $network_id ]; then
++            echo "lxc.network.flags=up" >> $TMP_VRF_FILE
++        else
++            echo "lxc.net.$network_id.flags=up" >> $TMP_VRF_FILE
++        fi
+         echo "$INF_CONFIG_END_PATTERN_MAP $HOST_LINK --> $IF_NAME $IPV4_ADDR ($NETTYPE)" >> $TMP_VRF_FILE
+ 
+     else
+-- 
+2.7.4
+

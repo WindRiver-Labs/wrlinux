@@ -20,6 +20,7 @@ SRC_URI    = "file://vrf-1.1.tgz \
               file://vrf-attach-convert-the-key.patch \
               file://vrf-helper.in-down-device-before-change-its-name.patch \
               file://vrf-attach-make-interface-attach-when-vrf-stops.patch \
+              file://vrf-attach-update-the-network-configuration-key.patch \
 "
 
 
