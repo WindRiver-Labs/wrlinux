@@ -20,6 +20,37 @@ Contact <support@windriver.com> or your support representative for more
 information on submitting changes.
 
 
+Recipes
+-------
+1. linux-libc-headers-custom.bb is an example for using customers' kernel
+   headers instead of the mainline official kernel headers. Note that
+   linux-libc-headers-custom.bb provides linux-libc-headers when and only when
+   KERNEL_HEADER_DIR is "/usr".
+
+2. linux-yocto-dev.bbappend is for customizing Yocto kernel source and
+   linux-yocto_4.18.bbappend for Wind River kernel source. If you want to use
+   headers of these kernels, you need to properly set KERNEL_ALT_HEADER_DIR
+   ("/usr" is invalid in this case).
+
+3. linux-yocto-custom.bb is an example for using customers' kernel source. If
+   you want to use kernel headers of linux-yocto-custom.bb, you need to properly
+   set KERNEL_ALT_HEADER_DIR("/usr" is invalid in this case).
+
+Templates
+---------
+1. feature/kernel-dev: includes kernel-dev and kernel-devsrc in SDK and sets
+   KERNEL_HEADER_DIR ?= "/usr-alt"
+
+2. feature/kernfeatures-clear: sets KERNEL_FEATURES = ""
+   (usually wanted for custom kernels)
+
+3. feature/kernel-alt-headers: sets KERNEL_ALT_HEADER_DIR ?= "/usr-alt"
+   (enables installation of alternative userspace headers from the kernel to
+   SDK)
+
+4. feature/custom-kernel: use linux-yocto-custom.bb as virtual/kernel
+
+
 Building with the wrlinux-kernel-dev layer
 -----------------------------
 1. Add this layer and a corresponding BSP layer to your build's
@@ -29,16 +60,6 @@ Building with the wrlinux-kernel-dev layer
    
 3. Add the desired feature templates to your conf/local.conf file
    WRTEMPLATE variable.
-
-   * feature/kernel-dev : include kernel-dev and kernel-devsrc in SDK
-
-   * feature/kernfeatures-clear : sets KERNEL_FEATURES=""
-     (usually wanted for custom kernels)
-
-   * feature/kernel-alt-headers: sets KERNEL_ALT_HEADER_DIR ?= "/usr-alt"
-     (enables installation of alternative userspace headers from the kernel)
-
-   * feature/custom-kernel: use linux-yocto-custom.bb
 
 NOTE: This layer is not indexed and therefor not available using
 Wind River Linux's setup.sh.
