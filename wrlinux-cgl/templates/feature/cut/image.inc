@@ -17,3 +17,6 @@ IMAGE_INSTALL += "openl2tp-ptest"
 
 # kdump CUT cases needs /boot/vmlinux
 IMAGE_INSTALL += "kernel-vmlinux"
+
+# /usr/bin/openssl is packaged into openssl-bin
+IMAGE_INSTALL += "openssl-bin"
