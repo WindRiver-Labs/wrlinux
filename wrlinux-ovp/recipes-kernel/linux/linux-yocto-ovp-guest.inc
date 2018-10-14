@@ -19,6 +19,3 @@ TARGET_SUPPORTED_KTYPES_qemux86-64 = "preempt-rt"
 COMPATIBLE_MACHINE_wrlinux-ovp = "(qemux86|qemux86-64)"
 
 COMPATIBLE_HOST = "(i.86|x86_64).*-linux"
-
-SRCREV_machine = "${AUTOREV}"
-SRCREV_meta = "${AUTOREV}"
