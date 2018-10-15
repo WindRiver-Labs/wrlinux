@@ -29,7 +29,8 @@ python linux_yocto_rewrite_uri() {
         src_uri = src_uri.replace("git://git.yoctoproject.org/linux-yocto-dev.git", "git://${LAYER_PATH_wrlinux}/git/linux-yocto-dev.git;protocol=file")
 
     if os.path.exists("%s/git/linux-yocto-%s.git" % (d.expand(layer_path), pv)):
-        src_uri = src_uri.replace("git://git.yoctoproject.org/linux-yocto-%s.git" % (pv), "git://${LAYER_PATH_wrlinux}/git/linux-yocto-%s.git;protocol=file" % pv)
+        src_uri = src_uri.replace("git://git.yoctoproject.org/linux-yocto.git", "git://${LAYER_PATH_wrlinux}/git/linux-yocto-%s.git;protocol=file" % (pv))
+        src_uri = src_uri.replace("git://git.yoctoproject.org/linux-yocto-%s.git" % (pv), "git://${LAYER_PATH_wrlinux}/git/linux-yocto-%s.git;protocol=file" % (pv))
 
     # Replace the kernel-cache URI.
     if os.path.exists("%s/git/yocto-kernel-cache.git" % d.expand(layer_path)):
