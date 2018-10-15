@@ -61,6 +61,11 @@ if [ -n "$version" ]; then
        SUBLEVEL=$(git show $branch:Makefile | grep "^SUBLEVEL =" | sed s/.*=\ *//)
        EXTRAVERSION=$(git show $branch:Makefile | grep "^EXTRAVERSION =" | sed s/.*=\ *//)
 
+       if [ -n "${version}" -a "${VERSION}.${PATCHLEVEL}" != "${version}" ]; then
+          # Only capture information on the version we care about
+          continue
+       fi
+
        # Build a plain version string
        vers="${VERSION}.${PATCHLEVEL}"
        if [ -n "${SUBLEVEL}" ]; then
@@ -92,6 +97,10 @@ echo "# yocto-kernel-cache entries"
    # Process ONLY branches with '-wr' in the name...
    base_branch=$(echo $branch | sed 's,refs/heads/,,')
    base_version=$(echo $base_branch | sed 's,yocto-,,' | sed 's,-wr,,')
+   if [ -n "${version}" -a "${base_version}" != "${version}" ]; then
+      # Not the version we care about...
+      continue
+   fi
    echo KERNEL_CACHE_BRANCH_${base_version} = \"${base_branch}\"
    echo SRCREV_meta_${base_version} = \"$(git rev-parse ${base_branch})\"
    echo LINUX_VERSION_${base_version} = \"$(git show ${base_branch}:kver | sed 's,v,,')\"
