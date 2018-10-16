@@ -121,7 +121,7 @@ PACKAGECONFIG_pn-wpa-supplicant ?= "${@bb.utils.contains('INCOMPATIBLE_LICENSE',
 # | dnsmasq: failed to create listening socket for port 53: Address already in use
 # So disable the service by default, and if the user want to use both of them,
 # it need to be set to a different port in dnsmasq.conf before starting the service.
-INITSCRIPT_PARAMS_pn-dnsmasq = "disabled"
+INITSCRIPT_PARAMS_pn-dnsmasq = "stop 20 0 1 6 ."
 SYSTEMD_AUTO_ENABLE_pn-dnsmasq = "disable"
 
 require conf/distro/include/wrlinux-distro-settings.conf
