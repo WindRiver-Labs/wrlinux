@@ -54,6 +54,6 @@ do_install_append() {
 	done
 }
 
-pkg_postinst_ontarget_${PN}_append() {
-	mkdir -m 711 -p /data/images
+pkg_postinst_${PN}_append() {
+	mkdir -m 711 -p $D/data/images
 }
