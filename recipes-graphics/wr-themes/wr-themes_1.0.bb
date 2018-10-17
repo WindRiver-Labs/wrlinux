@@ -35,6 +35,8 @@ do_install() {
 	install -m 0644 ${WORKDIR}/lxdm-theme/* ${D}${datadir}/lxdm/themes/Windriver/
 	sed -i "s/%DEFAULT_BACKGROUND%/windriver-login-${DEFAULT_WALLPAPER}.png/" \
 		${D}${datadir}/lxdm/themes/Windriver/gtkrc
+       sed -i "s/%DEFAULT_BACKGROUND%/windriver-login-${DEFAULT_WALLPAPER}.png/" \
+                ${D}${datadir}/lxdm/themes/Windriver/gtk.css
 }
 
 PACKAGES += "${PN}-lxdm ${PN}-wallpapers"
