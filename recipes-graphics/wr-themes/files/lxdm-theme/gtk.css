@@ -1,0 +1,24 @@
+#lxdm {
+	background-image: url("%DEFAULT_BACKGROUND%");
+	background-repeat: round;
+}
+
+#bottom_pane {
+	background-color: rgba(0,0,0,0.24);
+}
+
+#time {
+	font: Sans 12;
+	color: #ffffff;
+}
+
+#prompt {
+	font: Sans 14;
+	color: #ffffff;
+}
+
+#bottom_pane label,
+#bottom_pane GtkLabel {
+	font: Sans 12;
+	color: #9E9D9B;
+}
