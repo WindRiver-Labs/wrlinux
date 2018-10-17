@@ -2,7 +2,6 @@
 DEPENDS = "\
     acl-native \
     alsa-lib-native \
-    asciidoc-native \
     attr-native \
     autoconf-archive-native \
     autoconf-native \
