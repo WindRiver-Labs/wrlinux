@@ -5,14 +5,14 @@ require recipes-kernel/linux-libc-headers/linux-libc-headers.inc
 
 PROVIDES = "${@bb.utils.contains("KERNEL_HEADER_DIR", "/usr", "linux-libc-headers", "", d)}"
 
-LINUX_VERSION ?= "4.19-rc7"
+LINUX_VERSION ?= "4.18.9"
 LINUX_VERSION_EXTENSION_append = "-custom"
 
-KBRANCH ?= "standard/base"
+KBRANCH ?= "v4.18/standard/base"
 SRCREV_machine = "${AUTOREV}"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
-KSRC_linux_libc_headers_custom ?= "${THISDIR}/../../../git/linux-yocto-dev.git"
+KSRC_linux_libc_headers_custom ?= "${THISDIR}/../../../git/linux-yocto-4.18.git"
 SRC_URI = "git://${KSRC_linux_libc_headers_custom};protocol=file;branch=${KBRANCH};name=machine"
 
 S = "${WORKDIR}/git"
