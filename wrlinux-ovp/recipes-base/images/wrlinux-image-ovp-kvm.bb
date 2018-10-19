@@ -43,6 +43,7 @@ IMAGE_INSTALL += " \
    schedtool-dl \
    dpdk \
    system-report \
+   ceph \
 "
 
 # Taken from wr-base/recipes-base/images/wrlinux-image-glibc-std.bb
