@@ -51,7 +51,7 @@ SRCREV_machine_kb-standard-nxp-ls-lsdk-1709-nxp-ls20xx ?= "1573e13f70251987ecf37
 LINUX_VERSION_kb-standard-nxp-ls-lsdk-1709-nxp-ls20xx ?= "4.12.29"
 SRCREV_machine_kb-standard-nxp-ls-lsdk-1712-base ?= "f8d974e7dff642b701c67da262e39e353be5a298"
 LINUX_VERSION_kb-standard-nxp-ls-lsdk-1712-base ?= "4.12.29"
-SRCREV_machine_kb-standard-nxp-ls-lsdk-1712-nxp-lx2xxx ?= "d2f3403a1a6bf88d2d35162185db2938f5066e6c"
+SRCREV_machine_kb-standard-nxp-ls-lsdk-1712-nxp-lx2xxx ?= "7ac135da794fe0cc98ced0ebafbe8723e7352a97"
 LINUX_VERSION_kb-standard-nxp-ls-lsdk-1712-nxp-lx2xxx ?= "4.12.29"
 SRCREV_machine_kb-standard-nxp-qoriq-sdk-2-0-1703-base ?= "33d62fc84cf1f04c0ce6de22c947388b20553668"
 LINUX_VERSION_kb-standard-nxp-qoriq-sdk-2-0-1703-base ?= "4.12.29"
@@ -81,7 +81,7 @@ SRCREV_machine_kb-standard-preempt-rt-nxp-ls-lsdk-1709-nxp-ls20xx ?= "54402d084b
 LINUX_VERSION_kb-standard-preempt-rt-nxp-ls-lsdk-1709-nxp-ls20xx ?= "4.12.29"
 SRCREV_machine_kb-standard-preempt-rt-nxp-ls-lsdk-1712-base ?= "872f97ce727453209febd6166618a9122a17ab25"
 LINUX_VERSION_kb-standard-preempt-rt-nxp-ls-lsdk-1712-base ?= "4.12.29"
-SRCREV_machine_kb-standard-preempt-rt-nxp-ls-lsdk-1712-nxp-lx2xxx ?= "68d27ad81354a9c3b0bd83601f7bebb5cfd2454a"
+SRCREV_machine_kb-standard-preempt-rt-nxp-ls-lsdk-1712-nxp-lx2xxx ?= "cc61f7f3f993d16f0faf7cddc1c7a805338b1428"
 LINUX_VERSION_kb-standard-preempt-rt-nxp-ls-lsdk-1712-nxp-lx2xxx ?= "4.12.29"
 SRCREV_machine_kb-standard-preempt-rt-nxp-qoriq-sdk-2-0-1703-base ?= "58bed7f37e47f2a21d47035fae3d71ece0689e28"
 LINUX_VERSION_kb-standard-preempt-rt-nxp-qoriq-sdk-2-0-1703-base ?= "4.12.29"
@@ -120,6 +120,6 @@ LINUX_VERSION_kb-standard-xilinx-sdk2017-04-xilinx-zynqmp ?= "4.12.29"
 
 # yocto-kernel-cache branch entry
 KERNEL_CACHE_BRANCH = "yocto-4.12-wr"
-SRCREV_meta = "5fb4ef47a2bc1df5b1b4550801cc7aa2660e373a"
+SRCREV_meta = "beef1afc5bdd97f585a5efa330da2b0e3b222a6c"
 
 LINUX_VERSION = "4.12.29"
