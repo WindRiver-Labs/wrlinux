@@ -93,6 +93,7 @@ PNWHITELIST_perl-layer_append = " \
     libhtml-parser-perl \
     libio-socket-ssl-perl \
     libnet-dns-perl \
+    libnet-dns-sec-perl \
     libnet-libidn-perl \
     libnet-ssleay-perl \
     libnet-telnet-perl \
