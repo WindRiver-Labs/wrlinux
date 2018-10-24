@@ -1,3 +1,4 @@
+#!/bin/sh
 ##
 ##usage
 usage()
@@ -40,7 +41,7 @@ echo_process()
   done
   [ $current_percent -eq 0 ] && { $DATE; }
   [ $done_percent -ge $full_percent ] && { echo; echo "Task is over!"; $DATE; echo; return 1; }
-  let current_percent=$current_percent+1
+  current_percent=`expr $current_percent+1`
   msleep 250
   return 0
 }
@@ -69,24 +70,24 @@ get_sysinfo()
     cat /etc/issue | sed 's/\\.//g'> $LOGDIR/os.sysinfo
   fi
 
-  if which gcc &> /dev/null; then
-    gcc --version &> $LOGDIR/gcc.sysinfo
+  if which gcc > /dev/null 2>&1; then
+    gcc --version > $LOGDIR/gcc.sysinfo 2>&1
   fi
 
   if [ -r /proc/version ]; then
     cat /proc/version > $LOGDIR/version.sysinfo
   fi
   
-  if which getconf &> /dev/null; then
+  if which getconf > /dev/null 2>&1; then
     getconf -a | grep LIBC_VERSION > $LOGDIR/libc.sysinfo
   fi
   
-  if which uname &> /dev/null; then
+  if which uname > /dev/null 2>&1; then
     uname -r > $LOGDIR/kernel.sysinfo
     uname -m > $LOGDIR/machine.sysinfo
   fi
   
-  if which lspci &> /dev/null; then
+  if which lspci > /dev/null 2>&1; then
      lspci | grep -i eth > $LOGDIR/eth.sysinfo
   fi
 }
