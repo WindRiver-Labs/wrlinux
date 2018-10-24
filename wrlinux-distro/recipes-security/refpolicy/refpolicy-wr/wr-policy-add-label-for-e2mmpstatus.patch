@@ -1,0 +1,37 @@
+From 0cc1ffbb78da48080bd6e087b69df4d6ace77555 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 23 Oct 2018 08:02:03 +0000
+Subject: [PATCH] wr-policy: add label for e2mmpstatus
+
+Add security label for e2mmpstatus
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/fstools.fc | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/system/fstools.fc b/policy/modules/system/fstools.fc
+index 9842446..6ef4c52 100644
+--- a/policy/modules/system/fstools.fc
++++ b/policy/modules/system/fstools.fc
+@@ -10,6 +10,7 @@
+ /sbin/e2fsck		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /sbin/e4fsck		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /sbin/e2label		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
++/sbin/e2mmpstatus		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /sbin/fdisk		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /sbin/fdisk\.util-linux		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /sbin/findfs		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+@@ -69,6 +70,7 @@
+ /usr/sbin/e2fsck		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/e4fsck		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/e2label		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
++/usr/sbin/e2mmpstatus		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/efibootmgr		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/fatsort		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/fdisk			--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+-- 
+2.18.0
+

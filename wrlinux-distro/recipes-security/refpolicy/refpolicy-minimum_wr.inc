@@ -130,6 +130,7 @@ SRC_URI += "file://wr-policy-getty-console.patch \
             file://0001-wr-policy-fix-labels-for-resolv.conf.patch \
             file://wr-policy-fix-path-for-policycoreutils-commands.patch \
             file://wr-policy-add-path-for-mke2fs.-and-tune2fs.patch \
+            file://wr-policy-add-label-for-e2mmpstatus.patch \
            "
 
 # Backport from upstream
