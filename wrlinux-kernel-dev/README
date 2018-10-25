@@ -48,7 +48,9 @@ Templates
    (enables installation of alternative userspace headers from the kernel to
    SDK)
 
-4. feature/custom-kernel: use linux-yocto-custom.bb as virtual/kernel
+4. feature/custom-kernel: use linux-yocto-custom.bb as virtual/kernel.
+   COMPATIBLE_MACHINE needs to be manually set to expected machine type to avoid
+   unexpectedly using it as virtual/kernel.
 
 
 Building with the wrlinux-kernel-dev layer
