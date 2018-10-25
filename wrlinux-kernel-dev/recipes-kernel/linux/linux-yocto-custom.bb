@@ -56,19 +56,21 @@ require recipes-kernel/linux/linux-yocto.inc
 
 # Override SRC_URI in a copy of this recipe to point at a different source
 # tree if you do not want to build from Linus' tree.
-SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git;protocol=git;nocheckout=1;name=machine"
+SRC_URI = "git://${LAYER_PATH_wrlinux}/git/linux-yocto-dev.git;protocol=file;branch=standard/base;name=machine"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 
-LINUX_VERSION ?= "4.18-rc6"
+LINUX_VERSION ?= "4.19-rc8"
 LINUX_VERSION_EXTENSION_append = "-custom"
 
 KERNEL_VERSION_SANITY_SKIP="1"
 
 # Modify SRCREV to a different commit hash in a copy of this recipe to
 # build a different release of the Linux kernel.
-# tag: v4.18-rc6 d72e90f33aa4709ebecc5005562f52335e106a60
-SRCREV_machine ?= "d72e90f33aa4709ebecc5005562f52335e106a60"
+SRCREV_machine ?= "322b8527ac45dc4a24c28d2031a5a52898248eae"
+
+# Override this to use expected config options
+SRC_URI += "file://defconfig"
 
 PV ?= "${LINUX_VERSION}+git${SRCPV}"
 
