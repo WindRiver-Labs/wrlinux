@@ -56,5 +56,5 @@ LINUX_VERSION_kb-v4.18-standard-tiny-intel ?= "4.18.14"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_4.18 = "yocto-4.18-wr"
-SRCREV_meta_4.18 = "64c6bbfb7008387f8d53d9312e36206d9e5ac5a8"
+SRCREV_meta_4.18 = "124356db579295d3dc8128396278dead1df0e2b9"
 LINUX_VERSION_4.18 = "4.18.14"
