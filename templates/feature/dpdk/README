@@ -50,7 +50,7 @@ the target prior to executing DPDK processes:
 Bind Intel devices to igb_uio:
 
 	# ifconfig ethX down
-	# /opt/dpdk/sbin/dpdk-devbind --bind=igb_uio 07:00.0
+	# /usr/sbin/dpdk-devbind --bind=igb_uio 07:00.0
 
 NOTE: This test method need two intel ethernet (e1000e/igb/ixgbe) ports,
 please do this step on each port.
@@ -71,7 +71,7 @@ to /proc/sys/vm/nr_hugepages.
 
 The environment can be tested with:
 
-       # /opt/dpdk/app/test -c 0xffff -n 1
+       # /usr/share/dpdk/test/test -c 0xffff -n 1
 
 Alternatively you may run test with no options to get information on
 available command line options. This will start a RTE shell which you
@@ -98,43 +98,25 @@ autotests. Note that it may be required to increase the value of
 /proc/sys/vm/nr_hugepages to complete these tests. Additionally,
 eal_flags_autotest requires -m parameter with a correct value.
 
-4. Building DPDK applications
+4. DPDK examples applications
 =============================
-Since we cross build the DPDK you will need to use a cross build environment
-to build DPDK applications such as the examples shipped with the DPDK. The
-DPDK feature will place the required static libraries, header files, Makefiles
-etc. required for building in the sysroot.
-
-Building the helloworld example:
-        %> export PATH=${PATH}:<build_dir>/bitbake_build/tmp/sysroots/<arch>-linux/usr/bin/toolchain
-        %> export RTE_SDK=<build_dir>/bitbake_build/tmp/work/<bsp>-wrs-linux/dpdk/<version>/image/opt/dpdk
-        %> cd <build_dir>/build/dpdk/git/examples/helloworld
-        %> make CROSS=<tool_prefix> RTE_TARGET=<rte_target>
-
-  Where:
-        tool_prefix can be found by looking in
-        <build_dir>/bitbake_build/tmp/sysroots/<arch>-linux/usr/bin/i686-wrs-linux/i686-wrs-linux-(32bit),
-	<build_dir>/bitbake_build/tmp/sysroots/<arch>-linux/usr/bin/x86_64-wrs-linux/x86_64-wrs-linux-(64bit).
-
-        rte_target will be x86_64-native-linuxapp-gcc for 64bit target or
-        i686-native-linuxapp-gcc for 32bit target. You can verify your choice
-        by looking in ./build.
-
-If you decide not to use the DPDK make system you may use the normal
-toolchain wrapper along with the standard sysroot options.
+Various DPDK example application are built along with DPDK. To include
+these in your image add the 'dpdk-example' package to your image using
+IMAGE_INSTALL_append or similar in your local.conf.
 
 5. DPDK compilation with optimization
 =====================================
-DPDK supports compilation with optimization for a specific machine. For
-best usage, please change the definition of DPDK_TARGET_MACHINE
-at <path_to_wr-intel-support>/recipes-dpdk/dpdk/dpdk.inc. The available
-machines are native(guessing current machine), atm(Intel Atom Processor),
-nhm(Intel Nehalem Processor), wsm(Intel Westmere Processor),
-snb(Intel Sandy Bridge Processor) and ivb(Intel Ivy Bridge Processor).
-It is not recommended to use "native" because it will guess the host
-machine via /proc/cpuinfo against the real target machine.
+DPDK supports compilation with optimization for a specific
+machine. For best usage, please change set the definition of
+DPDK_TARGET_MACHINE in your build's local.conf
+(ie. DPDK_TARGET_MACHINE_pn-dpdk = "<target>". The available machines
+are native(guessing current machine), atm(Intel Atom Processor),
+nhm(Intel Nehalem Processor), wsm(Intel Westmere Processor), snb(Intel
+Sandy Bridge Processor) and ivb(Intel Ivy Bridge Processor).  It is
+not recommended to use "native" because it will guess the host machine
+via /proc/cpuinfo against the real target machine.
 
-7. Additional documentation
+6. Additional documentation
 ===========================
 Additional READMEs relating to the DPDK can be found in the dpdk/docs directory.
 
@@ -142,4 +124,3 @@ Additional READMEs relating to the DPDK can be found in the dpdk/docs directory.
 #@TYPE: Wrtemplate
 #@NAME: dpdk
 #@DESCRIPTION: Enable Data Plane Development Kit (DPDK)
-
