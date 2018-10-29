@@ -41,7 +41,7 @@ echo_process()
   done
   [ $current_percent -eq 0 ] && { $DATE; }
   [ $done_percent -ge $full_percent ] && { echo; echo "Task is over!"; $DATE; echo; return 1; }
-  current_percent=`expr $current_percent+1`
+  current_percent=`expr $current_percent + 1`
   msleep 250
   return 0
 }
