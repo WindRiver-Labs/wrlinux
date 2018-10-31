@@ -36,7 +36,7 @@ PACKAGECONFIG[gl] = ",,,"
 
 PACKAGECONFIG ?= "cap-ng linux-aio xfsctl attr \
                   virtfs fdt glusterfs \
-                  vhost pie alsa kvm \
+                  vhost pie alsa kvm rbd \
                  " 
 
 # This is making sure qemu-native independs on spice-native
