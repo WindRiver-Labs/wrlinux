@@ -14,6 +14,7 @@ KERNEL_FEATURES += "\
  features/aufs/aufs-enable.scc \
  features/nfsd/nfsd-enable.scc \
  features/vfio/vfio.scc \
+ features/xfs/xfs.scc \
 "
 
 COMPATIBLE_HOST = "x86_64.*-linux"
