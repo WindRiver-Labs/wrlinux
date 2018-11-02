@@ -36,12 +36,12 @@ PACKAGECONFIG[gl] = ",,,"
 
 PACKAGECONFIG ?= "cap-ng linux-aio xfsctl attr \
                   virtfs fdt glusterfs \
-                  vhost pie alsa kvm rbd \
+                  vhost pie alsa kvm \
                  " 
 
 # This is making sure qemu-native independs on spice-native
 # as spice-native is not provided
-PACKAGECONFIG_append_x86-64_class-target = " spice"
+PACKAGECONFIG_append_x86-64_class-target = " spice rbd"
 
 RDEPENDS_${PN}_class-nativesdk += "nativesdk-python-core"
 
