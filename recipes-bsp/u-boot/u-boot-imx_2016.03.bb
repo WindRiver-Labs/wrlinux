@@ -17,3 +17,4 @@ S = "${WORKDIR}/git"
 LOCALVERSION ?= "-${SRCBRANCH}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
+COMPATIBLE_MACHINE = "(nxp-imx6|nxp-imx7)"
