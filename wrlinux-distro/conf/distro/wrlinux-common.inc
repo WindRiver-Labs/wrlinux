@@ -139,3 +139,11 @@ TARGET_SUPPORTED_KTYPES ??= "standard"
 PNBLACKLIST[musl] ?= "only glibc is supported for wrlinux"
 PNBLACKLIST[musl-utils] ?= "only glibc is supported for wrlinux"
 
+# do_kernel_version_sanity_check in oe-core checks if the defined version in
+# metadata(LINUX_VERSION) matches the version written in the source code. For
+# release branches we have Jenkins to take care of the version updating. For
+# CI/CD branch we aim to use the latest source and directly use Yocto kernel
+# source code which frequently gets updated. But oe-core does not tightly follow
+# the latest version. We don't necessarily frequently manually bump up the
+# version.
+KERNEL_VERSION_SANITY_SKIP = "1"
