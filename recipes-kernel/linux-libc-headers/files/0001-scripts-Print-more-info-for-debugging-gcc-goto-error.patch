@@ -1,0 +1,45 @@
+From 5382c7188287e394ae0ddb14dee332a698230125 Mon Sep 17 00:00:00 2001
+From: He Zhe <zhe.he@windriver.com>
+Date: Fri, 16 Nov 2018 14:28:38 +0800
+Subject: [PATCH] scripts: Print more info for debugging gcc-goto error
+
+Compiler lacks asm-goto support.
+
+Upstream-Status: Inappropriate [for temporary debugging]
+
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ Makefile            | 3 +++
+ scripts/gcc-goto.sh | 2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 620a6f7..3ceb8bc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -517,6 +517,9 @@ KBUILD_CFLAGS	+= $(call cc-option,-fno-PIE)
+ KBUILD_AFLAGS	+= $(call cc-option,-fno-PIE)
+ 
+ # check for 'asm goto'
++$(warning CROSS_COMPILE=$(CROSS_COMPILE) CONFIG_SHELL=$(CONFIG_SHELL) srctree=$(srctree) HOSTCC=$(HOSTCC) CC=$(CC) KBUILD_CFLAGS=$(KBUILD_CFLAGS))
++RET = $(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLAGS))
++$(warning RET=$(RET))
+ ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLAGS)), y)
+   CC_HAVE_ASM_GOTO := 1
+   KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
+diff --git a/scripts/gcc-goto.sh b/scripts/gcc-goto.sh
+index 083c526..bd7fc8eb 100755
+--- a/scripts/gcc-goto.sh
++++ b/scripts/gcc-goto.sh
+@@ -3,7 +3,7 @@
+ # Test for gcc 'asm goto' support
+ # Copyright (C) 2010, Jason Baron <jbaron@redhat.com>
+ 
+-cat << "END" | $@ -x c - -c -o /dev/null >/dev/null 2>&1 && echo "y"
++cat << "END" | $@ -x c - -c -o /dev/null && echo "y"
+ int main(void)
+ {
+ #if defined(__arm__) || defined(__aarch64__)
+-- 
+2.7.4
+
