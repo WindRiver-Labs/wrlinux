@@ -1,0 +1,6 @@
+This template adds tcpslice (A tool for extracting parts of a
+tcpdump packet trace.) to the filesystem.
+
+To use this template, add the following to your setup line:
+
+    --templates feature/tcpslice
