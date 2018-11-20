@@ -23,7 +23,7 @@ SRCREV_machine_kb-standard-edgerouter ?= "b290449bd3283fb698adfae63a082987c39341
 LINUX_VERSION_kb-standard-edgerouter ?= "4.12.29"
 SRCREV_machine_kb-standard-fsl-mpc8315e-rdb ?= "f9ad3fac9e2761709fdca2c01d2e983f7e2ec873"
 LINUX_VERSION_kb-standard-fsl-mpc8315e-rdb ?= "4.12.29"
-SRCREV_machine_kb-standard-intel-socfpga ?= "b8ec9214f277631955e10d7b240865e248e991ee"
+SRCREV_machine_kb-standard-intel-socfpga ?= "0d98548c16bc2fbaa2f3bba09b0aec4a2fa0da2c"
 LINUX_VERSION_kb-standard-intel-socfpga ?= "4.12.29"
 SRCREV_machine_kb-standard-intel-x86 ?= "ea0d0c7d66238296bd473991a0cd8a107a61d1bd"
 LINUX_VERSION_kb-standard-intel-x86 ?= "4.12.29"
@@ -134,6 +134,6 @@ LINUX_VERSION_kb-standard-xilinx-sdk2017-04-xilinx-zynqmp ?= "4.12.29"
 
 # yocto-kernel-cache branch entry
 KERNEL_CACHE_BRANCH = "yocto-4.12-wr"
-SRCREV_meta = "5f10966dfea82e5512dc64ddbf2f00470de19b4c"
+SRCREV_meta = "62e990ab405c961d5fa35661d7b37caa654e01e4"
 
 LINUX_VERSION = "4.12.29"
