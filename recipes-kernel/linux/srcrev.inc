@@ -43,9 +43,9 @@ SRCREV_machine_kb-standard-nxp-imx-sdk-4.9.11-nxp-imx6 ?= "442c87c78781428938b6c
 LINUX_VERSION_kb-standard-nxp-imx-sdk-4.9.11-nxp-imx6 ?= "4.12.29"
 SRCREV_machine_kb-standard-nxp-imx-sdk-4.9.11-nxp-imx7 ?= "ac5495b92f3bb14efe2252a319c1bf00813c54b8"
 LINUX_VERSION_kb-standard-nxp-imx-sdk-4.9.11-nxp-imx7 ?= "4.12.29"
-SRCREV_machine_kb-standard-nxp-imx-sdk-4.9.88-base ?= "6d6787a6953083c67d75bcf27f99876ddf42c3a3"
+SRCREV_machine_kb-standard-nxp-imx-sdk-4.9.88-base ?= "0bf984456fe1a8fbdf964faddfb7c7dee51ead34"
 LINUX_VERSION_kb-standard-nxp-imx-sdk-4.9.88-base ?= "4.12.29"
-SRCREV_machine_kb-standard-nxp-imx-sdk-4.9.88-nxp-imx8 ?= "26beac464e75876b02d81c7a6599bbb2f2b9a573"
+SRCREV_machine_kb-standard-nxp-imx-sdk-4.9.88-nxp-imx8 ?= "1c662b3fb3ee9c110d6627bcdfacdb8fe6f68e5f"
 LINUX_VERSION_kb-standard-nxp-imx-sdk-4.9.88-nxp-imx8 ?= "4.12.29"
 SRCREV_machine_kb-standard-nxp-ls-base ?= "f6e19749f9147f46602604e12c075984969f7410"
 LINUX_VERSION_kb-standard-nxp-ls-base ?= "4.12.29"
@@ -134,6 +134,6 @@ LINUX_VERSION_kb-standard-xilinx-sdk2017-04-xilinx-zynqmp ?= "4.12.29"
 
 # yocto-kernel-cache branch entry
 KERNEL_CACHE_BRANCH = "yocto-4.12-wr"
-SRCREV_meta = "5ffa5f757aff781b96a4e6bf3871c8b4d2979b44"
+SRCREV_meta = "489a91046109740db3ab5d168f60d151580082cc"
 
 LINUX_VERSION = "4.12.29"
