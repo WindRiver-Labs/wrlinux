@@ -62,6 +62,7 @@ DEPENDS = "\
     icu-native \
     intltool-native \
     iucode-tool-native \
+    json-c-native \
     kern-tools-native \
     kmod-native \
     ldconfig-native \
@@ -76,6 +77,7 @@ DEPENDS = "\
     libgpg-error-native \
     libice-native \
     libjpeg-turbo-native \
+    libmodulemd-native \
     libmpc-native \
     libnsl2-native \
     libpcre-native \
@@ -100,6 +102,7 @@ DEPENDS = "\
     libxrandr-native \
     libxrender-native \
     libxslt-native \
+    libyaml-native \
     lz4-native \
     lzip-native \
     lzo-native \
@@ -160,7 +163,7 @@ DEPENDS = "\
     tcl-native \
     texinfo-dummy-native \
     tzcode-native \
-    u-boot-mkimage-native \
+    u-boot-tools-native \
     unifdef-native \
     unzip-native \
     update-rc.d-native \
