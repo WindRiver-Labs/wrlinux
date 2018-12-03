@@ -1,0 +1,8 @@
+python-tkinter feature
+=======================
+
+This feature is used to add python-tkinter and python3-tkinter to
+the image and enable tkinter support for both python and python3.
+
+To use the template, add "--templates feature/python-tkinter" as a
+setup option.
