@@ -129,7 +129,7 @@ require conf/distro/include/wrlinux-distro-settings.conf
 require conf/distro/include/wrlinux-uninative.inc
 
 # Exclude download layers from eSDK.
-SDK_LAYERS_EXCLUDE_PATTERN ?= ".*-dl$ .*-dl-2\.6$"
+SDK_LAYERS_EXCLUDE_PATTERN ?= ".*-dl$ .*-dl-[0-9.]+$"
 
 # By default we only support 'standard' kernels.  A machine configuration,
 # user, or other configuration file can override this.
