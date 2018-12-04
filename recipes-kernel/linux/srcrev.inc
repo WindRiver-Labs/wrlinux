@@ -45,6 +45,8 @@ SRCREV_machine_kb-v4.18-standard-qemuarm64 ?= "e78a46f375febc5f9305b6f94ae12fbf0
 LINUX_VERSION_kb-v4.18-standard-qemuarm64 ?= "4.18.17"
 SRCREV_machine_kb-v4.18-standard-qemuppc ?= "e78a46f375febc5f9305b6f94ae12fbf00b46330"
 LINUX_VERSION_kb-v4.18-standard-qemuppc ?= "4.18.17"
+SRCREV_machine_kb-v4.18-standard-ti-am335x ?= "142bcf25097dfcf11919c228df5fc70b0d3d8f62"
+LINUX_VERSION_kb-v4.18-standard-ti-am335x ?= "4.18.17"
 SRCREV_machine_kb-v4.18-standard-tiny-arm-versatile-926ejs ?= "26f444925aa62171e79a155bec72f055502cbce2"
 LINUX_VERSION_kb-v4.18-standard-tiny-arm-versatile-926ejs ?= "4.18.17"
 SRCREV_machine_kb-v4.18-standard-tiny-base ?= "e78a46f375febc5f9305b6f94ae12fbf00b46330"
@@ -56,5 +58,5 @@ LINUX_VERSION_kb-v4.18-standard-tiny-intel ?= "4.18.17"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_4.18 = "yocto-4.18-wr"
-SRCREV_meta_4.18 = "504fa0643a60fe0bada90d78f38cd34c6bfdc582"
+SRCREV_meta_4.18 = "b8d927e483537106235183794e17ba32d5c709ed"
 LINUX_VERSION_4.18 = "4.18.17"
