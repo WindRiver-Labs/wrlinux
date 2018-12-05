@@ -9,10 +9,6 @@ IMAGE_FSTYPES = "${INITRAMFS_FSTYPES}"
 
 inherit wrlinux-image
 
-# allows root login without a password
-#
-IMAGE_FEATURES += "debug-tweaks"
-
 IMAGE_INSTALL_INITRAMFS += "packagegroup-core-boot-wrs shadow"
 IMAGE_LINGUAS = ""
 
