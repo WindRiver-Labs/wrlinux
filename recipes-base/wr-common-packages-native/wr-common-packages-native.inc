@@ -17,6 +17,7 @@ DEPENDS = "\
     cdrtools-native \
     chrpath-native \
     cmake-native \
+    cpio-native \
     cracklib-native \
     createrepo-c-native \
     cross-localedef-native \
