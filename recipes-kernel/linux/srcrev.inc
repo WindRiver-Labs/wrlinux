@@ -58,5 +58,5 @@ LINUX_VERSION_kb-v4.18-standard-wr-base ?= "4.18.20"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_4.18 = "yocto-4.18-wr"
-SRCREV_meta_4.18 = "05aac57802ebb8ac322564debd496211e8eca959"
+SRCREV_meta_4.18 = "f7b8957c035edcb1cd3a5f4c59b2ef33b1c103e7"
 LINUX_VERSION_4.18 = "4.18.20"
