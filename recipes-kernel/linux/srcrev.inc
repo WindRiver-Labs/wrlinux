@@ -43,7 +43,7 @@ SRCREV_machine_kb-v4.18-standard-qemuarm64 ?= "3ec998a9e3e48f7f01c698c3932333be1
 LINUX_VERSION_kb-v4.18-standard-qemuarm64 ?= "4.18.20"
 SRCREV_machine_kb-v4.18-standard-qemuppc ?= "3ec998a9e3e48f7f01c698c3932333be1c1f13df"
 LINUX_VERSION_kb-v4.18-standard-qemuppc ?= "4.18.20"
-SRCREV_machine_kb-v4.18-standard-ti-am335x ?= "78bb170042e787d0ac6ac41bd52779ba45dd100a"
+SRCREV_machine_kb-v4.18-standard-ti-am335x ?= "ed181035b30bc2022c44ec35efb4fa2f0677707e"
 LINUX_VERSION_kb-v4.18-standard-ti-am335x ?= "4.18.20"
 SRCREV_machine_kb-v4.18-standard-tiny-arm-versatile-926ejs ?= "aee695377bdc1f8779a2c68383c069a664cbdf85"
 LINUX_VERSION_kb-v4.18-standard-tiny-arm-versatile-926ejs ?= "4.18.20"
@@ -53,10 +53,10 @@ SRCREV_machine_kb-v4.18-standard-tiny-common-pc ?= "3ec998a9e3e48f7f01c698c39323
 LINUX_VERSION_kb-v4.18-standard-tiny-common-pc ?= "4.18.20"
 SRCREV_machine_kb-v4.18-standard-tiny-intel ?= "3ec998a9e3e48f7f01c698c3932333be1c1f13df"
 LINUX_VERSION_kb-v4.18-standard-tiny-intel ?= "4.18.20"
-SRCREV_machine_kb-v4.18-standard-wr-base ?= "3ec998a9e3e48f7f01c698c3932333be1c1f13df"
+SRCREV_machine_kb-v4.18-standard-wr-base ?= "48af9a3745322cabf958f819e9953d4958dcc3ae"
 LINUX_VERSION_kb-v4.18-standard-wr-base ?= "4.18.20"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_4.18 = "yocto-4.18-wr"
-SRCREV_meta_4.18 = "f7b8957c035edcb1cd3a5f4c59b2ef33b1c103e7"
+SRCREV_meta_4.18 = "137dd60eb8159b415106b7ba04671f3b52e34390"
 LINUX_VERSION_4.18 = "4.18.20"
