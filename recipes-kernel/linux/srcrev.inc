@@ -39,6 +39,8 @@ SRCREV_machine_kb-v4.18-standard-preempt-rt-intel ?= "f1ab03a28806af68e66ef5aaf6
 LINUX_VERSION_kb-v4.18-standard-preempt-rt-intel ?= "4.18.20"
 SRCREV_machine_kb-v4.18-standard-preempt-rt-intel-x86 ?= "4edccef8083184d0fd2aff237a9d7f1ed00b71d8"
 LINUX_VERSION_kb-v4.18-standard-preempt-rt-intel-x86 ?= "4.18.20"
+SRCREV_machine_kb-v4.18-standard-preempt-rt-xilinx-sdk2018-03-xilinx-zynqmp ?= "c7d49925695daa5cefd6f8f86159b3b308874b14"
+LINUX_VERSION_kb-v4.18-standard-preempt-rt-xilinx-sdk2018-03-xilinx-zynqmp ?= "4.18.20"
 SRCREV_machine_kb-v4.18-standard-qemuarm64 ?= "3ec998a9e3e48f7f01c698c3932333be1c1f13df"
 LINUX_VERSION_kb-v4.18-standard-qemuarm64 ?= "4.18.20"
 SRCREV_machine_kb-v4.18-standard-qemuppc ?= "3ec998a9e3e48f7f01c698c3932333be1c1f13df"
@@ -55,6 +57,8 @@ SRCREV_machine_kb-v4.18-standard-tiny-intel ?= "3ec998a9e3e48f7f01c698c3932333be
 LINUX_VERSION_kb-v4.18-standard-tiny-intel ?= "4.18.20"
 SRCREV_machine_kb-v4.18-standard-wr-base ?= "48af9a3745322cabf958f819e9953d4958dcc3ae"
 LINUX_VERSION_kb-v4.18-standard-wr-base ?= "4.18.20"
+SRCREV_machine_kb-v4.18-standard-xilinx-sdk2018-03-xilinx-zynqmp ?= "9633fac7ba36c722b74bda36731b2cf4eb8a2681"
+LINUX_VERSION_kb-v4.18-standard-xilinx-sdk2018-03-xilinx-zynqmp ?= "4.18.20"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_4.18 = "yocto-4.18-wr"
