@@ -9,7 +9,7 @@ IMAGE_FSTYPES = "${INITRAMFS_FSTYPES}"
 
 inherit wrlinux-image
 
-IMAGE_INSTALL_INITRAMFS += "packagegroup-core-boot-wrs shadow"
+IMAGE_INSTALL_INITRAMFS += "packagegroup-core-boot-wrs shadow libgcc"
 IMAGE_LINGUAS = ""
 
 QB_DEFAULT_FSTYPE = "cpio.gz"
