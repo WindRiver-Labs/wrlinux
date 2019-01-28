@@ -1,0 +1,33 @@
+From 7072dfa7daa363516a18f15d227c648f4baeb9dd Mon Sep 17 00:00:00 2001
+From: He Zhe <zhe.he@windriver.com>
+Date: Mon, 28 Jan 2019 15:51:03 +0800
+Subject: [PATCH] wrLinux_ltp: Remove admin_tools
+
+admin_tools test group has been removed from upstream. Remove it in wr-runltp to
+fix the following failure.
+
+FATAL: there is no group file admin_tools under /opt/ltp/runtest/
+
+Upstream-Status: Inappropriate [WR specific]
+
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ wrLinux_ltp/wr-runltp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wrLinux_ltp/wr-runltp b/wrLinux_ltp/wr-runltp
+index 3037077..25fb02e 100644
+--- a/wrLinux_ltp/wr-runltp
++++ b/wrLinux_ltp/wr-runltp
+@@ -47,7 +47,7 @@ LOGPATH="$WRLTPROOT/results"
+ LOGFILE="$LOGPATH/LTP_RUN_ON-$EXECUTION_TIME.log"
+ LTPLOG=$LOGPATH/LTP.log
+ SCENARIO_GROUP_LIST="syscalls,fs,fs_perms_simple,fsx,dio,io,mm,ipc,sched,math,nptl,pty,\
+-containers,fs_bind,filecaps,cap_bounds,connectors,fcntl-locktests,admin_tools,timers,commands,\
++containers,fs_bind,filecaps,cap_bounds,connectors,fcntl-locktests,timers,commands,\
+ hyperthreading,kernel_misc,modules"
+ 
+ RUN_RESUME_TEST=0
+-- 
+2.7.4
+

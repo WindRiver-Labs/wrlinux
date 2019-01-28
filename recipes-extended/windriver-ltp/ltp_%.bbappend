@@ -18,6 +18,7 @@ SRC_URI += " file://README \
              file://0016-Fix-invalid-argument-error-for-POSIX-test-case-pi_test.patch \
              file://0017-Change-some-auto-detecting-options-to-configurable-o.patch \
              file://0018-posix-skip-the-test-pthread_barrier_destroy_2-1.patch \
+             file://0019-wrLinux_ltp-Remove-admin_tools.patch \
             "
 
 do_compile(){
