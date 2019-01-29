@@ -60,5 +60,5 @@ IMAGE_FEATURES += " \
     wr-core-mail \
     "
 
-# enable build out .ext3 image file, shall be useful for qemu
-IMAGE_FSTYPES += "ext3"
+# enable build out .ext4 image file, shall be useful for qemu
+IMAGE_FSTYPES += "ext4"
