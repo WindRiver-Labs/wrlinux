@@ -1,4 +1,4 @@
 OVP_INCLUDE = ""
-OVP_INCLUDE_wrlinux-ovp = "qemu-ovp-3.0.0.inc"
+OVP_INCLUDE_wrlinux-ovp = "qemu-ovp.inc"
 
 require ${OVP_INCLUDE}
