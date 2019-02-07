@@ -1,0 +1,62 @@
+wr-app-container
+-------------------------
+
+The wrlinux layer comes with a single 'flexible' image called
+'wr-app-container'. This image allows you to build a single
+application container where you select the application which the image
+will contain. Application selection is made via local.conf, by setting
+'WR_APP_CONTAINER_APP' to the name of the application.
+
+
+Building
+-------------------------
+
+The image is built using the normal bitbake commands:
+%> bitbake wr-app-container
+
+The output will be found in the tmp/deploy/images/* directory
+alongside the other images.
+
+
+Usage
+-------------------------
+
+Once built you would normally want to deploy the container image for
+use with OverC or Docker.
+
+For OverC this would be done by copying the container image tarball to
+the target running OverC and then running the following commands on
+dom0 or in a container with bindings to dom0:
+
+# c3 add -n app-container wr-app-container-genericx86-64.tar.bz2
+# c3 cfg -o /opt/container/app-container set app:/usr/bin/<your_app> [options]
+# c3 start [options] app-container
+
+If using docker you would make use of the resulting container image by
+importing and running it using:
+
+# docker import wr-app-container-genericx86-64.tar.bz2 app-container
+# docker run -it app-container /usr/bin/<your_app>
+
+At this poing either with OverC or Docker you could push the container
+to a registry such that it is avaible to other systems.
+
+Image size
+-------------------------
+
+The image size will depend on your selected application. As with any
+image, bitbake will include any dependencies in the image and as such
+the size can easily grow. A small application with no/few dependencies
+will result in a image of only a few MB.
+
+
+Creating more than one app container
+-------------------------
+
+The use of the 'wr-app-container' and 'WR_APP_CONTAINER_APP' is
+restricted to one application. However, you may use the
+wr-app-container.inc in your own image recipe in a similar way
+wr-app-container_*.bb does. This will allow you to write your own
+application container images in only a few lines, and, any
+improvements made to the wr-app-container.inc will immediately be
+available in your image.
