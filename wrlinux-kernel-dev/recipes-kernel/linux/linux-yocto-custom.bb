@@ -65,9 +65,10 @@ LINUX_VERSION_EXTENSION_append = "-custom"
 
 KERNEL_VERSION_SANITY_SKIP="1"
 
-# Modify SRCREV to a different commit hash in a copy of this recipe to
-# build a different release of the Linux kernel.
-SRCREV_machine ?= "322b8527ac45dc4a24c28d2031a5a52898248eae"
+# The use of ${AUTOREV} is not recommended and should be replaced by a specific
+# commit ID, ${AUTOREV} is only used here to ensure this reference recipe is
+# always buildable.
+SRCREV_machine ?= "${AUTOREV}"
 
 # Override this to use expected config options
 SRC_URI += "file://defconfig"
