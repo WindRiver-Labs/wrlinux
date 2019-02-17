@@ -2,6 +2,9 @@
 DEPENDS = "\
     acl-native \
     alsa-lib-native \
+    at-spi2-atk-native \
+    at-spi2-core-native \
+    atk-native \
     attr-native \
     autoconf-archive-native \
     autoconf-native \
@@ -57,8 +60,8 @@ DEPENDS = "\
     gptfdisk-native \
     groff-native \
     grub-efi-native \
+    gtk+3-native \
     gtk-doc-native \
-    gtk-icon-utils-native \
     harfbuzz-native \
     icu-native \
     intltool-native \
@@ -71,7 +74,6 @@ DEPENDS = "\
     libassuan-native \
     libcheck-native \
     libcomps-native \
-    libcroco-native \
     libdnf-native \
     libffi-native \
     libfontenc-native \
@@ -85,7 +87,6 @@ DEPENDS = "\
     libpng-native \
     libpthread-stubs-native \
     librepo-native \
-    librsvg-native \
     libsdl2-native \
     libsm-native \
     libsolv-native \
@@ -94,15 +95,21 @@ DEPENDS = "\
     libx11-native \
     libxau-native \
     libxcb-native \
+    libxcomposite-native \
+    libxcursor-native \
+    libxdamage-native \
     libxdmcp-native \
     libxext-native \
+    libxfixes-native \
     libxft-native \
+    libxi-native \
     libxml-namespacesupport-perl-native \
     libxml-parser-perl-native \
     libxml2-native \
     libxrandr-native \
     libxrender-native \
     libxslt-native \
+    libxtst-native \
     libyaml-native \
     lz4-native \
     lzip-native \
