@@ -1,0 +1,4 @@
+This template enables addition POSIX 1003.26 supported APIs, which is required
+by the FACE 3.0 Technical Standard.
+
+Specifically this implements the devctl.h header, and posix_devctl() API.
