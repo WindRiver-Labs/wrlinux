@@ -1,0 +1,712 @@
+From 38d737503d515f16d258434e03e9396f26b34cb1 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 22 Feb 2019 14:00:39 +0800
+Subject: [PATCH] Add support for posix_devctl()
+
+It is defined in POSIX 1003.26 and required by the FACE Technical
+Standard.
+
+POSIX 1003.26 is available from here:
+https://standards.ieee.org/findstds/standard/1003.26-2003.html
+
+Implement FACE 3.0 specific details, as documented in Section 3.2.1.2, GPSS
+POSIX numbers 10 and 11, see:
+http://oaevents.goprecise.com/wp-content/uploads/2017/11/FACE-Technical-Standard-Edition-3.0.pdf
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ bits/confname.h                                    |   2 +
+ posix/Makefile                                     |   3 +-
+ posix/Versions                                     |   5 +
+ posix/devctl.h                                     |  51 +++++++++
+ posix/getconf.c                                    |   2 +
+ posix/posix_devctl.c                               |  31 ++++++
+ posix/sysconf.c                                    |   7 ++
+ posix/unistd.h                                     |   4 +
+ sysdeps/mach/hurd/i386/libc.abilist                |   1 +
+ sysdeps/unix/sysv/linux/aarch64/libc.abilist       |   1 +
+ sysdeps/unix/sysv/linux/alpha/libc.abilist         |   1 +
+ sysdeps/unix/sysv/linux/arm/libc.abilist           |   1 +
+ sysdeps/unix/sysv/linux/csky/libc.abilist          |   1 +
+ sysdeps/unix/sysv/linux/hppa/libc.abilist          |   1 +
+ sysdeps/unix/sysv/linux/i386/libc.abilist          |   1 +
+ sysdeps/unix/sysv/linux/ia64/libc.abilist          |   1 +
+ sysdeps/unix/sysv/linux/m68k/coldfire/libc.abilist |   1 +
+ sysdeps/unix/sysv/linux/m68k/m680x0/libc.abilist   |   1 +
+ sysdeps/unix/sysv/linux/microblaze/libc.abilist    |   1 +
+ .../unix/sysv/linux/mips/mips32/fpu/libc.abilist   |   1 +
+ .../unix/sysv/linux/mips/mips32/nofpu/libc.abilist |   1 +
+ .../unix/sysv/linux/mips/mips64/n32/libc.abilist   |   1 +
+ .../unix/sysv/linux/mips/mips64/n64/libc.abilist   |   1 +
+ sysdeps/unix/sysv/linux/nios2/libc.abilist         |   1 +
+ sysdeps/unix/sysv/linux/posix_devctl.c             | 116 +++++++++++++++++++++
+ .../sysv/linux/powerpc/powerpc32/fpu/libc.abilist  |   1 +
+ .../linux/powerpc/powerpc32/nofpu/libc.abilist     |   1 +
+ .../sysv/linux/powerpc/powerpc64/be/libc.abilist   |   1 +
+ .../sysv/linux/powerpc/powerpc64/le/libc.abilist   |   1 +
+ sysdeps/unix/sysv/linux/riscv/rv64/libc.abilist    |   1 +
+ sysdeps/unix/sysv/linux/s390/s390-32/libc.abilist  |   1 +
+ sysdeps/unix/sysv/linux/s390/s390-64/libc.abilist  |   1 +
+ sysdeps/unix/sysv/linux/sh/libc.abilist            |   1 +
+ sysdeps/unix/sysv/linux/sparc/sparc32/libc.abilist |   1 +
+ sysdeps/unix/sysv/linux/sparc/sparc64/libc.abilist |   1 +
+ sysdeps/unix/sysv/linux/x86_64/64/libc.abilist     |   1 +
+ sysdeps/unix/sysv/linux/x86_64/x32/libc.abilist    |   1 +
+ 37 files changed, 248 insertions(+), 1 deletion(-)
+ create mode 100644 posix/devctl.h
+ create mode 100644 posix/posix_devctl.c
+ create mode 100644 sysdeps/unix/sysv/linux/posix_devctl.c
+
+diff --git a/bits/confname.h b/bits/confname.h
+index 1476f61..83c3274 100644
+--- a/bits/confname.h
++++ b/bits/confname.h
+@@ -492,6 +492,8 @@ enum
+ #define _SC_LEVEL4_CACHE_ASSOC		_SC_LEVEL4_CACHE_ASSOC
+     _SC_LEVEL4_CACHE_LINESIZE,
+ #define _SC_LEVEL4_CACHE_LINESIZE	_SC_LEVEL4_CACHE_LINESIZE
++    _SC_POSIX_26_VERSION,
++#define _SC_POSIX_26_VERSION		_SC_POSIX_26_VERSION
+     /* Leave room here, maybe we need a few more cache levels some day.  */
+ 
+     _SC_IPV6 = _SC_LEVEL1_ICACHE_SIZE + 50,
+diff --git a/posix/Makefile b/posix/Makefile
+index cfd914f..722a508 100644
+--- a/posix/Makefile
++++ b/posix/Makefile
+@@ -23,7 +23,7 @@ subdir	:= posix
+ include ../Makeconfig
+ 
+ headers	:= sys/utsname.h sys/times.h sys/wait.h sys/types.h unistd.h	      \
+-	   glob.h regex.h wordexp.h fnmatch.h 				      \
++	   glob.h regex.h wordexp.h fnmatch.h devctl.h			      \
+ 	   getopt.h bits/getopt_core.h bits/getopt_ext.h bits/getopt_posix.h  \
+ 	   bits/types.h bits/typesizes.h bits/pthreadtypes.h		      \
+ 	   bits/pthreadtypes-arch.h bits/thread-shared-types.h		      \
+@@ -63,6 +63,7 @@ routines :=								      \
+ 	spawnattr_getsigmask spawnattr_getschedpolicy spawnattr_getschedparam \
+ 	spawnattr_setsigmask spawnattr_setschedpolicy spawnattr_setschedparam \
+ 	posix_madvise							      \
++	posix_devctl							      \
+ 	get_child_max sched_cpucount sched_cpualloc sched_cpufree
+ 
+ aux		:= init-posix environ
+diff --git a/posix/Versions b/posix/Versions
+index ad693ae..661bffc 100644
+--- a/posix/Versions
++++ b/posix/Versions
+@@ -141,6 +141,11 @@ libc {
+     posix_spawn_file_actions_addchdir_np;
+     posix_spawn_file_actions_addfchdir_np;
+   }
++
++  GLIBC_2.28 {
++    posix_devctl;
++  }
++
+   GLIBC_PRIVATE {
+     __libc_fork; __libc_pread; __libc_pwrite;
+     __nanosleep_nocancel; __pause_nocancel;
+diff --git a/posix/devctl.h b/posix/devctl.h
+new file mode 100644
+index 0000000..1010035
+--- /dev/null
++++ b/posix/devctl.h
+@@ -0,0 +1,51 @@
++/* Definitions for POSIX posix_devctl interface.
++   Copyright (C) 2014-2019 Wind River Systems, Inc.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <http://www.gnu.org/licenses/>. */
++
++#ifndef _DEVCTL_H
++#define _DEVCTL_H
++
++#include <unistd.h>
++/*
++ * posix_devctl() is defined by POSIX 1003.26-2003. It requires
++ * POSIX_26_C_SOURCE to be defined in order for the function to
++ * be available.
++ */
++#if _POSIX_26_C_SOURCE == 200312L
++
++#include <sys/ioctl.h>
++#include <sys/types.h>
++
++/* http://oaevents.goprecise.com/wp-content/uploads/2017/11/FACE-Technical-Standard-Edition-3.0.pdf
++ * Implement FACE 3.0 specific details, as documented in Section 3.2.1.2, GPSS
++ * POSIX numbers 10 and 11, see:
++ * An OSS UoC shall define:
++ * a. A macro in <sys/ioctl.h> named FIONBIO to configure sockets for non-blocking I/O
++ * b. A macro in <devctl.h> named SOCKCLOSE to close an open socket
++ * Use `_IOR' to define SOCKCLOSE that avoids macro conflict with <sys/ioctl.h>
++ */
++#define SOCKCLOSE    _IOR('f', 200, int)
++
++__BEGIN_DECLS
++extern int posix_devctl(int fildes,
++                        int dcmd,
++                        void *__restrict dev_data_ptr,
++                        size_t nbyte,
++                        int *__restrict dev_info_ptr);
++__END_DECLS
++
++#endif /* _POSIX_26_C_SOURCE == 200312L */
++#endif /* _DEVCTL_H */
+diff --git a/posix/getconf.c b/posix/getconf.c
+index 0211fde..70ec8db 100644
+--- a/posix/getconf.c
++++ b/posix/getconf.c
+@@ -403,6 +403,8 @@ static const struct conf vars[] =
+     { "_POSIX_IPV6", _SC_IPV6, SYSCONF },
+     { "_POSIX_RAW_SOCKETS", _SC_RAW_SOCKETS, SYSCONF },
+ 
++    { "_POSIX_26_VERSION", _SC_POSIX_26_VERSION, SYSCONF },
++
+     { NULL, 0, SYSCONF }
+   };
+ 
+diff --git a/posix/posix_devctl.c b/posix/posix_devctl.c
+new file mode 100644
+index 0000000..a002274
+--- /dev/null
++++ b/posix/posix_devctl.c
+@@ -0,0 +1,31 @@
++/* Copyright (C) 2019 Wind River Systems, Inc.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <http://www.gnu.org/licenses/>. */
++
++#include <devctl.h>
++#include <errno.h>
++
++/* The posix_devctl method is defined by POSIX 1003.26-2003.
++   The interface can simply pass the arguments to the regular system ioctl. */
++
++int posix_devctl(int fildes,
++                 int dcmd,
++                 void *__restrict dev_data_ptr,
++                 size_t nbyte,
++                 int *__restrict dev_info_ptr)
++{
++    return ENOSYS;
++}
++stub_warning (posix_devctl)
+diff --git a/posix/sysconf.c b/posix/sysconf.c
+index 47afac9..befc6b0 100644
+--- a/posix/sysconf.c
++++ b/posix/sysconf.c
+@@ -148,6 +148,13 @@ __sysconf (int name)
+     case _SC_GETPW_R_SIZE_MAX:
+       return NSS_BUFLEN_PASSWD;
+ 
++    case _SC_POSIX_26_VERSION:
++#ifdef _POSIX_26_C_SOURCE
++      return _POSIX_26_VERSION;
++#else
++      return -1;
++#endif
++
+     case _SC_ARG_MAX:
+     case _SC_CHILD_MAX:
+     case _SC_CLK_TCK:
+diff --git a/posix/unistd.h b/posix/unistd.h
+index f674521..a42ac79 100644
+--- a/posix/unistd.h
++++ b/posix/unistd.h
+@@ -85,6 +85,10 @@ __BEGIN_DECLS
+    creation of locales with the localedef utility.  */
+ #define _POSIX2_LOCALEDEF       __POSIX2_THIS_VERSION
+ 
++/* If defined, the implementation supports the
++   implement posix_devctl() using ioctl()  */
++#define _POSIX_26_C_SOURCE 200312L
++
+ /* X/Open version number to which the library conforms.  It is selectable.  */
+ #ifdef __USE_XOPEN2K8
+ # define _XOPEN_VERSION	700
+diff --git a/sysdeps/mach/hurd/i386/libc.abilist b/sysdeps/mach/hurd/i386/libc.abilist
+index dd3cf6f..4773b6d 100644
+--- a/sysdeps/mach/hurd/i386/libc.abilist
++++ b/sysdeps/mach/hurd/i386/libc.abilist
+@@ -2037,6 +2037,7 @@ GLIBC_2.27 wcstof64x F
+ GLIBC_2.27 wcstof64x_l F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.29 _hurd_port_move F
+ GLIBC_2.29 posix_spawn_file_actions_addchdir_np F
+diff --git a/sysdeps/unix/sysv/linux/aarch64/libc.abilist b/sysdeps/unix/sysv/linux/aarch64/libc.abilist
+index 9c330f3..1407fde 100644
+--- a/sysdeps/unix/sysv/linux/aarch64/libc.abilist
++++ b/sysdeps/unix/sysv/linux/aarch64/libc.abilist
+@@ -2133,6 +2133,7 @@ GLIBC_2.27 wcstof64x F
+ GLIBC_2.27 wcstof64x_l F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/alpha/libc.abilist b/sysdeps/unix/sysv/linux/alpha/libc.abilist
+index f630fa4..a6a31a5 100644
+--- a/sysdeps/unix/sysv/linux/alpha/libc.abilist
++++ b/sysdeps/unix/sysv/linux/alpha/libc.abilist
+@@ -2028,6 +2028,7 @@ GLIBC_2.27 wcstof64x F
+ GLIBC_2.27 wcstof64x_l F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/arm/libc.abilist b/sysdeps/unix/sysv/linux/arm/libc.abilist
+index b96f455..4c63554 100644
+--- a/sysdeps/unix/sysv/linux/arm/libc.abilist
++++ b/sysdeps/unix/sysv/linux/arm/libc.abilist
+@@ -118,6 +118,7 @@ GLIBC_2.27 wcstof64_l F
+ GLIBC_2.28 fcntl F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/csky/libc.abilist b/sysdeps/unix/sysv/linux/csky/libc.abilist
+index 019044c..835c42b 100644
+--- a/sysdeps/unix/sysv/linux/csky/libc.abilist
++++ b/sysdeps/unix/sysv/linux/csky/libc.abilist
+@@ -1525,6 +1525,7 @@ GLIBC_2.29 remque F
+ GLIBC_2.29 rename F
+ GLIBC_2.29 renameat F
+ GLIBC_2.29 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.29 revoke F
+ GLIBC_2.29 rewind F
+ GLIBC_2.29 rewinddir F
+diff --git a/sysdeps/unix/sysv/linux/hppa/libc.abilist b/sysdeps/unix/sysv/linux/hppa/libc.abilist
+index 088a8ee..23a066b 100644
+--- a/sysdeps/unix/sysv/linux/hppa/libc.abilist
++++ b/sysdeps/unix/sysv/linux/hppa/libc.abilist
+@@ -1875,6 +1875,7 @@ GLIBC_2.27 wcstof64_l F
+ GLIBC_2.28 fcntl F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/i386/libc.abilist b/sysdeps/unix/sysv/linux/i386/libc.abilist
+index f7ff2c5..3cc29a7 100644
+--- a/sysdeps/unix/sysv/linux/i386/libc.abilist
++++ b/sysdeps/unix/sysv/linux/i386/libc.abilist
+@@ -2040,6 +2040,7 @@ GLIBC_2.27 wcstof64x_l F
+ GLIBC_2.28 fcntl F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/ia64/libc.abilist b/sysdeps/unix/sysv/linux/ia64/libc.abilist
+index becd8b1..add13dd 100644
+--- a/sysdeps/unix/sysv/linux/ia64/libc.abilist
++++ b/sysdeps/unix/sysv/linux/ia64/libc.abilist
+@@ -1909,6 +1909,7 @@ GLIBC_2.27 wcstof64x F
+ GLIBC_2.27 wcstof64x_l F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/m68k/coldfire/libc.abilist b/sysdeps/unix/sysv/linux/m68k/coldfire/libc.abilist
+index 74e42a5..f9fd484 100644
+--- a/sysdeps/unix/sysv/linux/m68k/coldfire/libc.abilist
++++ b/sysdeps/unix/sysv/linux/m68k/coldfire/libc.abilist
+@@ -119,6 +119,7 @@ GLIBC_2.27 wcstof64_l F
+ GLIBC_2.28 fcntl F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/m68k/m680x0/libc.abilist b/sysdeps/unix/sysv/linux/m68k/m680x0/libc.abilist
+index 4af5a74..873aba3 100644
+--- a/sysdeps/unix/sysv/linux/m68k/m680x0/libc.abilist
++++ b/sysdeps/unix/sysv/linux/m68k/m680x0/libc.abilist
+@@ -1984,6 +1984,7 @@ GLIBC_2.27 wcstof64_l F
+ GLIBC_2.28 fcntl F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/microblaze/libc.abilist b/sysdeps/unix/sysv/linux/microblaze/libc.abilist
+index ccef673..e91e1b7 100644
+--- a/sysdeps/unix/sysv/linux/microblaze/libc.abilist
++++ b/sysdeps/unix/sysv/linux/microblaze/libc.abilist
+@@ -2125,6 +2125,7 @@ GLIBC_2.27 wcstof64_l F
+ GLIBC_2.28 fcntl F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/mips/mips32/fpu/libc.abilist b/sysdeps/unix/sysv/linux/mips/mips32/fpu/libc.abilist
+index 1054bb5..6a04027 100644
+--- a/sysdeps/unix/sysv/linux/mips/mips32/fpu/libc.abilist
++++ b/sysdeps/unix/sysv/linux/mips/mips32/fpu/libc.abilist
+@@ -1962,6 +1962,7 @@ GLIBC_2.27 wcstof64_l F
+ GLIBC_2.28 fcntl F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/mips/mips32/nofpu/libc.abilist b/sysdeps/unix/sysv/linux/mips/mips32/nofpu/libc.abilist
+index 4f5b5ff..3fec6bc 100644
+--- a/sysdeps/unix/sysv/linux/mips/mips32/nofpu/libc.abilist
++++ b/sysdeps/unix/sysv/linux/mips/mips32/nofpu/libc.abilist
+@@ -1960,6 +1960,7 @@ GLIBC_2.27 wcstof64_l F
+ GLIBC_2.28 fcntl F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/mips/mips64/n32/libc.abilist b/sysdeps/unix/sysv/linux/mips/mips64/n32/libc.abilist
+index 943aee5..e8ddac6 100644
+--- a/sysdeps/unix/sysv/linux/mips/mips64/n32/libc.abilist
++++ b/sysdeps/unix/sysv/linux/mips/mips64/n32/libc.abilist
+@@ -1968,6 +1968,7 @@ GLIBC_2.27 wcstof64x_l F
+ GLIBC_2.28 fcntl F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/mips/mips64/n64/libc.abilist b/sysdeps/unix/sysv/linux/mips/mips64/n64/libc.abilist
+index 17a5d17..91d415c 100644
+--- a/sysdeps/unix/sysv/linux/mips/mips64/n64/libc.abilist
++++ b/sysdeps/unix/sysv/linux/mips/mips64/n64/libc.abilist
+@@ -1963,6 +1963,7 @@ GLIBC_2.27 wcstof64x F
+ GLIBC_2.27 wcstof64x_l F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/nios2/libc.abilist b/sysdeps/unix/sysv/linux/nios2/libc.abilist
+index 4d62a54..e3bd0c1 100644
+--- a/sysdeps/unix/sysv/linux/nios2/libc.abilist
++++ b/sysdeps/unix/sysv/linux/nios2/libc.abilist
+@@ -2166,6 +2166,7 @@ GLIBC_2.27 wcstof64_l F
+ GLIBC_2.28 fcntl F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/posix_devctl.c b/sysdeps/unix/sysv/linux/posix_devctl.c
+new file mode 100644
+index 0000000..2fd7ae6
+--- /dev/null
++++ b/sysdeps/unix/sysv/linux/posix_devctl.c
+@@ -0,0 +1,116 @@
++/* Define the posix_devctl.c function.
++   Copyright (C) 2014-2019 Wind River Systems, Inc.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <http://www.gnu.org/licenses/>. */
++
++#include <devctl.h>
++#include <errno.h>
++
++/* The posix_devctl method is defined by POSIX 1003.26-2003.
++   The interface can simply pass the arguments to the regular system ioctl. */
++
++int posix_devctl(int fildes,
++                 int dcmd,
++                 void *__restrict dev_data_ptr,
++                 size_t nbyte,
++                 int *__restrict dev_info_ptr)
++{
++  /* POSIX 1003.26-2003 indicates that there is a "general goal
++   * of being able to implement posix_devctl() using the existing
++   * ioctl() interfaces provided in current UNIX systems and other
++   * POSIX implementations because the standard allows but does not
++   * require checking the size of the device data."
++   *
++   * As such this function will be implemented primarily using the
++   * existing ioctl() interface as permitted by the specification.
++   *
++   * Additionally the FACE Technical Standard 3.0, Section 3.2.1.2,
++   * requiret that FIONBIO and SOCKCLOSE command be supported.
++   */
++
++  int ret = 0;
++  __set_errno (0);
++
++  if (fildes < 0)
++  {
++    __set_errno (EBADF);
++    ret = -1;
++    goto on_error;
++  }
++
++  if (nbyte > 0 && dev_data_ptr == NULL)
++  {
++    __set_errno (EINVAL);
++    ret = -1;
++    goto on_error;
++  }
++
++  /* An OSS UoC shall provide:
++   * a. The SOCKCLOSE command in the posix_devctl() API
++   * b. The FIONBIO command in the posix_devctl() API
++   */
++  switch (dcmd)
++    {
++    case SOCKCLOSE:
++      if (nbyte > 0 || dev_data_ptr != NULL)
++      {
++        __set_errno (EINVAL);
++        ret = -1;
++        goto on_error;
++      }
++      ret = close(fildes);
++      break;
++    // FIONBIO is implemented in kernel
++    case FIONBIO:
++      if ((nbyte > 0 && nbyte < sizeof(int)) ||
++          dev_data_ptr == NULL)
++      {
++        __set_errno (EINVAL);
++        ret = -1;
++        goto on_error;
++      }
++    default:
++      ret = __ioctl(fildes, dcmd, dev_data_ptr);
++    }
++
++
++on_error:
++  /* ioctl() and posix_devctl() have different return value semantics.
++   *
++   * (from the Linux man-pages project)
++   * ioctl() will usually return success with zero, but a few ioctl() request use
++   * the return value as an output parameter and return a nonnegative value on
++   * success.  On error, -1 is returned, and errno is set appropriately.
++   *
++   * post_devctl(), upon successful completion, shall return zero; otherwise an
++   * error number shall be returned to indicate the error. The value returned via
++   * the dev_info_ptr argument is driver dependent.
++   *
++   * Based on this it can be assumed an ioctl() return value of -1 indicates
++   * an error, and the error number will be set in errno.
++   *
++   * Any nonnegative value returned is then considered to indicate success,
++   * and assumed to be an output parameter from ioctl().  Output parameters are
++   * transferred into dev_info_ptr, unless it is NULL.
++   */
++  if (dev_info_ptr != NULL) {
++      *dev_info_ptr = ret;
++  }
++
++  if (ret < 0)
++    ret = errno;
++
++  return ret;
++}
+diff --git a/sysdeps/unix/sysv/linux/powerpc/powerpc32/fpu/libc.abilist b/sysdeps/unix/sysv/linux/powerpc/powerpc32/fpu/libc.abilist
+index ecc2d6f..80f71cc 100644
+--- a/sysdeps/unix/sysv/linux/powerpc/powerpc32/fpu/libc.abilist
++++ b/sysdeps/unix/sysv/linux/powerpc/powerpc32/fpu/libc.abilist
+@@ -1988,6 +1988,7 @@ GLIBC_2.27 wcstof64_l F
+ GLIBC_2.28 fcntl F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/powerpc/powerpc32/nofpu/libc.abilist b/sysdeps/unix/sysv/linux/powerpc/powerpc32/nofpu/libc.abilist
+index f5830f9..8915483 100644
+--- a/sysdeps/unix/sysv/linux/powerpc/powerpc32/nofpu/libc.abilist
++++ b/sysdeps/unix/sysv/linux/powerpc/powerpc32/nofpu/libc.abilist
+@@ -1992,6 +1992,7 @@ GLIBC_2.27 wcstof64_l F
+ GLIBC_2.28 fcntl F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/powerpc/powerpc64/be/libc.abilist b/sysdeps/unix/sysv/linux/powerpc/powerpc64/be/libc.abilist
+index 633d8f4..6077873 100644
+--- a/sysdeps/unix/sysv/linux/powerpc/powerpc64/be/libc.abilist
++++ b/sysdeps/unix/sysv/linux/powerpc/powerpc64/be/libc.abilist
+@@ -118,6 +118,7 @@ GLIBC_2.27 wcstof64 F
+ GLIBC_2.27 wcstof64_l F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/powerpc/powerpc64/le/libc.abilist b/sysdeps/unix/sysv/linux/powerpc/powerpc64/le/libc.abilist
+index 2c71263..134f0a8 100644
+--- a/sysdeps/unix/sysv/linux/powerpc/powerpc64/le/libc.abilist
++++ b/sysdeps/unix/sysv/linux/powerpc/powerpc64/le/libc.abilist
+@@ -2223,6 +2223,7 @@ GLIBC_2.27 wcstof64x F
+ GLIBC_2.27 wcstof64x_l F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/riscv/rv64/libc.abilist b/sysdeps/unix/sysv/linux/riscv/rv64/libc.abilist
+index 195bc8b..15db742 100644
+--- a/sysdeps/unix/sysv/linux/riscv/rv64/libc.abilist
++++ b/sysdeps/unix/sysv/linux/riscv/rv64/libc.abilist
+@@ -2095,6 +2095,7 @@ GLIBC_2.27 xprt_register F
+ GLIBC_2.27 xprt_unregister F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/s390/s390-32/libc.abilist b/sysdeps/unix/sysv/linux/s390/s390-32/libc.abilist
+index 334def0..77301a3 100644
+--- a/sysdeps/unix/sysv/linux/s390/s390-32/libc.abilist
++++ b/sysdeps/unix/sysv/linux/s390/s390-32/libc.abilist
+@@ -1997,6 +1997,7 @@ GLIBC_2.27 wcstof64x_l F
+ GLIBC_2.28 fcntl F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/s390/s390-64/libc.abilist b/sysdeps/unix/sysv/linux/s390/s390-64/libc.abilist
+index 536f4c4..cc2934f 100644
+--- a/sysdeps/unix/sysv/linux/s390/s390-64/libc.abilist
++++ b/sysdeps/unix/sysv/linux/s390/s390-64/libc.abilist
+@@ -1902,6 +1902,7 @@ GLIBC_2.27 wcstof64x F
+ GLIBC_2.27 wcstof64x_l F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/sh/libc.abilist b/sysdeps/unix/sysv/linux/sh/libc.abilist
+index 30ae3b6..6ff4116 100644
+--- a/sysdeps/unix/sysv/linux/sh/libc.abilist
++++ b/sysdeps/unix/sysv/linux/sh/libc.abilist
+@@ -1879,6 +1879,7 @@ GLIBC_2.27 wcstof64_l F
+ GLIBC_2.28 fcntl F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/sparc/sparc32/libc.abilist b/sysdeps/unix/sysv/linux/sparc/sparc32/libc.abilist
+index 68b107d..edc8018 100644
+--- a/sysdeps/unix/sysv/linux/sparc/sparc32/libc.abilist
++++ b/sysdeps/unix/sysv/linux/sparc/sparc32/libc.abilist
+@@ -1991,6 +1991,7 @@ GLIBC_2.27 wcstof64x_l F
+ GLIBC_2.28 fcntl F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/sparc/sparc64/libc.abilist b/sysdeps/unix/sysv/linux/sparc/sparc64/libc.abilist
+index e5b6a4d..eef73ab 100644
+--- a/sysdeps/unix/sysv/linux/sparc/sparc64/libc.abilist
++++ b/sysdeps/unix/sysv/linux/sparc/sparc64/libc.abilist
+@@ -1932,6 +1932,7 @@ GLIBC_2.27 wcstof64x F
+ GLIBC_2.27 wcstof64x_l F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/x86_64/64/libc.abilist b/sysdeps/unix/sysv/linux/x86_64/64/libc.abilist
+index 86dfb0c..7235302 100644
+--- a/sysdeps/unix/sysv/linux/x86_64/64/libc.abilist
++++ b/sysdeps/unix/sysv/linux/x86_64/64/libc.abilist
+@@ -1890,6 +1890,7 @@ GLIBC_2.27 wcstof64x F
+ GLIBC_2.27 wcstof64x_l F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/x86_64/x32/libc.abilist b/sysdeps/unix/sysv/linux/x86_64/x32/libc.abilist
+index dd68826..0c15361 100644
+--- a/sysdeps/unix/sysv/linux/x86_64/x32/libc.abilist
++++ b/sysdeps/unix/sysv/linux/x86_64/x32/libc.abilist
+@@ -2141,6 +2141,7 @@ GLIBC_2.27 wcstof64x F
+ GLIBC_2.27 wcstof64x_l F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+-- 
+2.7.4
+
