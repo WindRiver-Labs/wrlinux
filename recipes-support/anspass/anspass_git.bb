@@ -13,7 +13,7 @@ DEPENDS = "libgcrypt"
 
 SRC_URI = "git://github.com/WindRiver-OpenSourceLabs/anspass"
 
-SRCREV = "6bfb285bc5d80b5b53d3edfee5a512554150eb0f"
+SRCREV = "726c141fe582add0addf7d128aa33d1e3c532b56"
 
 PV = "1.0+git${SRCPV}"
 
