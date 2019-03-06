@@ -45,8 +45,12 @@ if [ -n "$version" ]; then
        cd linux-yocto-${version}
      elif [ -d linux-yocto-${version}.git ]; then
        cd linux-yocto-${version}.git
+     elif [ -d linux-yocto ]; then
+       cd linux-yocto
+     elif [ -d linux-yocto.git ]; then
+       cd linux-yocto.git
      else
-       echo "Unable to find linux-yocto-${version} repository." >&2
+       echo "Unable to find linux-yocto-${version} or linux-yocto repository." >&2
        exit 1
      fi
      for branch in `git for-each-ref --format='%(refname)' refs/heads` ; do
@@ -93,9 +97,14 @@ echo "# yocto-kernel-cache entries"
    echo "Unable to find yocto-kernel-cache repository." >&2
    exit 1
  fi
- for branch in `git for-each-ref --format='%(refname)' refs/heads | grep -- -wr` ; do
-   # Process ONLY branches with '-wr' in the name...
+
+ refs=`git for-each-ref --format='%(refname)' refs/heads`
+ for branch in $refs ; do
    base_branch=$(echo $branch | sed 's,refs/heads/,,')
+   if [[ $refs =~ "${base_branch}-wr" ]]; then
+      # We need the one with "-wr" if it exists
+      continue
+   fi
    base_version=$(echo $base_branch | sed 's,yocto-,,' | sed 's,-wr,,')
    if [ -n "${version}" -a "${base_version}" != "${version}" ]; then
       # Not the version we care about...
