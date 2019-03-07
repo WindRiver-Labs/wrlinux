@@ -43,7 +43,7 @@ SRCREV_machine_kb-v4.18-standard-preempt-rt-base ?= "c92b3640a3e85520517431ff6d7
 LINUX_VERSION_kb-v4.18-standard-preempt-rt-base ?= "4.18.20"
 SRCREV_machine_kb-v4.18-standard-preempt-rt-intel ?= "c140249304e297c12039d8dfec4576ad45b9948c"
 LINUX_VERSION_kb-v4.18-standard-preempt-rt-intel ?= "4.18.20"
-SRCREV_machine_kb-v4.18-standard-preempt-rt-intel-x86 ?= "41f8411e707794c969b47c817d4d2b3ae17d5e89"
+SRCREV_machine_kb-v4.18-standard-preempt-rt-intel-x86 ?= "3f9f319fb87e234a4b2679cbe8b6c80f8c904b03"
 LINUX_VERSION_kb-v4.18-standard-preempt-rt-intel-x86 ?= "4.18.20"
 SRCREV_machine_kb-v4.18-standard-preempt-rt-nxp-ls-lsdk-1812-base ?= "f8bd8741c8949656f62bf89cd50a0ce7025c239e"
 LINUX_VERSION_kb-v4.18-standard-preempt-rt-nxp-ls-lsdk-1812-base ?= "4.18.20"
@@ -82,5 +82,5 @@ LINUX_VERSION_kb-v4.18-standard-xilinx-sdk2018-03-xilinx-zynqmp ?= "4.18.20"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_4.18 = "yocto-4.18-wr"
-SRCREV_meta_4.18 = "c06df4164db13993dfc480ba3a68f80c51915db9"
+SRCREV_meta_4.18 = "33bf20fc15e8c5b99f478d9807fcdb6be4ade6ad"
 LINUX_VERSION_4.18 = "4.18.20"
