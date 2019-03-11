@@ -7,7 +7,7 @@
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_master = "master"
-SRCREV_meta_master = "9da26b2f3b4bd154792961582e0ca842937f1ecc"
+SRCREV_meta_master = "e426796a0e8957362476eef46c8450f5effe6240"
 LINUX_VERSION_master = "5.0-rc1"
 KERNEL_CACHE_BRANCH_3.10 = "yocto-3.10"
 SRCREV_meta_3.10 = "5ab48bfbf01376403ff3a0b3aa482913aee52ff5"
@@ -70,5 +70,5 @@ KERNEL_CACHE_BRANCH_4.9 = "yocto-4.9"
 SRCREV_meta_4.9 = "9aed9998adc8848b33ade296422f7df7642bbc04"
 LINUX_VERSION_4.9 = "4.9.128"
 KERNEL_CACHE_BRANCH_5.0 = "yocto-5.0"
-SRCREV_meta_5.0 = "8fbd119bd954443b1cae496d7797c458faa02495"
+SRCREV_meta_5.0 = "4faa4419884d2bbe65f637befd71a1e95629eaae"
 LINUX_VERSION_5.0 = "5.0"
