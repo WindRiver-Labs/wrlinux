@@ -10,3 +10,9 @@ inherit wrlinux-image
 # install specific packages.
 # Install busybox clearly in case no-busybox is enabled.
 PACKAGE_INSTALL += "busybox"
+
+# Install mdadm and necessary kernel module to initramfs
+# to support boot from raid
+PACKAGE_INSTALL_append_intel-x86-64 = " \
+                mdadm \
+"
