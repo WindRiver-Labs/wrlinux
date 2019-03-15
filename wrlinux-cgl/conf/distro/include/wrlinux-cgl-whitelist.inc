@@ -78,7 +78,6 @@ PNWHITELIST_openembedded-layer_append = " \
     ipmitool \
     libnet \
     libqb \
-    numactl \
     postgresql \
     pps-tools \
     python-pygobject \
