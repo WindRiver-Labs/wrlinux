@@ -15,4 +15,7 @@ PACKAGE_INSTALL += "busybox"
 # to support boot from raid
 PACKAGE_INSTALL_append_intel-x86-64 = " \
                 mdadm \
+                lvm2 \
+                lvm2-udevrules \
+                initramfs-module-lvm \
 "
