@@ -4,6 +4,12 @@
 
 inherit core-image
 
+WRLINUX_IMAGE_CLASSES = " core-image \
+	${@bb.utils.contains('DISTRO_FEATURES', 'ostree', 'flux-ota', '', d)} \
+"
+inherit ${WRLINUX_IMAGE_CLASSES}
+
+
 #
 # Package groups must be defined here.  Note convention: each group
 # "xxx" has a single package dependency on a "packagegroup-xxx" package
