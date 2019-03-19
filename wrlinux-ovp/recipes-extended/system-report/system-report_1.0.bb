@@ -20,3 +20,5 @@ do_install() {
     install -d ${D}/usr/bin
     install -m 755 systemReporter.py ${D}/usr/bin/systemReporter
 }
+
+COMPATIBLE_HOST = "(i.86|x86_64|aarch64|arm|powerpc|powerpc64).*-linux"
