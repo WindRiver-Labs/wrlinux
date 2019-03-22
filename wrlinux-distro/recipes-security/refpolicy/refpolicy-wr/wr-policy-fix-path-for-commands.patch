@@ -1,0 +1,162 @@
+From 6c575c1d5034e1fb51f5ccec3b1f2feb9d53416e Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 22 Mar 2019 11:10:32 +0800
+Subject: [PATCH] refpolicy: fix real path for commands
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/admin/su.fc            | 1 +
+ policy/modules/contrib/bluetooth.fc   | 1 +
+ policy/modules/contrib/dnsmasq.fc     | 1 +
+ policy/modules/contrib/ntp.fc         | 1 +
+ policy/modules/contrib/rdisc.fc       | 1 +
+ policy/modules/contrib/tftp.fc        | 1 +
+ policy/modules/kernel/corecommands.fc | 2 ++
+ policy/modules/services/postgresql.fc | 5 +++++
+ policy/modules/system/fstools.fc      | 2 ++
+ policy/modules/system/hostname.fc     | 1 +
+ policy/modules/system/init.fc         | 1 +
+ 11 files changed, 17 insertions(+)
+
+diff --git a/policy/modules/admin/su.fc b/policy/modules/admin/su.fc
+index c657c2e..48ec7d4 100644
+--- a/policy/modules/admin/su.fc
++++ b/policy/modules/admin/su.fc
+@@ -5,3 +5,4 @@
+ /usr/bin/kdesu		--	gen_context(system_u:object_r:su_exec_t,s0)
+ /usr/bin/su		--	gen_context(system_u:object_r:su_exec_t,s0)
+ /bin/su.shadow		--	gen_context(system_u:object_r:su_exec_t,s0)
++/bin/su.util-linux		--	gen_context(system_u:object_r:su_exec_t,s0)
+diff --git a/policy/modules/contrib/bluetooth.fc b/policy/modules/contrib/bluetooth.fc
+index a3abf7d..9e7491c 100644
+--- a/policy/modules/contrib/bluetooth.fc
++++ b/policy/modules/contrib/bluetooth.fc
+@@ -9,6 +9,7 @@
+ /usr/bin/dund	--	gen_context(system_u:object_r:bluetooth_exec_t,s0)
+ /usr/bin/hidd	--	gen_context(system_u:object_r:bluetooth_exec_t,s0)
+ /usr/bin/rfcomm	--	gen_context(system_u:object_r:bluetooth_exec_t,s0)
++/usr/bin/hciattach	--	gen_context(system_u:object_r:bluetooth_exec_t,s0)
+ 
+ # Systemd unit file
+ /usr/lib/systemd/system/[^/]*bluetooth.* -- gen_context(system_u:object_r:bluetooth_unit_t,s0)
+diff --git a/policy/modules/contrib/dnsmasq.fc b/policy/modules/contrib/dnsmasq.fc
+index d11afc7..35b187b 100644
+--- a/policy/modules/contrib/dnsmasq.fc
++++ b/policy/modules/contrib/dnsmasq.fc
+@@ -6,6 +6,7 @@
+ # Systemd unit file
+ /usr/lib/systemd/system/[^/]*dnsmasq.*	--	gen_context(system_u:object_r:dnsmasq_unit_t,s0)
+ 
++/usr/bin/dnsmasq	--	gen_context(system_u:object_r:dnsmasq_exec_t,s0)
+ /usr/sbin/dnsmasq	--	gen_context(system_u:object_r:dnsmasq_exec_t,s0)
+ 
+ /var/lib/misc/dnsmasq\.leases	--	gen_context(system_u:object_r:dnsmasq_lease_t,s0)
+diff --git a/policy/modules/contrib/ntp.fc b/policy/modules/contrib/ntp.fc
+index a3032ec..1606eeb 100644
+--- a/policy/modules/contrib/ntp.fc
++++ b/policy/modules/contrib/ntp.fc
+@@ -16,6 +16,7 @@
+ /usr/lib/systemd/system/ntpd.*\.service -- gen_context(system_u:object_r:ntpd_unit_t,s0)
+ 
+ /usr/sbin/ntpd		--	gen_context(system_u:object_r:ntpd_exec_t,s0)
++/usr/sbin/ntpd\.ntp		--	gen_context(system_u:object_r:ntpd_exec_t,s0)
+ /usr/sbin/ntpdate	--	gen_context(system_u:object_r:ntpdate_exec_t,s0)
+ /usr/sbin/sntp		--	gen_context(system_u:object_r:ntpdate_exec_t,s0)
+ 
+diff --git a/policy/modules/contrib/rdisc.fc b/policy/modules/contrib/rdisc.fc
+index e9765c0..aaaee31 100644
+--- a/policy/modules/contrib/rdisc.fc
++++ b/policy/modules/contrib/rdisc.fc
+@@ -1,3 +1,4 @@
++/bin/rdisc	--	gen_context(system_u:object_r:rdisc_exec_t,s0)
+ /sbin/rdisc	--	gen_context(system_u:object_r:rdisc_exec_t,s0)
+ 
+ /usr/sbin/rdisc	--	gen_context(system_u:object_r:rdisc_exec_t,s0)
+diff --git a/policy/modules/contrib/tftp.fc b/policy/modules/contrib/tftp.fc
+index fb0b982..48284b3 100644
+--- a/policy/modules/contrib/tftp.fc
++++ b/policy/modules/contrib/tftp.fc
+@@ -1,5 +1,6 @@
+ /etc/(x)?inetd\.d/tftp	--	gen_context(system_u:object_r:tftpd_conf_t,s0)
+ 
++/bin/tftpd		--	gen_context(system_u:object_r:tftpd_exec_t,s0)
+ /usr/bin/tftpd		--	gen_context(system_u:object_r:tftpd_exec_t,s0)
+ 
+ /usr/sbin/atftpd	--	gen_context(system_u:object_r:tftpd_exec_t,s0)
+diff --git a/policy/modules/kernel/corecommands.fc b/policy/modules/kernel/corecommands.fc
+index ed9e207..c17dbaa 100644
+--- a/policy/modules/kernel/corecommands.fc
++++ b/policy/modules/kernel/corecommands.fc
+@@ -157,6 +157,8 @@ ifdef(`distro_gentoo',`
+ /sbin/insmod_ksymoops_clean	--	gen_context(system_u:object_r:bin_t,s0)
+ /sbin/mkfs\.cramfs		--	gen_context(system_u:object_r:bin_t,s0)
+ /sbin/nologin			--	gen_context(system_u:object_r:shell_exec_t,s0)
++/sbin/nologin\.shadow			--	gen_context(system_u:object_r:shell_exec_t,s0)
++/sbin/nologin\.util-linux			--	gen_context(system_u:object_r:shell_exec_t,s0)
+ 
+ #
+ # /opt
+diff --git a/policy/modules/services/postgresql.fc b/policy/modules/services/postgresql.fc
+index d013468..88c5b79 100644
+--- a/policy/modules/services/postgresql.fc
++++ b/policy/modules/services/postgresql.fc
+@@ -12,6 +12,11 @@
+ #
+ /usr/bin/initdb(\.sepgsql)?	--	gen_context(system_u:object_r:postgresql_exec_t,s0)
+ /usr/bin/(se)?postgres		--	gen_context(system_u:object_r:postgresql_exec_t,s0)
++/usr/bin/pg_archivecleanup	--	gen_context(system_u:object_r:postgresql_exec_t,s0)
++/usr/bin/pg_basebackup	--	gen_context(system_u:object_r:postgresql_exec_t,s0)
++/usr/bin/pg_controldata	--	gen_context(system_u:object_r:postgresql_exec_t,s0)
++/usr/bin/pg_ctl		--	gen_context(system_u:object_r:postgresql_exec_t,s0)
++/usr/bin/pg_upgrade		--	gen_context(system_u:object_r:postgresql_exec_t,s0)
+ 
+ /usr/lib/pgsql/test/regress(/.*)?	gen_context(system_u:object_r:postgresql_db_t,s0)
+ /usr/lib/pgsql/test/regress/pg_regress -- gen_context(system_u:object_r:postgresql_exec_t,s0)
+diff --git a/policy/modules/system/fstools.fc b/policy/modules/system/fstools.fc
+index 6ef4c52..2765888 100644
+--- a/policy/modules/system/fstools.fc
++++ b/policy/modules/system/fstools.fc
+@@ -17,6 +17,7 @@
+ /sbin/fsck.*		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /sbin/hdparm		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /sbin/hdparm\.util-linux		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
++/sbin/hdparm\.hdparm		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /sbin/install-mbr	--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /sbin/jfs_.*		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /sbin/losetup.*		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+@@ -93,6 +94,7 @@
+ /usr/sbin/mkswap		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/parted		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/partprobe		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
++/usr/sbin/partprobe\.parted		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/partx			--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/raidautorun		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/raidstart		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+diff --git a/policy/modules/system/hostname.fc b/policy/modules/system/hostname.fc
+index 991f7f5..6bd2f7b 100644
+--- a/policy/modules/system/hostname.fc
++++ b/policy/modules/system/hostname.fc
+@@ -1,5 +1,6 @@
+ 
+ /bin/hostname		--	gen_context(system_u:object_r:hostname_exec_t,s0)
+ /bin/hostname\.net-tools	--	gen_context(system_u:object_r:hostname_exec_t,s0)
++/bin/hostname\.coreutils	--	gen_context(system_u:object_r:hostname_exec_t,s0)
+ 
+ /usr/bin/hostname	--	gen_context(system_u:object_r:hostname_exec_t,s0)
+diff --git a/policy/modules/system/init.fc b/policy/modules/system/init.fc
+index 339a277..f989b0c 100644
+--- a/policy/modules/system/init.fc
++++ b/policy/modules/system/init.fc
+@@ -57,6 +57,7 @@ ifdef(`distro_gentoo', `
+ /usr/sbin/apachectl	-- 	gen_context(system_u:object_r:initrc_exec_t,s0)
+ /usr/sbin/init(ng)?	--	gen_context(system_u:object_r:init_exec_t,s0)
+ /usr/sbin/open_init_pty	--	gen_context(system_u:object_r:initrc_exec_t,s0)
++/sbin/open_init_pty	--	gen_context(system_u:object_r:initrc_exec_t,s0)
+ /usr/sbin/upstart	--	gen_context(system_u:object_r:init_exec_t,s0)
+ 
+ #
+-- 
+2.7.4
+
