@@ -1,0 +1,13 @@
+Enable alternative userspace recipes
+
+When the system has multiple versions of userspace recipes available,
+a stable and an indevelopment 'next' version.  Switch to enabling the next
+version of selected packages.
+
+This template will focus on enabling new versions of recipes where ABI and
+API changes are expected.
+
+#@TYPE: Wrtemplate
+#@NAME: userspace-next
+#@DESCRIPTION: Enable alternative in-development (future) userspace recipes
+
