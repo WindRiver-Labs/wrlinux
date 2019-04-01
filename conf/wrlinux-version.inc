@@ -17,3 +17,7 @@ WRLINUX_BRANCH       ??= "${@'development' if d.getVar('WRLINUX_UPDATE_VERSION')
 
 # Make sure that WRLINUX_VERSION and WRLINUX_BRANCH are printed to logs
 BUILDCFG_VARS_prepend = "WRLINUX_VERSION WRLINUX_BRANCH "
+
+# Anything using WRLINUX_VERSION, only trigger a change to the hash if the
+# WRLINUX_MAJOR_VERSION changes.
+WRLINUX_VERSION[vardepsexclude] = "WRLINUX_YEAR_VERSION WRLINUX_WW_VERSION WRLINUX_UPDATE_VERSION"
