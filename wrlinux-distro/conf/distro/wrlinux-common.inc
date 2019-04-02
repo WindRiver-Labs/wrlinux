@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2017 Wind River Systems, Inc.
+# Copyright (C) 2012 - 2019 Wind River Systems, Inc.
 #
 # information common to all wrlinux distros
 #
@@ -41,10 +41,14 @@ TOOLCHAIN_OUTPUTNAME_pn-uninative-tarball = "${SDK_ARCH}-nativesdk-libc"
 # Add changelist.xml and fs_final*.sh processing
 IMAGE_CLASSES += "image-fs_finalize"
 
-# Override these in wrlinux based distros to modify DISTRO_EXTRA_R*
+# Override these in wrlinux based distros to modify DISTRO_*
+WRLINUX_DEFAULT_DISTRO_FEATURES = "ldconfig largefile multiarch pulseaudio virtualization"
 WRLINUX_DEFAULT_EXTRA_RDEPENDS = "packagegroup-core-boot"
 WRLINUX_DEFAULT_EXTRA_RRECOMMENDS = "kernel-module-af-packet"
 
+DISTRO_FEATURES ?= "${DISTRO_FEATURES_DEFAULT} ${WRLINUX_DEFAULT_DISTRO_FEATURES}"
+DISTRO_FEATURES_class-native ?= "${DISTRO_FEATURES_DEFAULT} ${WRLINUX_DEFAULT_DISTRO_FEATURES}"
+DISTRO_FEATURES_class-nativesdk ?= "${DISTRO_FEATURES_DEFAULT} ${WRLINUX_DEFAULT_DISTRO_FEATURES}"
 DISTRO_EXTRA_RDEPENDS += " ${WRLINUX_DEFAULT_EXTRA_RDEPENDS}"
 DISTRO_EXTRA_RRECOMMENDS += " ${WRLINUX_DEFAULT_EXTRA_RRECOMMENDS}"
 
@@ -52,11 +56,7 @@ DISTRO_EXTRA_RRECOMMENDS += " ${WRLINUX_DEFAULT_EXTRA_RRECOMMENDS}"
 #WRLINUXQEMUDEPS = "${@bb.utils.contains("INCOMPATIBLE_LICENSE", "GPLv3", "", "qemu-config",d)}"
 WRLINUXQEMUDEPS = ""
 
-DISTRO_EXTRA_RDEPENDS_append_qemuarm = " ${WRLINUXQEMUDEPS}"
-DISTRO_EXTRA_RDEPENDS_append_qemumips = " ${WRLINUXQEMUDEPS}"
-DISTRO_EXTRA_RDEPENDS_append_qemuppc = " ${WRLINUXQEMUDEPS}"
-DISTRO_EXTRA_RDEPENDS_append_qemux86 = " ${WRLINUXQEMUDEPS}"
-DISTRO_EXTRA_RDEPENDS_append_qemux86-64 = " ${WRLINUXQEMUDEPS}"
+DISTRO_EXTRA_RDEPENDS_append_qemuall = " ${WRLINUXQEMUDEPS}"
 
 #TCLIBCAPPEND = ""
 
@@ -101,11 +101,14 @@ require conf/distro/include/wrlinux-lsb-distro-adjust.inc
 # Make sure DISTRO_FEATURES backfill has pulseaudio 
 # this is a temporary fix until pulseaudio is fixed
 
-DISTRO_FEATURES_BACKFILL_CONSIDERED += " pulseaudio"
+DISTRO_FEATURES_BACKFILL_CONSIDERED += "pulseaudio"
 
 # Make sure that ldconfig is only enabled when the user has added ldconfig
 # to the DISTRO_FEATURES
 DISTRO_FEATURES_BACKFILL_CONSIDERED += "ldconfig"
+
+# Make sure that X11 is only enabled in a graphics configuration
+DISTRO_FEATURES_BACKFILL_CONSIDERED += "x11"
 
 # Multilib configuration
 MULTILIBS ?= ""
