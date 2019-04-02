@@ -42,7 +42,7 @@ TOOLCHAIN_OUTPUTNAME_pn-uninative-tarball = "${SDK_ARCH}-nativesdk-libc"
 IMAGE_CLASSES += "image-fs_finalize"
 
 # Override these in wrlinux based distros to modify DISTRO_*
-WRLINUX_DEFAULT_DISTRO_FEATURES = "ldconfig largefile multiarch pulseaudio virtualization"
+WRLINUX_DEFAULT_DISTRO_FEATURES = "largefile multiarch pulseaudio virtualization"
 WRLINUX_DEFAULT_EXTRA_RDEPENDS = "packagegroup-core-boot"
 WRLINUX_DEFAULT_EXTRA_RRECOMMENDS = "kernel-module-af-packet"
 
