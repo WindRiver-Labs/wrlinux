@@ -1,0 +1,20 @@
+                      Docker
+                      ======
+
+This template will enable the kernel features for docker and build
+containerd and docker into the file system.  The containerd and
+dockerd systemd services will be started up automatically.
+
+You can inspect the kernel configuration on a running device when
+logged is a root by running:
+
+  wget https://raw.githubusercontent.com/moby/moby/master/contrib/check-config.sh
+  chmod 755 check-config.sh
+  ./check-config.sh
+
+
+You can test docker's functionality by running:
+
+  docker run hello-world
+
+
