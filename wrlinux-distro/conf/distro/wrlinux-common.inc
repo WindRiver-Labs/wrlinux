@@ -66,7 +66,17 @@ IMAGE_LINGUAS ?= ""
 QEMU_TARGETS ?= "arm aarch64 i386 mips mipsel mips64 mips64el ppc ppc64 x86_64"
 # Other QEMU_TARGETS "sh4"
 
+# MIRRORS are used only if we don't have a local copy, and the stated upstream
+# is no longer available.
 MIRRORS =+ "\
+bzr://.*/.*      http://downloads.yoctoproject.org/mirror/sources/ \n \
+cvs://.*/.*      http://downloads.yoctoproject.org/mirror/sources/ \n \
+git://.*/.*      http://downloads.yoctoproject.org/mirror/sources/ \n \
+gitsm://.*/.*    http://downloads.yoctoproject.org/mirror/sources/ \n \
+hg://.*/.*       http://downloads.yoctoproject.org/mirror/sources/ \n \
+osc://.*/.*      http://downloads.yoctoproject.org/mirror/sources/ \n \
+p4://.*/.*       http://downloads.yoctoproject.org/mirror/sources/ \n \
+svn://.*/.*      http://downloads.yoctoproject.org/mirror/sources/ \n \
 ftp://.*/.*      http://downloads.yoctoproject.org/mirror/sources/ \n \
 http://.*/.*     http://downloads.yoctoproject.org/mirror/sources/ \n \
 https://.*/.*    http://downloads.yoctoproject.org/mirror/sources/ \n"
