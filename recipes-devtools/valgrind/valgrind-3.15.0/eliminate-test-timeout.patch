@@ -14,10 +14,11 @@ set of test results.  The tests for valgrind have been critical for
 regression testing proposed patches and also for evaluation of
 valgrind's compatibility with toolchain core variants and new bsps.
 
-Upstream-status: Not applicable
-
+Upstream-Status: Not applicable
 Signed-off-by: Dave Lerner <dave.lerner@windriver.com>
 
+Rebase to 3.15.0
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 
 diff --git a/tests/vg_regtest b/tests/vg_regtest
 index 1a17ca2..728925d 100755
