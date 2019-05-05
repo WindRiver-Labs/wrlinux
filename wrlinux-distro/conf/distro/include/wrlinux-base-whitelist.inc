@@ -36,6 +36,7 @@ PNWHITELIST_openembedded-layer += " \
     lemon-native \
     libdbd-mysql-perl \
     libdbi-perl \
+    libdev-checklib-perl \
     liblockfile \
     libmcrypt \
     lockfile-progs \
