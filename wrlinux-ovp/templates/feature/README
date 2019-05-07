@@ -21,3 +21,5 @@
 # 
 # This may disable some configuration of kernel that would
 # affect other modules. So it should be used with caution.
+#
+# Other features can take same method as shown above to use them.
