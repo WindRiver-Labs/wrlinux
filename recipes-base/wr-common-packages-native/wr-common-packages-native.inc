@@ -74,6 +74,7 @@ DEPENDS = "\
     libassuan-native \
     libcheck-native \
     libcomps-native \
+    libcroco-native \
     libdnf-native \
     libffi-native \
     libfontenc-native \
@@ -87,6 +88,7 @@ DEPENDS = "\
     libpng-native \
     libpthread-stubs-native \
     librepo-native \
+    librsvg-native \
     libsdl2-native \
     libsm-native \
     libsolv-native \
@@ -157,6 +159,7 @@ DEPENDS = "\
     python3-six-native \
     qemu-helper-native \
     qemu-native \
+    qemu-system-native \
     quilt-native \
     re2c-native \
     readline-native \
