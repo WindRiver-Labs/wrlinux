@@ -17,5 +17,5 @@ PACKAGE_INSTALL_append_intel-x86-64 = " \
                 mdadm \
                 lvm2 \
                 lvm2-udevrules \
-                initramfs-module-lvm \
+                ${@bb.utils.contains('INITRAMFS_SCRIPTS', 'initramfs-module-udev', 'initramfs-module-lvm', '', d)} \
 "
