@@ -17,24 +17,10 @@ import random
 
 
 # global variables section
-vdsmPresent = True
-vdsmPath = "/usr/share/vdsm"
 cpuinfoFile = "/proc/cpuinfo"
 meminfoFile = "/proc/meminfo"
 versionFile = "/proc/version"
 modulesFile = "/proc/modules"
-
-
-# check for the existence of vdsm on the current system. if exists, then import
-# the required utility classes
-if os.path.exists(vdsmPath):
-    vdsmPresent = True
-    sys.path.append(vdsmPath)
-    from vdsm import utils
-    import caps
-else:
-    vdsmPresent = False
-  
 
 
 # this method is used to print a simple centered headline to the console.
@@ -56,8 +42,7 @@ def printReportHeader(headline, skipNewLine = 1):
 ################################################################################
 
 # this method opens the /proc/cpuinfo file, and extracts the cpu related info
-# from it. returns a hash, which will be in respect with the cpu-related info
-# provided by the VDSM caps.py tool.
+# from it. returns a hash
 def getProcCpuInfo():
     retVal = {}
     retVal["cpuModel"] = ""
@@ -412,12 +397,7 @@ def kernelConfigGathering():
     printReportHeader("KERNEL Config Info - Done", 0)
 
 
-################################################################################
-### VDSM based info extraction
-################################################################################
-
-# this method is used to print out the CPU related informations, extracted by
-# the VDSM package caps.py script.
+# this method is used to print out the CPU related informations
 def printCpuInfo(cHash):
     printReportHeader("CPU Information")
     if cHash == None: # don't have VDSM, get the info from /proc/cpuinfo
@@ -469,19 +449,6 @@ def printHwInfo(cHash):
     printReportHeader("HARDWARE Info - Done", 0)
 
 
-# print OS related information - name, version and release
-def printOsInfo(cHash):
-    printReportHeader("OS Information")
-    if cHash != None: # if we have vdsm, report it from vdsm
-        osHash = cHash["operatingSystem"]
-        print "OS Name: " + osHash["name"]
-        print "OS Version: " + osHash["version"]
-        print "OS Release: " + osHash["release"]
-    else:
-        print "No info! VDSM not present...."
-    printReportHeader("OS Info - Done", 0)
-
-
 # print KERNEL related information - version and release
 def printKernelInfo(cHash):
     printReportHeader("KERNEL Information")
@@ -497,62 +464,6 @@ def printKernelInfo(cHash):
     printReportHeader("KERNEL Info - Done", 0)
 
 
-# print VDSM related information - version and release
-# also prints the supported engine versions
-def printVdsmInfo(cHash):
-    printReportHeader("VDSM Information")
-    if cHash != None: # if we have vdsm, report it from vdsm
-        vdsmInfo = cHash["packages2"]["vdsm"]
-        print "VDSM Version: " + vdsmInfo["version"]
-        print "VDSM Release: " + vdsmInfo["release"]
-
-        # format the supported engines...
-        supportedEngines = " ";
-        for idx in cHash["supportedENGINEs"]:
-            supportedEngines += idx.rstrip() + ", "
-        supportedEngines = supportedEngines[:-2]
-        print "VDMS Supported Engines: " + supportedEngines
-    else:
-        print "No info! VDSM not present...."
-    printReportHeader("VDSM Info - Done", 0)
-
-
-# print QEMU-KVM related information - version and release
-def printQemuInfo(cHash):
-    printReportHeader("QEMU-KVM Information")
-    if cHash != None: # if we have vdsm, report it from vdsm
-        qemuInfo = cHash["packages2"]["qemu-kvm"]
-        print "QEMU-KVM Version: " + qemuInfo["version"]
-        print "QEMU-KVM Release: " + qemuInfo["release"]
-    else:
-        print "No info! VDSM not present...."
-    printReportHeader("QEMU-KVM Info - Done", 0)
-
-
-# print LIBVIRT related information - version and release
-def printLibvirtInfo(cHash):
-    printReportHeader("LIBVIRT Information")
-    if cHash != None: # if we have vdsm, report it from vdsm
-        libvirtInfo = cHash["packages2"]["libvirt"]
-        print "LIBVIRT Version: " + libvirtInfo["version"]
-        print "LIBVIRT Release: " + libvirtInfo["release"]
-    else:
-        print "No info! VDSM not present...."
-    printReportHeader("LIBVIRT Info - Done", 0)
-
-# print SPICE related information - version and release
-def printSpiceInfo(cHash):
-    printReportHeader("SPICE Information")
-    if cHash != None: # if we have vdsm, report it from vdsm
-        spiceInfo = cHash["packages2"]["spice-server"]
-        print "SPICE Version: " + spiceInfo["version"]
-        print "SPICE Release: " + spiceInfo["release"]
-    else:
-        print "No info! VDSM not present...."
-    printReportHeader("SPICE Info - Done", 0)
-
-
-
 ###############################################################
 ### Show help
 ###############################################################
@@ -564,12 +475,7 @@ def printUsage():
     print "\t -h | --help = display this help message"
     print "\t -c | --cpushow = shows CPU information"
     print "\t -H | --hardware = shows various hardware related information"
-    print "\t -o | --os = shows Operating System related information (only if VDSM present)"
     print "\t -k | --kernel = shows kernel related information"
-    print "\t -v | --vdsm = shows VDSM related information (only if VDSM present)"
-    print "\t -q | --qemu = shows QEMU related information (only if VDSM present)"
-    print "\t -l | --libvirt = shows libvirt related information (only if VDSM present)"
-    print "\t -s | --spice = shows spice related information (only if VDSM present)"
     print "\t -L | --localization = shows lstopo (hwloc-info) topology information"
     print "\t -d | --dmi = shows dmidecode provided information"
     print "\t -p | --pci = shows pci related information"
@@ -585,8 +491,7 @@ def printUsage():
 def main(argv):
     try:
         opts, args = getopt.getopt(argv, "hcHokvqlsdpKLa",
-        ["help", "cpushow", "hardware", "os", "kernel", "vdsm",
-        "qemu", "libvirt", "spice", "dmi", "pci", "Kconfig", "localization", "all"])
+        ["help", "cpushow", "hardware", "kernel", "dmi", "pci", "Kconfig", "localization", "all"])
     except getopt.GetoptError:
         printUsage()
         sys.exit(10)
@@ -596,11 +501,7 @@ def main(argv):
         printUsage()
         sys.exit(11)
 
-    # initialize required data structures with various informations.
-    if vdsmPresent == True:
-        capabilityHash = caps.get()
-    else:
-        capabilityHash = None
+    capabilityHash = None
 
     processDmiDecodeValues()
     pciDevices = getPciDevicesList()
@@ -622,18 +523,8 @@ def main(argv):
             printCpuInfo(capabilityHash)
         elif opt in ("-H", "--hardware"):
             printHwInfo(capabilityHash)
-        elif opt in ("-o", "--os"):
-            printOsInfo(capabilityHash)
         elif opt in ("-k", "--kernel"):
             printKernelInfo(capabilityHash)
-        elif opt in ("-v", "--vdsm"):
-            printVdsmInfo(capabilityHash)
-        elif opt in ("-q", "--qemu"):
-            printQemuInfo(capabilityHash)
-        elif opt in ("-l", "--libvirt"):
-            printLibvirtInfo(capabilityHash)
-        elif opt in ("-s", "--spice"):
-	    printSpiceInfo(capabilityHash)
         elif opt in ("-L", "--localization"):
             printHwlocInfoData()
         elif opt in ("-d", "--dmi"):
