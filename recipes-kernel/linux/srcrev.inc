@@ -92,5 +92,5 @@ LINUX_VERSION_kb-v4.18-standard-xilinx-sdk2018-03-xilinx-zynqmp ?= "4.18.31"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_4.18 = "yocto-4.18-wr"
-SRCREV_meta_4.18 = "95bd211ec46e0599745d0c335c77375dd8753bbc"
+SRCREV_meta_4.18 = "f5f9c82e6b29214e1d778171f8e70940ac91b0ab"
 LINUX_VERSION_4.18 = "4.18.31"
