@@ -18,6 +18,8 @@ RDEPENDS_${PN} = " \
 
 # nice to have
 RRECOMMENDS_${PN} = " \
+    at-spi2-atk-gtk2 \
+    libgail \
     thunar-archive-plugin \
     thunar-media-tags-plugin \
     xfce4-appfinder \
