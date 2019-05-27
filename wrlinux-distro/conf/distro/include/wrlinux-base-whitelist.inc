@@ -16,7 +16,6 @@ PNWHITELIST_multimedia-layer += ""
 
 PNWHITELIST_networking-layer += " \
     freeradius \
-    ipsec-tools \
     libtalloc \
     netcat \
     netcat-openbsd \

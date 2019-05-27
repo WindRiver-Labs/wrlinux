@@ -27,7 +27,6 @@ RDEPENDS_${PN} = "\
 	freeradius \
 	ifenslave \
 	inetutils \
-	ipsec-tools \
 	libnet-ssleay-perl \
 	libnet-libidn-perl \
 	libnet-telnet-perl \
