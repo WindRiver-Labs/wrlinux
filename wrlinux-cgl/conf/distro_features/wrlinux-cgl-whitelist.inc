@@ -5,12 +5,15 @@
 #
 
 # Whitelist the whole wrlinux-cgl layer
-PNWHITELIST_LAYERS_remove = "wrlinux-cgl"
+PNWHITELIST_LAYERS_remove = "${@bb.utils.contains('DISTRO_FEATURES', 'cgl', 'wrlinux-cgl', '', d)}"
 
 # Enable items for wrlinux-cgl distro
 #
 # For meta-cgl/meta-cgl-common
-PNWHITELIST_cgl-common_append = " \
+PNWHITELIST_cgl-common += " \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'cgl', '${PNWHITELIST_CGL_COMMON}', '', d)}  \
+"
+PNWHITELIST_CGL_COMMON = " \
     cluster-glue \
     crmsh \
     libhtml-tagset-perl \
@@ -26,14 +29,20 @@ PNWHITELIST_cgl-common_append = " \
 "
 
 # For meta-openembedded/meta-python
-PNWHITELIST_meta-python_append = " \
+PNWHITELIST_meta-python += " \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'cgl', '${PNWHITELIST_META_PYTHON}', '', d)}  \
+"
+PNWHITELIST_META_PYTHON = " \
     python-lxml \
     python-paste \
     python-vcversioner \
 "
 
 # For meta-openembedded/meta-networking
-PNWHITELIST_networking-layer_append = " \
+PNWHITELIST_networking-layer += " \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'cgl', '${PNWHITELIST_META_NETWORKING}', '', d)}  \
+"
+PNWHITELIST_META_NETWORKING = " \
     bridge-utils \
     c-ares \
     corosync \
@@ -71,7 +80,10 @@ PNWHITELIST_networking-layer_append = " \
 "
 
 # For meta-openembedded/meta-oe
-PNWHITELIST_openembedded-layer_append = " \
+PNWHITELIST_openembedded-layer += " \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'cgl', '${PNWHITELIST_META_OE}', '', d)}  \
+"
+PNWHITELIST_META_OE = " \
     crash \
     edac-utils \
     indent \
@@ -85,7 +97,10 @@ PNWHITELIST_openembedded-layer_append = " \
 "
 
 # For meta-openembedded/meta-perl
-PNWHITELIST_perl-layer_append = " \
+PNWHITELIST_perl-layer += " \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'cgl', '${PNWHITELIST_META_PERL}', '', d)}  \
+"
+PNWHITELIST_META_PERL = " \
     libauthen-sasl-perl \
     libdigest-hmac-perl \
     libdigest-sha1-perl \
@@ -103,6 +118,6 @@ PNWHITELIST_perl-layer_append = " \
 "
 
 # For meta-virtualization
-PNWHITELIST_virtualization-layer_append = " \
-    lxc \
+PNWHITELIST_virtualization-layer += " \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'cgl', 'lxc', '', d)} \
 "
