@@ -1,2 +1,0 @@
-SECURITY_CFLAGS_pn-cgl-unittest = "${SECURITY_NOPIE_CFLAGS}"
-SECURITY_CFLAGS_pn-gen-coredump = "${SECURITY_NOPIE_CFLAGS}"
