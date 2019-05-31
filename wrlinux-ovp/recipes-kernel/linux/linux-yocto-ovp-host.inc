@@ -2,9 +2,6 @@
 # Copyright (C) 2017 Wind River Systems, Inc.
 #
 
-# meta-virtualization does not have a bbappend for linux-yocto-rt
-require ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'recipes-kernel/linux/linux-yocto_virtualization.inc', '', d)}
-
 KERNEL_FEATURES += "\
  cfg/virtio.scc \
  cfg/rbd.scc \
