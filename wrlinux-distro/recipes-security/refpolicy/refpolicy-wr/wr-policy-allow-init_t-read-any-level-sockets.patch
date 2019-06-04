@@ -1,4 +1,4 @@
-From 74b55228457bbe0719369bd1173d0013a25e2239 Mon Sep 17 00:00:00 2001
+From 4124c3b2488ae12faccd90c1245175fd8292e986 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Wed, 3 Feb 2016 04:16:06 -0500
 Subject: [PATCH] wr-policy-allow-init_t-read-any-level-sockets
@@ -19,12 +19,17 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/init.te | 3 +++
  1 file changed, 3 insertions(+)
 
---- refpolicy.orig/policy/modules/system/init.te
-+++ refpolicy/policy/modules/system/init.te
-@@ -1119,3 +1119,6 @@ mls_file_upgrade(init_t)
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index 16dfd0d..5102af4 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -1432,3 +1432,6 @@ mls_file_upgrade(init_t)
  
  # Get all service status (systemd)
  init_get_system_status(init_t)
 +
 +# MLS trusted for reading from sockets at any level
 +mls_socket_read_all_levels(init_t)
+-- 
+2.7.4
+

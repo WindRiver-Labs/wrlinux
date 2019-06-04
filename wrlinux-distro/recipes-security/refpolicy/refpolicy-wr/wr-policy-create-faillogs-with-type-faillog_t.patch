@@ -1,4 +1,4 @@
-From 7b2cab03f23f1bf07154e351840693bcf9db2b0b Mon Sep 17 00:00:00 2001
+From 501ece475402c474c24d56a1450d003190323aef Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Tue, 3 May 2016 07:00:10 +0000
 Subject: [PATCH] wr-policy: create faillogs with type faillog_t
@@ -23,10 +23,10 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  1 file changed, 3 insertions(+)
 
 diff --git a/policy/modules/system/authlogin.if b/policy/modules/system/authlogin.if
-index 38fd6f9..70a74c7 100644
+index 744ab24..2af8d48 100644
 --- a/policy/modules/system/authlogin.if
 +++ b/policy/modules/system/authlogin.if
-@@ -813,6 +813,9 @@ interface(`auth_manage_faillog',`
+@@ -803,6 +803,9 @@ interface(`auth_manage_faillog',`
  
  	allow $1 faillog_t:file manage_file_perms;
  	logging_rw_generic_log_dirs($1)
@@ -35,7 +35,7 @@ index 38fd6f9..70a74c7 100644
 +	logging_log_filetrans($1, faillog_t, file, "btmp")
  ')
  
- #######################################
+ ########################################
 -- 
-2.5.0
+2.7.4
 

@@ -1,4 +1,4 @@
-From b2961c53bfd815aad09b4f922eebb4ab42f8a333 Mon Sep 17 00:00:00 2001
+From aec7e99b1a2945e9d6703c184f092a6408cb34b6 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Tue, 26 Apr 2016 05:24:09 -0400
 Subject: [PATCH] wr-policy: fix avc_context_to_sid_raw assertion `avc_running'
@@ -39,10 +39,10 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  2 files changed, 2 insertions(+)
 
 diff --git a/policy/modules/admin/su.if b/policy/modules/admin/su.if
-index 36eaac5..b7a826c 100644
+index cbc45ea..356888d 100644
 --- a/policy/modules/admin/su.if
 +++ b/policy/modules/admin/su.if
-@@ -159,6 +159,7 @@ template(`su_role_template',`
+@@ -152,6 +152,7 @@ template(`su_role_template',`
  	allow $1_su_t self:process { setexec setsched setrlimit };
  	allow $1_su_t self:fifo_file rw_fifo_file_perms;
  	allow $1_su_t self:netlink_audit_socket { nlmsg_relay create_netlink_socket_perms };
@@ -51,10 +51,10 @@ index 36eaac5..b7a826c 100644
  
  	allow $1_su_t $3:key search;
 diff --git a/policy/modules/admin/usermanage.te b/policy/modules/admin/usermanage.te
-index def8386..f807733 100644
+index 9f97d35..237a858 100644
 --- a/policy/modules/admin/usermanage.te
 +++ b/policy/modules/admin/usermanage.te
-@@ -203,6 +203,7 @@ allow groupadd_t self:unix_dgram_socket create_socket_perms;
+@@ -201,6 +201,7 @@ allow groupadd_t self:unix_dgram_socket create_socket_perms;
  allow groupadd_t self:unix_stream_socket create_stream_socket_perms;
  allow groupadd_t self:unix_dgram_socket sendto;
  allow groupadd_t self:unix_stream_socket connectto;
@@ -63,5 +63,5 @@ index def8386..f807733 100644
  fs_getattr_xattr_fs(groupadd_t)
  fs_search_auto_mountpoints(groupadd_t)
 -- 
-2.8.1
+2.7.4
 

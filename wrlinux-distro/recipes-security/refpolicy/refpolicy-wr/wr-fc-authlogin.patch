@@ -1,0 +1,27 @@
+From 2d0cae50a7f104cee2f2d4a15413df3a2aca5a5a Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 25 Apr 2019 11:13:32 +0800
+Subject: [PATCH] refpolicy: fix real path for authlogin
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/authlogin.fc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/system/authlogin.fc b/policy/modules/system/authlogin.fc
+index a42bc0d..ffcaf5d 100644
+--- a/policy/modules/system/authlogin.fc
++++ b/policy/modules/system/authlogin.fc
+@@ -6,6 +6,7 @@
+ 
+ /usr/bin/login		--	gen_context(system_u:object_r:login_exec_t,s0)
+ /usr/bin/login\.shadow	--	gen_context(system_u:object_r:login_exec_t,s0)
++/usr/bin/login\.tinylogin	--	gen_context(system_u:object_r:login_exec_t,s0)
+ /usr/bin/pam_console_apply	--	gen_context(system_u:object_r:pam_console_exec_t,s0)
+ /usr/bin/pam_timestamp_check	--	gen_context(system_u:object_r:pam_exec_t,s0)
+ /usr/bin/unix_chkpwd		--	gen_context(system_u:object_r:chkpwd_exec_t,s0)
+-- 
+2.7.4
+

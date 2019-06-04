@@ -1,4 +1,4 @@
-From a61cb25c79296194e7c4fe7665437311daff5922 Mon Sep 17 00:00:00 2001
+From 60ce67ff108b320b115f0fd2d0bebac216faee2d Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Fri, 20 Mar 2015 11:03:11 +0800
 Subject: [PATCH] refpolicy: dontaudit attempts to search kernel debugfs
@@ -14,15 +14,17 @@ Changes come from: policy-f20-base.patch
   scontext=system_u:system_r:mdadm_t:s0-s15:c0.c1023 \
   tcontext=system_u:object_r:debugfs_t:s0 tclass=dir
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
  policy/modules/kernel/domain.te | 1 +
  1 file changed, 1 insertion(+)
 
---- refpolicy.orig/policy/modules/kernel/domain.te
-+++ refpolicy/policy/modules/kernel/domain.te
+diff --git a/policy/modules/kernel/domain.te b/policy/modules/kernel/domain.te
+index 09ad808..b64d2b0 100644
+--- a/policy/modules/kernel/domain.te
++++ b/policy/modules/kernel/domain.te
 @@ -95,6 +95,7 @@ kernel_read_proc_symlinks(domain)
  # a keyring
  kernel_dontaudit_search_key(domain)
@@ -31,3 +33,6 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  
  # create child processes in the domain
  allow domain self:process { fork sigchld };
+-- 
+2.7.4
+

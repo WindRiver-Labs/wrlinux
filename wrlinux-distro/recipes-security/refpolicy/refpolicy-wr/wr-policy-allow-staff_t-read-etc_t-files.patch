@@ -1,4 +1,4 @@
-From 5b2c8d8cb0d107e04265e42675b8aa757b33cce9 Mon Sep 17 00:00:00 2001
+From 110f916ac6764f8160ec4a6be9d03eb57dd10a75 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Thu, 28 Dec 2017 08:14:05 +0000
 Subject: [PATCH] wr-policy: allow staff_t read etc_t files
@@ -17,10 +17,10 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/policy/modules/roles/staff.te b/policy/modules/roles/staff.te
-index 1cdbdcd..1349dce 100644
+index 778ef8e..b737398 100644
 --- a/policy/modules/roles/staff.te
 +++ b/policy/modules/roles/staff.te
-@@ -71,6 +71,8 @@ optional_policy(`
+@@ -72,6 +72,8 @@ optional_policy(`
  	xserver_role(staff_r, staff_t)
  ')
  
@@ -30,5 +30,5 @@ index 1cdbdcd..1349dce 100644
  	optional_policy(`
  		auth_role(staff_r, staff_t)
 -- 
-2.13.3
+2.7.4
 

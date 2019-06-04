@@ -1,0 +1,35 @@
+From 91f3c87e649153c895f5a8d0c28506d4d3885396 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 30 May 2019 08:30:06 +0800
+Subject: [PATCH] rpc: allow rpcd_t to read to clearance
+
+Fix:
+type=AVC msg=audit(1559176077.169:242): avc:  denied  { search } for
+pid=374 comm="rpc.statd" name="journal" dev="tmpfs" ino=9854
+scontext=system_u:system_r:rpcd_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 tclass=dir
+permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/rpc.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/services/rpc.te b/policy/modules/services/rpc.te
+index 8b147aa..354144e 100644
+--- a/policy/modules/services/rpc.te
++++ b/policy/modules/services/rpc.te
+@@ -188,6 +188,8 @@ seutil_dontaudit_search_config(rpcd_t)
+ 
+ userdom_signal_all_users(rpcd_t)
+ 
++mls_file_read_to_clearance(rpcd_t)
++
+ ifdef(`distro_debian',`
+ 	term_dontaudit_use_unallocated_ttys(rpcd_t)
+ ')
+-- 
+2.7.4
+

@@ -1,0 +1,41 @@
+From 4e624bfea743d73e530476e3cbd46105041438e2 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 16 May 2019 13:31:56 +0800
+Subject: [PATCH] getty: fix avc denials for getty_t
+
+Fix:
+type=AVC msg=audit(1558592080.294:503): avc:  denied  { map } for
+pid=315 comm="agetty" path="/etc/group" dev="vda" ino=31276
+scontext=system_u:system_r:getty_t tcontext=system_u:object_r:etc_t
+tclass=file permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/getty.te | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/policy/modules/system/getty.te b/policy/modules/system/getty.te
+index 4e38d7c..218949e 100644
+--- a/policy/modules/system/getty.te
++++ b/policy/modules/system/getty.te
+@@ -63,12 +63,15 @@ dev_read_sysfs(getty_t)
+ 
+ files_read_etc_runtime_files(getty_t)
+ files_read_etc_files(getty_t)
++files_map_etc_files(getty_t)
+ files_search_spool(getty_t)
+ 
+ fs_search_auto_mountpoints(getty_t)
+ # for error condition handling
+ fs_getattr_xattr_fs(getty_t)
+ 
++fs_search_tmpfs(getty_t)
++
+ mcs_process_set_categories(getty_t)
+ 
+ mls_file_read_all_levels(getty_t)
+-- 
+2.7.4
+

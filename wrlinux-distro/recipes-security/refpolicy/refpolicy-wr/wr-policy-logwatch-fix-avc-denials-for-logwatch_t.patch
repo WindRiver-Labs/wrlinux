@@ -1,0 +1,61 @@
+From 3dcfd94eaa8e74f031e4bb76e1b0fa3fdce23839 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 28 May 2019 10:16:44 +0800
+Subject: [PATCH] logwatch: fix avc denials for logwatch_t
+
+Fix:
+type=AVC msg=audit(1559002111.347:86): avc:  denied  { write } for
+pid=474 comm="lockfile-create" name="logcheck" dev="tmpfs" ino=11349
+scontext=system_u:system_r:logwatch_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:logwatch_lock_t:s0 tclass=dir permissive=1
+
+type=AVC msg=audit(1559002111.347:86): avc:  denied  { add_name } for
+pid=474 comm="lockfile-create" name=".lk00474fqemux86-64"
+scontext=system_u:system_r:logwatch_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:logwatch_lock_t:s0 tclass=dir permissive=1
+
+type=AVC msg=audit(1559002111.349:87): avc:  denied  { remove_name } for
+pid=474 comm="lockfile-create" name=".lk00474fqemux86-64" dev="tmpfs"
+ino=16873 scontext=system_u:system_r:logwatch_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:logwatch_lock_t:s0 tclass=dir permissive=1
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/admin/logwatch.te | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/policy/modules/admin/logwatch.te b/policy/modules/admin/logwatch.te
+index f20454a..56781f9 100644
+--- a/policy/modules/admin/logwatch.te
++++ b/policy/modules/admin/logwatch.te
+@@ -38,14 +38,14 @@ role system_r types logwatch_mail_t;
+ #
+ 
+ allow logwatch_t self:capability { dac_override dac_read_search setgid };
+-allow logwatch_t self:process signal;
++allow logwatch_t self:process { signal getsched };
+ allow logwatch_t self:fifo_file rw_fifo_file_perms;
+ allow logwatch_t self:unix_stream_socket { accept listen };
+ 
+ manage_dirs_pattern(logwatch_t, logwatch_cache_t, logwatch_cache_t)
+ manage_files_pattern(logwatch_t, logwatch_cache_t, logwatch_cache_t)
+ 
+-allow logwatch_t logwatch_lock_t:file manage_file_perms;
++manage_files_pattern(logwatch_t, logwatch_lock_t, logwatch_lock_t)
+ files_lock_filetrans(logwatch_t, logwatch_lock_t, file)
+ 
+ manage_dirs_pattern(logwatch_t, logwatch_tmp_t, logwatch_tmp_t)
+@@ -189,6 +189,8 @@ dev_read_rand(logwatch_mail_t)
+ dev_read_urand(logwatch_mail_t)
+ dev_read_sysfs(logwatch_mail_t)
+ 
++files_map_etc_files(logwatch_mail_t)
++
+ logging_read_all_logs(logwatch_mail_t)
+ 
+ optional_policy(`
+-- 
+2.7.4
+

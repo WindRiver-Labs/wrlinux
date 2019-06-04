@@ -1,7 +1,7 @@
-From af6ab58fc3480a5adcf5ccf932ed7ed99b527d73 Mon Sep 17 00:00:00 2001
+From 8d6bc0e8ab9ae8b9245b0dd1686f36521caf668b Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Thu, 3 Mar 2016 22:41:24 -0500
-Subject: [PATCH 3/4] wr-policy: allow radiusd_t getcap to itself
+Subject: [PATCH] wr-policy: allow radiusd_t getcap to itself
 
 * Allow radiusd_t get linux capabilities of itself (process)
 
@@ -16,13 +16,13 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/contrib/radius.te | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ policy/modules/services/radius.te | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/policy/modules/contrib/radius.te b/policy/modules/contrib/radius.te
-index 1239a2e..0f63b4f 100644
---- a/policy/modules/contrib/radius.te
-+++ b/policy/modules/contrib/radius.te
+diff --git a/policy/modules/services/radius.te b/policy/modules/services/radius.te
+index e6ff2d0..1488b4f 100644
+--- a/policy/modules/services/radius.te
++++ b/policy/modules/services/radius.te
 @@ -34,7 +34,7 @@ files_pid_file(radiusd_var_run_t)
  
  allow radiusd_t self:capability { chown dac_override fsetid kill setgid setuid sys_resource sys_tty_config };
@@ -32,6 +32,14 @@ index 1239a2e..0f63b4f 100644
  allow radiusd_t self:fifo_file rw_fifo_file_perms;
  allow radiusd_t self:unix_stream_socket { accept listen };
  allow radiusd_t self:tcp_socket { accept listen };
+@@ -99,6 +99,7 @@ fs_search_auto_mountpoints(radiusd_t)
+ 
+ files_read_usr_files(radiusd_t)
+ files_read_etc_runtime_files(radiusd_t)
++files_map_etc_files(radiusd_t)
+ files_dontaudit_list_tmp(radiusd_t)
+ 
+ auth_use_nsswitch(radiusd_t)
 -- 
-1.9.1
+2.7.4
 

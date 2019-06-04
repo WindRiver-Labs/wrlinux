@@ -1,7 +1,7 @@
-From e4201d7eda4b0b3c0384afb3e790be1dbd2e4bfe Mon Sep 17 00:00:00 2001
+From d9903eded96afd56f9059bf0a553753a0b31f1ef Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Thu, 3 Mar 2016 07:29:54 -0500
-Subject: [PATCH 5/5] wr-policy: allow passwd_t, useradd_t search journal
+Subject: [PATCH] wr-policy: allow passwd_t, useradd_t search journal
 
 Fix avc denials:
 
@@ -25,19 +25,19 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  1 file changed, 4 insertions(+)
 
 diff --git a/policy/modules/admin/usermanage.te b/policy/modules/admin/usermanage.te
-index 74be7ef..65a1186 100644
+index 5753741..8a58681 100644
 --- a/policy/modules/admin/usermanage.te
 +++ b/policy/modules/admin/usermanage.te
-@@ -356,6 +356,8 @@ userdom_read_user_tmp_files(passwd_t)
+@@ -366,6 +366,8 @@ userdom_read_user_tmp_files(passwd_t)
  # on user home dir
  userdom_dontaudit_search_user_home_content(passwd_t)
  
 +mls_file_read_all_levels(passwd_t)
 +
- optional_policy(`
- 	nscd_run(passwd_t, passwd_roles)
- ')
-@@ -528,6 +530,8 @@ userdom_manage_user_home_content_files(useradd_t)
+ ifdef(`init_systemd',`
+ 	# for journald /dev/log
+ 	kernel_dgram_send(passwd_t)
+@@ -541,6 +543,8 @@ userdom_manage_user_home_content_files(useradd_t)
  userdom_home_filetrans_user_home_dir(useradd_t)
  userdom_user_home_dir_filetrans_user_home_content(useradd_t, notdevfile_class_set)
  
@@ -47,5 +47,5 @@ index 74be7ef..65a1186 100644
  	mta_manage_spool(useradd_t)
  ')
 -- 
-1.9.1
+2.7.4
 

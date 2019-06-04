@@ -1,0 +1,111 @@
+From a5f50d11b75c2ff2f3bc3f065ceabdb073664f2d Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 4 Feb 2016 06:03:19 -0500
+Subject: [PATCH] wr-policy: fix avc denials from systemd-tmpfile
+
+Patches ported from Fedora 22:
+Reference sources: selinux-policy-3.13.1-128.21.fc22.src.rpm
+Changes come from: policy-f22-base.patch
+
+Fix avc denials:
+
+  avc: denied { net_admin } for pid=92 comm="systemd-tmpfile" \
+  capability=12 \
+  scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tcontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tclass=capability
+
+  avc: denied { relabelfrom relabelto } for pid=108 \
+  comm="systemd-tmpfile" name="audit" dev="tmpfs" ino=9432 \
+  scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:auditd_log_t:s15:c0.c1023 \
+  tclass=dir
+
+  avc: denied { getattr } for pid=117 comm="systemd-tmpfile" \
+  path="/var/tmp" dev="hda" ino=5148 \
+  scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:tmp_t:s0 \
+  tclass=lnk_file
+
+  avc: denied { create } for pid=98 comm="systemd-tmpfile" name="log" \
+  scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:var_log_t:s0-s15:c0.c1023 \
+  tclass=dir
+
+  avc: denied { create } for pid=98 comm="systemd-tmpfile" name="tmp" \
+  scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:tmp_t:s0-s15:c0.c1023 \
+  tclass=dir
+
+  avc: denied { read } for pid=92 comm="systemd-tmpfile" \
+  name="filesystems" dev="proc" ino=4026532052 \
+  scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:proc_t:s0 \
+  tclass=file
+
+  avc: denied { search } for pid=92 comm="systemd-tmpfile" name="1" \
+  dev="proc" ino=7987 \
+  scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tcontext=system_u:system_r:init_t:s0-s15:c0.c1023 \
+  tclass=dir
+
+  avc: denied { search } for pid=92 comm="systemd-tmpfile" \
+  name="journal" dev="tmpfs" ino=8226 \
+  scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:syslogd_var_run_t:s15:c0.c1023 \
+  tclass=dir
+
+  avc: denied { write } for pid=92 comm="systemd-tmpfile" \
+  name="kmsg" dev="devtmpfs" ino=7242 \
+  scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:kmsg_device_t:s15:c0.c1023 \
+  tclass=chr_file
+
+  avc: denied { read } for pid=92 comm="systemd-tmpfile" \
+  name="kmod.conf" dev="tmpfs" ino=8660 \
+  scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:var_run_t:s0 \
+  tclass=file
+
+  avc: denied { search } for pid=92 comm="systemd-tmpfile" \
+  name="kernel" dev="proc" ino=8731 \
+  scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:sysctl_kernel_t:s0 tclass=dir
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/system/systemd.te | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 1ff5a04..9713915 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -1063,6 +1063,10 @@ files_relabel_var_lib_dirs(systemd_tmpfiles_t)
+ files_relabelfrom_home(systemd_tmpfiles_t)
+ files_relabelto_home(systemd_tmpfiles_t)
+ files_relabelto_etc_dirs(systemd_tmpfiles_t)
++
++files_manage_non_auth_files(systemd_tmpfiles_t)
++files_relabel_non_auth_files(systemd_tmpfiles_t)
++
+ # for /etc/mtab
+ files_manage_etc_symlinks(systemd_tmpfiles_t)
+ 
+@@ -1109,6 +1113,11 @@ sysnet_relabel_config(systemd_tmpfiles_t)
+ 
+ systemd_log_parse_environment(systemd_tmpfiles_t)
+ 
++mls_file_write_all_levels(systemd_tmpfiles_t)
++mls_file_read_all_levels(systemd_tmpfiles_t)
++mls_file_downgrade(systemd_tmpfiles_t)
++mls_file_upgrade(systemd_tmpfiles_t)
++
+ userdom_manage_user_runtime_root_dirs(systemd_tmpfiles_t)
+ userdom_relabel_user_runtime_root_dirs(systemd_tmpfiles_t)
+ 
+-- 
+2.7.4
+

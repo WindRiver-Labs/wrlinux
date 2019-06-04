@@ -1,4 +1,4 @@
-From 43a9d23829bd1090c497618b9094dd1584ab3b56 Mon Sep 17 00:00:00 2001
+From be2846ea7cabb3b015625d1c3e26edbbc1e77ae5 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Wed, 24 Feb 2016 01:14:01 -0500
 Subject: [PATCH] wr-policy: fix avc denials about searching journal dir
@@ -25,28 +25,32 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/contrib/avahi.te   | 2 ++
- policy/modules/contrib/bind.te    | 1 +
- policy/modules/contrib/inetd.te   | 1 +
- policy/modules/contrib/ntp.te     | 2 ++
- policy/modules/contrib/postfix.te | 4 ++++
- policy/modules/contrib/snmp.te    | 2 ++
- policy/modules/contrib/zebra.te   | 2 ++
- policy/modules/system/ipsec.te    | 4 ++++
- policy/modules/system/systemd.te  | 1 +
- 9 files changed, 19 insertions(+)
+ policy/modules/services/avahi.te   | 2 ++
+ policy/modules/services/bind.te    | 1 +
+ policy/modules/services/inetd.te   | 1 +
+ policy/modules/services/ntp.te     | 2 ++
+ policy/modules/services/postfix.te | 5 +++++
+ policy/modules/services/snmp.te    | 2 ++
+ policy/modules/services/zebra.te   | 2 ++
+ policy/modules/system/ipsec.te     | 4 ++++
+ policy/modules/system/systemd.te   | 2 ++
+ 9 files changed, 21 insertions(+)
 
---- refpolicy.orig/policy/modules/contrib/avahi.te
-+++ refpolicy/policy/modules/contrib/avahi.te
+diff --git a/policy/modules/services/avahi.te b/policy/modules/services/avahi.te
+index 953558f..acbd976 100644
+--- a/policy/modules/services/avahi.te
++++ b/policy/modules/services/avahi.te
 @@ -117,3 +117,5 @@ optional_policy(`
  optional_policy(`
  	udev_read_db(avahi_t)
  ')
 +
 +mls_file_read_all_levels(avahi_t)
---- refpolicy.orig/policy/modules/contrib/bind.te
-+++ refpolicy/policy/modules/contrib/bind.te
-@@ -161,6 +161,7 @@ fs_search_auto_mountpoints(named_t)
+diff --git a/policy/modules/services/bind.te b/policy/modules/services/bind.te
+index 939c1e9..65b90a8 100644
+--- a/policy/modules/services/bind.te
++++ b/policy/modules/services/bind.te
+@@ -164,6 +164,7 @@ fs_search_auto_mountpoints(named_t)
  auth_use_nsswitch(named_t)
  
  logging_send_syslog_msg(named_t)
@@ -54,9 +58,11 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  
  miscfiles_read_generic_certs(named_t)
  miscfiles_read_localization(named_t)
---- refpolicy.orig/policy/modules/contrib/inetd.te
-+++ refpolicy/policy/modules/contrib/inetd.te
-@@ -164,6 +164,7 @@ mls_socket_read_to_clearance(inetd_t)
+diff --git a/policy/modules/services/inetd.te b/policy/modules/services/inetd.te
+index 277a8ad..1ba3872 100644
+--- a/policy/modules/services/inetd.te
++++ b/policy/modules/services/inetd.te
+@@ -165,6 +165,7 @@ mls_socket_read_to_clearance(inetd_t)
  mls_socket_write_to_clearance(inetd_t)
  mls_net_outbound_all_levels(inetd_t)
  mls_process_set_level(inetd_t)
@@ -64,20 +70,24 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  
  userdom_dontaudit_use_unpriv_user_fds(inetd_t)
  userdom_dontaudit_search_user_home_dirs(inetd_t)
---- refpolicy.orig/policy/modules/contrib/ntp.te
-+++ refpolicy/policy/modules/contrib/ntp.te
-@@ -113,6 +113,8 @@ dev_rw_realtime_clock(ntpd_t)
+diff --git a/policy/modules/services/ntp.te b/policy/modules/services/ntp.te
+index dcad73b..bb29559 100644
+--- a/policy/modules/services/ntp.te
++++ b/policy/modules/services/ntp.te
+@@ -116,6 +116,8 @@ dev_rw_realtime_clock(ntpd_t)
  domain_use_interactive_fds(ntpd_t)
  domain_dontaudit_list_all_domains_state(ntpd_t)
  
 +mls_file_read_all_levels(ntpd_t)
 +
+ files_manage_etc_symlinks(ntpd_t)
  files_read_etc_runtime_files(ntpd_t)
  files_read_usr_files(ntpd_t)
- files_list_var_lib(ntpd_t)
---- refpolicy.orig/policy/modules/contrib/postfix.te
-+++ refpolicy/policy/modules/contrib/postfix.te
-@@ -316,6 +316,7 @@ mta_etc_filetrans_aliases(postfix_master
+diff --git a/policy/modules/services/postfix.te b/policy/modules/services/postfix.te
+index ec09ed2..c0089ec 100644
+--- a/policy/modules/services/postfix.te
++++ b/policy/modules/services/postfix.te
+@@ -321,6 +321,7 @@ mta_etc_filetrans_aliases(postfix_master_t, file, "aliasesdb-stamp")
  mta_spec_filetrans_aliases(postfix_master_t, postfix_etc_t, file)
  mta_read_sendmail_bin(postfix_master_t)
  mta_getattr_spool(postfix_master_t)
@@ -85,42 +95,49 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  
  optional_policy(`
  	cyrus_stream_connect(postfix_master_t)
-@@ -542,6 +543,8 @@ delete_files_pattern(postfix_pickup_t, p
+@@ -579,6 +580,8 @@ delete_files_pattern(postfix_pickup_t, postfix_spool_maildrop_t, postfix_spool_m
  mcs_file_read_all(postfix_pickup_t)
  mcs_file_write_all(postfix_pickup_t)
  
 +mls_file_read_all_levels(postfix_pickup_t)
 +
- ########################################
- #
- # Pipe local policy
-@@ -679,6 +682,7 @@ manage_lnk_files_pattern(postfix_qmgr_t,
- files_spool_filetrans(postfix_qmgr_t, postfix_spool_t, dir)
+ optional_policy(`
+ 	dbus_system_bus_client(postfix_pickup_t)
+ 	init_dbus_chat(postfix_pickup_t)
+@@ -731,6 +734,8 @@ files_spool_filetrans(postfix_qmgr_t, postfix_spool_t, dir)
  
  corecmd_exec_bin(postfix_qmgr_t)
-+mls_file_read_all_levels(postfix_qmgr_t)
  
- ########################################
- #
---- refpolicy.orig/policy/modules/contrib/snmp.te
-+++ refpolicy/policy/modules/contrib/snmp.te
++mls_file_read_all_levels(postfix_qmgr_t)
++
+ optional_policy(`
+ 	dbus_send_system_bus(postfix_qmgr_t)
+ 	dbus_system_bus_client(postfix_qmgr_t)
+diff --git a/policy/modules/services/snmp.te b/policy/modules/services/snmp.te
+index af4897d..f778629 100644
+--- a/policy/modules/services/snmp.te
++++ b/policy/modules/services/snmp.te
 @@ -183,3 +183,5 @@ optional_policy(`
  	xen_stream_connect(snmpd_t)
  	xen_stream_connect_xenstore(snmpd_t)
  ')
 +
 +mls_file_read_all_levels(snmpd_t)
---- refpolicy.orig/policy/modules/contrib/zebra.te
-+++ refpolicy/policy/modules/contrib/zebra.te
+diff --git a/policy/modules/services/zebra.te b/policy/modules/services/zebra.te
+index 3115a1c..1e62223 100644
+--- a/policy/modules/services/zebra.te
++++ b/policy/modules/services/zebra.te
 @@ -140,3 +140,5 @@ optional_policy(`
  optional_policy(`
  	udev_read_db(zebra_t)
  ')
 +
 +mls_file_read_all_levels(zebra_t)
---- refpolicy.orig/policy/modules/system/ipsec.te
-+++ refpolicy/policy/modules/system/ipsec.te
-@@ -311,6 +311,8 @@ sysnet_etc_filetrans_config(ipsec_mgmt_t
+diff --git a/policy/modules/system/ipsec.te b/policy/modules/system/ipsec.te
+index fa2851a..9d2dddf 100644
+--- a/policy/modules/system/ipsec.te
++++ b/policy/modules/system/ipsec.te
+@@ -315,6 +315,8 @@ sysnet_etc_filetrans_config(ipsec_mgmt_t)
  
  userdom_use_user_terminals(ipsec_mgmt_t)
  
@@ -129,7 +146,7 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  optional_policy(`
  	consoletype_exec(ipsec_mgmt_t)
  ')
-@@ -421,6 +423,8 @@ tunable_policy(`racoon_read_shadow',`
+@@ -425,6 +427,8 @@ tunable_policy(`racoon_read_shadow',`
  	auth_tunable_read_shadow(racoon_t)
  ')
  
@@ -138,13 +155,19 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  ########################################
  #
  # Setkey local policy
---- refpolicy.orig/policy/modules/system/systemd.te
-+++ refpolicy/policy/modules/system/systemd.te
-@@ -307,6 +307,7 @@ kernel_read_system_state(systemd_logind_
- kernel_read_kernel_sysctls(systemd_logind_t)
- fs_mount_tmpfs(systemd_logind_t)
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 86b0b93..20ed0f6 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -510,6 +510,8 @@ init_write_pid_socket(systemd_logind_t)
+ kernel_read_system_state(systemd_logind_t)
  auth_manage_var_auth(systemd_logind_t)
-+mls_file_read_all_levels(systemd_logind_t)
  
- optional_policy(`
- 	dbus_system_bus_client(systemd_logind_t)
++mls_file_read_all_levels(systemd_logind_t)
++
+ locallogin_read_state(systemd_logind_t)
+ 
+ seutil_libselinux_linked(systemd_logind_t)
+-- 
+2.7.4
+

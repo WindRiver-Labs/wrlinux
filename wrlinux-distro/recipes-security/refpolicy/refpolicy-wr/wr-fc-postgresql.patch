@@ -1,0 +1,37 @@
+From f8f672a6811759bb0c41148553c0e65234d2ab46 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 25 Apr 2019 11:12:49 +0800
+Subject: [PATCH] refpolicy: fix real path for postgresql
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/postgresql.fc | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/policy/modules/services/postgresql.fc b/policy/modules/services/postgresql.fc
+index d013468..05a12f9 100644
+--- a/policy/modules/services/postgresql.fc
++++ b/policy/modules/services/postgresql.fc
+@@ -27,6 +27,17 @@
+ /usr/lib/postgresql(-.*)?/(.*/)?bin/postgres		--	gen_context(system_u:object_r:postgresql_exec_t,s0)
+ /usr/lib/postgresql(-.*)?/(.*/)?bin/postmaster		-l	gen_context(system_u:object_r:postgresql_exec_t,s0)
+ 
++/usr/bin/pg_archivecleanup	--	gen_context(system_u:object_r:postgresql_exec_t,s0)
++/usr/bin/pg_basebackup	--	gen_context(system_u:object_r:postgresql_exec_t,s0)
++/usr/bin/pg_controldata	--	gen_context(system_u:object_r:postgresql_exec_t,s0)
++/usr/bin/pg_ctl		--	gen_context(system_u:object_r:postgresql_exec_t,s0)
++/usr/bin/pg_resetxlog	--	gen_context(system_u:object_r:postgresql_exec_t,s0)
++/usr/bin/pg_standby		--	gen_context(system_u:object_r:postgresql_exec_t,s0)
++/usr/bin/pg_upgrade		--	gen_context(system_u:object_r:postgresql_exec_t,s0)
++/usr/bin/pg_xlogdump		--	gen_context(system_u:object_r:postgresql_exec_t,s0)
++/usr/bin/postgres		--	gen_context(system_u:object_r:postgresql_exec_t,s0)
++/usr/bin/postmaster		-l	gen_context(system_u:object_r:postgresql_exec_t,s0)
++
+ ifdef(`distro_redhat', `
+ /usr/share/jonas/pgsql(/.*)?		gen_context(system_u:object_r:postgresql_db_t,s0)
+ ')
+-- 
+2.7.4
+

@@ -1,7 +1,7 @@
-From 7186914bf0a6c1311fd0663f344bde79fec37952 Mon Sep 17 00:00:00 2001
+From 7f1f1bd381ddbf76e9645131cec41806dd2c301b Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Thu, 3 Mar 2016 06:24:24 -0500
-Subject: [PATCH 2/5] wr-policy: allow mount_t getattr of all filesystems
+Subject: [PATCH] wr-policy: allow mount_t getattr of all filesystems
 
 Reference sources: selinux-policy-3.13.1-128.21.fc22.src.rpm
 Changes come from: policy-f22-base.patch
@@ -27,13 +27,18 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/mount.te | 1 +
  1 file changed, 1 insertion(+)
 
---- refpolicy.orig/policy/modules/system/mount.te
-+++ refpolicy/policy/modules/system/mount.te
-@@ -108,6 +108,7 @@ files_dontaudit_setattr_all_mountpoints(
- 
- fs_getattr_xattr_fs(mount_t)
+diff --git a/policy/modules/system/mount.te b/policy/modules/system/mount.te
+index d31406a..122f375 100644
+--- a/policy/modules/system/mount.te
++++ b/policy/modules/system/mount.te
+@@ -111,6 +111,7 @@ fs_getattr_tmpfs(mount_t)
+ fs_getattr_rpc_pipefs(mount_t)
  fs_getattr_cifs(mount_t)
+ fs_getattr_nfs(mount_t)
 +fs_getattr_all_fs(mount_t)
  fs_mount_all_fs(mount_t)
  fs_unmount_all_fs(mount_t)
  fs_remount_all_fs(mount_t)
+-- 
+2.7.4
+

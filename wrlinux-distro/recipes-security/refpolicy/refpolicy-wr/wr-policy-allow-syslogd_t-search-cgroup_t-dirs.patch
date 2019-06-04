@@ -1,4 +1,4 @@
-From f16834b763eb7052e477e0671c91254151f81a69 Mon Sep 17 00:00:00 2001
+From f7fe8771e3284256b79b82ead3199823015e3656 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Wed, 27 Dec 2017 06:12:50 +0000
 Subject: [PATCH] wr-policy: allow syslogd_t search cgroup_t dirs
@@ -27,9 +27,11 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/logging.te | 1 +
  1 file changed, 1 insertion(+)
 
---- refpolicy.orig/policy/modules/system/logging.te
-+++ refpolicy/policy/modules/system/logging.te
-@@ -501,6 +501,7 @@ files_var_lib_filetrans(syslogd_t, syslo
+diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
+index 1bb98ff..23f572d 100644
+--- a/policy/modules/system/logging.te
++++ b/policy/modules/system/logging.te
+@@ -519,6 +519,7 @@ files_var_lib_filetrans(syslogd_t, syslogd_var_lib_t, { file dir })
  fs_getattr_all_fs(syslogd_t)
  fs_search_auto_mountpoints(syslogd_t)
  fs_search_tmpfs(syslogd_t)
@@ -37,3 +39,6 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  
  mls_file_read_all_levels(syslogd_t)
  mls_file_write_all_levels(syslogd_t) # Need to be able to write to /var/run/ and /var/log directories
+-- 
+2.7.4
+

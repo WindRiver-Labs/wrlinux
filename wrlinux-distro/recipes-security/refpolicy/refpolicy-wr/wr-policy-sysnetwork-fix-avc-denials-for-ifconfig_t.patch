@@ -1,0 +1,34 @@
+From 79f4bb2744abff15fe507cc0a5fa0869fa8d84f5 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Mon, 27 May 2019 15:55:19 +0800
+Subject: [PATCH] sysnetwork: fix avc denials for ifconfig_t
+
+Fix:
+type=AVC msg=audit(1558942740.789:50): avc:  denied  { read } for
+pid=221 comm="ip" path="/var/lib/dhcp/dhclient.leases" dev="vda"
+ino=29858 scontext=system_u:system_r:ifconfig_t
+tcontext=system_u:object_r:dhcpc_state_t tclass=file permissive=1
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/sysnetwork.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/system/sysnetwork.te b/policy/modules/system/sysnetwork.te
+index fc31af6..13c783e 100644
+--- a/policy/modules/system/sysnetwork.te
++++ b/policy/modules/system/sysnetwork.te
+@@ -317,6 +317,8 @@ kernel_request_load_module(ifconfig_t)
+ kernel_search_network_sysctl(ifconfig_t)
+ kernel_rw_net_sysctls(ifconfig_t)
+ 
++sysnet_read_dhcpc_state(ifconfig_t)
++
+ corenet_rw_tun_tap_dev(ifconfig_t)
+ 
+ dev_read_sysfs(ifconfig_t)
+-- 
+2.7.4
+

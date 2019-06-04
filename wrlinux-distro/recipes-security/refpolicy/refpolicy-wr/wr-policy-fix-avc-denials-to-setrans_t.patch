@@ -1,4 +1,4 @@
-From 3fe8ca57752b942bd43a30fb0b92c96730d1f205 Mon Sep 17 00:00:00 2001
+From e7f3c8b82f1ecb2f30ee3b9aae175a0866fe7840 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Thu, 3 Mar 2016 05:26:42 -0500
 Subject: [PATCH] wr-policy: fix avc denials to setrans_t
@@ -34,9 +34,11 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/setrans.te |  1 +
  3 files changed, 33 insertions(+)
 
---- refpolicy.orig/policy/modules/kernel/domain.te
-+++ refpolicy/policy/modules/kernel/domain.te
-@@ -13,6 +13,14 @@ policy_module(domain, 1.14.0)
+diff --git a/policy/modules/kernel/domain.te b/policy/modules/kernel/domain.te
+index c481455..fd4f66d 100644
+--- a/policy/modules/kernel/domain.te
++++ b/policy/modules/kernel/domain.te
+@@ -13,6 +13,14 @@ policy_module(domain, 1.15.0)
  ## </desc>
  gen_tunable(mmap_low_allowed, false)
  
@@ -51,7 +53,7 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  # Mark process types as domains
  attribute domain;
  
-@@ -184,3 +192,8 @@ allow unconfined_domain_type domain:key
+@@ -195,3 +203,8 @@ allow unconfined_domain_type domain:key manage_key_perms;
  
  # receive from all domains over labeled networking
  domain_all_recvfrom_all_domains(unconfined_domain_type)
@@ -60,13 +62,15 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 +	# Allow all domains to use fds past to them
 +	allow domain domain:fd use;
 +')
---- refpolicy.orig/policy/modules/system/init.te
-+++ refpolicy/policy/modules/system/init.te
-@@ -1134,3 +1134,22 @@ init_get_system_status(init_t)
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index 97b5d80..caa9980 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -1447,3 +1447,22 @@ init_get_system_status(init_t)
  
  # MLS trusted for reading from sockets at any level
  mls_socket_read_all_levels(init_t)
-+
++ 
 +## <desc>
 +## <p>
 +## Allow all daemons the ability to read/write terminals
@@ -84,9 +88,11 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 +	term_dontaudit_use_generic_ptys(daemon)
 +	term_dontaudit_use_all_ttys(daemon)
 +	term_dontaudit_use_all_ptys(daemon)
-+ ')
---- refpolicy.orig/policy/modules/system/setrans.te
-+++ refpolicy/policy/modules/system/setrans.te
++')
+diff --git a/policy/modules/system/setrans.te b/policy/modules/system/setrans.te
+index 779c59e..f7cd2a6 100644
+--- a/policy/modules/system/setrans.te
++++ b/policy/modules/system/setrans.te
 @@ -75,6 +75,7 @@ mls_net_receive_all_levels(setrans_t)
  mls_socket_write_all_levels(setrans_t)
  mls_process_read_all_levels(setrans_t)
@@ -95,3 +101,6 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  
  selinux_compute_access_vector(setrans_t)
  
+-- 
+2.7.4
+

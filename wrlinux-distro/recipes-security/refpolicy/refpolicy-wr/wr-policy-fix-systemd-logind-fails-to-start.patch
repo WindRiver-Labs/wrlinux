@@ -1,4 +1,4 @@
-From e094978dcc909941e67de133ec52806bcf6d3f22 Mon Sep 17 00:00:00 2001
+From 11e95a1e5656fdba0fe0e6078950689875d6cfbe Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Mon, 23 Jan 2017 08:42:44 +0000
 Subject: [PATCH] refpolicy: fix systemd-logind fails to start
@@ -35,39 +35,30 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/contrib/dbus.te   | 1 +
- policy/modules/system/systemd.te | 6 ++++++
- 2 files changed, 7 insertions(+)
+ policy/modules/system/systemd.te | 3 +++
+ 1 file changed, 3 insertions(+)
 
---- refpolicy.orig/policy/modules/contrib/dbus.te
-+++ refpolicy/policy/modules/contrib/dbus.te
-@@ -144,6 +144,7 @@ userdom_dontaudit_use_unpriv_user_fds(sy
- userdom_dontaudit_search_user_home_dirs(system_dbusd_t)
- 
- systemd_write_inherited_logind_sessions_pipes(system_dbusd_t)
-+systemd_read_logind_pids(system_dbusd_t)
- 
- optional_policy(`
- 	bluetooth_stream_connect(system_dbusd_t)
---- refpolicy.orig/policy/modules/system/systemd.te
-+++ refpolicy/policy/modules/system/systemd.te
-@@ -322,6 +322,7 @@ kernel_read_kernel_sysctls(systemd_login
- fs_mount_tmpfs(systemd_logind_t)
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 5459213..565fd6e 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -514,6 +514,7 @@ kernel_read_system_state(systemd_logind_t)
  auth_manage_var_auth(systemd_logind_t)
+ 
  mls_file_read_all_levels(systemd_logind_t)
 +mls_file_write_all_levels(systemd_logind_t)
  
  domain_read_all_domains_state(systemd_logind_t)
  
-@@ -336,6 +337,11 @@ optional_policy(`
- 	dbus_connect_system_bus(systemd_logind_t)
- ')
+@@ -554,6 +555,8 @@ userdom_relabelto_user_runtime_dirs(systemd_logind_t)
+ userdom_setattr_user_ttys(systemd_logind_t)
+ userdom_use_user_ttys(systemd_logind_t)
  
 +seutil_read_config(systemd_logind_t)
-+seutil_read_file_contexts(systemd_logind_t)
-+userdom_manage_user_runtime_dirs(systemd_logind_t)
-+userdom_manage_user_runtime_root_dirs(systemd_logind_t)
 +
- #########################################
- #
- # Resolved local policy
+ # Needed to work around patch not yet merged into the systemd-logind supported on RHEL 7.x
+ # The change in systemd by Nicolas Iooss on 02-Feb-2016 with hash 4b51966cf6c06250036e428608da92f8640beb96
+ # should fix the problem where user directories in /run/user/$UID/ are not getting the proper context
+-- 
+2.7.4
+

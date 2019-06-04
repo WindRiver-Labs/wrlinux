@@ -1,4 +1,7 @@
-clock.te: allow hwclock_t create adjtime_t file
+From a6e3049c492de018ed018d616f2f6013d7d23415 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Thu, 31 Jan 2019 13:53:07 +0800
+Subject: [PATCH] clock.te: allow hwclock_t create adjtime_t file
 
 Fix avc denied issue:
 type=1400 audit(1399538541.505:5): avc:  denied  { write } for  pid=307 comm="hwclock" name="etc" dev="hda" ino=40072 scontext=system_u:system_r:hwclock_t:s0-s15:c0.c1023 tcontext=system_u:object_r:etc_t:s0 tclass=dir
@@ -6,16 +9,18 @@ type=1400 audit(1399538541.517:6): avc:  denied  { add_name } for  pid=307 comm=
 type=1400 audit(1399538541.528:7): avc:  denied  { create } for  pid=307 comm="hwclock" name="adjtime" scontext=system_u:system_r:hwclock_t:s0-s15:c0.c1023 tcontext=system_u:object_r:etc_t:s0 tclass=file
 type=1400 audit(1399538541.537:8): avc:  denied  { write } for  pid=307 comm="hwclock" path="/etc/adjtime" dev="hda" ino=107977 scontext=system_u:system_r:hwclock_t:s0-s15:c0.c1023 tcontext=system_u:object_r:etc_t:s0 tclass=file
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
 ---
- policy/modules/system/clock.te |    3 ++-
+ policy/modules/system/clock.te | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
---- refpolicy.orig/policy/modules/system/clock.te
-+++ refpolicy/policy/modules/system/clock.te
-@@ -26,7 +26,7 @@ allow hwclock_t self:process signal_perm
+diff --git a/policy/modules/system/clock.te b/policy/modules/system/clock.te
+index bbd9d64..8f0d4e4 100644
+--- a/policy/modules/system/clock.te
++++ b/policy/modules/system/clock.te
+@@ -26,7 +26,7 @@ allow hwclock_t self:process signal_perms;
  allow hwclock_t self:fifo_file rw_fifo_file_perms;
  
  # Allow hwclock to store & retrieve correction factors.
@@ -32,3 +37,6 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  
  fs_getattr_xattr_fs(hwclock_t)
  fs_search_auto_mountpoints(hwclock_t)
+-- 
+2.7.4
+

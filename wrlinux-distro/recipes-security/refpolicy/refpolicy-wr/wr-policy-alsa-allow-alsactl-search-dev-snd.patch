@@ -1,4 +1,4 @@
-From ad606a0d280e3f7a7905c1929160a49e37403119 Mon Sep 17 00:00:00 2001
+From ddea7490cf0b15be083bcfbfc77f7a8d1d354bcb Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Mon, 24 Feb 2014 01:00:43 -0500
 Subject: [PATCH] allow alsactl to search /dev/snd
@@ -10,16 +10,18 @@ for  pid=390 comm="alsactl" name="snd" dev="devtmpfs" ino=5741 \
 scontext=system_u:system_r:alsa_t:s0-s15:c0.c1023 tcontext= \
 system_u:object_r:device_t:s15:c0.c1023 tclass=dir
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/contrib/alsa.te |    4 ++++
+ policy/modules/admin/alsa.te | 4 ++++
  1 file changed, 4 insertions(+)
 
---- refpolicy.orig/policy/modules/contrib/alsa.te
-+++ refpolicy/policy/modules/contrib/alsa.te
-@@ -76,6 +76,10 @@ dev_read_sysfs(alsa_t)
+diff --git a/policy/modules/admin/alsa.te b/policy/modules/admin/alsa.te
+index caffc3a..2512e82 100644
+--- a/policy/modules/admin/alsa.te
++++ b/policy/modules/admin/alsa.te
+@@ -86,6 +86,10 @@ dev_read_sysfs(alsa_t)
  dev_read_urand(alsa_t)
  dev_write_sound(alsa_t)
  
@@ -30,3 +32,6 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  files_read_usr_files(alsa_t)
  files_search_var_lib(alsa_t)
  
+-- 
+2.7.4
+

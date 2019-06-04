@@ -1,4 +1,4 @@
-From 978262a9980e2939448bad9f2c7434605f01f778 Mon Sep 17 00:00:00 2001
+From 7a6d2183e2b2260a306d12a4da45b70d50198171 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Mon, 7 Mar 2016 22:24:32 -0500
 Subject: [PATCH] wr-policy: fix su failure with non-root users
@@ -65,9 +65,11 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/systemd.te | 2 ++
  3 files changed, 9 insertions(+)
 
---- refpolicy.orig/policy/modules/admin/su.if
-+++ refpolicy/policy/modules/admin/su.if
-@@ -206,6 +206,10 @@ template(`su_role_template',`
+diff --git a/policy/modules/admin/su.if b/policy/modules/admin/su.if
+index 75e6d62..cbc45ea 100644
+--- a/policy/modules/admin/su.if
++++ b/policy/modules/admin/su.if
+@@ -200,6 +200,10 @@ template(`su_role_template',`
  	init_rw_utmp($1_su_t)
  
  	mls_file_write_all_levels($1_su_t)
@@ -78,8 +80,10 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  
  	logging_send_syslog_msg($1_su_t)
  
---- refpolicy.orig/policy/modules/kernel/domain.te
-+++ refpolicy/policy/modules/kernel/domain.te
+diff --git a/policy/modules/kernel/domain.te b/policy/modules/kernel/domain.te
+index 87d8759..2ed8a0f 100644
+--- a/policy/modules/kernel/domain.te
++++ b/policy/modules/kernel/domain.te
 @@ -122,6 +122,9 @@ files_list_root(domain)
  # Yocto/oe-core use some var volatile links
  files_read_var_symlinks(domain)
@@ -90,10 +94,12 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  ifdef(`hide_broken_symptoms',`
  	# This check is in the general socket
  	# listen code, before protocol-specific
---- refpolicy.orig/policy/modules/system/systemd.te
-+++ refpolicy/policy/modules/system/systemd.te
-@@ -323,6 +323,8 @@ fs_mount_tmpfs(systemd_logind_t)
- auth_manage_var_auth(systemd_logind_t)
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index c35f6e5..5622b46 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -495,6 +495,8 @@ auth_manage_var_auth(systemd_logind_t)
+ 
  mls_file_read_all_levels(systemd_logind_t)
  
 +domain_read_all_domains_state(systemd_logind_t)
@@ -101,3 +107,6 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  userdom_manage_all_user_tmp_content(systemd_logind_t)
  userdom_mounton_tmp_dirs(systemd_logind_t)
  
+-- 
+2.7.4
+

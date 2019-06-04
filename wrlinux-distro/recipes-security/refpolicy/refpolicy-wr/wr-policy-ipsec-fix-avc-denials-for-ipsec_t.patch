@@ -1,0 +1,60 @@
+From 8fd57506c80fb8a74f8dd1e46db1524988cda467 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Wed, 29 May 2019 08:18:40 +0800
+Subject: [PATCH] ipsec: fix avc denials for ipsec_t
+
+Fix:
+type=AVC msg=audit(1559087800.829:85): avc:  denied  { map } for
+pid=345 comm="charon" path="/etc/ipsec.secrets" dev="vda" ino=29849
+scontext=system_u:system_r:ipsec_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:ipsec_key_file_t:s0 tclass=file permissive=1
+
+type=AVC msg=audit(1559087800.829:86): avc:  denied  { listen } for
+pid=345 comm="charon" path="/run/charon.ctl"
+scontext=system_u:system_r:ipsec_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:ipsec_t:s0-s15:c0.c1023
+tclass=unix_stream_socket permissive=1
+
+type=AVC msg=audit(1559087799.957:66): avc:  denied  { map } for
+pid=309 comm="sh" path="/etc/passwd" dev="vda" ino=31099
+scontext=system_u:system_r:ipsec_supervisor_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:etc_t:s0 tclass=file permissive=1
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/ipsec.te | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/policy/modules/system/ipsec.te b/policy/modules/system/ipsec.te
+index caf6f08..6a24942 100644
+--- a/policy/modules/system/ipsec.te
++++ b/policy/modules/system/ipsec.te
+@@ -89,6 +89,7 @@ allow ipsec_t self:key_socket create_socket_perms;
+ allow ipsec_t self:fifo_file rw_fifo_file_perms;
+ allow ipsec_t self:netlink_xfrm_socket create_netlink_socket_perms;
+ allow ipsec_t self:netlink_route_socket rw_netlink_socket_perms;
++allow ipsec_t self:unix_stream_socket { accept listen };
+ 
+ allow ipsec_t ipsec_initrc_exec_t:file read_file_perms;
+ 
+@@ -97,6 +98,7 @@ read_files_pattern(ipsec_t, ipsec_conf_file_t, ipsec_conf_file_t)
+ read_lnk_files_pattern(ipsec_t, ipsec_conf_file_t, ipsec_conf_file_t)
+ 
+ allow ipsec_t ipsec_key_file_t:dir list_dir_perms;
++allow ipsec_t ipsec_key_file_t:file map;
+ manage_files_pattern(ipsec_t, ipsec_key_file_t, ipsec_key_file_t)
+ read_lnk_files_pattern(ipsec_t, ipsec_key_file_t, ipsec_key_file_t)
+ 
+@@ -511,6 +513,7 @@ dev_read_rand(ipsec_supervisor_t)
+ dev_read_urand(ipsec_supervisor_t)
+ 
+ files_read_etc_files(ipsec_supervisor_t)
++files_map_etc_files(ipsec_supervisor_t)
+ 
+ logging_send_syslog_msg(ipsec_supervisor_t)
+ 
+-- 
+2.7.4
+

@@ -1,7 +1,7 @@
-From ef56e4d882d271cdd2709c5209d7f9b54c55e8a4 Mon Sep 17 00:00:00 2001
+From b799124b86e86232187d83adc5de57480b10a705 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Wed, 9 Mar 2016 02:49:07 -0500
-Subject: [PATCH 1/2] wr-policy: fix label for dnssec keys file
+Subject: [PATCH] wr-policy: fix label for dnssec keys file
 
 * Fix label for /etc/bind/rndc.key: named_zone_t -> dnssec_t
 
@@ -17,12 +17,14 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/contrib/bind.if | 19 +++++++++++++++++++
- policy/modules/system/init.te  |  6 ++++++
+ policy/modules/services/bind.if | 19 +++++++++++++++++++
+ policy/modules/system/init.te   |  6 ++++++
  2 files changed, 25 insertions(+)
 
---- refpolicy.orig/policy/modules/contrib/bind.if
-+++ refpolicy/policy/modules/contrib/bind.if
+diff --git a/policy/modules/services/bind.if b/policy/modules/services/bind.if
+index a99bae9..5e37050 100644
+--- a/policy/modules/services/bind.if
++++ b/policy/modules/services/bind.if
 @@ -157,6 +157,25 @@ interface(`bind_read_dnssec_keys',`
  
  ########################################
@@ -49,11 +51,13 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  ##	Read bind named configuration files.
  ## </summary>
  ## <param name="domain">
---- refpolicy.orig/policy/modules/system/init.te
-+++ refpolicy/policy/modules/system/init.te
-@@ -584,6 +584,12 @@ userdom_read_user_home_content_files(ini
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index ad6748a..251a21f 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -766,6 +766,12 @@ userdom_read_user_home_content_files(initrc_t)
  # started from init should be placed in their own domain.
- userdom_use_user_terminals(initrc_t)
+ userdom_use_inherited_user_terminals(initrc_t)
  
 +optional_policy(`
 +	# WRL fix:
@@ -64,3 +68,6 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  ifdef(`distro_debian',`
  	kernel_getattr_core_if(initrc_t)
  
+-- 
+2.7.4
+

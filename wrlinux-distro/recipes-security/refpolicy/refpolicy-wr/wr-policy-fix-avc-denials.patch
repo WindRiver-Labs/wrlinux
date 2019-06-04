@@ -1,4 +1,4 @@
-From 1406538dcca2e4e3d695fd7931ec914fec20538e Mon Sep 17 00:00:00 2001
+From c6dcfccdd6b3bf1898d8056d909b962588580570 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Mon, 27 Feb 2017 10:33:18 +0000
 Subject: [PATCH] refpolicy: fix avc denials
@@ -187,72 +187,51 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/contrib/apm.te            |  1 +
- policy/modules/contrib/bind.te           |  1 +
- policy/modules/contrib/irqbalance.te     |  6 ++++++
- policy/modules/contrib/networkmanager.te |  5 +++++
- policy/modules/contrib/policykit.te      |  6 ++++++
- policy/modules/contrib/zebra.te          |  1 +
- policy/modules/services/xserver.te       |  3 +++
- policy/modules/system/init.if            | 19 +++++++++++++++++++
- policy/modules/system/systemd.if         | 19 +++++++++++++++++++
- policy/modules/system/systemd.te         | 20 ++++++++++++++++++++
- 10 files changed, 81 insertions(+)
+ policy/modules/services/acpi.te           |  1 +
+ policy/modules/services/irqbalance.te     |  6 ++++++
+ policy/modules/services/networkmanager.te |  4 ++++
+ policy/modules/services/policykit.te      |  6 ++++++
+ policy/modules/services/xserver.te        |  3 +++
+ policy/modules/services/zebra.te          |  1 +
+ policy/modules/system/init.if             | 19 +++++++++++++++++++
+ policy/modules/system/systemd.if          | 19 +++++++++++++++++++
+ policy/modules/system/systemd.te          | 14 +++++++++++++-
+ 9 files changed, 72 insertions(+), 1 deletion(-)
 
-diff --git a/policy/modules/contrib/apm.te b/policy/modules/contrib/apm.te
-index f5692d5..c59995a 100644
---- a/policy/modules/contrib/apm.te
-+++ b/policy/modules/contrib/apm.te
-@@ -87,6 +87,7 @@ files_var_lib_filetrans(apmd_t, apmd_var_lib_t, dir)
- manage_files_pattern(apmd_t, apmd_var_run_t, apmd_var_run_t)
- manage_sock_files_pattern(apmd_t, apmd_var_run_t, apmd_var_run_t)
- files_pid_filetrans(apmd_t, apmd_var_run_t, { file sock_file })
-+mls_file_read_all_levels(apmd_t)
+diff --git a/policy/modules/services/acpi.te b/policy/modules/services/acpi.te
+index 3a7320d..5a7741d 100644
+--- a/policy/modules/services/acpi.te
++++ b/policy/modules/services/acpi.te
+@@ -98,6 +98,7 @@ files_var_lib_filetrans(acpid_t, acpid_var_lib_t, dir)
+ manage_files_pattern(acpid_t, acpid_var_run_t, acpid_var_run_t)
+ manage_sock_files_pattern(acpid_t, acpid_var_run_t, acpid_var_run_t)
+ files_pid_filetrans(acpid_t, acpid_var_run_t, { file sock_file })
++mls_file_read_all_levels(acpid_t)
  
- can_exec(apmd_t, apmd_var_run_t)
+ can_exec(acpid_t, acpid_var_run_t)
  
-diff --git a/policy/modules/contrib/bind.te b/policy/modules/contrib/bind.te
-index d7af6b2..6f66f56 100644
---- a/policy/modules/contrib/bind.te
-+++ b/policy/modules/contrib/bind.te
-@@ -118,6 +118,7 @@ kernel_read_kernel_sysctls(named_t)
- kernel_read_vm_overcommit_sysctl(named_t)
- kernel_read_system_state(named_t)
- kernel_read_network_state(named_t)
-+kernel_read_net_sysctls(named_t)
- 
- corecmd_search_bin(named_t)
- 
-diff --git a/policy/modules/contrib/irqbalance.te b/policy/modules/contrib/irqbalance.te
-index e955650..f8ab10a 100644
---- a/policy/modules/contrib/irqbalance.te
-+++ b/policy/modules/contrib/irqbalance.te
-@@ -36,6 +36,12 @@ kernel_read_network_state(irqbalance_t)
+diff --git a/policy/modules/services/irqbalance.te b/policy/modules/services/irqbalance.te
+index ffc5997..1f0ce10 100644
+--- a/policy/modules/services/irqbalance.te
++++ b/policy/modules/services/irqbalance.te
+@@ -38,6 +38,12 @@ kernel_read_network_state(irqbalance_t)
  kernel_read_system_state(irqbalance_t)
  kernel_read_kernel_sysctls(irqbalance_t)
  kernel_rw_irq_sysctls(irqbalance_t)
 +gen_require(`
 +	type sysctl_irq_t, proc_t;
 +')
-+allow irqbalance_t sysctl_irq_t:dir { rw_dir_perms };
++allow irqbalance_t sysctl_irq_t:dir rw_dir_perms;
 +allow irqbalance_t sysctl_irq_t:file create;
 +allow sysctl_irq_t proc_t:filesystem associate;
  
  dev_read_sysfs(irqbalance_t)
  
-diff --git a/policy/modules/contrib/networkmanager.te b/policy/modules/contrib/networkmanager.te
-index 5199e29..84d2e9e 100644
---- a/policy/modules/contrib/networkmanager.te
-+++ b/policy/modules/contrib/networkmanager.te
-@@ -136,6 +136,7 @@ corecmd_exec_shell(NetworkManager_t)
- corecmd_exec_bin(NetworkManager_t)
- 
- dev_rw_sysfs(NetworkManager_t)
-+dev_write_sysfs_dirs(NetworkManager_t)
- dev_read_rand(NetworkManager_t)
- dev_read_urand(NetworkManager_t)
- dev_dontaudit_getattr_generic_blk_files(NetworkManager_t)
-@@ -162,6 +163,7 @@ storage_getattr_fixed_disk_dev(NetworkManager_t)
+diff --git a/policy/modules/services/networkmanager.te b/policy/modules/services/networkmanager.te
+index aaa0a8a..7c9f4c3 100644
+--- a/policy/modules/services/networkmanager.te
++++ b/policy/modules/services/networkmanager.te
+@@ -171,6 +171,7 @@ storage_getattr_fixed_disk_dev(NetworkManager_t)
  init_read_utmp(NetworkManager_t)
  init_dontaudit_write_utmp(NetworkManager_t)
  init_domtrans_script(NetworkManager_t)
@@ -260,7 +239,7 @@ index 5199e29..84d2e9e 100644
  
  auth_use_nsswitch(NetworkManager_t)
  
-@@ -186,6 +188,9 @@ sysnet_search_dhcp_state(NetworkManager_t)
+@@ -196,6 +197,9 @@ sysnet_search_dhcp_state(NetworkManager_t)
  sysnet_manage_config(NetworkManager_t)
  sysnet_etc_filetrans_config(NetworkManager_t)
  
@@ -270,19 +249,20 @@ index 5199e29..84d2e9e 100644
  # certificates in user home directories (cert_home_t in ~/\.pki)
  userdom_read_user_certs(NetworkManager_t)
  
-diff --git a/policy/modules/contrib/policykit.te b/policy/modules/contrib/policykit.te
-index 21ab30e..6d239e1 100644
---- a/policy/modules/contrib/policykit.te
-+++ b/policy/modules/contrib/policykit.te
-@@ -87,12 +87,18 @@ domtrans_pattern(policykit_t, policykit_resolve_exec_t, policykit_resolve_t)
- 
+diff --git a/policy/modules/services/policykit.te b/policy/modules/services/policykit.te
+index 80cc9d8..96906a0 100644
+--- a/policy/modules/services/policykit.te
++++ b/policy/modules/services/policykit.te
+@@ -88,6 +88,8 @@ domtrans_pattern(policykit_t, policykit_resolve_exec_t, policykit_resolve_t)
+ kernel_read_crypto_sysctls(policykit_t)
  kernel_read_kernel_sysctls(policykit_t)
  kernel_read_system_state(policykit_t)
 +kernel_search_vm_sysctl(policykit_t)
 +kernel_read_vm_overcommit_sysctl(policykit_t)
  
  dev_read_urand(policykit_t)
- 
+ dev_read_urand(policykit_t)
+@@ -95,6 +97,10 @@ dev_read_urand(policykit_t)
  domain_read_all_domains_state(policykit_t)
  
  files_dontaudit_search_all_mountpoints(policykit_t)
@@ -293,23 +273,11 @@ index 21ab30e..6d239e1 100644
  
  fs_getattr_xattr_fs(policykit_t)
  fs_list_inotifyfs(policykit_t)
-diff --git a/policy/modules/contrib/zebra.te b/policy/modules/contrib/zebra.te
-index 0accea8..cfe4d52 100644
---- a/policy/modules/contrib/zebra.te
-+++ b/policy/modules/contrib/zebra.te
-@@ -109,6 +109,7 @@ files_read_etc_runtime_files(zebra_t)
- 
- fs_getattr_all_fs(zebra_t)
- fs_search_auto_mountpoints(zebra_t)
-+fs_read_nsfs_files(zebra_t)
- 
- term_list_ptys(zebra_t)
- 
 diff --git a/policy/modules/services/xserver.te b/policy/modules/services/xserver.te
-index 1d8f189..d2f44fb 100644
+index a2b08a8..2e7beb4 100644
 --- a/policy/modules/services/xserver.te
 +++ b/policy/modules/services/xserver.te
-@@ -729,6 +729,9 @@ files_read_etc_files(xserver_t)
+@@ -774,6 +774,9 @@ files_read_etc_files(xserver_t)
  files_read_etc_runtime_files(xserver_t)
  files_read_usr_files(xserver_t)
  
@@ -319,16 +287,26 @@ index 1d8f189..d2f44fb 100644
  # brought on by rhgb
  files_search_mnt(xserver_t)
  # for nscd
+diff --git a/policy/modules/services/zebra.te b/policy/modules/services/zebra.te
+index fe5a4fb..c34cca9 100644
+--- a/policy/modules/services/zebra.te
++++ b/policy/modules/services/zebra.te
+@@ -110,6 +110,7 @@ files_read_etc_runtime_files(zebra_t)
+ 
+ fs_getattr_all_fs(zebra_t)
+ fs_search_auto_mountpoints(zebra_t)
++fs_read_nsfs_files(zebra_t)
+ 
+ term_list_ptys(zebra_t)
+ 
 diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
-index ec68ca6..cc1e451 100644
+index 7f73e0e..57affe4 100644
 --- a/policy/modules/system/init.if
 +++ b/policy/modules/system/init.if
-@@ -2599,6 +2599,25 @@ interface(`init_create_pid_dirs',`
- 	create_dirs_pattern($1, init_var_run_t, init_var_run_t)
- ')
+@@ -2802,6 +2802,25 @@ interface(`init_rename_pid_files',`
  
-+########################################
-+## <summary>
+ ########################################
+ ## <summary>
 +##      Allow the specified domain to modify the systemd configuration of
 +##      transient scripts.
 +## </summary>
@@ -346,14 +324,16 @@ index ec68ca6..cc1e451 100644
 +	allow $1 init_var_run_t:service { start stop status };
 +')
 +
- #######################################
- ## <summary>
- ##	Reload all systemd units.
++########################################
++## <summary>
+ ##      Rename init_var_run_t files
+ ## </summary>
+ ## <param name="domain">
 diff --git a/policy/modules/system/systemd.if b/policy/modules/system/systemd.if
-index fee64a5..7e3bb9f 100644
+index d381d44..871578f 100644
 --- a/policy/modules/system/systemd.if
 +++ b/policy/modules/system/systemd.if
-@@ -59,6 +59,25 @@ interface(`systemd_manage_logind_pid_pipes',`
+@@ -116,6 +116,25 @@ interface(`systemd_write_logind_pid_pipes',`
  
  ######################################
  ## <summary>
@@ -380,36 +360,49 @@ index fee64a5..7e3bb9f 100644
  ##   logind file descriptors.
  ## </summary>
 diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
-index 169edd9..6ce8494 100644
+index b3ffcfa..a901099 100644
 --- a/policy/modules/system/systemd.te
 +++ b/policy/modules/system/systemd.te
-@@ -235,8 +235,11 @@ optional_policy(`
+@@ -214,7 +214,7 @@ init_unit_file(power_unit_t)
+ # Backlight local policy
  #
  
- kernel_read_kernel_sysctls(systemd_hostnamed_t)
-+dev_read_sysfs(systemd_hostnamed_t)
+-allow systemd_backlight_t self:unix_dgram_socket { connect connected_socket_perms };
++allow systemd_backlight_t self:unix_dgram_socket { create connect connected_socket_perms };
+ 
+ allow systemd_backlight_t systemd_backlight_var_lib_t:dir manage_dir_perms;
+ init_var_lib_filetrans(systemd_backlight_t, systemd_backlight_var_lib_t, dir)
+@@ -233,6 +233,10 @@ udev_read_pid_files(systemd_backlight_t)
+ 
+ files_search_var_lib(systemd_backlight_t)
+ 
++dev_write_kmsg(systemd_backlight_t)
++mls_file_write_all_levels(systemd_backlight_t)
++kernel_read_system_state(systemd_backlight_t)
++
+ #######################################
+ #
+ # Binfmt local policy
+@@ -350,6 +354,9 @@ dev_read_sysfs(systemd_hostnamed_t)
  
  files_read_etc_files(systemd_hostnamed_t)
+ 
 +fs_search_tmpfs(systemd_hostnamed_t)
 +mls_file_read_all_levels(systemd_hostnamed_t)
- 
++
  seutil_read_file_contexts(systemd_hostnamed_t)
  
-@@ -301,6 +304,7 @@ init_start_all_units(systemd_logind_t)
- init_stop_all_units(systemd_logind_t)
- init_service_status(systemd_logind_t)
- init_service_start(systemd_logind_t)
+ sysnet_etc_filetrans_config(systemd_hostnamed_t)
+@@ -507,6 +514,8 @@ init_stop_system(systemd_logind_t)
+ init_reboot_system(systemd_logind_t)
+ init_shutdown_system(systemd_logind_t)
+ 
 +init_config_transient_files(systemd_logind_t)
- 
- locallogin_read_state(systemd_logind_t)
- 
-@@ -325,11 +329,13 @@ fs_mount_tmpfs(systemd_logind_t)
- auth_manage_var_auth(systemd_logind_t)
- mls_file_read_all_levels(systemd_logind_t)
- mls_file_write_all_levels(systemd_logind_t)
-+domain_obj_id_change_exemption(systemd_logind_t)
- 
- domain_read_all_domains_state(systemd_logind_t)
++
+ init_dgram_send(systemd_logind_t)
+ init_write_pid_socket(systemd_logind_t)
+ kernel_read_system_state(systemd_logind_t)
+@@ -519,6 +528,7 @@ domain_read_all_domains_state(systemd_logind_t)
  
  userdom_manage_all_user_tmp_content(systemd_logind_t)
  userdom_mounton_tmp_dirs(systemd_logind_t)
@@ -417,43 +410,22 @@ index 169edd9..6ce8494 100644
  
  files_dontaudit_list_non_security(systemd_logind_t)
  auth_dontaudit_mounton_var_auth(systemd_logind_t)
-@@ -343,6 +349,7 @@ seutil_read_config(systemd_logind_t)
- seutil_read_file_contexts(systemd_logind_t)
- userdom_manage_user_runtime_dirs(systemd_logind_t)
- userdom_manage_user_runtime_root_dirs(systemd_logind_t)
-+userdom_mounton_user_runtime_dirs(systemd_logind_t)
- 
- #########################################
- #
-@@ -384,8 +391,10 @@ optional_policy(`
+@@ -1016,6 +1026,7 @@ allow systemd_sessions_t self:process setfscreate;
  
  allow systemd_sessions_t systemd_sessions_var_run_t:file manage_file_perms;
  files_pid_filetrans(systemd_sessions_t, systemd_sessions_var_run_t, file)
 +mls_file_write_all_levels(systemd_sessions_t)
+ 
+ selinux_get_enforce_mode(systemd_sessions_t)
+ selinux_get_fs_mount(systemd_sessions_t)
+@@ -1025,6 +1036,7 @@ seutil_read_default_contexts(systemd_sessions_t)
+ seutil_read_file_contexts(systemd_sessions_t)
  
  systemd_log_parse_environment(systemd_sessions_t)
 +seutil_dontaudit_read_file_contexts(systemd_sessions_t)
  
  #########################################
  #
-@@ -438,6 +447,17 @@ tunable_policy(`systemd_tmpfiles_manage_all',`
- 
- #######################################
- #
-+# Systemd_backlight_t local policy
-+#
-+
-+allow systemd_backlight_t self:unix_dgram_socket create;
-+
-+dev_write_kmsg(systemd_backlight_t)
-+mls_file_write_all_levels(systemd_backlight_t)
-+kernel_read_system_state(systemd_backlight_t)
-+
-+#######################################
-+#
- # Systemd_passwd_agent local policy
- #
- 
 -- 
-2.13.3
+2.7.4
 

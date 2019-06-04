@@ -1,4 +1,4 @@
-From acb72e72e91ab1599f37a4c4a7c27baecc19890b Mon Sep 17 00:00:00 2001
+From dec697a5725189ccd404fef176bb8f2947b8d61b Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Thu, 1 Feb 2018 03:07:39 +0000
 Subject: [PATCH] wr-policy: allow systemd_backlight_t read all level files
@@ -30,10 +30,10 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
-index 5836f46..bd29de3 100644
+index 51bdffa..eeabf26 100644
 --- a/policy/modules/system/systemd.te
 +++ b/policy/modules/system/systemd.te
-@@ -462,6 +462,7 @@ allow systemd_backlight_t self:unix_dgram_socket create;
+@@ -226,6 +226,7 @@ allow systemd_backlight_t self:unix_dgram_socket create;
  
  dev_write_kmsg(systemd_backlight_t)
  mls_file_write_all_levels(systemd_backlight_t)
@@ -42,5 +42,5 @@ index 5836f46..bd29de3 100644
  
  #######################################
 -- 
-2.13.3
+2.7.4
 

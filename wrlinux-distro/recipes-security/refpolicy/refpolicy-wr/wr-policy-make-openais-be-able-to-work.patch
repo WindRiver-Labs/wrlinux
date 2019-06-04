@@ -1,0 +1,54 @@
+From ea0b8c252efe01353db9250d2e9a0c55e4c15ce4 Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Sat, 22 Feb 2014 17:08:42 +0800
+Subject: [PATCH] make openais be able to work
+
+Upstream-Status: Pending
+
+1.  give aisexec the permission to bootup corosync, since aisexec calls
+corosync
+2.  allow corosync to associate device_t filesystem
+
+Starting OpenAIS (aisexec): type=1400 audit(1393059863.470:26): avc:  denied  { associate } for  pid=837 comm="corosync" name="fdata-JDp3yH" scontext=system_u:object_r:corosync_tmpfs_t:s0 tcontext=system_u:object_r:device_t:s0 tclass=filesystem
+type=1300 audit(1393059863.470:26): arch=c000003e syscall=2 success=yes exit=3 a0=7fffc5f8bd80 a1=c2 a2=180 a3=0 items=0 ppid=836 pid=837 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 ses=4294967295 tty=pts0 comm="corosync" exe="/usr/sbin/corosync" subj=system_u:system_r:corosync_t:s0-s15:c0.c1023 key=(null)
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ policy/modules/services/aisexec.te  | 1 +
+ policy/modules/services/corosync.te | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/policy/modules/services/aisexec.te b/policy/modules/services/aisexec.te
+index dfacbf5..1bb7606 100644
+--- a/policy/modules/services/aisexec.te
++++ b/policy/modules/services/aisexec.te
+@@ -85,6 +85,7 @@ corenet_sendrecv_cluster_server_packets(aisexec_t)
+ corenet_udp_bind_cluster_port(aisexec_t)
+ corenet_udp_sendrecv_cluster_port(aisexec_t)
+ 
++corosync_domtrans(aisexec_t)
+ dev_read_urand(aisexec_t)
+ 
+ files_manage_mounttab(aisexec_t)
+diff --git a/policy/modules/services/corosync.te b/policy/modules/services/corosync.te
+index 6f8d20c..1da14b2 100644
+--- a/policy/modules/services/corosync.te
++++ b/policy/modules/services/corosync.te
+@@ -18,6 +18,7 @@ files_tmp_file(corosync_tmp_t)
+ 
+ type corosync_tmpfs_t;
+ files_tmpfs_file(corosync_tmpfs_t)
++dev_associate(corosync_tmpfs_t)
+ 
+ type corosync_var_lib_t;
+ files_type(corosync_var_lib_t)
+@@ -145,4 +146,4 @@ optional_policy(`
+ 
+ optional_policy(`
+ 	rpc_search_nfs_state_data(corosync_t)
+-')
+\ No newline at end of file
++')
+-- 
+2.7.4
+

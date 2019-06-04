@@ -1,4 +1,4 @@
-From 67cee404e06d4833be6a42c161d0df17f6f316ea Mon Sep 17 00:00:00 2001
+From fbf90b850129b6507f64e4900dcef33f6981515a Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Fri, 6 May 2016 02:20:35 -0400
 Subject: [PATCH] wr-policy: fix mailx send mail failure
@@ -51,23 +51,23 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/contrib/postfix.te | 8 ++++++++
+ policy/modules/services/postfix.te | 8 ++++++++
  1 file changed, 8 insertions(+)
 
-diff --git a/policy/modules/contrib/postfix.te b/policy/modules/contrib/postfix.te
-index 239bf73..5030567 100644
---- a/policy/modules/contrib/postfix.te
-+++ b/policy/modules/contrib/postfix.te
-@@ -403,6 +403,8 @@ corenet_tcp_sendrecv_kismet_port(postfix_cleanup_t)
- 
+diff --git a/policy/modules/services/postfix.te b/policy/modules/services/postfix.te
+index ae434d0..30106ac 100644
+--- a/policy/modules/services/postfix.te
++++ b/policy/modules/services/postfix.te
+@@ -415,6 +415,8 @@ corenet_tcp_sendrecv_kismet_port(postfix_cleanup_t)
  mta_read_aliases(postfix_cleanup_t)
+ mta_map_aliases(postfix_cleanup_t)
  
 +mls_file_read_all_levels(postfix_cleanup_t)
 +
  optional_policy(`
- 	mailman_read_data_files(postfix_cleanup_t)
+ 	dkim_stream_connect(postfix_cleanup_t)
  ')
-@@ -432,6 +434,8 @@ mta_read_aliases(postfix_local_t)
+@@ -449,6 +451,8 @@ mta_map_aliases(postfix_local_t)
  mta_read_config(postfix_local_t)
  mta_send_mail(postfix_local_t)
  
@@ -76,7 +76,7 @@ index 239bf73..5030567 100644
  tunable_policy(`postfix_local_write_mail_spool',`
  	mta_manage_spool(postfix_local_t)
  ')
-@@ -600,10 +604,12 @@ optional_policy(`
+@@ -619,10 +623,12 @@ optional_policy(`
  allow postfix_postdrop_t self:capability sys_resource;
  
  rw_fifo_files_pattern(postfix_postdrop_t, postfix_public_t, postfix_public_t)
@@ -87,9 +87,9 @@ index 239bf73..5030567 100644
  allow postfix_postdrop_t postfix_local_t:unix_stream_socket { read write };
 +allow postfix_postdrop_t postfix_master_t:unix_stream_socket connectto;
  
- mcs_file_read_all(postfix_postdrop_t)
- mcs_file_write_all(postfix_postdrop_t)
-@@ -613,6 +619,8 @@ term_dontaudit_use_all_ttys(postfix_postdrop_t)
+ # for /var/spool/postfix/public/pickup
+ stream_connect_pattern(postfix_postdrop_t, postfix_public_t, postfix_public_t, postfix_master_t)
+@@ -635,6 +641,8 @@ term_dontaudit_use_all_ttys(postfix_postdrop_t)
  
  mta_rw_user_mail_stream_sockets(postfix_postdrop_t)
  
@@ -99,5 +99,5 @@ index 239bf73..5030567 100644
  	apache_dontaudit_rw_fifo_file(postfix_postdrop_t)
  ')
 -- 
-2.8.1
+2.7.4
 

@@ -1,0 +1,70 @@
+From 1bfe6d1511f61bbf96f2dfae7eca39134a9008e6 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Mon, 27 May 2019 14:22:51 +0800
+Subject: [PATCH] sysadm: fix avc denials for sysadm_t
+
+Fix:
+type=AVC msg=audit(1558926569.592:105): avc:  denied  { read write } for
+pid=1580 comm="systemd" path="socket:[19499]" dev="sockfs" ino=19499
+scontext=root:sysadm_r:sysadm_t tcontext=system_u:system_r:init_t
+tclass=unix_stream_socket permissive=1
+
+type=AVC msg=audit(1558926569.595:106): avc:  denied  { ioctl } for
+pid=1580 comm="systemd" path="socket:[19499]" dev="sockfs" ino=19499
+ioctlcmd=0x5401 scontext=root:sysadm_r:sysadm_t
+tcontext=system_u:system_r:init_t tclass=unix_stream_socket permissive=1
+
+type=AVC msg=audit(1558926569.597:107): avc:  denied  { map_create } for
+pid=1580 comm="systemd" scontext=root:sysadm_r:sysadm_t
+tcontext=root:sysadm_r:sysadm_t tclass=bpf permissive=1
+
+type=AVC msg=audit(1558926569.597:107): avc:  denied  { map_read
+map_write } for  pid=1580 comm="systemd"
+scontext=root:sysadm_r:sysadm_t tcontext=root:sysadm_r:sysadm_t
+tclass=bpf permissive=1
+
+type=AVC msg=audit(1558926569.598:108): avc:  denied  { prog_load }
+for  pid=1580 comm="systemd" scontext=root:sysadm_r:sysadm_t
+tcontext=root:sysadm_r:sysadm_t tclass=bpf permissive=1
+
+type=AVC msg=audit(1558926569.598:108): avc:  denied  { prog_run }
+for  pid=1580 comm="systemd" scontext=root:sysadm_r:sysadm_t
+tcontext=root:sysadm_r:sysadm_t tclass=bpf permissive=1
+
+type=AVC msg=audit(1558926569.619:109): avc:  denied  { ioctl } for
+pid=1580 comm="systemd" path="socket:[19499]" dev="sockfs" ino=19499
+ioctlcmd=0x5401 scontext=root:sysadm_r:sysadm_t
+tcontext=system_u:system_r:init_t tclass=unix_stream_socket
+permissive=1
+
+type=AVC msg=audit(1558926569.619:110): avc:  denied  { audit_write
+} for  pid=1580 comm="systemd" capability=29
+scontext=root:sysadm_r:sysadm_t tcontext=root:sysadm_r:sysadm_t
+tclass=capability permissive=1
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/roles/sysadm.te | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/policy/modules/roles/sysadm.te b/policy/modules/roles/sysadm.te
+index a83b1c1..3dae16d 100644
+--- a/policy/modules/roles/sysadm.te
++++ b/policy/modules/roles/sysadm.te
+@@ -46,6 +46,11 @@ ubac_fd_exempt(sysadm_t)
+ init_exec(sysadm_t)
+ init_admin(sysadm_t)
+ 
++allow sysadm_t self:bpf { map_create map_read map_write prog_load prog_run };
++allow sysadm_t self:capability audit_write;
++allow sysadm_t self:system reload;
++init_rw_inherited_stream_socket(sysadm_t)
++
+ selinux_read_policy(sysadm_t)
+ 
+ # Add/remove user home directories
+-- 
+2.7.4
+

@@ -1,0 +1,115 @@
+From 40055d84a20bcbdc3827969b87f9b91c9bc5f198 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 28 May 2019 10:42:05 +0800
+Subject: [PATCH] systemd: allow systemd_* domain to map generic files in /etc
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/systemd.te | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 3cf4002..33cdede 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -227,6 +227,7 @@ dev_rw_sysfs(systemd_backlight_t)
+ 
+ # for udev.conf
+ files_read_etc_files(systemd_backlight_t)
++files_map_etc_files(systemd_backlight_t)
+ 
+ # for /run/udev/data/+backlight*
+ udev_read_pid_files(systemd_backlight_t)
+@@ -247,6 +248,7 @@ systemd_log_parse_environment(systemd_binfmt_t)
+ 
+ # Allow to read /etc/binfmt.d/ files
+ files_read_etc_files(systemd_binfmt_t)
++files_map_etc_files(systemd_binfmt_t)
+ 
+ fs_register_binary_executable_type(systemd_binfmt_t)
+ 
+@@ -258,6 +260,7 @@ fs_register_binary_executable_type(systemd_binfmt_t)
+ dev_read_sysfs(systemd_gpt_generator_t)
+ files_list_usr(systemd_gpt_generator_t)
+ files_read_etc_files(systemd_gpt_generator_t)
++files_map_etc_files(systemd_gpt_generator_t)
+ fs_getattr_xattr_fs(systemd_gpt_generator_t)
+ storage_raw_read_fixed_disk(systemd_gpt_generator_t)
+ dev_write_kmsg(systemd_gpt_generator_t)
+@@ -333,6 +336,7 @@ corecmd_read_all_executables(systemd_coredump_t)
+ dev_write_kmsg(systemd_coredump_t)
+ 
+ files_read_etc_files(systemd_coredump_t)
++files_map_etc_files(systemd_coredump_t)
+ files_search_var_lib(systemd_coredump_t)
+ 
+ fs_getattr_xattr_fs(systemd_coredump_t)
+@@ -361,6 +365,7 @@ kernel_read_kernel_sysctls(systemd_hostnamed_t)
+ dev_read_sysfs(systemd_hostnamed_t)
+ 
+ files_read_etc_files(systemd_hostnamed_t)
++files_map_etc_files(systemd_hostnamed_t)
+ 
+ fs_search_tmpfs(systemd_hostnamed_t)
+ mls_file_read_all_levels(systemd_hostnamed_t)
+@@ -409,6 +414,7 @@ corecmd_search_bin(systemd_hw_t)
+ kernel_read_kernel_sysctls(systemd_locale_t)
+ 
+ files_read_etc_files(systemd_locale_t)
++files_map_etc_files(systemd_locale_t)
+ 
+ seutil_read_file_contexts(systemd_locale_t)
+ 
+@@ -636,6 +642,7 @@ kernel_read_kernel_sysctls(systemd_machined_t)
+ kernel_read_system_state(systemd_machined_t)
+ 
+ files_read_etc_files(systemd_machined_t)
++files_map_etc_files(systemd_machined_t)
+ 
+ fs_getattr_cgroup(systemd_machined_t)
+ fs_getattr_tmpfs(systemd_machined_t)
+@@ -673,6 +680,7 @@ optional_policy(`
+ 
+ files_load_kernel_modules(systemd_modules_load_t)
+ files_read_etc_files(systemd_modules_load_t)
++files_map_etc_files(systemd_modules_load_t)
+ 
+ init_read_state(systemd_modules_load_t)
+ init_search_run(systemd_modules_load_t)
+@@ -771,6 +779,7 @@ allow systemd_notify_t self:unix_stream_socket create_stream_socket_perms;
+ domain_use_interactive_fds(systemd_notify_t)
+ 
+ files_read_etc_files(systemd_notify_t)
++files_map_etc_files(systemd_notify_t)
+ files_read_usr_files(systemd_notify_t)
+ 
+ fs_getattr_cgroup_files(systemd_notify_t)
+@@ -944,6 +953,7 @@ dev_write_generic_sock_files(systemd_passwd_agent_t)
+ dev_write_kmsg(systemd_passwd_agent_t)
+ 
+ files_read_etc_files(systemd_passwd_agent_t)
++files_map_etc_files(systemd_passwd_agent_t)
+ 
+ fs_getattr_xattr_fs(systemd_passwd_agent_t)
+ 
+@@ -1000,6 +1010,7 @@ dev_rw_wireless(systemd_rfkill_t)
+ 
+ # Allow reading /etc/udev/udev.conf
+ files_read_etc_files(systemd_rfkill_t)
++files_map_etc_files(systemd_rfkill_t)
+ 
+ # Allow reading /run/udev/data/+rfkill:rfkill0
+ udev_read_pid_files(systemd_rfkill_t)
+@@ -1123,6 +1134,7 @@ files_manage_var_dirs(systemd_tmpfiles_t)
+ files_manage_var_lib_dirs(systemd_tmpfiles_t)
+ files_purge_tmp(systemd_tmpfiles_t)
+ files_read_etc_files(systemd_tmpfiles_t)
++files_map_etc_files(systemd_tmpfiles_t)
+ files_read_etc_runtime_files(systemd_tmpfiles_t)
+ files_relabel_all_lock_dirs(systemd_tmpfiles_t)
+ files_relabel_all_pid_dirs(systemd_tmpfiles_t)
+-- 
+2.7.4
+

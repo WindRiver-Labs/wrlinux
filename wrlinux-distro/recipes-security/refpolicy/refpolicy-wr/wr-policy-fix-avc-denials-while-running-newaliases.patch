@@ -1,4 +1,4 @@
-From cbedb7368663f45b3312345dd76118145387c662 Mon Sep 17 00:00:00 2001
+From fab246d3f7907f2b217bc53a7c17f7247b6b039f Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Fri, 26 Feb 2016 07:24:57 -0500
 Subject: [PATCH] wr-policy: fix avc denials while running newaliases
@@ -38,16 +38,16 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/contrib/mta.te      | 8 ++++++++
- policy/modules/contrib/postfix.te  | 4 ++++
- policy/modules/contrib/sendmail.te | 2 ++
- 3 files changed, 14 insertions(+)
+ policy/modules/services/mta.te      |  8 ++++++++
+ policy/modules/services/postfix.te  | 13 +++++++++++++
+ policy/modules/services/sendmail.te |  2 ++
+ 3 files changed, 23 insertions(+)
 
-diff --git a/policy/modules/contrib/mta.te b/policy/modules/contrib/mta.te
-index 61f78ae..f2c4089 100644
---- a/policy/modules/contrib/mta.te
-+++ b/policy/modules/contrib/mta.te
-@@ -394,6 +394,14 @@ dev_read_sysfs(user_mail_t)
+diff --git a/policy/modules/services/mta.te b/policy/modules/services/mta.te
+index d2f3a94..2a8cf08 100644
+--- a/policy/modules/services/mta.te
++++ b/policy/modules/services/mta.te
+@@ -416,6 +416,14 @@ dev_read_sysfs(user_mail_t)
  
  userdom_use_user_terminals(user_mail_t)
  
@@ -62,11 +62,11 @@ index 61f78ae..f2c4089 100644
  optional_policy(`
  	allow user_mail_t self:capability dac_override;
  
-diff --git a/policy/modules/contrib/postfix.te b/policy/modules/contrib/postfix.te
-index 0bcdc78..38890e0 100644
---- a/policy/modules/contrib/postfix.te
-+++ b/policy/modules/contrib/postfix.te
-@@ -318,6 +318,10 @@ mta_read_sendmail_bin(postfix_master_t)
+diff --git a/policy/modules/services/postfix.te b/policy/modules/services/postfix.te
+index c3dde8e..9095570 100644
+--- a/policy/modules/services/postfix.te
++++ b/policy/modules/services/postfix.te
+@@ -324,6 +324,10 @@ mta_read_sendmail_bin(postfix_master_t)
  mta_getattr_spool(postfix_master_t)
  mls_file_read_all_levels(postfix_master_t)
  
@@ -77,11 +77,55 @@ index 0bcdc78..38890e0 100644
  optional_policy(`
  	cyrus_stream_connect(postfix_master_t)
  ')
-diff --git a/policy/modules/contrib/sendmail.te b/policy/modules/contrib/sendmail.te
-index 04aa439..c8baf18 100644
---- a/policy/modules/contrib/sendmail.te
-+++ b/policy/modules/contrib/sendmail.te
-@@ -125,6 +125,8 @@ mta_manage_spool(sendmail_t)
+@@ -414,6 +418,7 @@ manage_dirs_pattern(postfix_cleanup_t, postfix_spool_t, postfix_spool_t)
+ manage_files_pattern(postfix_cleanup_t, postfix_spool_t, postfix_spool_t)
+ manage_lnk_files_pattern(postfix_cleanup_t, postfix_spool_t, postfix_spool_t)
+ files_spool_filetrans(postfix_cleanup_t, postfix_spool_t, dir)
++files_map_etc_files(postfix_cleanup_t)
+ 
+ allow postfix_cleanup_t postfix_spool_bounce_t:dir list_dir_perms;
+ 
+@@ -460,6 +465,8 @@ corecmd_exec_bin(postfix_local_t)
+ 
+ logging_dontaudit_search_logs(postfix_local_t)
+ 
++files_map_etc_files(postfix_local_t)
++
+ mta_delete_spool(postfix_local_t)
+ mta_read_aliases(postfix_local_t)
+ mta_map_aliases(postfix_local_t)
+@@ -578,6 +585,8 @@ allow postfix_pickup_t postfix_spool_maildrop_t:dir list_dir_perms;
+ read_files_pattern(postfix_pickup_t, postfix_spool_maildrop_t, postfix_spool_maildrop_t)
+ delete_files_pattern(postfix_pickup_t, postfix_spool_maildrop_t, postfix_spool_maildrop_t)
+ 
++files_map_etc_files(postfix_pickup_t)
++
+ mcs_file_read_all(postfix_pickup_t)
+ mcs_file_write_all(postfix_pickup_t)
+ 
+@@ -649,6 +658,8 @@ allow postfix_postdrop_t postfix_local_t:unix_stream_socket { read write };
+ # for /var/spool/postfix/public/pickup
+ stream_connect_pattern(postfix_postdrop_t, postfix_public_t, postfix_public_t, postfix_master_t)
+ 
++files_map_etc_files(postfix_postdrop_t)
++
+ mcs_file_read_all(postfix_postdrop_t)
+ mcs_file_write_all(postfix_postdrop_t)
+ 
+@@ -733,6 +744,8 @@ manage_files_pattern(postfix_qmgr_t, postfix_spool_t, postfix_spool_t)
+ manage_lnk_files_pattern(postfix_qmgr_t, postfix_spool_t, postfix_spool_t)
+ files_spool_filetrans(postfix_qmgr_t, postfix_spool_t, dir)
+ 
++files_map_etc_files(postfix_qmgr_t)
++
+ corecmd_exec_bin(postfix_qmgr_t)
+ 
+ mls_file_read_all_levels(postfix_qmgr_t)
+diff --git a/policy/modules/services/sendmail.te b/policy/modules/services/sendmail.te
+index d5272a4..3d8c281 100644
+--- a/policy/modules/services/sendmail.te
++++ b/policy/modules/services/sendmail.te
+@@ -127,6 +127,8 @@ mta_manage_spool(sendmail_t)
  mta_read_config(sendmail_t)
  mta_sendmail_exec(sendmail_t)
  
@@ -91,5 +135,5 @@ index 04aa439..c8baf18 100644
  	cfengine_dontaudit_write_log_files(sendmail_t)
  ')
 -- 
-1.9.1
+2.7.4
 

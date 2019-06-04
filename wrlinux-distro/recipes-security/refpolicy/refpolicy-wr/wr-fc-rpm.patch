@@ -1,0 +1,27 @@
+From d5921a9da066a848552da2dc56954a0c870b09bd Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 25 Apr 2019 11:10:52 +0800
+Subject: [PATCH] refpolicy: fix real path for rpm
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/admin/rpm.fc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/policy/modules/admin/rpm.fc b/policy/modules/admin/rpm.fc
+index f2b8003..4edb758 100644
+--- a/policy/modules/admin/rpm.fc
++++ b/policy/modules/admin/rpm.fc
+@@ -67,6 +67,6 @@ ifdef(`distro_redhat',`
+ ifdef(`enable_mls',`
+ /usr/sbin/cpio		--	gen_context(system_u:object_r:rpm_exec_t,s0)
+ /usr/bin/cpio		--	gen_context(system_u:object_r:rpm_exec_t,s0)
+-/usr/bin/cpio.cpio	--	gen_context(system_u:object_r:rpm_exec_t,s0)
++/usr/bin/cpio\.cpio	--	gen_context(system_u:object_r:rpm_exec_t,s0)
+ ')
+ 
+-- 
+2.7.4
+

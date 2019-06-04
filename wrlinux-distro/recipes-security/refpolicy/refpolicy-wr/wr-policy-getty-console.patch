@@ -1,3 +1,6 @@
+From 64825931e25af51de7056a18b7e58787e69107e8 Mon Sep 17 00:00:00 2001
+From: Xin Ouyang <Xin.Ouyang@windriver.com>
+Date: Mon, 28 Jan 2019 10:03:03 +0800
 Subject: [PATCH] refpolicy: fix policy for "getty console"
 
 When "getty console" adding to inittab, SELinux will block users
@@ -21,11 +24,13 @@ Upstream-Status: Pending
 
 Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
 ---
- policy/modules/system/locallogin.te |    1 +
+ policy/modules/system/locallogin.te | 1 +
  1 file changed, 1 insertion(+)
 
---- refpolicy.orig/policy/modules/system/locallogin.te
-+++ refpolicy/policy/modules/system/locallogin.te
+diff --git a/policy/modules/system/locallogin.te b/policy/modules/system/locallogin.te
+index 4dd20ea..2971744 100644
+--- a/policy/modules/system/locallogin.te
++++ b/policy/modules/system/locallogin.te
 @@ -152,6 +152,7 @@ ifdef(`distro_ubuntu',`
  tunable_policy(`console_login',`
  	# Able to relabel /dev/console to user tty types.
@@ -34,3 +39,6 @@ Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
  ')
  
  tunable_policy(`use_nfs_home_dirs',`
+-- 
+2.7.4
+

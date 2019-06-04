@@ -1,4 +1,4 @@
-From 95f8ceb28a9427b05e5d08fb4c3c304adaf35132 Mon Sep 17 00:00:00 2001
+From 9ed825bfac6b4d2bfda76525bdba91e4980278ab Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Fri, 15 Jan 2016 03:47:05 -0500
 Subject: [PATCH] wr-policy-fix-security_validate_transition
@@ -24,15 +24,14 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/system/init.te | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ policy/modules/system/init.te | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
-index 6503fff..b7d9932 100644
+index d869658..3587fc9 100644
 --- a/policy/modules/system/init.te
 +++ b/policy/modules/system/init.te
-@@ -1111,4 +1111,8 @@ optional_policy(`
- # systemd related allow rules
+@@ -1425,3 +1425,7 @@ optional_policy(`
  allow kernel_t init_t:process dyntransition;
  allow devpts_t device_t:filesystem associate;
  allow init_t self:capability2 block_suspend;
@@ -41,5 +40,5 @@ index 6503fff..b7d9932 100644
 +mls_file_downgrade(init_t)
 +mls_file_upgrade(init_t)
 -- 
-2.13.3
+2.7.4
 

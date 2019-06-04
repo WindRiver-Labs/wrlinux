@@ -1,4 +1,4 @@
-From 3d029a7e81045be930b8946aa272c24745da36a9 Mon Sep 17 00:00:00 2001
+From e53ff77d56585afa53cf8bd23224d66960489833 Mon Sep 17 00:00:00 2001
 From: Roy Li <rongqing.li@windriver.com>
 Date: Thu, 20 Feb 2014 17:07:05 +0800
 Subject: [PATCH] allow sysadm_r to run crontab
@@ -10,12 +10,14 @@ we define distro_redhat
 
 Signed-off-by: Roy Li <rongqing.li@windriver.com>
 ---
- policy/modules/roles/sysadm.te |    4 ++++
+ policy/modules/roles/sysadm.te | 4 ++++
  1 file changed, 4 insertions(+)
 
---- refpolicy.orig/policy/modules/roles/sysadm.te
-+++ refpolicy/policy/modules/roles/sysadm.te
-@@ -1245,6 +1245,10 @@ optional_policy(`
+diff --git a/policy/modules/roles/sysadm.te b/policy/modules/roles/sysadm.te
+index 3a4a31a..b85554d 100644
+--- a/policy/modules/roles/sysadm.te
++++ b/policy/modules/roles/sysadm.te
+@@ -1268,6 +1268,10 @@ optional_policy(`
  	kerberos_exec_kadmind(sysadm_t)
  ')
  
@@ -26,3 +28,6 @@ Signed-off-by: Roy Li <rongqing.li@windriver.com>
  ifndef(`distro_redhat',`
  	optional_policy(`
  		auth_role(sysadm_r, sysadm_t)
+-- 
+2.7.4
+

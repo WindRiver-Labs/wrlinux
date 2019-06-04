@@ -1,0 +1,33 @@
+From 2ae19233e26ac10ddb6c9a92378a438baabfdf74 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Wed, 29 May 2019 11:36:06 +0800
+Subject: [PATCH] postfix: fix avc denials for postfix_local_t
+
+Fix:
+type=AVC msg=audit(1559100013.762:77): avc:  denied  { search } for
+pid=1578 comm="local" name="logcheck" dev="vda" ino=29501
+scontext=system_u:system_r:postfix_local_t
+tcontext=system_u:object_r:logwatch_cache_t tclass=dir permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/postfix.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/services/postfix.te b/policy/modules/services/postfix.te
+index a182ab4..187b06b 100644
+--- a/policy/modules/services/postfix.te
++++ b/policy/modules/services/postfix.te
+@@ -468,6 +468,7 @@ corecmd_exec_bin(postfix_local_t)
+ logging_dontaudit_search_logs(postfix_local_t)
+ 
+ files_map_etc_files(postfix_local_t)
++logwatch_search_cache_dir(postfix_local_t)
+ 
+ mta_delete_spool(postfix_local_t)
+ mta_read_aliases(postfix_local_t)
+-- 
+2.7.4
+

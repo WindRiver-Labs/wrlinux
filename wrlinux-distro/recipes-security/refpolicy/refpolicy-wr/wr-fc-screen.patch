@@ -1,0 +1,25 @@
+From dcaead589c7c6259e69b27289a2ccb7ec0dfe746 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 25 Apr 2019 11:11:24 +0800
+Subject: [PATCH] refpolicy: fix real path for screen
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/apps/screen.fc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/apps/screen.fc b/policy/modules/apps/screen.fc
+index 7196c59..cada994 100644
+--- a/policy/modules/apps/screen.fc
++++ b/policy/modules/apps/screen.fc
+@@ -6,4 +6,5 @@ HOME_DIR/\.tmux\.conf	--	gen_context(system_u:object_r:screen_home_t,s0)
+ /run/tmux(/.*)?			gen_context(system_u:object_r:screen_runtime_t,s0)
+ 
+ /usr/bin/screen		--	gen_context(system_u:object_r:screen_exec_t,s0)
++/usr/bin/screen-.*		--	gen_context(system_u:object_r:screen_exec_t,s0)
+ /usr/bin/tmux		--	gen_context(system_u:object_r:screen_exec_t,s0)
+-- 
+2.7.4
+

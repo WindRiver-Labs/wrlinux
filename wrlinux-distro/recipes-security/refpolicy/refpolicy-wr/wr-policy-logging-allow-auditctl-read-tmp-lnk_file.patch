@@ -1,4 +1,4 @@
-From 436a909274cce3294418aecdf7a074b5ddbeca21 Mon Sep 17 00:00:00 2001
+From 2ffda96a3ad413ecd80a08312bd61bd7f3ff8321 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Fri, 6 Jun 2014 02:26:52 -0400
 Subject: [PATCH] logging: allow auditctl read tmp lnk_file
@@ -15,16 +15,18 @@ This fixes avc denied error:
   scontext=root:auditadm_r:auditctl_t:s0-s15:c0.c1023 \
   tcontext=system_u:object_r:tmp_t:s0-s15:c0.c1023 tclass=lnk_file
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/system/logging.te |    1 +
+ policy/modules/system/logging.te | 1 +
  1 file changed, 1 insertion(+)
 
---- refpolicy.orig/policy/modules/system/logging.te
-+++ refpolicy/policy/modules/system/logging.te
-@@ -110,6 +110,7 @@ allow auditctl_t auditd_etc_t:dir list_d
+diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
+index cf6038e..3557d72 100644
+--- a/policy/modules/system/logging.te
++++ b/policy/modules/system/logging.te
+@@ -111,6 +111,7 @@ dontaudit auditctl_t auditd_etc_t:file map;
  files_getattr_all_dirs(auditctl_t)
  files_getattr_all_files(auditctl_t)
  files_read_etc_files(auditctl_t)
@@ -32,3 +34,6 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  
  kernel_read_kernel_sysctls(auditctl_t)
  kernel_read_proc_symlinks(auditctl_t)
+-- 
+2.7.4
+

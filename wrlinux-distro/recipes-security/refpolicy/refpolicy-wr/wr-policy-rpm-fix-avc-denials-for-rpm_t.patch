@@ -1,0 +1,38 @@
+From bc241fb6a0673e86e86ca286652bec99711a3cbe Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Wed, 29 May 2019 11:27:52 +0800
+Subject: [PATCH] rpm: fix avc denials for rpm_t
+
+Fix:
+type=AVC msg=audit(1559100055.945:82): avc:  denied  { map } for
+pid=1598 comm="rpm" path="/var/lib/rpm/__db.001" dev="vda" ino=31351
+scontext=root:sysadm_r:rpm_t tcontext=root:object_r:rpm_var_lib_t
+tclass=file permissive=0
+
+type=AVC msg=audit(1559100055.945:83): avc:  denied  { map } for
+pid=1598 comm="rpm" path="/var/lib/rpm/Name" dev="vda" ino=29523
+scontext=root:sysadm_r:rpm_t tcontext=system_u:object_r:rpm_var_lib_t
+tclass=file permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/admin/rpm.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/admin/rpm.te b/policy/modules/admin/rpm.te
+index e00b8dd..66f4bb9 100644
+--- a/policy/modules/admin/rpm.te
++++ b/policy/modules/admin/rpm.te
+@@ -112,6 +112,7 @@ files_lock_filetrans(rpm_t, rpm_lock_t, file)
+ manage_dirs_pattern(rpm_t, rpm_var_lib_t, rpm_var_lib_t)
+ manage_files_pattern(rpm_t, rpm_var_lib_t, rpm_var_lib_t)
+ files_var_lib_filetrans(rpm_t, rpm_var_lib_t, { dir file })
++allow rpm_t rpm_var_lib_t:file map;
+ 
+ manage_dirs_pattern(rpm_t, rpm_var_run_t, rpm_var_run_t)
+ manage_files_pattern(rpm_t, rpm_var_run_t, rpm_var_run_t)
+-- 
+2.7.4
+

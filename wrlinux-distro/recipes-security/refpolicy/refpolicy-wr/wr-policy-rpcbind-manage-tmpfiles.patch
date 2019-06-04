@@ -1,0 +1,73 @@
+From aec2ed721123185fb6bf66d86355f02d1633b4a4 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Tue, 3 Mar 2015 10:39:01 +0800
+Subject: [PATCH] refpolicy: rpcbind manage tmpfiles
+
+* allow rpcbind to manage tmpfiles: portmap.xdr, rpcbind.xdr.
+
+Fix avc denials:
+
+  avc: denied { read } for pid=399 comm="rpcbind" \
+  name="tmp" dev="hda" ino=27240 \
+  scontext=system_u:system_r:rpcbind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:tmp_t:s0-s15:c0.c1023 \
+  tclass=lnk_file permissive=0
+
+  avc: denied { write } for pid=399 comm="rpcbind" \
+  name="tmp" dev="tmpfs" ino=8102 \
+  scontext=system_u:system_r:rpcbind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:tmp_t:s0-s15:c0.c1023 \
+  tclass=dir permissive=1
+
+  avc: denied { add_name } for pid=399 comm="rpcbind" \
+  name="rpcbind.xdr" \
+  scontext=system_u:system_r:rpcbind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:tmp_t:s0-s15:c0.c1023 \
+  tclass=dir permissive=1
+
+  avc: denied { create } for pid=399 comm="rpcbind" \
+  name="rpcbind.xdr" \
+  scontext=system_u:system_r:rpcbind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:tmp_t:s0 \
+  tclass=file permissive=1
+
+  avc: denied { write open } for pid=399 comm="rpcbind" \
+  path="/var/volatile/tmp/rpcbind.xdr" dev="tmpfs" ino=14154 \
+  scontext=system_u:system_r:rpcbind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:tmp_t:s0 \
+  tclass=file permissive=1
+
+  avc: denied { getattr } for pid=399 comm="rpcbind" \
+  path="/var/volatile/tmp/rpcbind.xdr" dev="tmpfs" ino=14154 \
+  scontext=system_u:system_r:rpcbind_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:tmp_t:s0 \
+  tclass=file permissive=1
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/services/rpcbind.te | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/policy/modules/services/rpcbind.te b/policy/modules/services/rpcbind.te
+index 2055c11..fe2c143 100644
+--- a/policy/modules/services/rpcbind.te
++++ b/policy/modules/services/rpcbind.te
+@@ -80,6 +80,13 @@ miscfiles_read_localization(rpcbind_t)
+ mls_socket_read_all_levels(rpcbind_t)
+ mls_socket_write_all_levels(rpcbind_t)
+ 
++# WRL fix:
++# manage files that have type rpcbind_tmp_t
++type rpcbind_tmp_t;
++files_tmp_file(rpcbind_tmp_t)
++manage_files_pattern(rpcbind_t, rpcbind_tmp_t, rpcbind_tmp_t)
++files_tmp_filetrans(rpcbind_t, rpcbind_tmp_t, file)
++
+ ifdef(`distro_debian',`
+ 	term_dontaudit_use_unallocated_ttys(rpcbind_t)
+ ')
+-- 
+2.7.4
+

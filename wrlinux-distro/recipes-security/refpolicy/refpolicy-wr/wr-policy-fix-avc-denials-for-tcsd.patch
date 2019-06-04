@@ -1,4 +1,4 @@
-From ad5347242c336eb63465d00c763f2abebd0b6c65 Mon Sep 17 00:00:00 2001
+From ae3fa0569a1b73149e4022e35320867e839816be Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Tue, 31 May 2016 08:05:53 +0000
 Subject: [PATCH] wr-policy: fix avc denials for tcsd
@@ -23,13 +23,13 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/contrib/tcsd.te | 2 ++
+ policy/modules/services/tcsd.te | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/policy/modules/contrib/tcsd.te b/policy/modules/contrib/tcsd.te
-index ca98bf8..30033ca 100644
---- a/policy/modules/contrib/tcsd.te
-+++ b/policy/modules/contrib/tcsd.te
+diff --git a/policy/modules/services/tcsd.te b/policy/modules/services/tcsd.te
+index 6ad0cac..18ed48e 100644
+--- a/policy/modules/services/tcsd.te
++++ b/policy/modules/services/tcsd.te
 @@ -53,3 +53,5 @@ init_read_utmp(tcsd_t)
  logging_send_syslog_msg(tcsd_t)
  
@@ -37,5 +37,5 @@ index ca98bf8..30033ca 100644
 +
 +mls_file_read_all_levels(tcsd_t)
 -- 
-2.8.1
+2.7.4
 

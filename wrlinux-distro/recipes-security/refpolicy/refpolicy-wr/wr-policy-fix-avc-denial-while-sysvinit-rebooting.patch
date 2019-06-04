@@ -1,4 +1,4 @@
-From d1a7522add88a55c1672de5489e5aea5eacaada6 Mon Sep 17 00:00:00 2001
+From 8e2af3f29ce48cb1f5e3a01d01b1f437641fa5e8 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Thu, 3 Mar 2016 21:55:27 -0500
 Subject: [PATCH] wr-policy: fix avc denial while sysvinit rebooting
@@ -41,51 +41,30 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/contrib/alsa.te    |   3 +
- policy/modules/contrib/rpc.te     |   2 +
  policy/modules/kernel/kernel.te   |   2 +
  policy/modules/kernel/terminal.if | 395 ++++++++++++++++++++++++++++++++++++++
  policy/modules/roles/sysadm.te    |   2 +
  policy/modules/system/logging.te  |   1 +
- 6 files changed, 405 insertions(+)
+ 4 files changed, 400 insertions(+)
 
---- refpolicy.orig/policy/modules/contrib/alsa.te
-+++ refpolicy/policy/modules/contrib/alsa.te
-@@ -99,6 +99,9 @@ userdom_manage_unpriv_user_semaphores(al
- userdom_manage_unpriv_user_shared_mem(alsa_t)
- userdom_search_user_home_dirs(alsa_t)
- 
-+term_use_all_ttys(alsa_t)
-+term_use_all_ptys(alsa_t)
-+
- ifdef(`distro_debian',`
- 	term_dontaudit_use_unallocated_ttys(alsa_t)
- 
---- refpolicy.orig/policy/modules/contrib/rpc.te
-+++ refpolicy/policy/modules/contrib/rpc.te
-@@ -156,6 +156,8 @@ files_pid_filetrans(rpcd_t, rpcd_var_run
- 
- can_exec(rpcd_t, rpcd_exec_t)
- 
-+kernel_read_system_state(rpcd_t)
-+kernel_write_proc_files(rpcd_t)
- kernel_read_network_state(rpcd_t)
- kernel_read_sysctl(rpcd_t)
- kernel_rw_fs_sysctls(rpcd_t)
---- refpolicy.orig/policy/modules/kernel/kernel.te
-+++ refpolicy/policy/modules/kernel/kernel.te
-@@ -277,6 +277,8 @@ dev_setattr_generic_chr_files(kernel_t)
- dev_getattr_fs(kernel_t)
+diff --git a/policy/modules/kernel/kernel.te b/policy/modules/kernel/kernel.te
+index 7b81c73..8971db3 100644
+--- a/policy/modules/kernel/kernel.te
++++ b/policy/modules/kernel/kernel.te
+@@ -282,6 +282,8 @@ dev_getattr_fs(kernel_t)
  dev_getattr_sysfs(kernel_t)
+ dev_write_kmsg(kernel_t)
  
 +term_filetrans_all_named_dev(kernel_t)
 +
  # Mount root file system. Used when loading a policy
  # from initrd, then mounting the root filesystem
  fs_mount_all_fs(kernel_t)
---- refpolicy.orig/policy/modules/kernel/terminal.if
-+++ refpolicy/policy/modules/kernel/terminal.if
-@@ -1626,3 +1626,398 @@ interface(`term_use_virtio_console',`
+diff --git a/policy/modules/kernel/terminal.if b/policy/modules/kernel/terminal.if
+index cf66da2..7897df4 100644
+--- a/policy/modules/kernel/terminal.if
++++ b/policy/modules/kernel/terminal.if
+@@ -1419,3 +1419,398 @@ interface(`term_use_virtio_console',`
  	dev_list_all_dev_nodes($1)
  	allow $1 virtio_device_t:chr_file rw_term_perms;
  ')
@@ -484,9 +463,11 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 +        dev_filetrans($1, tty_device_t, chr_file, "xvc8")
 +        dev_filetrans($1, tty_device_t, chr_file, "xvc9")
 +')
---- refpolicy.orig/policy/modules/roles/sysadm.te
-+++ refpolicy/policy/modules/roles/sysadm.te
-@@ -51,6 +51,8 @@ init_reload_generic_units(sysadm_t)
+diff --git a/policy/modules/roles/sysadm.te b/policy/modules/roles/sysadm.te
+index 4a913d9..a3f55da 100644
+--- a/policy/modules/roles/sysadm.te
++++ b/policy/modules/roles/sysadm.te
+@@ -52,6 +52,8 @@ selinux_read_policy(sysadm_t)
  userdom_manage_user_home_dirs(sysadm_t)
  userdom_home_filetrans_user_home_dir(sysadm_t)
  
@@ -495,9 +476,11 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  ifdef(`init_systemd',`
  	init_get_all_units_status(sysadm_t)
  	init_start_all_units(sysadm_t)
---- refpolicy.orig/policy/modules/system/logging.te
-+++ refpolicy/policy/modules/system/logging.te
-@@ -499,6 +499,7 @@ fs_getattr_all_fs(syslogd_t)
+diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
+index 5a570e7..4fd7c1d 100644
+--- a/policy/modules/system/logging.te
++++ b/policy/modules/system/logging.te
+@@ -520,6 +520,7 @@ fs_getattr_all_fs(syslogd_t)
  fs_search_auto_mountpoints(syslogd_t)
  fs_search_tmpfs(syslogd_t)
  
@@ -505,3 +488,6 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  mls_file_write_all_levels(syslogd_t) # Need to be able to write to /var/run/ and /var/log directories
  mls_socket_write_all_levels(syslogd_t) # Neet to be able to sendto dgram
  mls_trusted_object(syslogd_t) # Other process need to have the right to connectto/sendto /dev/log
+-- 
+2.7.4
+

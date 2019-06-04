@@ -1,7 +1,7 @@
-From 51a35134178ea4062ad3b0612b03da2dd7a971d6 Mon Sep 17 00:00:00 2001
+From 1e219f8cf91360e9135c0919838997b6763fb912 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Fri, 15 Jan 2016 03:55:44 -0500
-Subject: [PATCH 4/4] wr-policy-init_t-get-all-service-status
+Subject: [PATCH] wr-policy-init_t-get-all-service-status
 
 Allow init_t to get status of all services that have type init_t.
 
@@ -14,12 +14,17 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/init.te | 3 +++
  1 file changed, 3 insertions(+)
 
---- refpolicy.orig/policy/modules/system/init.te
-+++ refpolicy/policy/modules/system/init.te
-@@ -1116,3 +1116,6 @@ allow init_t self:capability2 block_susp
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index 3587fc9..16dfd0d 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -1429,3 +1429,6 @@ allow init_t self:capability2 block_suspend;
  # MLS trusted for lowering/raising the level of files
  mls_file_downgrade(init_t)
  mls_file_upgrade(init_t)
 +
 +# Get all service status (systemd)
 +init_get_system_status(init_t)
+-- 
+2.7.4
+

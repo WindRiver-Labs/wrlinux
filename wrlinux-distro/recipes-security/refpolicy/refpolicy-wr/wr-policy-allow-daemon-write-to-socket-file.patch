@@ -1,4 +1,4 @@
-From fa4f89078f3cc3ec6eb41cff2580a63f3ba28a45 Mon Sep 17 00:00:00 2001
+From 8984123179ac6c134739c550e682a0265e0293fe Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Thu, 25 Feb 2016 03:35:52 -0500
 Subject: [PATCH] wr-policy: allow daemon write to socket file
@@ -30,9 +30,11 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/init.te | 4 ++++
  1 file changed, 4 insertions(+)
 
---- refpolicy.orig/policy/modules/system/init.te
-+++ refpolicy/policy/modules/system/init.te
-@@ -195,6 +195,10 @@ seutil_read_config(init_t)
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index 0a340db..09f6450 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -213,6 +213,10 @@ seutil_read_config(init_t)
  
  miscfiles_read_localization(init_t)
  
@@ -43,3 +45,6 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  ifdef(`init_systemd',`
  	# handle instances where an old labeled init script is encountered.
  	typeattribute init_t init_run_all_scripts_domain;
+-- 
+2.7.4
+

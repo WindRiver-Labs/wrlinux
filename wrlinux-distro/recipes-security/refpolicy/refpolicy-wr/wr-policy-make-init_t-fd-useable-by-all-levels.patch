@@ -1,4 +1,4 @@
-From a165ad862b98a6659494b37ab2139870afdff017 Mon Sep 17 00:00:00 2001
+From 70d07e1f18010d8b0a1ff7227e0a2802f012a2c5 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Thu, 7 Apr 2016 04:00:03 -0400
 Subject: [PATCH] wr-policy: make init_t fd useable by all levels
@@ -41,13 +41,18 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/system/init.te | 1 +
  1 file changed, 1 insertion(+)
 
---- refpolicy.orig/policy/modules/system/init.te
-+++ refpolicy/policy/modules/system/init.te
-@@ -174,6 +174,7 @@ mls_file_read_all_levels(init_t)
- mls_file_write_all_levels(init_t)
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index 50b14b0..9a62244 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -192,6 +192,7 @@ mls_file_write_all_levels(init_t)
  mls_process_write_all_levels(init_t)
  mls_fd_use_all_levels(init_t)
+ mls_process_set_level(init_t)
 +mls_fd_share_all_levels(init_t)
  
  # the following one is needed for libselinux:is_selinux_enabled()
  # otherwise the call fails and sysvinit tries to load the policy
+-- 
+2.7.4
+

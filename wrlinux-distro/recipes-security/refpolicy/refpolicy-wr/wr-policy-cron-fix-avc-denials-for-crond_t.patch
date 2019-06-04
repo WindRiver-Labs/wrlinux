@@ -1,0 +1,47 @@
+From b0aa6cf43ac6db9ce04b5f7015d9cb7c6ce63747 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 23 May 2019 15:52:17 +0800
+Subject: [PATCH] cron: fix avc denials for crond_t
+
+Fix:
+type=AVC msg=audit(1558592078.245:168): avc:  denied  { map } for
+pid=193 comm="atd" path="/etc/passwd" dev="vda" ino=31098
+scontext=system_u:system_r:crond_t tcontext=system_u:object_r:etc_t
+tclass=file permissive=0
+
+type=AVC msg=audit(1558592078.442:206): avc:  denied  { search } for
+pid=218 comm="crond" name="logcheck" dev="vda" ino=29501
+scontext=system_u:system_r:crond_t
+tcontext=system_u:object_r:logwatch_cache_t tclass=dir permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/cron.te | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/policy/modules/services/cron.te b/policy/modules/services/cron.te
+index abd3565..e53f132 100644
+--- a/policy/modules/services/cron.te
++++ b/policy/modules/services/cron.te
+@@ -283,6 +283,7 @@ fs_search_auto_mountpoints(crond_t)
+ 
+ files_read_usr_files(crond_t)
+ files_read_etc_runtime_files(crond_t)
++files_map_etc_files(crond_t)
+ files_read_generic_spool(crond_t)
+ files_list_usr(crond_t)
+ files_search_var_lib(crond_t)
+@@ -324,6 +325,8 @@ miscfiles_read_localization(crond_t)
+ 
+ userdom_list_user_home_dirs(crond_t)
+ 
++logwatch_search_cache_dir(crond_t)
++
+ tunable_policy(`cron_userdomain_transition',`
+ 	dontaudit crond_t cronjob_t:process transition;
+ 	dontaudit crond_t cronjob_t:fd use;
+-- 
+2.7.4
+

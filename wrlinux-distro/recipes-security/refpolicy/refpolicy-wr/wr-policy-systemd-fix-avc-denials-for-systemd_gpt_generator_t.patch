@@ -1,0 +1,43 @@
+From 0bd315a2cf8f341824d3032aedef7264adcb9048 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 14 May 2019 08:22:54 +0800
+Subject: [PATCH] systemd: fix avc denials for systemd_gpt_generator_t
+
+Fix:
+audit: type=1400 audit(1559002104.277:3): avc:  denied  { write } for
+pid=99 comm="systemd-gpt-aut" name="kmsg" dev="devtmpfs" ino=8991
+scontext=system_u:system_r:systemd_gpt_generator_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:kmsg_device_t:s15:c0.c1023 tclass=chr_file
+permissive=1
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/systemd.te | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 755eb1f..c2912cf 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -260,9 +260,16 @@ files_list_usr(systemd_gpt_generator_t)
+ files_read_etc_files(systemd_gpt_generator_t)
+ fs_getattr_xattr_fs(systemd_gpt_generator_t)
+ storage_raw_read_fixed_disk(systemd_gpt_generator_t)
++dev_write_kmsg(systemd_gpt_generator_t)
++
++mls_file_write_all_levels(systemd_gpt_generator_t)
+ 
+ systemd_log_parse_environment(systemd_gpt_generator_t)
+ 
++kernel_dontaudit_search_sysctl(systemd_gpt_generator_t)
++kernel_dontaudit_search_kernel_sysctl(systemd_gpt_generator_t)
++kernel_dontaudit_read_kernel_sysctl(systemd_gpt_generator_t)
++
+ ######################################
+ #
+ # Cgroups local policy
+-- 
+2.7.4
+

@@ -1,4 +1,4 @@
-From 13d6798ce16fa57a8130416d02f263cca4a26a2c Mon Sep 17 00:00:00 2001
+From 8cbe5455b71ca38a0d57a9171cce839f795fb5d9 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Thu, 23 Feb 2017 08:18:36 +0000
 Subject: [PATCH] refpolicy: fix avc denials for dhcpc_t
@@ -25,14 +25,14 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/system/sysnetwork.te | 3 +++
- 1 file changed, 3 insertions(+)
+ policy/modules/system/sysnetwork.te | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/policy/modules/system/sysnetwork.te b/policy/modules/system/sysnetwork.te
-index b144d52..45dd5f2 100644
+index b1c240f..420dcb4 100644
 --- a/policy/modules/system/sysnetwork.te
 +++ b/policy/modules/system/sysnetwork.te
-@@ -131,6 +131,7 @@ files_search_var_lib(dhcpc_t)
+@@ -134,6 +134,7 @@ files_search_var_lib(dhcpc_t)
  files_dontaudit_search_locks(dhcpc_t)
  files_getattr_generic_locks(dhcpc_t)
  files_manage_var_files(dhcpc_t)
@@ -40,15 +40,6 @@ index b144d52..45dd5f2 100644
  
  fs_getattr_all_fs(dhcpc_t)
  fs_search_auto_mountpoints(dhcpc_t)
-@@ -146,6 +147,8 @@ init_rw_utmp(dhcpc_t)
- logging_send_syslog_msg(dhcpc_t)
- 
- miscfiles_read_localization(dhcpc_t)
-+# read generic SSL certificates
-+miscfiles_read_generic_certs(dhcpc_t)
- 
- modutils_run_insmod(dhcpc_t, dhcpc_roles)
- 
 -- 
-2.11.0
+2.7.4
 

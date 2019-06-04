@@ -1,4 +1,4 @@
-From f69ae397f4fefbab9a2898c7aa67b693041ea9ff Mon Sep 17 00:00:00 2001
+From de3f3e01bf8e492c2fad4aa33e5c9945a1edf11e Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Thu, 21 Jan 2016 01:06:36 -0500
 Subject: [PATCH] wr-policy-fix-avc-denials-from-systemd-logind
@@ -77,113 +77,49 @@ Upstream-Status: pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/system/init.if       | 37 +++++++++++++++++++++++++++++++++++++
- policy/modules/system/locallogin.te |  2 ++
- policy/modules/system/systemd.te    | 11 ++++++++++-
- policy/modules/system/udev.if       |  4 ++++
- 4 files changed, 53 insertions(+), 1 deletion(-)
+ policy/modules/system/systemd.te | 6 ++++++
+ policy/modules/system/udev.if    | 3 +++
+ 2 files changed, 9 insertions(+)
 
---- refpolicy.orig/policy/modules/system/init.if
-+++ refpolicy/policy/modules/system/init.if
-@@ -793,6 +793,25 @@ interface(`init_rw_stream_sockets',`
- 	allow $1 init_t:unix_stream_socket rw_stream_socket_perms;
- ')
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index f6455f6..f64d69c 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -458,6 +458,7 @@ dev_setattr_video_dev(systemd_logind_t)
+ domain_obj_id_change_exemption(systemd_logind_t)
  
-+#######################################
-+## <summary>
-+##  Allow the specified domain to write to
-+##  init sock file.
-+## </summary>
-+## <param name="domain">
-+##  <summary>
-+##  Domain allowed access.
-+##  </summary>
-+## </param>
-+#
-+interface(`init_write_pid_socket',`
-+	gen_require(`
-+		type init_var_run_t;
-+	')
-+
-+	allow $1 init_var_run_t:sock_file write;
-+')
-+
- ########################################
- ## <summary>
- ##	Send UDP network traffic to init.  (Deprecated)
-@@ -826,6 +845,24 @@ interface(`init_get_system_status',`
- ')
+ files_read_etc_files(systemd_logind_t)
++files_map_etc_files(systemd_logind_t)
+ files_search_pids(systemd_logind_t)
  
- ########################################
-+## <summary>
-+##      Tell init to start system (systemd).
-+## </summary>
-+## <param name="domain">
-+##      <summary>
-+##      Domain allowed access.
-+##      </summary>
-+## </param>
-+#
-+interface(`init_system_start',`
-+        gen_require(`
-+                type init_t;
-+        ')
-+
-+        allow $1 init_t:system start;
-+')
-+
-+########################################
- ## <summary>
- ##	Enable all systemd services (systemd).
- ## </summary>
---- refpolicy.orig/policy/modules/system/locallogin.te
-+++ refpolicy/policy/modules/system/locallogin.te
-@@ -135,6 +135,8 @@ userdom_use_unpriv_users_fds(local_login
- userdom_sigchld_all_users(local_login_t)
- userdom_create_all_users_keys(local_login_t)
+ fs_getattr_cgroup(systemd_logind_t)
+@@ -493,6 +494,11 @@ init_stop_all_units(systemd_logind_t)
+ init_start_system(systemd_logind_t)
+ init_stop_system(systemd_logind_t)
  
-+dontaudit local_login_t self:capability net_admin;
-+
- ifdef(`init_systemd',`
- 	auth_manage_faillog(local_login_t)
- 
---- refpolicy.orig/policy/modules/system/systemd.te
-+++ refpolicy/policy/modules/system/systemd.te
-@@ -231,7 +231,7 @@ optional_policy(`
- #
- 
- allow systemd_logind_t self:capability { fowner sys_tty_config chown dac_override };
--allow systemd_logind_t self:process getcap;
-+allow systemd_logind_t self:process { getcap setfscreate };
- allow systemd_logind_t self:netlink_kobject_uevent_socket create_socket_perms;
- allow systemd_logind_t self:unix_dgram_socket create_socket_perms;
- allow systemd_logind_t self:fifo_file rw_fifo_file_perms;
-@@ -283,6 +283,15 @@ udev_read_pid_files(systemd_logind_t)
- 
- userdom_use_user_ttys(systemd_logind_t)
- 
-+init_get_system_status(systemd_logind_t)
-+init_system_start(systemd_logind_t)
 +init_dgram_send(systemd_logind_t)
 +init_write_pid_socket(systemd_logind_t)
 +kernel_read_system_state(systemd_logind_t)
-+kernel_read_kernel_sysctls(systemd_logind_t)
-+fs_mount_tmpfs(systemd_logind_t)
 +auth_manage_var_auth(systemd_logind_t)
 +
- optional_policy(`
- 	dbus_system_bus_client(systemd_logind_t)
- 	dbus_connect_system_bus(systemd_logind_t)
---- refpolicy.orig/policy/modules/system/udev.if
-+++ refpolicy/policy/modules/system/udev.if
-@@ -296,6 +296,10 @@ interface(`udev_read_pid_files',`
+ locallogin_read_state(systemd_logind_t)
+ 
+ seutil_libselinux_linked(systemd_logind_t)
+diff --git a/policy/modules/system/udev.if b/policy/modules/system/udev.if
+index 3028d6b..5090b67 100644
+--- a/policy/modules/system/udev.if
++++ b/policy/modules/system/udev.if
+@@ -384,7 +384,10 @@ interface(`udev_read_pid_files',`
  	')
  
  	files_search_pids($1)
-+
 +	# port changes from fedora
 +	allow $1 udev_var_run_t:dir list_dir_perms;
-+
  	read_files_pattern($1, udev_var_run_t, udev_var_run_t)
++	read_lnk_files_pattern($1, udev_var_run_t, udev_var_run_t)
  ')
  
+ ########################################
+-- 
+2.7.4
+

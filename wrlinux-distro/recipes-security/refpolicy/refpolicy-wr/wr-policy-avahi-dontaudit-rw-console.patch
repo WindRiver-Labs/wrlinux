@@ -1,6 +1,10 @@
-[PATCH] avahi-daemon dontaudit r/w to /dev/console, /dev/pts/*
+From ea50a1210c1cb6548e156f74c6fd509811254b91 Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Thu, 31 Jan 2019 14:27:58 +0800
+Subject: [PATCH] refpolicy: avahi-daemon dontaudit r/w to /dev/console,
+ /dev/pts/*
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 avahi-daemon does not need to read/write /dev/console, so dontaudit
 the AVC messages
@@ -9,12 +13,22 @@ type=AVC msg=audit(1399622624.430:7): avc: denied { read write } for pid=337 com
 
 Signed-off-by: Roy Li <rongqing.li@windriver.com>
 ---
- policy/modules/contrib/avahi.te |    1 +
- 1 file changed, 1 insertion(+)
+ policy/modules/services/avahi.te | 2 ++
+ 1 file changed, 2 insertions(+)
 
---- refpolicy.orig/policy/modules/contrib/avahi.te
-+++ refpolicy/policy/modules/contrib/avahi.te
-@@ -94,6 +94,7 @@ sysnet_domtrans_ifconfig(avahi_t)
+diff --git a/policy/modules/services/avahi.te b/policy/modules/services/avahi.te
+index c902082..8ef5785 100644
+--- a/policy/modules/services/avahi.te
++++ b/policy/modules/services/avahi.te
+@@ -78,6 +78,7 @@ fs_list_inotifyfs(avahi_t)
+ domain_use_interactive_fds(avahi_t)
+ 
+ files_read_etc_runtime_files(avahi_t)
++files_map_etc_files(avahi_t)
+ files_read_usr_files(avahi_t)
+ 
+ auth_use_nsswitch(avahi_t)
+@@ -94,6 +95,7 @@ sysnet_domtrans_ifconfig(avahi_t)
  sysnet_manage_config(avahi_t)
  sysnet_etc_filetrans_config(avahi_t)
  
@@ -22,3 +36,6 @@ Signed-off-by: Roy Li <rongqing.li@windriver.com>
  userdom_dontaudit_use_unpriv_user_fds(avahi_t)
  userdom_dontaudit_search_user_home_dirs(avahi_t)
  
+-- 
+2.7.4
+

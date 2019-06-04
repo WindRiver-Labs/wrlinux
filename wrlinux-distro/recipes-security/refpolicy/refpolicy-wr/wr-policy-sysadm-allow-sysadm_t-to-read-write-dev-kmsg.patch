@@ -1,0 +1,35 @@
+From 4b67943087c5514642b2c9c35f3ceb919df6c4aa Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 30 May 2019 08:55:48 +0800
+Subject: [PATCH] sysadm: allow sysadm_t to read/write /dev/kmsg
+
+Fix:
+type=AVC msg=audit(1559176142.823:256): avc:  denied  { write } for
+pid=1579 comm="systemd" name="kmsg" dev="devtmpfs" ino=8991
+scontext=root:sysadm_r:sysadm_t:s0
+tcontext=system_u:object_r:kmsg_device_t:s15:c0.c1023 tclass=chr_file
+permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/roles/sysadm.te | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/policy/modules/roles/sysadm.te b/policy/modules/roles/sysadm.te
+index 3dae16d..fb3511d 100644
+--- a/policy/modules/roles/sysadm.te
++++ b/policy/modules/roles/sysadm.te
+@@ -34,7 +34,7 @@ dev_read_kmsg(sysadm_t)
+ 
+ mls_process_read_all_levels(sysadm_t)
+ 
+-mls_file_read_to_clearance(sysadm_t)
++mls_file_read_all_levels(sysadm_t)
+ mls_process_write_to_clearance(sysadm_t)
+ 
+ selinux_read_policy(sysadm_t)
+-- 
+2.7.4
+

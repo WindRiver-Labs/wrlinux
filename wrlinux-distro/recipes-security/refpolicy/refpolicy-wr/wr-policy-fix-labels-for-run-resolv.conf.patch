@@ -1,4 +1,4 @@
-From 00b6f383962b586b5928781b61eb2af83ceffaea Mon Sep 17 00:00:00 2001
+From 6e5e3a498a61f540c45dd5b97fd1c265257fc2cb Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Fri, 24 Feb 2017 07:43:30 +0000
 Subject: [PATCH] refpolicy: fix labels for /run/resolv.conf
@@ -19,20 +19,26 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/contrib/networkmanager.te | 5 +++++
- 1 file changed, 5 insertions(+)
+ policy/modules/services/networkmanager.te | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
---- refpolicy.orig/policy/modules/contrib/networkmanager.te
-+++ refpolicy/policy/modules/contrib/networkmanager.te
-@@ -91,6 +91,11 @@ manage_dirs_pattern(NetworkManager_t, Ne
- manage_files_pattern(NetworkManager_t, NetworkManager_var_run_t, NetworkManager_var_run_t)
+diff --git a/policy/modules/services/networkmanager.te b/policy/modules/services/networkmanager.te
+index 32279e4..5029ba3 100644
+--- a/policy/modules/services/networkmanager.te
++++ b/policy/modules/services/networkmanager.te
+@@ -94,6 +94,12 @@ manage_files_pattern(NetworkManager_t, NetworkManager_var_run_t, NetworkManager_
  manage_sock_files_pattern(NetworkManager_t, NetworkManager_var_run_t, NetworkManager_var_run_t)
  files_pid_filetrans(NetworkManager_t, NetworkManager_var_run_t, { dir file sock_file })
+ 
 +gen_require(`
 +	type var_run_t, net_conf_t;
 +')
 +filetrans_pattern(NetworkManager_t, var_run_t, net_conf_t, file, "resolv.conf")
 +filetrans_pattern(NetworkManager_t, var_run_t, net_conf_t, file, "resolv.conf.tmp")
++
+ can_exec(NetworkManager_t, { NetworkManager_exec_t NetworkManager_initrc_exec_t wpa_cli_exec_t NetworkManager_tmp_t })
  
- can_exec(NetworkManager_t, { NetworkManager_exec_t wpa_cli_exec_t NetworkManager_tmp_t })
- 
+ kernel_read_crypto_sysctls(NetworkManager_t)
+-- 
+2.7.4
+

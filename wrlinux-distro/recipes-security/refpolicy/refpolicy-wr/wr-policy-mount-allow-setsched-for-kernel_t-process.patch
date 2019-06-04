@@ -1,4 +1,4 @@
-From c21c99dc299222063556e24dd434fbe3be1483bd Mon Sep 17 00:00:00 2001
+From 8e8e838eeec71af861e92011eeedad0fbd43fb16 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Sat, 15 Feb 2014 04:22:47 -0500
 Subject: [PATCH] allow mount setsched for kernel_t process
@@ -10,16 +10,18 @@ type=1400 audit(1390381555.738:217): avc: denied \
 system_u:system_r:mount_t:s0-s15:c0.c1023 tcontext= \
 system_u:system_r:kernel_t:s15:c0.c1023 tclass=process
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signen-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/system/mount.te |    2 ++
- 1 file changed, 2 insertions(+)
+ policy/modules/system/mount.te | 1 +
+ 1 file changed, 1 insertion(+)
 
---- refpolicy.orig/policy/modules/system/mount.te
-+++ refpolicy/policy/modules/system/mount.te
-@@ -61,6 +61,7 @@ files_pid_filetrans(mount_t, mount_runti
+diff --git a/policy/modules/system/mount.te b/policy/modules/system/mount.te
+index 3dcb849..37ed9de 100644
+--- a/policy/modules/system/mount.te
++++ b/policy/modules/system/mount.te
+@@ -61,6 +61,7 @@ files_pid_filetrans(mount_t, mount_runtime_t, dir, "mount")
  kernel_read_system_state(mount_t)
  kernel_read_kernel_sysctls(mount_t)
  kernel_setsched(mount_t)
@@ -27,3 +29,6 @@ Signen-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  kernel_dontaudit_getattr_core_if(mount_t)
  kernel_dontaudit_write_debugfs_dirs(mount_t)
  kernel_dontaudit_write_proc_dirs(mount_t)
+-- 
+2.7.4
+

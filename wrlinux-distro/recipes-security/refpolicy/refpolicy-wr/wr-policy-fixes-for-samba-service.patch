@@ -1,4 +1,4 @@
-From 5f19e591c964ce9c3c4c337a5ef32416e60a2bfd Mon Sep 17 00:00:00 2001
+From c819e726d48072b9a1fe880e6ce2c9f455df755f Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Wed, 27 Dec 2017 07:05:44 +0000
 Subject: [PATCH] wr-policy: fixes for samba service
@@ -29,38 +29,30 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/contrib/samba.te | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ policy/modules/services/samba.te | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/policy/modules/contrib/samba.te b/policy/modules/contrib/samba.te
-index ed7058d..baa2215 100644
---- a/policy/modules/contrib/samba.te
-+++ b/policy/modules/contrib/samba.te
-@@ -261,7 +261,7 @@ optional_policy(`
+diff --git a/policy/modules/services/samba.te b/policy/modules/services/samba.te
+index 84308ef..6dd8de1 100644
+--- a/policy/modules/services/samba.te
++++ b/policy/modules/services/samba.te
+@@ -267,7 +267,7 @@ optional_policy(`
  # Smbd Local policy
  #
  
--allow smbd_t self:capability { chown fowner kill fsetid setgid setuid sys_chroot sys_nice sys_admin sys_resource lease dac_override dac_read_search };
-+allow smbd_t self:capability { chown fowner kill fsetid setgid setuid sys_chroot sys_nice sys_admin sys_resource lease dac_override dac_read_search net_admin };
+-allow smbd_t self:capability { chown dac_override dac_read_search fowner fsetid kill lease setgid setuid sys_admin sys_chroot sys_nice sys_resource };
++allow smbd_t self:capability { chown dac_override dac_read_search fowner fsetid kill lease setgid setuid sys_admin sys_chroot sys_nice sys_resource net_admin };
  dontaudit smbd_t self:capability sys_tty_config;
- allow smbd_t self:process ~{ ptrace setcurrent setexec setfscreate execmem execstack execheap };
+ allow smbd_t self:process { transition signal_perms getsched setsched getsession getpgid setpgid getcap setcap share getattr noatsecure siginh setrlimit rlimitinh dyntransition setkeycreate setsockcreate getrlimit };
  allow smbd_t self:fd use;
-@@ -512,6 +512,7 @@ optional_policy(`
+@@ -524,6 +524,7 @@ optional_policy(`
  #
  
  dontaudit nmbd_t self:capability sys_tty_config;
-+allow nmbd_t self:capability { net_admin };
- allow nmbd_t self:process ~{ ptrace setcurrent setexec setfscreate setrlimit execmem execstack execheap };
++allow nmbd_t self:capability net_admin;
+ allow nmbd_t self:process { transition signal_perms getsched setsched getsession getpgid setpgid getcap setcap share getattr noatsecure siginh rlimitinh dyntransition setkeycreate setsockcreate getrlimit };
  allow nmbd_t self:fd use;
  allow nmbd_t self:fifo_file rw_fifo_file_perms;
-@@ -575,6 +576,7 @@ corenet_tcp_sendrecv_smbd_port(nmbd_t)
- 
- dev_read_sysfs(nmbd_t)
- dev_getattr_mtrr_dev(nmbd_t)
-+dev_read_urand(nmbd_t)
- 
- domain_use_interactive_fds(nmbd_t)
- 
 -- 
-2.13.3
+2.7.4
 

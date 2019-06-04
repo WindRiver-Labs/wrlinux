@@ -1,4 +1,4 @@
-From 307230ec26510b9fd6116b7257c9bdb12a8e73b8 Mon Sep 17 00:00:00 2001
+From db6e7a1bd49a81246e3de92c8187073f02152759 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Fri, 3 Mar 2017 09:28:41 +0000
 Subject: [PATCH] refpolicy: allow local_login_t search default_t dir
@@ -24,10 +24,10 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/policy/modules/system/locallogin.te b/policy/modules/system/locallogin.te
-index d947d86..0662310 100644
+index 050f5a4..aabb22b 100644
 --- a/policy/modules/system/locallogin.te
 +++ b/policy/modules/system/locallogin.te
-@@ -103,6 +103,7 @@ files_read_world_readable_pipes(local_login_t)
+@@ -102,6 +102,7 @@ files_read_world_readable_pipes(local_login_t)
  files_read_world_readable_sockets(local_login_t)
  # for when /var/mail is a symlink
  files_read_var_symlinks(local_login_t)
@@ -36,5 +36,5 @@ index d947d86..0662310 100644
  fs_search_auto_mountpoints(local_login_t)
  fs_search_tmpfs(local_login_t)
 -- 
-2.11.0
+2.7.4
 

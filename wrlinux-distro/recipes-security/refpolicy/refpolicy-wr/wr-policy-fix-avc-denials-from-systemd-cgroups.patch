@@ -1,4 +1,4 @@
-From 0b0f47b83c37842f5f9ac32b8f241f765fe0b4bc Mon Sep 17 00:00:00 2001
+From 32f6d3c09ffc95d035fccfe3eb32fba194d1afe3 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Thu, 4 Feb 2016 03:44:57 -0500
 Subject: [PATCH] wr-policy: fix avc denials from systemd-cgroups
@@ -57,31 +57,31 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/system/systemd.te | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ policy/modules/system/systemd.te | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
---- refpolicy.orig/policy/modules/system/systemd.te
-+++ refpolicy/policy/modules/system/systemd.te
-@@ -165,6 +165,22 @@ files_read_etc_files(systemd_backlight_t
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 5ca3c61..9659ee7 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -262,6 +262,17 @@ init_stream_connect(systemd_cgroups_t)
+ # for /proc/1/environ
+ init_read_state(systemd_cgroups_t)
  
- udev_read_pid_files(systemd_backlight_t)
- 
-+allow systemd_cgroups_t self:capability net_admin;
-+# read the process state (/proc/pid) of init
-+init_read_state(systemd_cgroups_t)
 +# MLS trusted for writing to sockets at any level
 +mls_socket_write_all_levels(systemd_cgroups_t)
 +# write to init sock file
 +init_write_pid_socket(systemd_cgroups_t)
 +# MLS trusted for writing to files at all levels
 +mls_file_write_all_levels(systemd_cgroups_t)
-+# read system state information in /proc
-+kernel_read_system_state(systemd_cgroups_t)
 +# write to the kernel messages device
 +dev_write_kmsg(systemd_cgroups_t)
 +# create, read, write, and delete syslog PID sockets
 +logging_manage_pid_sockets(systemd_cgroups_t)
 +
- #######################################
- #
- # Binfmt local policy
+ seutil_libselinux_linked(systemd_cgroups_t)
+ 
+ systemd_log_parse_environment(systemd_cgroups_t)
+-- 
+2.7.4
+

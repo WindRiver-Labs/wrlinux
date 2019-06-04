@@ -1,4 +1,4 @@
-From f012183df55cfd476303508b373ee790b0ee1666 Mon Sep 17 00:00:00 2001
+From f89c8d3b2f385ce12395f6c9b8555cb010998ff7 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Tue, 3 Jun 2014 04:06:41 -0400
 Subject: [PATCH] dhcp: dontaudit r/w to /dev/console, /dev/pts/*
@@ -29,29 +29,18 @@ And search from current policy db:
 
 It's proper to dontaudit those syscalls.
 
-Also fix context for /var/lib/dhcp/dhcpd6.leases
-
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/contrib/dhcp.fc |    2 +-
- policy/modules/contrib/dhcp.te |    1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ policy/modules/services/dhcp.te | 1 +
+ 1 file changed, 1 insertion(+)
 
---- refpolicy.orig/policy/modules/contrib/dhcp.fc
-+++ refpolicy/policy/modules/contrib/dhcp.fc
-@@ -5,6 +5,6 @@
- /usr/sbin/dhcpd.*	--	gen_context(system_u:object_r:dhcpd_exec_t,s0)
- 
- /var/lib/dhcpd(/.*)?	gen_context(system_u:object_r:dhcpd_state_t,s0)
--/var/lib/dhcp(3)?/dhcpd\.leases.*	--	gen_context(system_u:object_r:dhcpd_state_t,s0)
-+/var/lib/dhcp(3)?/dhcpd(6)?\.leases.*	--	gen_context(system_u:object_r:dhcpd_state_t,s0)
- 
- /run/dhcpd(6)?\.pid	--	gen_context(system_u:object_r:dhcpd_var_run_t,s0)
---- refpolicy.orig/policy/modules/contrib/dhcp.te
-+++ refpolicy/policy/modules/contrib/dhcp.te
-@@ -111,6 +111,7 @@ sysnet_read_dhcp_config(dhcpd_t)
+diff --git a/policy/modules/services/dhcp.te b/policy/modules/services/dhcp.te
+index 5d7cc8b..cac34e6 100644
+--- a/policy/modules/services/dhcp.te
++++ b/policy/modules/services/dhcp.te
+@@ -112,6 +112,7 @@ sysnet_read_dhcp_config(dhcpd_t)
  
  userdom_dontaudit_use_unpriv_user_fds(dhcpd_t)
  userdom_dontaudit_search_user_home_dirs(dhcpd_t)
@@ -59,3 +48,6 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  
  tunable_policy(`dhcpd_use_ldap',`
  	sysnet_use_ldap(dhcpd_t)
+-- 
+2.7.4
+

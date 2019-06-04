@@ -1,0 +1,75 @@
+From 989748269d7ac4fe1c287ed05d3c747bcd6fef8e Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Fri, 13 Oct 2017 07:20:40 +0000
+Subject: [PATCH] poky-policy: kernel_t mls trusted for lowering file level
+
+The boot process hangs with the error while using MLS policy:
+
+  [!!!!!!] Failed to mount API filesystems, freezing.
+  [    4.085349] systemd[1]: Freezing execution.
+
+Make kernel_t mls trusted for lowering the level of files to fix below
+avc denials and remove the hang issue.
+
+  op=security_validate_transition seresult=denied \
+  oldcontext=system_u:object_r:device_t:s15:c0.c1023 \
+  newcontext=system_u:object_r:device_t:s0 \
+  taskcontext=system_u:system_r:kernel_t:s15:c0.c1023 tclass=dir
+  systemd[1]: Unable to fix SELinux security context of /dev: Operation not permitted
+
+  avc: denied { create } for pid=1 comm="systemd" name="shm" \
+  scontext=system_u:system_r:kernel_t:s15:c0.c1023 \
+  tcontext=system_u:object_r:tmpfs_t:s0 tclass=dir permissive=0
+  systemd[1]: Failed to mount tmpfs at /dev/shm: No such file or directory
+
+  avc: denied { create } for pid=1 comm="systemd" name="pts" \
+  scontext=system_u:system_r:kernel_t:s15:c0.c1023 \
+  tcontext=system_u:object_r:devpts_t:s0-s15:c0.c1023 tclass=dir permissive=0
+
+  op=security_validate_transition seresult=denied \
+  oldcontext=system_u:object_r:unlabeled_t:s0 \
+  newcontext=system_u:object_r:var_run_t:s0-s15:c0.c1023 \
+  taskcontext=system_u:system_r:kernel_t:s15:c0.c1023 tclass=dir
+
+  op=security_validate_transition seresult=denied \
+  oldcontext=system_u:object_r:tmpfs_t:s15:c0.c1023 \
+  newcontext=system_u:object_r:var_run_t:s0-s15:c0.c1023 \
+  taskcontext=system_u:system_r:kernel_t:s15:c0.c1023 tclass=dir
+  systemd[1]: Unable to fix SELinux security context of /run: Operation not permitted
+
+  op=security_validate_transition seresult=denied \
+  oldcontext=system_u:object_r:tmpfs_t:s15:c0.c1023 \
+  newcontext=system_u:object_r:cgroup_t:s0 \
+  taskcontext=system_u:system_r:kernel_t:s15:c0.c1023 tclass=dir
+  systemd[1]: Unable to fix SELinux security context of /sys/fs/cgroup: Operation not permitted
+
+  avc: denied { create } for pid=1 comm="systemd" name="pstore" \
+  scontext=system_u:system_r:kernel_t:s15:c0.c1023 \
+  tcontext=system_u:object_r:pstore_t:s0 tclass=dir permissive=0
+
+Reference: https://bugzilla.redhat.com/show_bug.cgi?id=667370
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/kernel/kernel.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/kernel/kernel.te b/policy/modules/kernel/kernel.te
+index 7b81c73..9084584 100644
+--- a/policy/modules/kernel/kernel.te
++++ b/policy/modules/kernel/kernel.te
+@@ -336,6 +336,8 @@ mls_file_write_all_levels(kernel_t)
+ mls_file_read_all_levels(kernel_t)
+ mls_socket_write_all_levels(kernel_t)
+ mls_fd_use_all_levels(kernel_t)
++# https://bugzilla.redhat.com/show_bug.cgi?id=667370
++mls_file_downgrade(kernel_t)
+ 
+ ifdef(`distro_redhat',`
+ 	# Bugzilla 222337
+-- 
+2.7.4
+

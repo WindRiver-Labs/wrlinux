@@ -1,4 +1,4 @@
-From ab5ef900d85eba19b0a2a0aa0c0f56cac3eb761b Mon Sep 17 00:00:00 2001
+From 3e35a83ab7415e3eb99d9fc93c2f41a06ad21b1a Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Wed, 8 Apr 2015 16:17:39 +0800
 Subject: [PATCH] refpolicy: allow setrans_t dac_read_search
@@ -14,15 +14,17 @@ This removes avc denial issue:
   scontext=system_u:system_r:setrans_t:s15:c0.c1023 \
   tcontext=system_u:system_r:setrans_t:s15:c0.c1023 tclass=capability
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
  policy/modules/system/setrans.te | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
---- refpolicy.orig/policy/modules/system/setrans.te
-+++ refpolicy/policy/modules/system/setrans.te
+diff --git a/policy/modules/system/setrans.te b/policy/modules/system/setrans.te
+index 79a32ee..7762176 100644
+--- a/policy/modules/system/setrans.te
++++ b/policy/modules/system/setrans.te
 @@ -40,7 +40,7 @@ ifdef(`enable_mls',`
  # setrans local policy
  #
@@ -32,3 +34,6 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  allow setrans_t self:process { setrlimit getcap setcap signal_perms };
  allow setrans_t self:unix_stream_socket create_stream_socket_perms;
  allow setrans_t self:unix_dgram_socket create_socket_perms;
+-- 
+2.7.4
+

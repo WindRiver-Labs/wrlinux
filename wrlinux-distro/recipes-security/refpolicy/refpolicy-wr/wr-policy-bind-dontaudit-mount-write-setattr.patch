@@ -1,4 +1,4 @@
-From 5584d07c02f26ccac1bc7574df4afd4e4170d9aa Mon Sep 17 00:00:00 2001
+From a02246529a867a1a759407fa59591ddb1396aad9 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Thu, 27 Feb 2014 05:07:19 -0500
 Subject: [PATCH] dontaudit mount write, setattr operations
@@ -18,12 +18,14 @@ Upstream-Status: Inappropriate [ WR Only ]
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/contrib/bind.te |   14 ++++++++++++++
+ policy/modules/services/bind.te | 14 ++++++++++++++
  1 file changed, 14 insertions(+)
 
---- refpolicy.orig/policy/modules/contrib/bind.te
-+++ refpolicy/policy/modules/contrib/bind.te
-@@ -168,6 +168,20 @@ miscfiles_read_localization(named_t)
+diff --git a/policy/modules/services/bind.te b/policy/modules/services/bind.te
+index 9f833e7..939c1e9 100644
+--- a/policy/modules/services/bind.te
++++ b/policy/modules/services/bind.te
+@@ -172,6 +172,20 @@ miscfiles_read_generic_tls_privkey(named_t)
  userdom_dontaudit_use_unpriv_user_fds(named_t)
  userdom_dontaudit_search_user_home_dirs(named_t)
  
@@ -44,3 +46,6 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  tunable_policy(`named_tcp_bind_http_port',`
  	corenet_sendrecv_http_server_packets(named_t)
  	corenet_tcp_bind_http_port(named_t)
+-- 
+2.7.4
+

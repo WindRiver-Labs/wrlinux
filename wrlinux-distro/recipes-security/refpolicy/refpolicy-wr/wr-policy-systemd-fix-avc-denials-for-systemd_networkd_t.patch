@@ -1,0 +1,48 @@
+From 587f69adb171dc0b621a3423353a2bb7398b0b7d Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 14 May 2019 15:34:56 +0800
+Subject: [PATCH] systemd: fix avc denials for systemd_networkd_t
+
+Fix:
+type=AVC msg=audit(1558592077.890:125): avc:  denied  { map } for
+pid=164 comm="systemd-network" path="/etc/passwd" dev="vda" ino=31098
+scontext=system_u:system_r:systemd_networkd_t
+tcontext=system_u:object_r:etc_t tclass=file permissive=0
+type=AVC msg=audit(1558592077.890:126): avc:  denied  { create } for
+pid=164 comm="systemd-network"
+scontext=system_u:system_r:systemd_networkd_t
+tcontext=system_u:system_r:systemd_networkd_t
+tclass=netlink_generic_socket permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/systemd.te | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index aa66c3f..58238c1 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -682,6 +682,7 @@ allow systemd_networkd_t self:rawip_socket create_socket_perms;
+ allow systemd_networkd_t self:tun_socket { create_socket_perms relabelfrom relabelto };
+ allow systemd_networkd_t self:udp_socket create_socket_perms;
+ allow systemd_networkd_t self:unix_dgram_socket create_socket_perms;
++allow systemd_networkd_t self:netlink_generic_socket create_socket_perms;
+ 
+ manage_dirs_pattern(systemd_networkd_t, systemd_networkd_var_run_t, systemd_networkd_var_run_t)
+ manage_files_pattern(systemd_networkd_t, systemd_networkd_var_run_t, systemd_networkd_var_run_t)
+@@ -706,6 +707,9 @@ dev_read_sysfs(systemd_networkd_t)
+ dev_write_kmsg(systemd_networkd_t)
+ 
+ files_read_etc_files(systemd_networkd_t)
++files_map_etc_files(systemd_networkd_t)
++
++files_list_pids(systemd_networkd_t)
+ 
+ auth_use_nsswitch(systemd_networkd_t)
+ 
+-- 
+2.7.4
+

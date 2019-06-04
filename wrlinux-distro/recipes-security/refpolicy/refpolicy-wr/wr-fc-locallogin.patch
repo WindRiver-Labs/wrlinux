@@ -1,0 +1,25 @@
+From 8c4ffbc026be9dc2bd80ec1090032ba1bfd91a75 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 25 Apr 2019 11:14:03 +0800
+Subject: [PATCH] refpolicy: fix real path for locallogin
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/locallogin.fc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/system/locallogin.fc b/policy/modules/system/locallogin.fc
+index fc8d585..59e6e96 100644
+--- a/policy/modules/system/locallogin.fc
++++ b/policy/modules/system/locallogin.fc
+@@ -2,4 +2,5 @@
+ /usr/bin/sushell	--	gen_context(system_u:object_r:sulogin_exec_t,s0)
+ 
+ /usr/sbin/sulogin	--	gen_context(system_u:object_r:sulogin_exec_t,s0)
++/usr/sbin/sulogin\.util-linux	--	gen_context(system_u:object_r:sulogin_exec_t,s0)
+ /usr/sbin/sushell	--	gen_context(system_u:object_r:sulogin_exec_t,s0)
+-- 
+2.7.4
+

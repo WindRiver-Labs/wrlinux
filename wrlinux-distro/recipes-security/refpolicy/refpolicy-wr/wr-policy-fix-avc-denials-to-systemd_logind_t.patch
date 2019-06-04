@@ -1,4 +1,4 @@
-From c63d15b3c3b3eadbe1f9ff9ba78d85640eed2177 Mon Sep 17 00:00:00 2001
+From e0ed3a3dd7a1157359bd3cff071a1a41611c3450 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Thu, 3 Mar 2016 07:15:05 -0500
 Subject: [PATCH] wr-policy: fix avc denials to systemd_logind_t
@@ -44,74 +44,22 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/system/init.if       | 18 ++++++++++++++++++
- policy/modules/system/systemd.te    |  5 +++++
- policy/modules/system/userdomain.if |  2 ++
- 3 files changed, 25 insertions(+)
+ policy/modules/system/systemd.te | 2 ++
+ 1 file changed, 2 insertions(+)
 
---- refpolicy.orig/policy/modules/system/init.if
-+++ refpolicy/policy/modules/system/init.if
-@@ -864,6 +864,24 @@ interface(`init_system_start',`
- 
- ########################################
- ## <summary>
-+##      Tell init to stop system (systemd).
-+## </summary>
-+## <param name="domain">
-+##      <summary>
-+##      Domain allowed access.
-+##      </summary>
-+## </param>
-+#
-+interface(`init_system_stop',`
-+	gen_require(`
-+		type init_t;
-+	')
-+
-+	allow $1 init_t:system stop;
-+')
-+
-+########################################
-+## <summary>
- ##	Enable all systemd services (systemd).
- ## </summary>
- ## <param name="domain">
---- refpolicy.orig/policy/modules/system/systemd.te
-+++ refpolicy/policy/modules/system/systemd.te
-@@ -284,6 +284,8 @@ files_read_etc_files(systemd_logind_t)
- fs_read_efivarfs_files(systemd_logind_t)
- 
- fs_getattr_tmpfs(systemd_logind_t)
-+fs_list_tmpfs(systemd_logind_t)
-+fs_unmount_tmpfs(systemd_logind_t)
- 
- storage_getattr_removable_dev(systemd_logind_t)
- storage_setattr_removable_dev(systemd_logind_t)
-@@ -310,6 +312,9 @@ userdom_use_user_ttys(systemd_logind_t)
- 
- init_get_system_status(systemd_logind_t)
- init_system_start(systemd_logind_t)
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 2a337a7..db00454 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -504,6 +504,8 @@ init_start_all_units(systemd_logind_t)
+ init_stop_all_units(systemd_logind_t)
+ init_start_system(systemd_logind_t)
+ init_stop_system(systemd_logind_t)
 +init_reboot_system(systemd_logind_t)
 +init_shutdown_system(systemd_logind_t)
-+init_system_stop(systemd_logind_t)
+ 
  init_dgram_send(systemd_logind_t)
  init_write_pid_socket(systemd_logind_t)
- kernel_read_system_state(systemd_logind_t)
---- refpolicy.orig/policy/modules/system/userdomain.if
-+++ refpolicy/policy/modules/system/userdomain.if
-@@ -3849,6 +3849,7 @@ interface(`userdom_dbus_send_all_users',
- interface(`userdom_manage_all_user_tmp_content',`
- 	gen_require(`
- 		attribute user_tmp_type;
-+		type user_tmp_t;
- 	')
- 
- 	manage_dirs_pattern($1, user_tmp_type, user_tmp_type)
-@@ -3857,6 +3858,7 @@ interface(`userdom_manage_all_user_tmp_c
- 	manage_sock_files_pattern($1, user_tmp_type, user_tmp_type)
- 	manage_fifo_files_pattern($1, user_tmp_type, user_tmp_type)
- 	files_search_tmp($1)
-+	fs_tmpfs_filetrans($1, user_tmp_t, { dir file lnk_file sock_file fifo_file })
- ')
- 
- #######################################
+-- 
+2.7.4
+

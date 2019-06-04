@@ -1,4 +1,4 @@
-From 1a3dd87e8d056109e19ef39ddc387ea42e399a49 Mon Sep 17 00:00:00 2001
+From 3efcc6772b6d06a6ec454bd6381633b09aa02c37 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Wed, 8 Apr 2015 15:40:54 +0800
 Subject: [PATCH] refpolicy: allow login_pgm manage user keys
@@ -12,13 +12,15 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/system/authlogin.if | 20 ++++++++++++++++++++
- policy/modules/system/authlogin.te |  4 ++++
- 2 files changed, 24 insertions(+)
+ policy/modules/system/authlogin.if | 2 ++
+ policy/modules/system/authlogin.te | 4 ++++
+ 2 files changed, 6 insertions(+)
 
---- refpolicy.orig/policy/modules/system/authlogin.if
-+++ refpolicy/policy/modules/system/authlogin.if
-@@ -105,9 +105,11 @@ interface(`auth_use_pam',`
+diff --git a/policy/modules/system/authlogin.if b/policy/modules/system/authlogin.if
+index c7efda9..072ca7c 100644
+--- a/policy/modules/system/authlogin.if
++++ b/policy/modules/system/authlogin.if
+@@ -112,9 +112,11 @@ interface(`auth_use_pam_systemd',`
  interface(`auth_login_pgm_domain',`
  	gen_require(`
  		type var_auth_t, auth_cache_t;
@@ -30,33 +32,10 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  	domain_subj_id_change_exemption($1)
  	domain_role_change_exemption($1)
  	domain_obj_id_change_exemption($1)
-@@ -1903,6 +1905,24 @@ interface(`auth_unconfined',`
- 	typeattribute $1 can_relabelto_shadow_passwords;
- ')
- 
-+########################################
-+## <summary>
-+##     Manage keys for all user domains.
-+## </summary>
-+## <param name="domain">
-+##     <summary>
-+##     Domain allowed access.
-+##     </summary>
-+## </param>
-+#
-+interface(`userdom_manage_all_users_keys',`
-+	gen_require(`
-+		attribute userdomain;
-+	')
-+
-+	allow $1 userdomain:key manage_key_perms;
-+')
-+
- #######################################
- ## <summary>
- ##      Manage create logins log.
---- refpolicy.orig/policy/modules/system/authlogin.te
-+++ refpolicy/policy/modules/system/authlogin.te
+diff --git a/policy/modules/system/authlogin.te b/policy/modules/system/authlogin.te
+index 06bbba0..5e58023 100644
+--- a/policy/modules/system/authlogin.te
++++ b/policy/modules/system/authlogin.te
 @@ -17,6 +17,7 @@ attribute can_read_shadow_passwords;
  attribute can_write_shadow_passwords;
  attribute can_relabelto_shadow_passwords;
@@ -65,10 +44,13 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  
  type auth_cache_t;
  logging_log_file(auth_cache_t)
-@@ -462,3 +463,6 @@ optional_policy(`
+@@ -472,3 +473,6 @@ optional_policy(`
  	samba_read_var_files(nsswitch_domain)
  	samba_dontaudit_write_var_files(nsswitch_domain)
  ')
 +
 +# manage keys for all user domains
 +userdom_manage_all_users_keys(login_pgm)
+-- 
+2.7.4
+

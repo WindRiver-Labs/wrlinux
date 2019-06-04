@@ -1,7 +1,7 @@
-From e7dc5eeef4a8255cf38467bf7fe005aaa1fb0ff7 Mon Sep 17 00:00:00 2001
+From bc16688cd0ad17f2bbe8c224d39f1668c21e6e4b Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Wed, 9 Mar 2016 02:58:55 -0500
-Subject: [PATCH 2/2] wr-policy: fix avc denials for unix_chkpwd, systemd-*
+Subject: [PATCH] wr-policy: fix avc denials for unix_chkpwd, systemd-*
 
 * Allow chkpwd_t search /run/systemd/journal
 * Allow systemd_tmpfiles_t read the network state information
@@ -31,13 +31,31 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/system/authlogin.te | 2 ++
- policy/modules/system/systemd.te   | 3 +++
- 2 files changed, 5 insertions(+)
+ policy/modules/system/authlogin.te | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
---- refpolicy.orig/policy/modules/system/authlogin.te
-+++ refpolicy/policy/modules/system/authlogin.te
-@@ -131,6 +131,8 @@ seutil_dontaudit_use_newrole_fds(chkpwd_
+diff --git a/policy/modules/system/authlogin.te b/policy/modules/system/authlogin.te
+index 28f74ba..4b87358 100644
+--- a/policy/modules/system/authlogin.te
++++ b/policy/modules/system/authlogin.te
+@@ -99,7 +99,7 @@ allow chkpwd_t self:capability { dac_override setuid };
+ dontaudit chkpwd_t self:capability sys_tty_config;
+ allow chkpwd_t self:process { getattr signal };
+ 
+-allow chkpwd_t shadow_t:file read_file_perms;
++allow chkpwd_t shadow_t:file { read_file_perms map };
+ files_list_etc(chkpwd_t)
+ 
+ kernel_read_crypto_sysctls(chkpwd_t)
+@@ -113,6 +113,7 @@ dev_read_urand(chkpwd_t)
+ dev_search_sysfs(chkpwd_t)
+ 
+ files_read_etc_files(chkpwd_t)
++files_map_etc_files(chkpwd_t)
+ # for nscd
+ files_dontaudit_search_var(chkpwd_t)
+ 
+@@ -138,6 +139,8 @@ seutil_dontaudit_use_newrole_fds(chkpwd_t)
  
  userdom_use_user_terminals(chkpwd_t)
  
@@ -46,19 +64,6 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  ifdef(`distro_ubuntu',`
  	optional_policy(`
  		unconfined_domain(chkpwd_t)
---- refpolicy.orig/policy/modules/system/systemd.te
-+++ refpolicy/policy/modules/system/systemd.te
-@@ -417,6 +417,8 @@ mls_file_read_all_levels(systemd_tmpfile
- mls_file_downgrade(systemd_tmpfiles_t)
- mls_file_upgrade(systemd_tmpfiles_t)
- 
-+kernel_read_network_state(systemd_tmpfiles_t)
-+
- tunable_policy(`systemd_tmpfiles_manage_all',`
- 	# systemd-tmpfiles can be configured to manage anything.
- 	# have a last-resort option for users to do this.
-@@ -443,3 +445,4 @@ init_rw_pipes(systemd_passwd_agent_t)
- init_create_pid_dirs(systemd_passwd_agent_t)
- init_read_utmp(systemd_passwd_agent_t)
- init_stream_connect(systemd_passwd_agent_t)
-+kernel_read_system_state(systemd_passwd_agent_t)
+-- 
+2.7.4
+

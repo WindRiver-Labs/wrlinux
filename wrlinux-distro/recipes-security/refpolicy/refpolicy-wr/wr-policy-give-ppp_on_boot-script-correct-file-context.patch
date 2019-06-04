@@ -1,0 +1,30 @@
+From 79657bfc1005165341fc0d50c9415a24202956d3 Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Fri, 21 Feb 2014 09:04:33 +0800
+Subject: [PATCH] Give ppp_on_boot script correct file context
+
+Upstream-Status: Inappropriate [only for Poky]
+
+ppp_on_boot is a script, which will be called by /etc/init.d/ppp,
+so they should have the same file context
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ policy/modules/services/ppp.fc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/services/ppp.fc b/policy/modules/services/ppp.fc
+index 67de5b3..9a156fb 100644
+--- a/policy/modules/services/ppp.fc
++++ b/policy/modules/services/ppp.fc
+@@ -8,6 +8,7 @@ HOME_DIR/\.ppprc	--	gen_context(system_u:object_r:ppp_home_t,s0)
+ /etc/ppp/.*secrets	--	gen_context(system_u:object_r:pppd_secret_t,s0)
+ /etc/ppp/resolv\.conf	--	gen_context(system_u:object_r:pppd_etc_rw_t,s0)
+ /etc/ppp/(auth|ip(v6|x)?)-(up|down)	--	gen_context(system_u:object_r:pppd_initrc_exec_t,s0)
++/etc/ppp/ppp_on_boot	--	gen_context(system_u:object_r:pppd_initrc_exec_t,s0)
+ 
+ /usr/bin/ipppd		--	gen_context(system_u:object_r:pppd_exec_t,s0)
+ /usr/bin/ppp-watch	--	gen_context(system_u:object_r:pppd_exec_t,s0)
+-- 
+2.7.4
+

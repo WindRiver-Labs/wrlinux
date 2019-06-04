@@ -1,0 +1,53 @@
+From 3d490cee6fed59b6aa42f92f2b07c35a24abfdf4 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 28 May 2019 09:32:14 +0800
+Subject: [PATCH] udev: fix avc denials for udevadm_t
+
+Fix:
+avc:  denied  { search } for  pid=112 comm="udevadm" name="kernel"
+dev="proc" ino=9668 scontext=system_u:system_r:udevadm_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:sysctl_kernel_t:s0 tclass=dir permissive=1
+avc:  denied  { read } for  pid=112 comm="udevadm" name="osrelease"
+dev="proc" ino=9792 scontext=system_u:system_r:udevadm_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:sysctl_kernel_t:s0 tclass=file permissive=1
+avc:  denied  { open } for  pid=112 comm="udevadm"
+path="/proc/sys/kernel/osrelease" dev="proc" ino=9792
+scontext=system_u:system_r:udevadm_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:sysctl_kernel_t:s0 tclass=file permissive=1
+avc:  denied  { getattr } for  pid=112 comm="udevadm"
+path="/proc/sys/kernel/osrelease" dev="proc" ino=9792
+scontext=system_u:system_r:udevadm_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:sysctl_kernel_t:s0 tclass=file permissive=1
+avc:  denied  { dac_read_search } for  pid=112 comm="udevadm"
+capability=2  scontext=system_u:system_r:udevadm_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:udevadm_t:s0-s15:c0.c1023 tclass=capability
+permissive=1
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/udev.te | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/policy/modules/system/udev.te b/policy/modules/system/udev.te
+index ff56428..f0a3c2a 100644
+--- a/policy/modules/system/udev.te
++++ b/policy/modules/system/udev.te
+@@ -388,6 +388,7 @@ optional_policy(`
+ 
+ allow udevadm_t self:netlink_kobject_uevent_socket create_socket_perms;
+ allow udevadm_t self:unix_stream_socket create_socket_perms;
++allow udevadm_t self:capability dac_read_search;
+ 
+ stream_connect_pattern(udevadm_t, udev_var_run_t, udev_var_run_t, udev_t)
+ 
+@@ -409,3 +410,5 @@ kernel_read_system_state(udevadm_t)
+ 
+ seutil_read_file_contexts(udevadm_t)
+ 
++kernel_dontaudit_search_kernel_sysctl(udevadm_t)
++kernel_dontaudit_read_kernel_sysctl(udevadm_t)
+-- 
+2.7.4
+

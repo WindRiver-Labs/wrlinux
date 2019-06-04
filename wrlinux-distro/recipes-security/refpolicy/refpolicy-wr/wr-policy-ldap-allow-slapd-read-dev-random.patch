@@ -1,4 +1,4 @@
-From 1cf9ddd57e4e1a0818ee08718ab762edf971bf2d Mon Sep 17 00:00:00 2001
+From b0c9c3eb131efc8f5d344c2dbca02d5f9ac772d9 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Sat, 22 Feb 2014 02:01:10 -0500
 Subject: [PATCH] allow slapd read /dev/random
@@ -10,22 +10,27 @@ pid=945 comm="slapd" path="/dev/random" dev="devtmpfs" ino=5038 \
 scontext=system_u:system_r:slapd_t:s0-s15:c0.c1023 tcontext= \
 system_u:object_r:random_device_t:s0 tclass=chr_file
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/contrib/ldap.te |    3 +++
+ policy/modules/services/ldap.te | 3 +++
  1 file changed, 3 insertions(+)
 
---- refpolicy.orig/policy/modules/contrib/ldap.te
-+++ refpolicy/policy/modules/contrib/ldap.te
-@@ -56,6 +56,9 @@ allow slapd_t self:process setsched;
- allow slapd_t self:fifo_file rw_fifo_file_perms;
- allow slapd_t self:tcp_socket { accept listen };
+diff --git a/policy/modules/services/ldap.te b/policy/modules/services/ldap.te
+index a6d5230..4f21db7 100644
+--- a/policy/modules/services/ldap.te
++++ b/policy/modules/services/ldap.te
+@@ -109,6 +109,9 @@ corenet_tcp_bind_ldap_port(slapd_t)
+ corenet_sendrecv_all_client_packets(slapd_t)
+ corenet_tcp_connect_all_ports(slapd_t)
  
 +# allow slapd read /dev/random
 +dev_read_rand(slapd_t)
 +
- allow slapd_t slapd_cert_t:dir list_dir_perms;
- read_files_pattern(slapd_t, slapd_cert_t, slapd_cert_t)
- read_lnk_files_pattern(slapd_t, slapd_cert_t, slapd_cert_t)
+ dev_read_urand(slapd_t)
+ dev_read_sysfs(slapd_t)
+ 
+-- 
+2.7.4
+

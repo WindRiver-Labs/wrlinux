@@ -1,4 +1,4 @@
-From e6e2f93914f2812ac558e248564b72452adc371f Mon Sep 17 00:00:00 2001
+From 43998486f3a0cb249daeac2929467030beca4444 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Fri, 5 Feb 2016 04:53:09 -0500
 Subject: [PATCH] wr-policy: allow auditd use all levels fd
@@ -7,12 +7,22 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/system/logging.te | 1 +
- 1 file changed, 1 insertion(+)
+ policy/modules/system/logging.te | 2 ++
+ 1 file changed, 2 insertions(+)
 
---- refpolicy.orig/policy/modules/system/logging.te
-+++ refpolicy/policy/modules/system/logging.te
-@@ -203,6 +203,7 @@ miscfiles_read_localization(auditd_t)
+diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
+index 9872399..f494437 100644
+--- a/policy/modules/system/logging.te
++++ b/policy/modules/system/logging.te
+@@ -198,6 +198,7 @@ corecmd_exec_shell(auditd_t)
+ domain_use_interactive_fds(auditd_t)
+ 
+ files_read_etc_files(auditd_t)
++files_map_etc_files(auditd_t)
+ files_list_usr(auditd_t)
+ 
+ init_telinit(auditd_t)
+@@ -211,6 +212,7 @@ miscfiles_read_localization(auditd_t)
  
  mls_file_read_all_levels(auditd_t)
  mls_file_write_all_levels(auditd_t) # Need to be able to write to /var/run/ directory
@@ -20,3 +30,6 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  
  seutil_dontaudit_read_config(auditd_t)
  
+-- 
+2.7.4
+

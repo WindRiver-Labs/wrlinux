@@ -1,3 +1,6 @@
+From 801844bbd337b80f4ada24b9d37e7aab395ae42e Mon Sep 17 00:00:00 2001
+From: Xin Ouyang <Xin.Ouyang@windriver.com>
+Date: Mon, 28 Jan 2019 14:13:36 +0800
 Subject: [PATCH] refpolicy: add boolean to allow creating unconfined VMs
 
 While using static labeling, admins may want to create VMs running on
@@ -11,13 +14,15 @@ Upstream-Status: Inappropriate [configuration]
 
 Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
 ---
- policy/modules/contrib/virt.te      |   14 ++++++++++++++
- policy/modules/system/unconfined.if |   19 +++++++++++++++++++
+ policy/modules/services/virt.te     | 14 ++++++++++++++
+ policy/modules/system/unconfined.if | 19 +++++++++++++++++++
  2 files changed, 33 insertions(+)
 
---- refpolicy.orig/policy/modules/contrib/virt.te
-+++ refpolicy/policy/modules/contrib/virt.te
-@@ -95,6 +95,14 @@ roleattribute system_r virt_bridgehelper
+diff --git a/policy/modules/services/virt.te b/policy/modules/services/virt.te
+index 3bfdddf..36e9fac 100644
+--- a/policy/modules/services/virt.te
++++ b/policy/modules/services/virt.te
+@@ -95,6 +95,14 @@ roleattribute system_r virt_bridgehelper_roles;
  attribute_role svirt_lxc_domain_roles;
  roleattribute system_r svirt_lxc_domain_roles;
  
@@ -32,7 +37,7 @@ Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
  virt_domain_template(svirt)
  virt_domain_template(svirt_prot_exec)
  
-@@ -446,6 +454,12 @@ tunable_policy(`virt_use_vfio',`
+@@ -458,6 +466,12 @@ tunable_policy(`virt_use_vfio',`
  	dev_rw_vfio_dev(svirt_t)
  ')
  
@@ -45,9 +50,11 @@ Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
  ########################################
  #
  # virtd local policy
---- refpolicy.orig/policy/modules/system/unconfined.if
-+++ refpolicy/policy/modules/system/unconfined.if
-@@ -587,3 +587,22 @@ interface(`unconfined_dbus_connect',`
+diff --git a/policy/modules/system/unconfined.if b/policy/modules/system/unconfined.if
+index 565e712..06f7d16 100644
+--- a/policy/modules/system/unconfined.if
++++ b/policy/modules/system/unconfined.if
+@@ -560,3 +560,22 @@ interface(`unconfined_dbus_connect',`
  
  	allow $1 unconfined_t:dbus acquire_svc;
  ')
@@ -70,3 +77,6 @@ Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
 +
 +	allow $1 unconfined_t:process transition;
 +')
+-- 
+2.7.4
+

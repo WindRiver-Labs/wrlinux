@@ -1,4 +1,4 @@
-From a272f3950db771e01a2e7354cf126f97ad0edf3b Mon Sep 17 00:00:00 2001
+From b215f76a869d70e62d7841805dec675fcbeb50d6 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Wed, 25 May 2016 03:16:24 -0400
 Subject: [PATCH] wr-policy: fix avc denials for rngd
@@ -25,25 +25,41 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/contrib/rngd.fc |  1 +
- policy/modules/contrib/rngd.te | 11 +++++++++++
- 2 files changed, 12 insertions(+)
+ policy/modules/services/rngd.fc |  1 +
+ policy/modules/services/rngd.te | 14 +++++++++++++-
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/policy/modules/contrib/rngd.fc b/policy/modules/contrib/rngd.fc
-index fa19aa8..0093098 100644
---- a/policy/modules/contrib/rngd.fc
-+++ b/policy/modules/contrib/rngd.fc
+diff --git a/policy/modules/services/rngd.fc b/policy/modules/services/rngd.fc
+index c49ab4a..6db530c 100644
+--- a/policy/modules/services/rngd.fc
++++ b/policy/modules/services/rngd.fc
 @@ -1,4 +1,5 @@
  /etc/rc\.d/init\.d/rngd	--	gen_context(system_u:object_r:rngd_initrc_exec_t,s0)
 +/etc/init\.d/rng-tools	--	gen_context(system_u:object_r:rngd_initrc_exec_t,s0)
  
- /usr/sbin/rngd	--	gen_context(system_u:object_r:rngd_exec_t,s0)
+ /usr/bin/rngd	--	gen_context(system_u:object_r:rngd_exec_t,s0)
  
-diff --git a/policy/modules/contrib/rngd.te b/policy/modules/contrib/rngd.te
-index 5f97a72..9876c06 100644
---- a/policy/modules/contrib/rngd.te
-+++ b/policy/modules/contrib/rngd.te
-@@ -40,3 +40,14 @@ files_read_etc_files(rngd_t)
+diff --git a/policy/modules/services/rngd.te b/policy/modules/services/rngd.te
+index 8cf7921..ba4e926 100644
+--- a/policy/modules/services/rngd.te
++++ b/policy/modules/services/rngd.te
+@@ -21,7 +21,7 @@ files_pid_file(rngd_var_run_t)
+ #
+ 
+ allow rngd_t self:capability { ipc_lock sys_admin };
+-allow rngd_t self:process signal;
++allow rngd_t self:process { signal getsched setsched };
+ allow rngd_t self:fifo_file rw_fifo_file_perms;
+ allow rngd_t self:unix_stream_socket { accept listen };
+ 
+@@ -34,9 +34,21 @@ dev_read_rand(rngd_t)
+ dev_read_urand(rngd_t)
+ dev_rw_tpm(rngd_t)
+ dev_write_rand(rngd_t)
++dev_read_sysfs(rngd_t)
+ 
+ files_read_etc_files(rngd_t)
+ 
  logging_send_syslog_msg(rngd_t)
  
  miscfiles_read_localization(rngd_t)
@@ -59,5 +75,5 @@ index 5f97a72..9876c06 100644
 +role sysadm_r types rngd_t;
 +domtrans_pattern(sysadm_t, rngd_exec_t, rngd_t)
 -- 
-2.8.1
+2.7.4
 

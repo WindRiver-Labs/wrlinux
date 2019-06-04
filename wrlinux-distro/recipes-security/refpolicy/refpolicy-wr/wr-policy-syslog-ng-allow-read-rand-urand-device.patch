@@ -1,4 +1,4 @@
-From f15b75696c653562b9923563347bd9e7b80a0ca3 Mon Sep 17 00:00:00 2001
+From 8925760a59f984dae26c3e927e70d023be8408a6 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Fri, 14 Feb 2014 01:37:38 -0500
 Subject: [PATCH] refpolicy: allow read rand/urand device and add block_suspend for syslog-ng
@@ -21,25 +21,24 @@ capability for it. This will fix below avc denied issues:
     scontext=system_u:system_r:syslogd_t:s15:c0.c1023 tcontext= \
     system_u:system_r:syslogd_t:s15:c0.c1023 tclass=capability2
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/system/logging.te | 7 +++++++
- 1 file changed, 7 insertions(+)
+ policy/modules/system/logging.te | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
-index bb05505..255bbac 100644
+index f09e57e..7ecd9c1 100644
 --- a/policy/modules/system/logging.te
 +++ b/policy/modules/system/logging.te
-@@ -377,6 +377,13 @@ optional_policy(`
+@@ -386,6 +386,12 @@ optional_policy(`
  # cjp: why net_admin!
- allow syslogd_t self:capability { dac_override sys_resource sys_tty_config net_admin sys_admin sys_nice chown fsetid };
- dontaudit syslogd_t self:capability { sys_tty_config sys_ptrace };
+ allow syslogd_t self:capability { chown dac_override fsetid net_admin setgid setuid sys_admin sys_nice sys_resource sys_tty_config };
+ dontaudit syslogd_t self:capability { sys_ptrace };
 +
-+# allow read to /dev/random, /dev/urandom for syslog-ng
++# allow read to /dev/random for syslog-ng
 +dev_read_rand(syslogd_t)
-+dev_read_urand(syslogd_t)
 +# block_suspend for syslog-ng
 +allow syslogd_t self:capability2 block_suspend;
 +
@@ -47,5 +46,5 @@ index bb05505..255bbac 100644
  # setrlimit for syslog-ng
  # getsched for syslog-ng
 -- 
-2.13.3
+2.7.4
 

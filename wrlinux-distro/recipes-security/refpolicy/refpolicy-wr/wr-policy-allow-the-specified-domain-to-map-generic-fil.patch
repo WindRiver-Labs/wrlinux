@@ -1,0 +1,180 @@
+From 2b5d69d0b578dd559713c72cf847b6c441b47fe0 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 23 May 2019 16:00:38 +0800
+Subject: [PATCH] policy: allow the specified domain to map generic files in
+ /etc
+
+Fix:
+type=AVC msg=audit(1558592079.426:483): avc:  denied  { map } for
+pid=371 comm="httpd" path="/etc/passwd" dev="vda" ino=31098
+scontext=system_u:system_r:httpd_t tcontext=system_u:object_r:etc_t
+tclass=file permissive=0
+type=AVC msg=audit(1558592122.776:528): avc:  denied  { map } for
+pid=313 comm="login" path="/etc/passwd" dev="vda" ino=31098
+scontext=system_u:system_r:local_login_t
+tcontext=system_u:object_r:etc_t tclass=file permissive=0
+type=AVC msg=audit(1558592307.926:640): avc:  denied  { map } for
+pid=637 comm="ssh" path="/etc/passwd" dev="vda" ino=31098
+scontext=root:sysadm_r:ssh_t tcontext=system_u:object_r:etc_t
+tclass=file permissive=0
+type=AVC msg=audit(1558592078.994:257): avc:  denied  { map } for
+pid=303 comm="newaliases" path="/etc/passwd" dev="vda" ino=31098
+scontext=system_u:system_r:sendmail_t tcontext=system_u:object_r:etc_t
+tclass=file permissive=0
+type=AVC msg=audit(1558592078.268:172): avc:  denied  { map } for
+pid=198 comm="dbus-daemon" path="/etc/passwd" dev="vda" ino=31098
+scontext=system_u:system_r:system_dbusd_t
+tcontext=system_u:object_r:etc_t tclass=file permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/apache.te    | 1 +
+ policy/modules/services/dbus.te      | 2 ++
+ policy/modules/services/sendmail.te  | 1 +
+ policy/modules/services/ssh.te       | 4 ++++
+ policy/modules/system/locallogin.te  | 2 ++
+ policy/modules/system/selinuxutil.te | 5 +++++
+ 6 files changed, 15 insertions(+)
+
+diff --git a/policy/modules/services/apache.te b/policy/modules/services/apache.te
+index 596370b..31e2d55 100644
+--- a/policy/modules/services/apache.te
++++ b/policy/modules/services/apache.te
+@@ -517,6 +517,7 @@ files_read_var_lib_files(httpd_t)
+ files_search_home(httpd_t)
+ files_getattr_home_dir(httpd_t)
+ files_read_etc_runtime_files(httpd_t)
++files_map_etc_files(httpd_t)
+ files_read_var_lib_symlinks(httpd_t)
+ 
+ auth_use_nsswitch(httpd_t)
+diff --git a/policy/modules/services/dbus.te b/policy/modules/services/dbus.te
+index 9c08587..75bd540 100644
+--- a/policy/modules/services/dbus.te
++++ b/policy/modules/services/dbus.te
+@@ -76,6 +76,8 @@ allow system_dbusd_t dbusd_etc_t:dir list_dir_perms;
+ read_files_pattern(system_dbusd_t, dbusd_etc_t, dbusd_etc_t)
+ read_lnk_files_pattern(system_dbusd_t, dbusd_etc_t, dbusd_etc_t)
+ 
++files_map_etc_files(system_dbusd_t)
++
+ manage_dirs_pattern(system_dbusd_t, system_dbusd_tmp_t, system_dbusd_tmp_t)
+ manage_files_pattern(system_dbusd_t, system_dbusd_tmp_t, system_dbusd_tmp_t)
+ files_tmp_filetrans(system_dbusd_t, system_dbusd_tmp_t, { dir file })
+diff --git a/policy/modules/services/sendmail.te b/policy/modules/services/sendmail.te
+index 3d8c281..11025e2 100644
+--- a/policy/modules/services/sendmail.te
++++ b/policy/modules/services/sendmail.te
+@@ -89,6 +89,7 @@ domain_use_interactive_fds(sendmail_t)
+ 
+ files_read_all_tmp_files(sendmail_t)
+ files_read_etc_runtime_files(sendmail_t)
++files_map_etc_files(sendmail_t)
+ files_read_usr_files(sendmail_t)
+ files_search_spool(sendmail_t)
+ 
+diff --git a/policy/modules/services/ssh.te b/policy/modules/services/ssh.te
+index 4e75b6e..21dd534 100644
+--- a/policy/modules/services/ssh.te
++++ b/policy/modules/services/ssh.te
+@@ -171,6 +171,7 @@ files_list_home(ssh_t)
+ files_read_usr_files(ssh_t)
+ files_read_etc_runtime_files(ssh_t)
+ files_read_etc_files(ssh_t)
++files_map_etc_files(ssh_t)
+ files_read_var_files(ssh_t)
+ 
+ logging_send_syslog_msg(ssh_t)
+@@ -237,6 +238,7 @@ allow ssh_keysign_t sshd_key_t:file { getattr read };
+ dev_read_urand(ssh_keysign_t)
+ 
+ files_read_etc_files(ssh_keysign_t)
++files_map_etc_files(ssh_keysign_t)
+ 
+ optional_policy(`
+ 	nscd_use(ssh_keysign_t)
+@@ -262,6 +264,7 @@ manage_dirs_pattern(sshd_t, sshd_tmp_t, sshd_tmp_t)
+ manage_files_pattern(sshd_t, sshd_tmp_t, sshd_tmp_t)
+ manage_sock_files_pattern(sshd_t, sshd_tmp_t, sshd_tmp_t)
+ files_tmp_filetrans(sshd_t, sshd_tmp_t, { dir file sock_file })
++files_map_etc_files(sshd_t)
+ 
+ kernel_search_key(sshd_t)
+ kernel_link_key(sshd_t)
+@@ -366,6 +369,7 @@ term_dontaudit_use_console(ssh_keygen_t)
+ domain_use_interactive_fds(ssh_keygen_t)
+ 
+ files_read_etc_files(ssh_keygen_t)
++files_map_etc_files(ssh_keygen_t)
+ 
+ init_use_fds(ssh_keygen_t)
+ init_use_script_ptys(ssh_keygen_t)
+diff --git a/policy/modules/system/locallogin.te b/policy/modules/system/locallogin.te
+index f03d779..45ccef4 100644
+--- a/policy/modules/system/locallogin.te
++++ b/policy/modules/system/locallogin.te
+@@ -93,6 +93,7 @@ domain_read_all_entry_files(local_login_t)
+ 
+ files_read_etc_files(local_login_t)
+ files_read_etc_runtime_files(local_login_t)
++files_map_etc_files(local_login_t)
+ files_read_usr_files(local_login_t)
+ files_list_mnt(local_login_t)
+ files_list_world_readable(local_login_t)
+@@ -248,6 +249,7 @@ fs_search_auto_mountpoints(sulogin_t)
+ fs_rw_tmpfs_chr_files(sulogin_t)
+ 
+ files_read_etc_files(sulogin_t)
++files_map_etc_files(sulogin_t)
+ 
+ term_use_console(sulogin_t)
+ term_use_unallocated_ttys(sulogin_t)
+diff --git a/policy/modules/system/selinuxutil.te b/policy/modules/system/selinuxutil.te
+index c6cf996..9830ae1 100644
+--- a/policy/modules/system/selinuxutil.te
++++ b/policy/modules/system/selinuxutil.te
+@@ -178,6 +178,7 @@ domain_use_interactive_fds(load_policy_t)
+ 
+ # for mcs.conf
+ files_read_etc_files(load_policy_t)
++files_map_etc_files(load_policy_t)
+ files_read_etc_runtime_files(load_policy_t)
+ 
+ fs_getattr_xattr_fs(load_policy_t)
+@@ -253,6 +254,7 @@ domain_use_interactive_fds(newrole_t)
+ domain_sigchld_interactive_fds(newrole_t)
+ 
+ files_read_etc_files(newrole_t)
++files_map_etc_files(newrole_t)
+ files_read_var_files(newrole_t)
+ files_read_var_symlinks(newrole_t)
+ 
+@@ -422,6 +424,7 @@ dev_dontaudit_list_all_dev_nodes(run_init_t)
+ domain_use_interactive_fds(run_init_t)
+ 
+ files_read_etc_files(run_init_t)
++files_map_etc_files(run_init_t)
+ files_dontaudit_search_all_dirs(run_init_t)
+ init_exec_all_script_files(run_init_t)
+ 
+@@ -506,6 +509,7 @@ dev_read_urand(semanage_t)
+ domain_use_interactive_fds(semanage_t)
+ 
+ files_read_etc_files(semanage_t)
++files_map_etc_files(semanage_t)
+ files_read_etc_runtime_files(semanage_t)
+ files_map_usr_files(semanage_t)
+ files_read_usr_files(semanage_t)
+@@ -611,6 +615,7 @@ domain_dontaudit_search_all_domains_state(setfiles_t)
+ 
+ files_read_etc_runtime_files(setfiles_t)
+ files_read_etc_files(setfiles_t)
++files_map_etc_files(setfiles_t)
+ files_list_all(setfiles_t)
+ files_relabel_all_files(setfiles_t)
+ files_read_usr_symlinks(setfiles_t)
+-- 
+2.7.4
+

@@ -1,0 +1,39 @@
+From ead62aa2caa0d74ed5b9c4834c6332706ab044fe Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Wed, 23 Jan 2019 13:36:18 +0800
+Subject: [PATCH] refpolicy: fix real path for corecommands
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
+Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/kernel/corecommands.fc | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/policy/modules/kernel/corecommands.fc b/policy/modules/kernel/corecommands.fc
+index cf3848d..278438e 100644
+--- a/policy/modules/kernel/corecommands.fc
++++ b/policy/modules/kernel/corecommands.fc
+@@ -141,7 +141,7 @@ ifdef(`distro_gentoo',`
+ /usr/bin/d?ash			--	gen_context(system_u:object_r:shell_exec_t,s0)
+ /usr/bin/bash			--	gen_context(system_u:object_r:shell_exec_t,s0)
+ /usr/bin/bash2			--	gen_context(system_u:object_r:shell_exec_t,s0)
+-/usr/bin/bash.bash			--	gen_context(system_u:object_r:shell_exec_t,s0)
++/usr/bin/bash\.bash			--	gen_context(system_u:object_r:shell_exec_t,s0)
+ /usr/bin/fish			--	gen_context(system_u:object_r:shell_exec_t,s0)
+ /usr/bin/git-shell		--	gen_context(system_u:object_r:shell_exec_t,s0)
+ /usr/bin/insmod_ksymoops_clean	--	gen_context(system_u:object_r:bin_t,s0)
+@@ -281,6 +281,8 @@ ifdef(`distro_gentoo',`
+ /usr/sbin/insmod_ksymoops_clean	--	gen_context(system_u:object_r:bin_t,s0)
+ /usr/sbin/mkfs\.cramfs		--	gen_context(system_u:object_r:bin_t,s0)
+ /usr/sbin/nologin		--	gen_context(system_u:object_r:shell_exec_t,s0)
++/usr/sbin/nologin\.shadow		--	gen_context(system_u:object_r:shell_exec_t,s0)
++/usr/sbin/nologin\.util-linux		--	gen_context(system_u:object_r:shell_exec_t,s0)
+ /usr/sbin/scponlyc		--	gen_context(system_u:object_r:shell_exec_t,s0)
+ /usr/sbin/sesh			--	gen_context(system_u:object_r:shell_exec_t,s0)
+ /usr/sbin/smrsh			--	gen_context(system_u:object_r:shell_exec_t,s0)
+-- 
+2.7.4
+

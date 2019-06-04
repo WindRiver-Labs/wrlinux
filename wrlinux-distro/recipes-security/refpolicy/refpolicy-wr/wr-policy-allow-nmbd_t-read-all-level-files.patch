@@ -1,7 +1,7 @@
-From 35173269a106c08e9f005edec5e413936ae2413e Mon Sep 17 00:00:00 2001
+From a3c42bbfce89f99b75129f2d09ba6f947defbf6f Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Fri, 2 Feb 2018 07:16:07 +0000
-Subject: [PATCH 1/1] wr-policy: allow nmbd_t read all level files
+Subject: [PATCH] wr-policy: allow nmbd_t read all level files
 
 Remove avc denial:
   avc: denied { search } for pid=517 comm="nmbd" \
@@ -13,14 +13,14 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/contrib/samba.te | 2 ++
+ policy/modules/services/samba.te | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/policy/modules/contrib/samba.te b/policy/modules/contrib/samba.te
-index baa2215..b3eba45 100644
---- a/policy/modules/contrib/samba.te
-+++ b/policy/modules/contrib/samba.te
-@@ -596,6 +596,8 @@ miscfiles_read_localization(nmbd_t)
+diff --git a/policy/modules/services/samba.te b/policy/modules/services/samba.te
+index 1afe886..c989e90 100644
+--- a/policy/modules/services/samba.te
++++ b/policy/modules/services/samba.te
+@@ -605,6 +605,8 @@ miscfiles_read_localization(nmbd_t)
  userdom_use_unpriv_users_fds(nmbd_t)
  userdom_user_home_dir_filetrans_user_home_content(nmbd_t, { file dir })
  
@@ -30,5 +30,5 @@ index baa2215..b3eba45 100644
  	fs_read_noxattr_fs_files(nmbd_t)
  	files_list_non_auth_dirs(nmbd_t)
 -- 
-2.13.3
+2.7.4
 

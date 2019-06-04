@@ -1,3 +1,6 @@
+From e71220b8f4f170632c0408502d0f964654e09107 Mon Sep 17 00:00:00 2001
+From: Xin Ouyang <Xin.Ouyang@windriver.com>
+Date: Mon, 28 Jan 2019 14:05:18 +0800
 Subject: [PATCH] refpolicy: MLS - sysadm rw to clearance
 
 The two new rules make sysadm_t domain MLS trusted for:
@@ -18,15 +21,20 @@ Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
  policy/modules/roles/sysadm.te | 3 +++
  1 file changed, 3 insertions(+)
 
---- refpolicy.orig/policy/modules/roles/sysadm.te
-+++ refpolicy/policy/modules/roles/sysadm.te
-@@ -29,6 +29,9 @@ corecmd_exec_shell(sysadm_t)
+diff --git a/policy/modules/roles/sysadm.te b/policy/modules/roles/sysadm.te
+index 3fcc3c4..30c0c83 100644
+--- a/policy/modules/roles/sysadm.te
++++ b/policy/modules/roles/sysadm.te
+@@ -34,6 +34,9 @@ dev_read_kmsg(sysadm_t)
  
  mls_process_read_all_levels(sysadm_t)
  
 +mls_file_read_to_clearance(sysadm_t)
 +mls_process_write_to_clearance(sysadm_t)
 +
+ selinux_read_policy(sysadm_t)
+ 
  ubac_process_exempt(sysadm_t)
- ubac_file_exempt(sysadm_t)
- ubac_fd_exempt(sysadm_t)
+-- 
+2.7.4
+

@@ -1,7 +1,7 @@
-From 6ef34164fb7e0e50ab74b20e1909f659e2f81428 Mon Sep 17 00:00:00 2001
+From 4ed4156c9bf794abac31c130e221abd79af938d6 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Thu, 3 Mar 2016 22:35:53 -0500
-Subject: [PATCH 2/4] wr-policy: allow unconfined_domain_type manage
+Subject: [PATCH] wr-policy: allow unconfined_domain_type manage
  system/services
 
 Reference sources: selinux-policy-3.13.1-128.21.fc22.src.rpm
@@ -24,9 +24,11 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  policy/modules/kernel/domain.te | 11 +++++++++++
  1 file changed, 11 insertions(+)
 
---- refpolicy.orig/policy/modules/kernel/domain.te
-+++ refpolicy/policy/modules/kernel/domain.te
-@@ -193,6 +193,17 @@ allow unconfined_domain_type domain:key
+diff --git a/policy/modules/kernel/domain.te b/policy/modules/kernel/domain.te
+index a31c059..87d8759 100644
+--- a/policy/modules/kernel/domain.te
++++ b/policy/modules/kernel/domain.te
+@@ -208,6 +208,17 @@ allow unconfined_domain_type domain:key manage_key_perms;
  # receive from all domains over labeled networking
  domain_all_recvfrom_all_domains(unconfined_domain_type)
  
@@ -44,3 +46,6 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
  tunable_policy(`domain_fd_use',`
  	# Allow all domains to use fds past to them
  	allow domain domain:fd use;
+-- 
+2.7.4
+

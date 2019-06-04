@@ -1,4 +1,4 @@
-From 1a781819811a1251b77e0f9fc2843e65b432ea7c Mon Sep 17 00:00:00 2001
+From 2ff3c32cae30d6547c6216ba5783ddaae93546e1 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Tue, 2 Jan 2018 08:40:32 +0000
 Subject: [PATCH] wr-policy: allow ping_t read all levels' file
@@ -15,21 +15,22 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/admin/netutils.te | 1 +
- 1 file changed, 1 insertion(+)
+ policy/modules/admin/netutils.te | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/policy/modules/admin/netutils.te b/policy/modules/admin/netutils.te
-index 3bfb406..8db03d6 100644
+index 46560a0..2b9a11d 100644
 --- a/policy/modules/admin/netutils.te
 +++ b/policy/modules/admin/netutils.te
-@@ -131,6 +131,7 @@ domain_use_interactive_fds(ping_t)
+@@ -128,6 +128,8 @@ domain_use_interactive_fds(ping_t)
  
  files_read_etc_files(ping_t)
- files_dontaudit_search_var(ping_t)
-+mls_file_read_all_levels(ping_t)
  
++mls_file_read_all_levels(ping_t)
++
  kernel_read_system_state(ping_t)
  
+ auth_use_nsswitch(ping_t)
 -- 
-2.13.3
+2.7.4
 

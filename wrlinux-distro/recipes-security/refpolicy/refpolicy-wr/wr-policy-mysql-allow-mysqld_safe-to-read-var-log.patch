@@ -1,0 +1,37 @@
+From 5b7677eb8d1662bfa3bb8d05712d28f191d3b752 Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Tue, 12 Feb 2019 15:02:31 +0800
+Subject: [PATCH] mysql: make it be able to work
+
+the mysql.err log files is installed under /var/log/, so mysqld and
+mysqld_safe_t should have the permission to read this path.
+
+if /var/lib is not created, the mysqld_safe will create it, to install
+the pid and data
+
+Upstream-Status: Pending
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/mysql.te | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/policy/modules/services/mysql.te b/policy/modules/services/mysql.te
+index df8e789..9a066e1 100644
+--- a/policy/modules/services/mysql.te
++++ b/policy/modules/services/mysql.te
+@@ -166,6 +166,10 @@ allow mysqld_safe_t self:capability { chown dac_override fowner kill };
+ allow mysqld_safe_t self:process { setsched getsched setrlimit };
+ allow mysqld_safe_t self:fifo_file rw_fifo_file_perms;
+ 
++logging_list_logs(mysqld_safe_t)
++logging_list_logs(mysqld_t)
++files_var_lib_filetrans(mysqld_safe_t, mysqld_db_t, {file dir})
++
+ allow mysqld_safe_t mysqld_t:process { signull sigkill };
+ 
+ read_lnk_files_pattern(mysqld_safe_t, mysqld_db_t, mysqld_db_t)
+-- 
+2.7.4
+

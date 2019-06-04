@@ -1,0 +1,135 @@
+From 266f139aa24b5c6f1458a13c92c11dcff76b374b Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Sat, 2 Feb 2019 10:50:21 +0800
+Subject: [PATCH] dontaudit several operations of useradd, newrole, and ssh
+
+passwd, newrole and semanage need not to search init_var_run_t
+systemd_logind needs not to mounton var_auth and read tmp_t
+semanage needs not to write lib_t
+
+Upstream-Status: Pending
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ policy/modules/admin/usermanage.te   |  2 ++
+ policy/modules/system/authlogin.if   | 19 +++++++++++++++++++
+ policy/modules/system/init.if        | 19 +++++++++++++++++++
+ policy/modules/system/selinuxutil.te |  6 ++++++
+ policy/modules/system/systemd.te     |  3 +++
+ 5 files changed, 49 insertions(+)
+
+diff --git a/policy/modules/admin/usermanage.te b/policy/modules/admin/usermanage.te
+index 8a58681..4c6e915 100644
+--- a/policy/modules/admin/usermanage.te
++++ b/policy/modules/admin/usermanage.te
+@@ -368,6 +368,8 @@ userdom_dontaudit_search_user_home_content(passwd_t)
+ 
+ mls_file_read_all_levels(passwd_t)
+ 
++init_dontaudit_search_pid_dirs(passwd_t)
++
+ ifdef(`init_systemd',`
+ 	# for journald /dev/log
+ 	kernel_dgram_send(passwd_t)
+diff --git a/policy/modules/system/authlogin.if b/policy/modules/system/authlogin.if
+index b363e37..872a83b 100644
+--- a/policy/modules/system/authlogin.if
++++ b/policy/modules/system/authlogin.if
+@@ -1057,6 +1057,25 @@ interface(`auth_manage_var_auth',`
+ 	allow $1 var_auth_t:lnk_file rw_lnk_file_perms;
+ ')
+ 
++
++########################################
++## <summary>
++## </summary>
++## <param name="type">
++##	<summary>
++##	</summary>
++## </param>
++#
++interface(`auth_dontaudit_mounton_var_auth',`
++	gen_require(`
++		type var_auth_t;
++	')
++
++	dontaudit $1 var_auth_t:dir mounton;
++')
++
++
++
+ ########################################
+ ## <summary>
+ ##	Read PAM PID files.
+diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
+index 7688cae..759f20c 100644
+--- a/policy/modules/system/init.if
++++ b/policy/modules/system/init.if
+@@ -2566,6 +2566,25 @@ interface(`init_getattr_utmp',`
+ 	allow $1 initrc_var_run_t:file getattr;
+ ')
+ 
++######################################
++## <summary>
++##  dontaudit search  directory in the /run/systemd directory.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`init_dontaudit_search_pid_dirs',`
++	gen_require(`
++		type init_var_run_t;
++	')
++
++	dontaudit $1 init_var_run_t:dir search_dir_perms;
++')
++
++
+ ########################################
+ ## <summary>
+ ##	Read utmp.
+diff --git a/policy/modules/system/selinuxutil.te b/policy/modules/system/selinuxutil.te
+index 626ee72..c6cf996 100644
+--- a/policy/modules/system/selinuxutil.te
++++ b/policy/modules/system/selinuxutil.te
+@@ -294,6 +294,8 @@ miscfiles_read_localization(newrole_t)
+ 
+ seutil_libselinux_linked(newrole_t)
+ 
++init_dontaudit_search_pid_dirs(newrole_t)
++
+ # for some PAM modules and for cwd
+ userdom_dontaudit_search_user_home_content(newrole_t)
+ userdom_search_user_home_dirs(newrole_t)
+@@ -540,6 +542,10 @@ seutil_get_semanage_read_lock(semanage_t)
+ # netfilter_contexts:
+ seutil_manage_default_contexts(semanage_t)
+ 
++init_dontaudit_search_pid_dirs(semanage_t)
++libs_dontaudit_write_lib_dirs(semanage_t)
++seutil_sigchld_newrole(semanage_t)
++
+ # Handle pp files created in homedir and /tmp
+ userdom_read_user_home_content_files(semanage_t)
+ userdom_map_user_home_content_files(semanage_t)
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 37735bf..5459213 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -520,6 +520,9 @@ domain_read_all_domains_state(systemd_logind_t)
+ userdom_manage_all_user_tmp_content(systemd_logind_t)
+ userdom_mounton_tmp_dirs(systemd_logind_t)
+ 
++files_dontaudit_list_non_security(systemd_logind_t)
++auth_dontaudit_mounton_var_auth(systemd_logind_t)
++
+ locallogin_read_state(systemd_logind_t)
+ 
+ seutil_libselinux_linked(systemd_logind_t)
+-- 
+2.7.4
+

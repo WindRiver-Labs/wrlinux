@@ -1,20 +1,20 @@
-From 4f16274a06cd4a79a3d97b53658b650d298022d2 Mon Sep 17 00:00:00 2001
+From 519848a59c0429dd897c59183568628edac816e1 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Tue, 22 Apr 2014 03:50:52 -0400
 Subject: [PATCH] selinuxutil: allow run_init exec all initscripts
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/system/selinuxutil.te |    1 +
+ policy/modules/system/selinuxutil.te | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/policy/modules/system/selinuxutil.te b/policy/modules/system/selinuxutil.te
-index 6c57709..34f3e8a 100644
+index 947fb54..1452ffd 100644
 --- a/policy/modules/system/selinuxutil.te
 +++ b/policy/modules/system/selinuxutil.te
-@@ -387,6 +387,7 @@ domain_use_interactive_fds(run_init_t)
+@@ -419,6 +419,7 @@ domain_use_interactive_fds(run_init_t)
  
  files_read_etc_files(run_init_t)
  files_dontaudit_search_all_dirs(run_init_t)
@@ -23,5 +23,5 @@ index 6c57709..34f3e8a 100644
  fs_getattr_xattr_fs(run_init_t)
  
 -- 
-1.7.9.5
+2.7.4
 

@@ -1,4 +1,4 @@
-From 711a5872536bddd463ad43b6131c93295b2ae14e Mon Sep 17 00:00:00 2001
+From feb1475643edfb04f0e4844293082f5722cacffa Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Fri, 4 Mar 2016 01:52:02 -0500
 Subject: [PATCH] wr-policy: allow initrc_t start systemd_unit_t service
@@ -73,32 +73,32 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/kernel/devices.te    |  1 +
- policy/modules/system/init.if       | 37 +++++++++++++++++++++++++++++++++++++
- policy/modules/system/init.te       |  2 ++
- policy/modules/system/locallogin.fc |  1 +
- policy/modules/system/locallogin.te | 10 ++++++++++
- policy/modules/system/systemd.te    | 18 ++++++++++++++++++
- 6 files changed, 69 insertions(+)
+ policy/modules/kernel/devices.te    |  2 ++
+ policy/modules/system/init.if       | 18 ++++++++++++++++++
+ policy/modules/system/init.te       |  1 +
+ policy/modules/system/locallogin.te |  8 ++++++++
+ policy/modules/system/systemd.te    |  4 ++++
+ 5 files changed, 33 insertions(+)
 
 diff --git a/policy/modules/kernel/devices.te b/policy/modules/kernel/devices.te
-index 37dceb4..8585526 100644
+index 027c523..cd4743d 100644
 --- a/policy/modules/kernel/devices.te
 +++ b/policy/modules/kernel/devices.te
-@@ -21,6 +21,7 @@ files_mountpoint(device_t)
- files_associate_tmp(device_t)
+@@ -22,6 +22,8 @@ files_associate_tmp(device_t)
  fs_xattr_type(device_t)
  fs_use_trans devtmpfs gen_context(system_u:object_r:device_t,s0);
-+dev_node(device_t)
  
- #
- # Type for /dev/agpgart
++dev_node(device_t)
++
+ optional_policy(`
+ 	systemd_tmpfilesd_managed(device_t, fifo_file)
+ ')
 diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
-index 90b2480..c624a68 100644
+index be2c0a7..5bb3ed6 100644
 --- a/policy/modules/system/init.if
 +++ b/policy/modules/system/init.if
-@@ -2543,6 +2543,43 @@ interface(`init_stop_all_units',`
- 	allow $1 systemdunit:service stop;
+@@ -2714,6 +2714,24 @@ interface(`init_runtime_filetrans_utmp',`
+ 	files_pid_filetrans($1, initrc_var_run_t, file, "utmp")
  ')
  
 +########################################
@@ -119,65 +119,26 @@ index 90b2480..c624a68 100644
 +	rw_fifo_files_pattern($1, init_var_run_t, init_var_run_t)
 +')
 +
-+#######################################
-+## <summary>
-+##  Create a directory in the /run/systemd directory.
-+## </summary>
-+## <param name="domain">
-+##  <summary>
-+##  Domain allowed access.
-+##  </summary>
-+## </param>
-+#
-+interface(`init_create_pid_dirs',`
-+	gen_require(`
-+		type init_var_run_t;
-+	')
-+
-+	allow $1 init_var_run_t:dir list_dir_perms;
-+	create_dirs_pattern($1, init_var_run_t, init_var_run_t)
-+')
-+
  #######################################
  ## <summary>
- ##	Reload all systemd units.
+ ##	Create a directory in the /run/systemd directory.
 diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
-index 5004c17..20b9b14 100644
+index caa9980..da7b6e2 100644
 --- a/policy/modules/system/init.te
 +++ b/policy/modules/system/init.te
-@@ -784,6 +784,8 @@ ifdef(`init_systemd',`
- 	init_rw_stream_sockets(initrc_t)
- 	init_get_all_units_status(initrc_t)
- 	init_stop_all_units(initrc_t)
-+	init_reload_all_units(initrc_t)
-+	init_start_all_units(initrc_t)
+@@ -749,6 +749,7 @@ init_get_system_status(initrc_t)
+ init_stream_connect(initrc_t)
+ init_start_all_units(initrc_t)
+ init_stop_all_units(initrc_t)
++init_reload_all_units(initrc_t)
  
- 	# Create /etc/audit.rules.prev after firstboot remediation
- 	logging_manage_audit_config(initrc_t)
-diff --git a/policy/modules/system/locallogin.fc b/policy/modules/system/locallogin.fc
-index 06b5de6..9023860 100644
---- a/policy/modules/system/locallogin.fc
-+++ b/policy/modules/system/locallogin.fc
-@@ -1,5 +1,6 @@
- 
- /sbin/sulogin		--	gen_context(system_u:object_r:sulogin_exec_t,s0)
-+/sbin/sulogin.util-linux	--	gen_context(system_u:object_r:sulogin_exec_t,s0)
- /sbin/sushell		--	gen_context(system_u:object_r:sulogin_exec_t,s0)
- 
- /usr/sbin/sulogin	--	gen_context(system_u:object_r:sulogin_exec_t,s0)
+ libs_rw_ld_so_cache(initrc_t)
+ libs_exec_lib_files(initrc_t)
 diff --git a/policy/modules/system/locallogin.te b/policy/modules/system/locallogin.te
-index 8e35567..976a595 100644
+index 8961579..86b034b 100644
 --- a/policy/modules/system/locallogin.te
 +++ b/policy/modules/system/locallogin.te
-@@ -227,6 +227,7 @@ allow sulogin_t self:msgq create_msgq_perms;
- allow sulogin_t self:msg { send receive };
- 
- kernel_read_system_state(sulogin_t)
-+kernel_read_crypto_sysctls(sulogin_t)
- # because file systems are not mounted:
- kernel_dontaudit_search_unlabeled(sulogin_t)
- 
-@@ -268,6 +269,15 @@ ifdef(`sulogin_no_pam', `
+@@ -282,6 +282,14 @@ ifdef(`sulogin_pam', `
  	selinux_compute_user_contexts(sulogin_t)
  ')
  
@@ -186,7 +147,6 @@ index 8e35567..976a595 100644
 +
 +mls_file_read_all_levels(sulogin_t)
 +
-+term_use_console(sulogin_t)
 +term_use_generic_ptys(sulogin_t)
 +term_use_all_ttys(sulogin_t)
 +
@@ -194,31 +154,27 @@ index 8e35567..976a595 100644
  	nis_use_ypbind(sulogin_t)
  ')
 diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
-index 1246875..927ec3a 100644
+index db00454..0ed5101 100644
 --- a/policy/modules/system/systemd.te
 +++ b/policy/modules/system/systemd.te
-@@ -420,3 +420,21 @@ tunable_policy(`systemd_tmpfiles_manage_all',`
- 	files_relabel_non_security_dirs(systemd_tmpfiles_t)
- 	files_relabel_non_security_files(systemd_tmpfiles_t)
- ')
-+
-+#######################################
-+#
-+# Systemd_passwd_agent local policy
-+#
-+
-+allow systemd_passwd_agent_t self:capability { chown sys_tty_config dac_override };
-+allow systemd_passwd_agent_t self:process { setfscreate signal_perms setsockcreate };
-+allow systemd_passwd_agent_t self:unix_dgram_socket create_socket_perms;
-+
-+term_read_console(systemd_passwd_agent_t)
+@@ -902,6 +902,7 @@ selinux_get_enforce_mode(systemd_passwd_agent_t)
+ selinux_getattr_fs(systemd_passwd_agent_t)
+ 
+ term_read_console(systemd_passwd_agent_t)
 +term_write_console(systemd_passwd_agent_t)
-+
+ 
+ auth_use_nsswitch(systemd_passwd_agent_t)
+ 
+@@ -911,6 +912,9 @@ init_read_state(systemd_passwd_agent_t)
+ init_read_utmp(systemd_passwd_agent_t)
+ init_stream_connect(systemd_passwd_agent_t)
+ 
 +init_search_run(systemd_passwd_agent_t)
 +init_rw_pipes(systemd_passwd_agent_t)
-+init_create_pid_dirs(systemd_passwd_agent_t)
-+init_read_utmp(systemd_passwd_agent_t)
-+init_stream_connect(systemd_passwd_agent_t)
++
+ logging_send_syslog_msg(systemd_passwd_agent_t)
+ 
+ miscfiles_read_localization(systemd_passwd_agent_t)
 -- 
 2.7.4
 

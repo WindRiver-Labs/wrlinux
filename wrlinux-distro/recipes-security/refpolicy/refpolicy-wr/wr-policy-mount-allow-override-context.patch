@@ -1,4 +1,4 @@
-From fa522a483d7ba57751a68c2036c19971bb9d7ad8 Mon Sep 17 00:00:00 2001
+From 455792ec2f0163ea511cc0939305d8e7aea326ca Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Tue, 8 Apr 2014 02:46:00 -0400
 Subject: [PATCH] allow mount to override contexts
@@ -15,35 +15,18 @@ type=AVC msg=audit(1396939321.174:110): avc:  denied  { rename } for  pid=2183 c
 type=AVC msg=audit(1396939321.174:110): avc:  denied  { unlink } for  pid=2183 comm="mount.nfs" name="utab" dev="tmpfs" ino=27419 scontext=root:sysadm_r:mount_t:s0-s15:c0.c1023 tcontext=root:object_r:mount_var_run_t:s0 tclass=file
 type=AVC msg=audit(1396936635.289:46): avc:  denied  { getattr } for  pid=2035 comm="mount" name="/" dev="selinuxfs" ino=1 scontext=root:sysadm_r:mount_t:s0-s15:c0.c1023 tcontext=system_u:object_r:security_t:s0 tclass=filesystem
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- policy/modules/system/mount.te      | 5 +++++
  policy/modules/system/userdomain.te | 1 +
- 2 files changed, 6 insertions(+)
+ 1 file changed, 1 insertion(+)
 
-diff --git a/policy/modules/system/mount.te b/policy/modules/system/mount.te
-index 49d234a..f7dacef 100644
---- a/policy/modules/system/mount.te
-+++ b/policy/modules/system/mount.te
-@@ -58,6 +58,11 @@ create_files_pattern(mount_t, mount_runtime_t, mount_runtime_t)
- rw_files_pattern(mount_t, mount_runtime_t, mount_runtime_t)
- files_pid_filetrans(mount_t, mount_runtime_t, dir, "mount")
- 
-+manage_dirs_pattern(mount_t, mount_var_run_t, mount_var_run_t)
-+manage_files_pattern(mount_t, mount_var_run_t, mount_var_run_t)
-+
-+selinux_getattr_fs(mount_t)
-+
- kernel_read_system_state(mount_t)
- kernel_read_kernel_sysctls(mount_t)
- kernel_setsched(mount_t)
 diff --git a/policy/modules/system/userdomain.te b/policy/modules/system/userdomain.te
-index 5341e14..7bd4ec8 100644
+index d57aaa0..4b57869 100644
 --- a/policy/modules/system/userdomain.te
 +++ b/policy/modules/system/userdomain.te
-@@ -89,6 +89,7 @@ type user_home_t alias { staff_home_t sysadm_home_t secadm_home_t auditadm_home_
+@@ -92,6 +92,7 @@ type user_home_t alias { staff_home_t sysadm_home_t secadm_home_t auditadm_home_
  typealias user_home_t alias { staff_untrusted_content_t sysadm_untrusted_content_t secadm_untrusted_content_t auditadm_untrusted_content_t unconfined_untrusted_content_t };
  userdom_user_home_content(user_home_t)
  fs_associate_tmpfs(user_home_t)
@@ -52,5 +35,5 @@ index 5341e14..7bd4ec8 100644
  files_poly_parent(user_home_t)
  files_mountpoint(user_home_t)
 -- 
-2.13.3
+2.7.4
 
