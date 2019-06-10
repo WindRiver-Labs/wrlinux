@@ -7,8 +7,8 @@ KERNEL_FEATURES += "\
 "
 
 # Only qemux86 and qemux86-64 is allowed!
-TARGET_SUPPORTED_KTYPES_qemux86 = "preempt-rt"
-TARGET_SUPPORTED_KTYPES_qemux86-64 = "preempt-rt"
+TARGET_SUPPORTED_KTYPES_qemux86 = "preempt-rt standard"
+TARGET_SUPPORTED_KTYPES_qemux86-64 = "preempt-rt standard"
 
 # Most BSPs provide a compatible_machine override, the distro override
 # has a higher priority then machine override so use it to block other
