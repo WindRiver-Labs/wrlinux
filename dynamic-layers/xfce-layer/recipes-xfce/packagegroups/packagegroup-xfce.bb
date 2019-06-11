@@ -42,6 +42,7 @@ RRECOMMENDS_${PN} = " \
     xfce4-power-manager \
     xfce4-powermanager-plugin \
     xfce4-pulseaudio-plugin \
+    xfce4-screensaver \
     xfce4-screenshooter \
     xfce4-systemload-plugin \
     xfce4-taskmanager \
