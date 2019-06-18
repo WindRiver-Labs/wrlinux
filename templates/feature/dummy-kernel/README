@@ -1,0 +1,9 @@
+This template causes the build to use the linux-dummy
+kernel, a standin for virtual/kernel which provides no
+real kernel, but satisfies dependancies on virtual/kernel.
+Useful when the build does not require a kernel, such as
+when building containers, saving build time.
+
+#@TYPE: Wrtemplate
+#@NAME: dummy-kernel
+#@DESCRIPTION: This template allows the build to use the linux-dummy kernel, which provides no real kernel, but satisfies dependancies on virtual/kernel. This is useful when the build does not require a kernel, such as when building containers, saving build time as a result.
