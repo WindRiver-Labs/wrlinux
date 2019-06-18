@@ -19,6 +19,11 @@ def base_get_metadata_git_branch(path, d):
             if subprocess.check_output(cmd1, cwd=path) == subprocess.check_output(cmd2, cwd=path):
                 cmd = 'git rev-parse --abbrev-ref m/master'.split()
                 branch = subprocess.check_output(cmd, cwd=path).decode('utf-8')
+        if branch == 'HEAD':
+            bb.debug(1, "Trying to get tag name...")
+            cmd = 'git describe HEAD'.split()
+            branch = subprocess.check_output(cmd, cwd=path).decode('utf-8')
+
     except subprocess.CalledProcessError:
         branch = '<unknown>'
 
