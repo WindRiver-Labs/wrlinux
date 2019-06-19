@@ -155,4 +155,5 @@ SRC_URI += "file://wr-policy-fix-dev-log-label.patch \
             file://wr-policy-samba-enable-samba_export_all_rw-and-samba_export_al.patch \
             file://wr-policy-rpm-fix-avc-denials-for-rpm_t.patch \
             file://wr-policy-postfix-fix-avc-denials-for-postfix_local_t.patch \
+            file://wr-policy-revert-remove-unused-translate-permission-in-context.patch \
            "
