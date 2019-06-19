@@ -29,7 +29,7 @@ SRCREV_machine_kb-v4.18-standard-intel-socfpga ?= "7826f053492870f359fcc69bbe2c9
 LINUX_VERSION_kb-v4.18-standard-intel-socfpga ?= "4.18.40"
 SRCREV_machine_kb-v4.18-standard-intel-x86 ?= "a81adc8605d7fb076be27269a5796800cadd4429"
 LINUX_VERSION_kb-v4.18-standard-intel-x86 ?= "4.18.40"
-SRCREV_machine_kb-v4.18-standard-marvell-cn91xx ?= "84ac7d00d79442251ae6aae5384519f0ffe6b061"
+SRCREV_machine_kb-v4.18-standard-marvell-cn91xx ?= "15f11c8f2fd564f84ba57882492c47006dba8e09"
 LINUX_VERSION_kb-v4.18-standard-marvell-cn91xx ?= "4.18.40"
 SRCREV_machine_kb-v4.18-standard-mti-malta32 ?= "6bbdf8dbe9a11ae3ece0d2ed854c8cff42399e4b"
 LINUX_VERSION_kb-v4.18-standard-mti-malta32 ?= "4.18.40"
@@ -102,5 +102,5 @@ LINUX_VERSION_kb-v4.18-standard-xilinx-sdk2018-03-xilinx-zynqmp ?= "4.18.40"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_4.18 = "yocto-4.18-wr"
-SRCREV_meta_4.18 = "b436d517f7d5ec02421285ecc6357a82537f91d2"
+SRCREV_meta_4.18 = "90c7395d6d98d46eea59139b932b8a796459054f"
 LINUX_VERSION_4.18 = "4.18.40"
