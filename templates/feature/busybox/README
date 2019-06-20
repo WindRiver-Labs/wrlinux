@@ -1,0 +1,14 @@
+This feature installs busybox rather than packagegroup-busybox-replacement, so
+that the image size will be smaller.
+
+To use, add
+
+--templates feature/busybox
+
+as a setup option.
+
+
+#@TYPE: Wrtemplate
+#@NAME: busybox
+#@DESCRIPTION: Install busybox to rootfs
+
