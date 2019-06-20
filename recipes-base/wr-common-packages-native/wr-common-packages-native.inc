@@ -72,6 +72,7 @@ DEPENDS = "\
     ldconfig-native \
     libarchive-native \
     libassuan-native \
+    libcap-ng-native \
     libcheck-native \
     libcomps-native \
     libcroco-native \
