@@ -4,9 +4,9 @@
 # than 'overc' or 'wrlinux-overc' will be used, which in most cases is
 # the correct assumption.
 
-SUMMARY ?= "Wind River Linux application container"
+SUMMARY ?= "${PN} -- application container"
 DESCRIPTION ?= "An application container which will run \
-                the application defined in IMAGE_INSTALL."
+                the application(s) ${IMAGE_INSTALL}."
 HOMEPAGE ?= "http://www.windriver.com"
 
 LICENSE ?= "MIT"
@@ -15,10 +15,6 @@ LIC_FILES_CHKSUM ?= "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecd
 IMAGE_FSTYPES ?= "tar.bz2"
 IMAGE_FSTYPES_remove = "live"
 
-TARGETNAME ?= "wr-app-container"
-
-IMAGE_INSTALL += ""
-
-IMAGE_FEATURES = ""
+IMAGE_FEATURES ?= ""
 
 inherit image
