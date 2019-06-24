@@ -4,9 +4,9 @@
 # than 'overc' or 'wrlinux-overc' will be used, which in most cases is
 # the correct assumption.
 
-SUMMARY ?= "Wind River Linux systemd system container"
+SUMMARY ?= "${PN} -- systemd system container"
 DESCRIPTION ?= "A systemd system container which will run \
-                the application defined in IMAGE_INSTALL."
+                the application(s) ${IMAGE_INSTALL}."
 HOMEPAGE ?= "http://www.windriver.com"
 
 LICENSE ?= "MIT"
@@ -15,13 +15,11 @@ LIC_FILES_CHKSUM ?= "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecd
 IMAGE_FSTYPES ?= "tar.bz2"
 IMAGE_FSTYPES_remove = "live"
 
-TARGETNAME ?= "wr-systemd-container"
-
-IMAGE_INSTALL_append += "systemd"
+IMAGE_INSTALL_append = " systemd"
 
 DEPENDS += "systemd-systemctl-native"
 
-IMAGE_FEATURES = ""
+IMAGE_FEATURES ?= ""
 
 NO_RECOMMENDATIONS = "1"
 

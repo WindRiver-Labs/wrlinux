@@ -14,4 +14,4 @@ SERVICES_TO_DISABLE_append += "${WR_SYSTEMD_CONTAINER_DISABLE_SERVICES}"
 # Use local.conf to enable systemd services
 SERVICES_TO_ENABLE += "${WR_SYSTEMD_CONTAINER_ENABLE_SERVICES}"
 
-require wr-systemd-container.inc
+inherit wr-systemd-container

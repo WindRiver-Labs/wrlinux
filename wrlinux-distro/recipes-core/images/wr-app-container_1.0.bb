@@ -3,6 +3,6 @@ DESCRIPTION = "An application container which will run \
                 ${WR_APP_CONTAINER_APP}."
 HOMEPAGE = "http://www.windriver.com"
 
-require wr-app-container.inc
+inherit wr-app-container
 
 IMAGE_INSTALL += "${WR_APP_CONTAINER_APP}"
