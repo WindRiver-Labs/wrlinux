@@ -167,5 +167,6 @@ SANITY_TESTED_DISTROS ?= " \
             ubuntu-18.04 \n \
             fedora-28 \n \
             fedora-29 \n \
+            centos-7 \n \
             opensuse-151 \n \
             "
