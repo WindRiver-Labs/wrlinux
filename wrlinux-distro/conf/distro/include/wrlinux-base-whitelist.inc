@@ -22,7 +22,6 @@ PNWHITELIST_networking-layer += " \
     postfix \
     tcpdump \
     crda \
-    wireless-regdb \
 "
 
 PNWHITELIST_openembedded-layer += " \

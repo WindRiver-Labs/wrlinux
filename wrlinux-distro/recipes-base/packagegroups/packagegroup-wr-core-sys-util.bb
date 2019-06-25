@@ -39,7 +39,7 @@ RDEPENDS_${PN} = " \
     usbutils \
     watchdog \
     crda \
-    wireless-regdb \
+    wireless-regdb-static \
     ${@bb.utils.contains('INCOMPATIBLE_LICENSE', 'GPLv3+', '', 'parted', d)} \
     "
 RRECOMMENDS_${PN} = " \
