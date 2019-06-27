@@ -1,0 +1,34 @@
+From 818bf2147ed92a31a3934f926f7bc61f9c90beca Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Thu, 27 Jun 2019 11:37:57 +0800
+Subject: [PATCH] ltp: remove modules in SCENARIO_GROUP_LIST
+
+Because ltp upstream already remove the modules group file by:
+
+    https://github.com/linux-test-project/ltp/commit/6425ade4a7ac2840f0dc0e7d7857157075ba8374
+
+So we should remove it in our scripts.
+
+Upstream-Status: Inappropriate [WR Linux specific change]
+
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ wrLinux_ltp/wr-runltp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wrLinux_ltp/wr-runltp b/wrLinux_ltp/wr-runltp
+index add2f52..616fb22 100755
+--- a/wrLinux_ltp/wr-runltp
++++ b/wrLinux_ltp/wr-runltp
+@@ -48,7 +48,7 @@ LOGFILE="$LOGPATH/LTP_RUN_ON-$EXECUTION_TIME.log"
+ LTPLOG=$LOGPATH/LTP.log
+ SCENARIO_GROUP_LIST="syscalls,fs,fs_perms_simple,fsx,dio,io,mm,ipc,sched,math,nptl,pty,\
+ containers,fs_bind,filecaps,cap_bounds,connectors,fcntl-locktests,timers,commands,\
+-kernel_misc,modules"
++kernel_misc"
+ 
+ RUN_RESUME_TEST=0
+ RUN_SELECTED_GROUP=0
+-- 
+2.7.4
+
