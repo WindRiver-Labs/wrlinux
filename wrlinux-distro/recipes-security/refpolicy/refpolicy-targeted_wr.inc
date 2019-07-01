@@ -21,6 +21,7 @@ SRC_URI += "file://wr-fc-subs_dist-busybox.patch \
             file://wr-fc-rpm.patch \
             file://wr-fc-screen.patch \
             file://wr-fc-usermanage.patch \
+            file://wr-fc-udev-udevadm.patch \
            "
 
 # Other policy fixes
