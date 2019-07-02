@@ -27,6 +27,7 @@ SRC_URI = "\
 	file://saftest-delay-to-ensure-events-added.patch \
 	file://makefile-add-ldflags.patch \
 	file://0001-fix-build-failures.patch \
+	file://saHpiDomainTagSet-set-correct-invalid-character.patch \
 	"
 
 SRC_URI[md5sum] = "af9da2a206739adfe0536aefab776289"

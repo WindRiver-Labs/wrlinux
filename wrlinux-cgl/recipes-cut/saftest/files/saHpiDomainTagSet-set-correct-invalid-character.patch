@@ -1,0 +1,43 @@
+From 28a8e37d988a876e897032f0624ccc8404644335 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 2 Jul 2019 14:38:14 +0800
+Subject: [PATCH] saHpiDomainTagSet: set correct invalid character for case 4-2
+
+This case attempts to set an character in the data of the DomainTag to
+an invalid characters for the given SAHPI_TL_TYPE_UNICODE. The expected
+return value should be SA_ERR_HPI_INVALID_PARAMS.
+In this case, it considers 0xFFFF to be an invalid character and set it
+to the first 2 bytes in the data of DomainTag. Unfortunately, this is
+not correct because 0xFFFF is an valid BMP (Basic Multilingual Plane)
+character. It should set an invalid surrogate pair between
+0xD800-0xDFFF. In this case, we set it to 0xDBDB, this is an illegal
+surrogate pair and the case can return the expected result.
+
+For more information about UTF-16:
+https://en.wikipedia.org/wiki/UTF-16
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ HPI-B.01.01/src/domain/saHpiDomainTagSet/4-2.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/HPI-B.01.01/src/domain/saHpiDomainTagSet/4-2.c b/HPI-B.01.01/src/domain/saHpiDomainTagSet/4-2.c
+index 40a9c76..d0743c5 100644
+--- a/HPI-B.01.01/src/domain/saHpiDomainTagSet/4-2.c
++++ b/HPI-B.01.01/src/domain/saHpiDomainTagSet/4-2.c
+@@ -48,8 +48,8 @@ int Test_Domain(SaHpiSessionIdT sessionId)
+ 	strncpy(NewTag.Data, TEST_STRING, TEST_STRING_SIZE);
+ 
+ 	//Invalid character
+-	NewTag.Data[0] = 0xff;
+-	NewTag.Data[1] = 0xff;
++	NewTag.Data[0] = 0xdb;
++	NewTag.Data[1] = 0xdb;
+ 
+ 	//
+ 	// Retrieve the current DomainTag
+-- 
+2.7.4
+
