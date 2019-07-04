@@ -1,0 +1,65 @@
+From 637bc998a5ce8157fef5c2d2a39a1e2bf0e6420b Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 4 Jul 2019 16:36:20 +0800
+Subject: [PATCH] vrf-create: do not create /var/run and /var/lock
+
+We don't need to create /var/run and /var/lock in rootfs layout since
+they should be symbolic links of /run and /run/lock. The
+systemd-tmpfiles will create them when booting.
+Since systemd 240, it will check pid file of service in /run even if the
+PIDFile of service points to /var/run. So the separated directories /run
+and /var/run will make systemd can not check the pid file and get the
+correct status of services.
+
+Upstream-Status: Inappropriate [no upstream]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ package/wrlinux-cgl_package.list | 7 ++++---
+ src/vrf-create                   | 3 +--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/package/wrlinux-cgl_package.list b/package/wrlinux-cgl_package.list
+index 8cbf667..d466c8b 100644
+--- a/package/wrlinux-cgl_package.list
++++ b/package/wrlinux-cgl_package.list
+@@ -69,7 +69,7 @@ SYSTEMD_VRF_PACKAGE_FUNCTION_func_last_run () {
+       mkdir -p ${VRF_ROOTFS}/etc/systemd/system/wr-vrf.target.wants
+   fi
+ 
+-  for i in babeld bgpd ospf6d ospfd ripd ripngd zebra; do \
++  for i in bgpd ospf6d ospfd ripd ripngd zebra; do \
+       ln -s /lib/systemd/system/$i.service ${VRF_ROOTFS}/etc/systemd/system/wr-vrf.target.wants/$i.service
+   done
+ 
+@@ -104,10 +104,11 @@ SYSV_VRF_PACKAGE_FUNCTION_quagga () {
+     dup_user_group quagga quagga
+ }
+ 
+-SYSTEMD_VRF_PACKAGE_UNION_quagga="/var/run/quagga /var/log/quagga"
++SYSTEMD_VRF_PACKAGE_UNION_quagga="/var/log/quagga"
+ SYSTEMD_VRF_PACKAGE_quagga="$SYSTEMD_VRF_PACKAGE_UNION_quagga \
+     /etc/default/quagga /etc/quagga/* \
+-    /lib/systemd/system/zebra.service
++    /etc/tmpfiles.d/quagga.conf \
++    /lib/systemd/system/zebra.service \
+ "
+ SYSTEMD_VRF_PACKAGE_FUNCTION_quagga () {
+     #user: quagga group:quagga, quaggavty
+diff --git a/src/vrf-create b/src/vrf-create
+index e845498..e03f0c0 100755
+--- a/src/vrf-create
++++ b/src/vrf-create
+@@ -583,8 +583,7 @@ get_rootfs_baselayout () {
+         $WHERE/proc $WHERE/sys	\
+         $WHERE/dev  $WHERE/tmp	\
+         $WHERE/etc  \
+-        $WHERE/var/run  $WHERE/var/log	\
+-        $WHERE/var/lock/subsys 	\
++        $WHERE/var/log	\
+ 	$WHERE/var/lib	\
+ 	$WHERE/var/mail	\
+ 	$WHERE/usr		\
+-- 
+2.7.4
+
