@@ -188,7 +188,7 @@ runstep_6()
         echo "SFA.1.0 Kernel Panic Handler Enhancements                   [  FAIL  ]" >> $test_report
         cutfail
     fi
-    cat $TESTROOT/crash_output.log | grep "SysRq : Trigger a crash" && cat $TESTROOT/crash_output.log | grep  machine_kexec
+    cat $TESTROOT/crash_output.log | grep "Trigger a crash" && cat $TESTROOT/crash_output.log | grep  machine_kexec
     if [ $? -ne 0 ]; then
         echo "SFA.1.0 Kernel Panic Handler Enhancements                   [  FAIL  ]" >> $test_report
         cutfail
