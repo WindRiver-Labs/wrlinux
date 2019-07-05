@@ -38,15 +38,21 @@ search_keyword_with_subject() {
 	local system_events_line= revert_system_events_line=
 	local start_delete= end_delete=
 
+	if grep "Content-Transfer-Encoding: quoted-printable" $mailfile;then
+	    seperator="=3D-=3D-=3D-"
+	else
+	    seperator="=-=-=-"
+	fi
+
 	while true; do
-		all_lines=$(grep --line-number -B1 '=-=-=-' "$mailfile")
+		all_lines=$(grep --line-number -B1 $seperator "$mailfile")
 		if [ "$debug" = "1" ]; then
 			echo "all_lines=$all_lines"
 		fi
 
 		#remove the group seperator and =-=-=-
 		line_numbers=$(echo "$all_lines" | grep -v '\--' | \
-				grep -v '=-=-=-')
+				grep -v $seperator)
 		if [ "$debug" = "1" ]; then
 			echo "line_numbers=$line_numbers"
 		fi

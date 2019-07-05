@@ -41,7 +41,7 @@ checkerr()
 error()
 {
 echo "Error step : $1"
-if [ $2 -eq 1 ]
+if [ "$2" == "1" ]
 then
 	result NOTRUN
 	exit 1
