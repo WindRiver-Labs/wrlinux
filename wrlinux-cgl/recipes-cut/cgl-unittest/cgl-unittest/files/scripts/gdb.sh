@@ -85,7 +85,7 @@ expect {
 
 expect	{
 	eof  {exit 1}
-	"*alone (* at *mthread.c"	 {}
+	"hit Breakpoint 1,*alone*(*at*mthread.c"	 {}
 	"*Unable to find libthread_db matching*"  { send_tty " glibc-debuginfo not installed, please install it.\r\n" ; exit 11 }
 	timeout { send_tty "##GDB## timeout waiting for breakpoint\r\n"; exit 5 }
 	}
