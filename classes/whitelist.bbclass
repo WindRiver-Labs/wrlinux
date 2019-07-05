@@ -18,6 +18,11 @@
 #
 # PNWHITELIST_REASON_layername = "not supported by ${DISTRO}"
 
+# Generic reason
+PNWHITELIST_CURRENT_LAYER = "${@bb.utils.get_file_layer(d.getVar('FILE'), d)}"
+PNWHITELIST_REASON = "Not supported in this configuration by Wind River. To override, add to your local.conf: PNWHITELIST_${PNWHITELIST_CURRENT_LAYER} += '${BPN}'"
+PNWHITELIST = ""
+
 python() {
     layer = bb.utils.get_file_layer(d.getVar('FILE'), d)
     if layer:
