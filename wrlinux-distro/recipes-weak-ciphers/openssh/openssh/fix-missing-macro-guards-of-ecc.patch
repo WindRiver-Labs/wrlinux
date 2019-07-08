@@ -1,0 +1,81 @@
+Fix link error of openssh when openssl disable ec suport.
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/kexgen.c b/kexgen.c
+index 2abbb9e..5ac2f4c 100644
+--- a/kexgen.c
++++ b/kexgen.c
+@@ -109,9 +109,11 @@ kex_gen_client(struct ssh *ssh)
+ 	case KEX_DH_GRP18_SHA512:
+ 		r = kex_dh_keypair(kex);
+ 		break;
++# ifdef OPENSSL_HAS_ECC
+ 	case KEX_ECDH_SHA2:
+ 		r = kex_ecdh_keypair(kex);
+ 		break;
++# endif
+ #endif
+ 	case KEX_C25519_SHA256:
+ 		r = kex_c25519_keypair(kex);
+@@ -177,9 +179,11 @@ input_kex_gen_reply(int type, u_int32_t seq, struct ssh *ssh)
+ 	case KEX_DH_GRP18_SHA512:
+ 		r = kex_dh_dec(kex, server_blob, &shared_secret);
+ 		break;
++# ifdef OPENSSL_HAS_ECC
+ 	case KEX_ECDH_SHA2:
+ 		r = kex_ecdh_dec(kex, server_blob, &shared_secret);
+ 		break;
++# endif
+ #endif
+ 	case KEX_C25519_SHA256:
+ 		r = kex_c25519_dec(kex, server_blob, &shared_secret);
+@@ -272,10 +276,12 @@ input_kex_gen_init(int type, u_int32_t seq, struct ssh *ssh)
+ 		r = kex_dh_enc(kex, client_pubkey, &server_pubkey,
+ 		    &shared_secret);
+ 		break;
++# ifdef OPENSSL_HAS_ECC
+ 	case KEX_ECDH_SHA2:
+ 		r = kex_ecdh_enc(kex, client_pubkey, &server_pubkey,
+ 		    &shared_secret);
+ 		break;
++# endif
+ #endif
+ 	case KEX_C25519_SHA256:
+ 		r = kex_c25519_enc(kex, client_pubkey, &server_pubkey,
+diff --git a/ssh-pkcs11-helper.c b/ssh-pkcs11-helper.c
+index 97fb121..eb09d70 100644
+--- a/ssh-pkcs11-helper.c
++++ b/ssh-pkcs11-helper.c
+@@ -207,6 +207,7 @@ process_sign(void)
+ 					slen = ret;
+ 					ok = 0;
+ 				}
++#ifdef OPENSSL_HAS_ECC
+ 			} else if (key->type == KEY_ECDSA) {
+ 				xslen = ECDSA_size(key->ecdsa);
+ 				signature = xmalloc(xslen);
+@@ -219,6 +220,7 @@ process_sign(void)
+ 					error("%s: ECDSA_sign"
+ 					    " returns %d", __func__, ret);
+ 				slen = xslen;
++#endif
+ 			} else
+ 				error("%s: don't know how to sign with key "
+ 				    "type %d", __func__, (int)key->type);
+diff --git a/ssh-pkcs11.c b/ssh-pkcs11.c
+index 70f06bf..3bf9dc3 100644
+--- a/ssh-pkcs11.c
++++ b/ssh-pkcs11.c
+@@ -1043,7 +1043,9 @@ fail:
+ 		free(cert_attr[i].pValue);
+ 	X509_free(x509);
+ 	RSA_free(rsa);
++#ifdef OPENSSL_HAS_ECC
+ 	EC_KEY_free(ec);
++#endif
+ 
+ 	return (key);
+ }
