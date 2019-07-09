@@ -1,34 +1,35 @@
-From dba5a375f6f6cb05ff1fdf78a92ddbe6eab0d17f Mon Sep 17 00:00:00 2001
+From af2a6788e385a7c9d736a1f28bdea4a5dbe9e0f2 Mon Sep 17 00:00:00 2001
 From: Yi Zhao <yi.zhao@windriver.com>
-Date: Mon, 1 Jul 2019 10:25:13 +0800
-Subject: [PATCH] udev.fc: remove file context of /usr/libexec/udevadm
+Date: Tue, 9 Jul 2019 13:47:24 +0800
+Subject: [PATCH] udev.fc: fix file context of /usr/libexec/udevadm
 
 The file context of /bin/udevadm was changed from udev_exec_t to
 udevadm_exec_t in refpolicy commit
 ba31e59cd17a549acb675c0b7d8cc6fdc43ea896. The /usr/libexec/udevadm is
-hard link of /bin/udevadm, we don't need to label it twice. So remove
-the file context of /usr/libexec/udevadm.
+hard link of /bin/udevadm, we also need to label it with same context.
+Otherwise the hard link files that have different contexts are labeled
+based on the last matching specification.
 
 Upstream-Status: Pending
 
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 ---
- policy/modules/system/udev.fc | 2 --
- 1 file changed, 2 deletions(-)
+ policy/modules/system/udev.fc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/policy/modules/system/udev.fc b/policy/modules/system/udev.fc
-index 2919c0b..606ad51 100644
+index 2919c0b..e17f687 100644
 --- a/policy/modules/system/udev.fc
 +++ b/policy/modules/system/udev.fc
-@@ -28,8 +28,6 @@ ifdef(`distro_debian',`
+@@ -28,7 +28,7 @@ ifdef(`distro_debian',`
  /usr/sbin/udevstart	--	gen_context(system_u:object_r:udev_exec_t,s0)
  /usr/sbin/wait_for_sysfs --	gen_context(system_u:object_r:udev_exec_t,s0)
  
 -/usr/libexec/udevadm	--	gen_context(system_u:object_r:udev_exec_t,s0)
--
++/usr/libexec/udevadm	--	gen_context(system_u:object_r:udevadm_exec_t,s0)
+ 
  ifdef(`distro_redhat',`
  /usr/sbin/start_udev --	gen_context(system_u:object_r:udev_exec_t,s0)
- ')
 -- 
 2.7.4
 
