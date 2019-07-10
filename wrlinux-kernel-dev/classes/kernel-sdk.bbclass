@@ -1,4 +1,5 @@
 do_populate_sdk[postfuncs] =+ "kernel_sdkpostprocess"
+do_populate_sdk[depends] =+ "bison-native:do_populate_sysroot"
 python kernel_sdkpostprocess () {
 
     import os, subprocess
@@ -22,7 +23,7 @@ python kernel_sdkpostprocess () {
         repack_sdk = 1
 
     if repack_sdk:
-        bb.build.exec_func('tar_sdk', d)
+        bb.build.exec_func('archive_sdk', d)
         bb.build.exec_func('create_shar', d)
 
     bb.note( "kernel SDK: done" )
