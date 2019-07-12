@@ -1,0 +1,120 @@
+From 1035c07d5a504d5b50a34aff8b957ee4c2535a99 Mon Sep 17 00:00:00 2001
+From: He Zhe <zhe.he@windriver.com>
+Date: Fri, 12 Jul 2019 12:37:22 +0800
+Subject: [PATCH] vrf: Fix missing /var and lxc rootfs populating
+
+*VRF_PACKAGE* and *VRF_PACKAGE_FUNCTION* are used to duplicate container-needed
+directories and files to lxc rootfs before mounting. However, with these
+approaches, some necessary directories that do not exist on host machine cannot
+be created on lxc rootfs.
+
+Specifically, /var was previously created on lxc rootfs just because
+/var/run/quagga was in SYSTEMD_VRF_PACKAGE_UNION_quagga and also happened to
+exist on host machine. Since /var/run/quagga was removed from
+SYSTEMD_VRF_PACKAGE_UNION_quagga, nothing makes sure /var is created and thus
+causes the following error:
+
+lxc-start vrf_1 20190708105749.308 ERROR utils - utils.c:safe_mount:1187 -
+No such file or directory - Failed to mount "/vrf/fs/mnt.vrf_1/var" onto
+"/usr/lib64/lxc/rootfs//var"
+
+This patch,
+ - adds a _default package for *VRF_PACKAGE* and *VRF_PACKAGE_FUNCTION* to
+   enable duplication or creation of necessary files and directories that do not
+   belong to any specific package;
+ - adds create_only_dir to create directories without checking the existence of
+   which on host machine;
+ - creates quagga related things by create_only_dir.
+
+Upstream-Status: Inappropriate [no upstream]
+
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ package/wrlinux-cgl_package.list | 25 ++++++++++++++++++++++---
+ src/vrf-helper.in                | 11 +++++++++++
+ 2 files changed, 33 insertions(+), 3 deletions(-)
+
+diff --git a/package/wrlinux-cgl_package.list b/package/wrlinux-cgl_package.list
+index d466c8b..ed1fcbd 100644
+--- a/package/wrlinux-cgl_package.list
++++ b/package/wrlinux-cgl_package.list
+@@ -21,7 +21,7 @@
+ #will be run at the end of make rootfs,
+ #user can write a startup script
+ 
+-VRF_PACKAGE_LIST="quagga sshd rsyslog ncurses"
++VRF_PACKAGE_LIST="default quagga sshd rsyslog ncurses"
+ #VRF_PACKAGE_LIST="quagga syslogng sshd \
+ #                  nfs auditd ppp logrotate \
+ #                  xinetd apache2 radiusd cron \
+@@ -92,7 +92,21 @@ ${VRF_ROOTFS}/etc/systemd/system/wr-vrf.target.wants/vrf-getty@tty1.service
+   fi
+ }
+ 
+-SYSV_VRF_PACKAGE_UNION_quagga="/var/run/quagga /var/log/quagga"
++SYSV_VRF_PACKAGE_UNION_default=""
++SYSV_VRF_PACKAGE_default="$SYSV_VRF_PACKAGE_UNION_default \
++"
++SYSV_VRF_PACKAGE_FUNCTION_default () {
++    create_only_dir /var
++}
++
++SYSTEMD_VRF_PACKAGE_UNION_default=""
++SYSTEMD_VRF_PACKAGE_default="$SYSTEMD_VRF_PACKAGE_UNION_default \
++"
++SYSTEMD_VRF_PACKAGE_FUNCTION_default () {
++    create_only_dir /var
++}
++
++SYSV_VRF_PACKAGE_UNION_quagga=""
+ SYSV_VRF_PACKAGE_quagga="$SYSV_VRF_PACKAGE_UNION_quagga \
+     /etc/default/quagga /etc/default/watchquagga /etc/quagga/* \
+     ${VRF_INITD_BASE}/init.d/watchquagga \
+@@ -102,9 +116,12 @@ SYSV_VRF_PACKAGE_quagga="$SYSV_VRF_PACKAGE_UNION_quagga \
+ SYSV_VRF_PACKAGE_FUNCTION_quagga () {
+     #user: quagga group:quagga, quaggavty
+     dup_user_group quagga quagga
++
++    create_only_dir /var/run/quagga
++    create_only_dir /var/log/quagga
+ }
+ 
+-SYSTEMD_VRF_PACKAGE_UNION_quagga="/var/log/quagga"
++SYSTEMD_VRF_PACKAGE_UNION_quagga=""
+ SYSTEMD_VRF_PACKAGE_quagga="$SYSTEMD_VRF_PACKAGE_UNION_quagga \
+     /etc/default/quagga /etc/quagga/* \
+     /etc/tmpfiles.d/quagga.conf \
+@@ -113,6 +130,8 @@ SYSTEMD_VRF_PACKAGE_quagga="$SYSTEMD_VRF_PACKAGE_UNION_quagga \
+ SYSTEMD_VRF_PACKAGE_FUNCTION_quagga () {
+     #user: quagga group:quagga, quaggavty
+     dup_user_group quagga quagga
++
++    create_only_dir /var/log/quagga
+ }
+ 
+ SYSTEMD_VRF_PACKAGE_UNION_rsyslog=""
+diff --git a/src/vrf-helper.in b/src/vrf-helper.in
+index eacfe78..960cc75 100755
+--- a/src/vrf-helper.in
++++ b/src/vrf-helper.in
+@@ -789,6 +789,17 @@ dup_only_dir () {
+     done
+ }
+ 
++# This function creates whatever directory passed,
++# without checking the existence of which on host machine.
++create_only_dir () {
++    local DIR
++
++    for DIR in $@
++    do
++        mkdir -p $VRF_ROOTFS$DIR
++    done
++}
++
+ dup_only_dir_real () {
+     local OLD=$VRF_ROOTFS
+ 
+-- 
+2.7.4
+
