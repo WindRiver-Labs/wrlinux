@@ -23,6 +23,7 @@ SRC_URI    = "file://vrf-1.1.tgz \
               file://vrf-attach-update-the-network-configuration-key.patch \
               file://vrf-create-do-not-create-var-run-and-var-lock.patch \
               file://vrf-fix-missing-var-and-lxc-rootfs-populating.patch \
+              file://vrf-enable-systemd-tmpfiles-service-for-unionfs.patch \
 "
 
 

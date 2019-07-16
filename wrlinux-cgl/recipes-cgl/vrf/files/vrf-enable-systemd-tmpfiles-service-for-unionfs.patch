@@ -1,0 +1,37 @@
+From 1e8769f8a3082c8900519d1604518ff7e7021ec4 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 16 Jul 2019 16:20:20 +0800
+Subject: [PATCH] wrlinux-cgl_package.list: enable
+ systemd-tmpfiles-setup.service for unionfs
+
+Since systemd 240, it will check pid file of service in /run even if the
+PIDFile of service points to /var/run. So the separated directories /run
+and /var/run will make systemd can not check the pid file and get the
+correct status of services.
+
+We don't need to create /var/run in rootfs layout since it should be
+symbolic link of /run. So enable systemd-tmpfiles-setup.service to
+create it when booting for unionfs.
+
+Upstream-Status: Inappropriate [no upstream]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ package/wrlinux-cgl_package.list | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/package/wrlinux-cgl_package.list b/package/wrlinux-cgl_package.list
+index ed1fcbd..eed3102 100644
+--- a/package/wrlinux-cgl_package.list
++++ b/package/wrlinux-cgl_package.list
+@@ -87,7 +87,6 @@ ${VRF_ROOTFS}/etc/systemd/system/wr-vrf.target.wants/vrf-getty@tty1.service
+   if [ "$fs" != "union" ]; then
+       ln -s /dev/null ${VRF_ROOTFS}/etc/systemd/system/systemd-firstboot.service
+   else
+-      ln -s /dev/null ${VRF_ROOTFS}/etc/systemd/system/systemd-tmpfiles-setup.service
+       ln -s /dev/null ${VRF_ROOTFS}/etc/systemd/system/systemd-tmpfiles-clean.service
+   fi
+ }
+-- 
+2.7.4
+
