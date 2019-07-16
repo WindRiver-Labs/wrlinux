@@ -1,0 +1,37 @@
+From fea59a98a289db303516ac1bfc49f3cf411969ee Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 16 Jul 2019 16:25:45 +0800
+Subject: [PATCH] wrlinux-cgl_package.list: disable systemd-tmpfiles to create
+ /run/nologin
+
+The /run/nologin file is created by systemd-tmpfiles-setup.service. It
+is then removed by systemd-user-sessions.service. But in a container we
+don't need this file otherwise it will print warning when login:
+"Unprivileged users are not permitted to log in yet"
+
+Upstream-Status: Inappropriate [no upstream]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ package/wrlinux-cgl_package.list | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/package/wrlinux-cgl_package.list b/package/wrlinux-cgl_package.list
+index eed3102..b5f65c0 100644
+--- a/package/wrlinux-cgl_package.list
++++ b/package/wrlinux-cgl_package.list
+@@ -84,6 +84,11 @@ ${VRF_ROOTFS}/etc/systemd/system/wr-vrf.target.wants/vrf-getty@tty1.service
+       ln -s /dev/null ${VRF_ROOTFS}/etc/systemd/system/$j.socket
+   done
+ 
++  if [ ! -d ${VRF_ROOTFS}/etc/tmpfiles.d ]; then
++      mkdir -p ${VRF_ROOTFS}/etc/tmpfiles.d
++  fi
++  ln -s /dev/null ${VRF_ROOTFS}/etc/tmpfiles.d/systemd-nologin.conf
++
+   if [ "$fs" != "union" ]; then
+       ln -s /dev/null ${VRF_ROOTFS}/etc/systemd/system/systemd-firstboot.service
+   else
+-- 
+2.7.4
+
