@@ -215,7 +215,7 @@ ssh root@${CLIENT_IP} -- ps -e | grep drbd
 # wait 10s to let the service be stable
 sleep 10
 # check drbd status
-drbd-overview | grep "Connected Primary/Secondary" || cutfail
+drbdadm status | grep "r0 role:Primary" && drbdadm status | grep "peer role:Secondary" || cutfail
 
 # format /dev/drbd1 on the target
 mkfs.ext4 /dev/drbd1
@@ -236,13 +236,13 @@ umount /dev/drbd1
 drbdadm secondary r0
 
 # check drbd status
-drbd-overview|grep "Connected Secondary/Secondary" || cutfail
+drbdadm status | grep "r0 role:Secondary" && drbdadm status | grep "peer role:Secondary" || cutfail
 
 # Setup client as primary
 ssh root@${CLIENT_IP} -- drbdadm primary --force r0
 
 # check drbd status
-drbd-overview | grep "Connected Secondary/Primary" || cutfail
+drbdadm status | grep "r0 role:Secondary" && drbdadm status | grep "peer role:Primary" || cutfail
 
 # check the file md5 on client
 ssh root@${CLIENT_IP}  -- "mkdir -p $TMP_DIR1 && mount /dev/drbd1 $TMP_DIR1"
