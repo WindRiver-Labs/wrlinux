@@ -1,5 +1,5 @@
-This template adds packagegroup-xfce, which includes
-packages required to run the XFCE desktop environment.
+This template adds packagegroup-xfce-extended from layer meta-xfce, which
+includes packages required to run the Xfce desktop environment.
 
 It is supported for x86, x86-64 and arm targets only.
 

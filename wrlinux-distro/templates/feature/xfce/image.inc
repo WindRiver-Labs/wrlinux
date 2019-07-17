@@ -1,1 +1,4 @@
-IMAGE_INSTALL += "packagegroup-xfce"
+IMAGE_INSTALL += " \
+    packagegroup-xfce-extended \
+    wr-themes \
+"
