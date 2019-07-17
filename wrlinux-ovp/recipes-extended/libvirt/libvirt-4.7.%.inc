@@ -18,7 +18,7 @@ EXTRA_OECONF += "--with-qemu-user=qemu \
 # Use this if we want to configure like 1.0.0.
 # We have added yajl because without it libvmi will not initialize.
 #
-PACKAGECONFIG = "qemu lxc test remote macvtap libvirtd udev yajl \
+PACKAGECONFIG = "gnutls qemu lxc test remote macvtap libvirtd udev yajl \
 		 python ebtables fuse iproute2 \
 		 firewalld libpcap \
 		 ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux', '', d)} \
