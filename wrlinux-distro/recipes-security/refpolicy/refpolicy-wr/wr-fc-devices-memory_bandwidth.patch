@@ -1,0 +1,27 @@
+From 4e6be9eefd848a466d8df9d836e08c8689bf47e7 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 19 Jul 2019 10:20:21 +0800
+Subject: [PATCH] refpolicy: add file context for /dev/memory_bandwidth
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/kernel/devices.fc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/kernel/devices.fc b/policy/modules/kernel/devices.fc
+index 3d613e3..91d0f51 100644
+--- a/policy/modules/kernel/devices.fc
++++ b/policy/modules/kernel/devices.fc
+@@ -63,6 +63,7 @@
+ /dev/mcelog		-c	gen_context(system_u:object_r:kmsg_device_t,mls_systemhigh)
+ /dev/mei		-c	gen_context(system_u:object_r:mei_device_t,s0)
+ /dev/mem		-c	gen_context(system_u:object_r:memory_device_t,mls_systemhigh)
++/dev/memory_bandwidth	-c	gen_context(system_u:object_r:memory_device_t,mls_systemhigh)
+ /dev/mergemem		-c	gen_context(system_u:object_r:memory_device_t,mls_systemhigh)
+ /dev/mga_vid.*		-c	gen_context(system_u:object_r:xserver_misc_device_t,s0)
+ /dev/mice		-c	gen_context(system_u:object_r:mouse_device_t,s0)
+-- 
+2.7.4
+
