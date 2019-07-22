@@ -168,4 +168,8 @@ SANITY_TESTED_DISTROS ?= " \
             fedora-30 \n \
             centos-7 \n \
             opensuse-151 \n \
+            opensuseleap-15.0 \n \
+            rhel-7.6 \n \
+            rhel-8.0 \n \
+            sled-15 \n \
             "
