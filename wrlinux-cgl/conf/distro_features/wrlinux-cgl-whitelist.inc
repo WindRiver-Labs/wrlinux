@@ -16,7 +16,6 @@ PNWHITELIST_cgl-common += " \
 PNWHITELIST_CGL_COMMON = " \
     cluster-glue \
     crmsh \
-    libhtml-tagset-perl \
     libmailtools-perl \
     libsocket6-perl \
     libtest-pod-perl \
@@ -105,6 +104,7 @@ PNWHITELIST_META_PERL = " \
     libdigest-hmac-perl \
     libdigest-sha1-perl \
     libhtml-parser-perl \
+    libhtml-tagset-perl \
     libio-socket-ssl-perl \
     libnet-dns-perl \
     libnet-dns-sec-perl \
