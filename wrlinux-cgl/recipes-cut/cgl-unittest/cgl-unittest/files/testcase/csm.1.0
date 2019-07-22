@@ -84,7 +84,7 @@ valid_clientip()
     ip4=`echo $CLIENT_IP | awk -F . '{print $4}'`
     for testip in $ip1 $ip2 $ip3 $ip4
     do
-        if [ $testip -ge 255 ] || [ $testip -le 1 ]; then
+        if [ $testip -ge 255 ] || [ $testip -lt 1 ]; then
             cuterr "Invalid client ip"
         fi
     done
