@@ -16,7 +16,6 @@ SRC_URI += " file://README \
              file://0013-Fix-POSIX-mmap-5-1-failure-in-cgl-platform.patch \
              file://0014-Add-testrun-plan-for-realtime-tests.patch \
              file://0016-Fix-invalid-argument-error-for-POSIX-test-case-pi_test.patch \
-             file://0017-Change-some-auto-detecting-options-to-configurable-o.patch \
              file://0018-posix-skip-the-test-pthread_barrier_destroy_2-1.patch \
              file://0019-wrLinux_ltp-Remove-admin_tools.patch \
              file://0020-ltp-remove-modules-in-SCENARIO_GROUP_LIST.patch \
