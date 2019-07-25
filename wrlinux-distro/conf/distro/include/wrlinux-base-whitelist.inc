@@ -80,6 +80,11 @@ PNWHITELIST_meta-python += " \
     nativesdk-python3-pytz \
     python-m2crypto \
     python-typing \
+    python3-pyyaml \
+    python3-jinja2 \
+    python3-markupsafe \
+    python3-pyparsing \
+    python3-cython \
 "
 
 PNWHITELIST_webserver += " \
@@ -110,4 +115,9 @@ PACKAGECONFIG_remove_pn-nmap = "zenmap"
 
 PNWHITELIST_selinux += " \
     audit \
+"
+
+PNWHITELIST_scanners-layer += " \
+    openscap \
+    scap-security-guide \
 "
