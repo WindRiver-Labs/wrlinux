@@ -1,0 +1,8 @@
+This template will enable features and add packages for STIG compliance.
+
+The Security Technical Implementation Guides (STIGs) are the configuration
+standards for devices/systems.
+The STIGs contain technical guidance to "lock down" information systems/software
+that might otherwise be vulnerable to a malicious computer attack.
+
+To use the template, add "--templates feature/stig" as a setup option.
