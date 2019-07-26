@@ -13,11 +13,16 @@
 
 TOPDIR=${CUTDIR-/opt/cut/}
 . $TOPDIR/function.sh
-
+# a flag to mark whether need to clean the ipv6 address or not
+ipv6_set=false
 clean()
 {
 	echo "Clean System..."
 	pkill -x mip6d
+	# clean up the ipv6 address in case the address will affect other tests
+	if [ "$ipv6_set" = true ]; then
+		ifconfig ${ETH_TEST} inet6 del 2001:db8:ffff:0::1000/64
+	fi
 	echo "Finish"
 }
 
@@ -30,7 +35,11 @@ if [ x"$ETH_TEST" = x ]; then
 	cutfail
 fi
 
-ifconfig ${ETH_TEST} inet6 add 2001:db8:ffff:0::1000/64
+ifconfig ${ETH_TEST} | grep 'inet6 addr: 2001:db8:ffff::1000/64' > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+	ifconfig ${ETH_TEST} inet6 add 2001:db8:ffff:0::1000/64
+	ipv6_set=true
+fi
 
 # Generate configure file
 cat > /tmp/mip6d.conf << EOF
