@@ -1,0 +1,147 @@
+From 34a6efac33f1077bfc0156d92e421d3bf6b005fe Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 26 Jul 2019 13:35:53 +0800
+Subject: [PATCH] mariadb: fix openssl no des
+
+When openssl disable des with configure option 'no-des', it doesn't
+provide des related header files and functions. That causes mariadb
+compile failed.
+
+Fix it by checking macro OPENSSL_NO_DES to use openssl des related
+library conditionaly.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ sql/des_key_file.cc |  2 ++
+ sql/des_key_file.h  |  2 ++
+ sql/item_strfunc.cc | 16 ++++++++++++++++
+ sql/mysqld.cc       |  2 ++
+ sql/sql_reload.cc   |  2 ++
+ 5 files changed, 24 insertions(+)
+
+diff --git a/sql/des_key_file.cc b/sql/des_key_file.cc
+index bfbe04f..5e13514 100644
+--- a/sql/des_key_file.cc
++++ b/sql/des_key_file.cc
+@@ -20,6 +20,7 @@
+ #include <m_ctype.h>
+ 
+ #ifdef HAVE_OPENSSL
++#ifndef OPENSSL_NO_DES
+ 
+ struct st_des_keyschedule des_keyschedule[10];
+ uint   des_default_key;
+@@ -103,4 +104,5 @@ load_des_key_file(const char *file_name)
+   mysql_mutex_unlock(&LOCK_des_key_file);
+   DBUG_RETURN(result);
+ }
++#endif /* OPENSSL_NO_DES */
+ #endif /* HAVE_OPENSSL */
+diff --git a/sql/des_key_file.h b/sql/des_key_file.h
+index 847cd76..58a6193 100644
+--- a/sql/des_key_file.h
++++ b/sql/des_key_file.h
+@@ -21,6 +21,7 @@
+ 
+ #include "violite.h"                /* DES_cblock, DES_key_schedule */
+ 
++#ifndef OPENSSL_NO_DES
+ struct st_des_keyblock
+ {
+   DES_cblock key1, key2, key3;
+@@ -35,6 +36,7 @@ extern struct st_des_keyschedule des_keyschedule[10];
+ extern uint des_default_key;
+ 
+ bool load_des_key_file(const char *file_name);
++#endif /* OPENSSL_NO_DES */
+ #endif /* HAVE_OPENSSL */
+ 
+ #endif /* DES_KEY_FILE_INCLUDED */
+diff --git a/sql/item_strfunc.cc b/sql/item_strfunc.cc
+index 3d2b3ef..dec16d1 100644
+--- a/sql/item_strfunc.cc
++++ b/sql/item_strfunc.cc
+@@ -705,6 +705,7 @@ String *Item_func_des_encrypt::val_str(String *str)
+ {
+   DBUG_ASSERT(fixed == 1);
+ #if defined(HAVE_OPENSSL) && !defined(EMBEDDED_LIBRARY)
++#ifndef OPENSSL_NO_DES
+   uint code= ER_WRONG_PARAMETERS_TO_PROCEDURE;
+   DES_cblock ivec;
+   struct st_des_keyblock keyblock;
+@@ -790,6 +791,12 @@ String *Item_func_des_encrypt::val_str(String *str)
+   push_warning_printf(thd,Sql_condition::WARN_LEVEL_WARN,
+                       code, ER_THD(thd, code),
+                       "des_encrypt");
++#else /* OPENSSL_NO_DES */
++  THD *thd= current_thd;
++  push_warning_printf(thd, Sql_condition::WARN_LEVEL_WARN,
++                      ER_FEATURE_DISABLED, ER_THD(thd, ER_FEATURE_DISABLED),
++                      "des_encrypt", "--with-ssl");
++#endif /* OPENSSL_NO_DES */
+ #else
+   THD *thd= current_thd;
+   push_warning_printf(thd, Sql_condition::WARN_LEVEL_WARN,
+@@ -805,6 +812,7 @@ String *Item_func_des_decrypt::val_str(String *str)
+ {
+   DBUG_ASSERT(fixed == 1);
+ #if defined(HAVE_OPENSSL) && !defined(EMBEDDED_LIBRARY)
++#ifndef OPENSSL_NO_DES
+   uint code= ER_WRONG_PARAMETERS_TO_PROCEDURE;
+   DES_cblock ivec;
+   struct st_des_keyblock keyblock;
+@@ -874,6 +882,14 @@ String *Item_func_des_decrypt::val_str(String *str)
+                         "des_decrypt");
+   }
+ wrong_key:
++#else /* OPENSSL_NO_DES */
++  {
++    THD *thd= current_thd;
++    push_warning_printf(thd, Sql_condition::WARN_LEVEL_WARN,
++                        ER_FEATURE_DISABLED, ER_THD(thd, ER_FEATURE_DISABLED),
++                        "des_decrypt", "--with-ssl");
++  }
++#endif /* OPENSSL_NO_DES */
+ #else
+   {
+     THD *thd= current_thd;
+diff --git a/sql/mysqld.cc b/sql/mysqld.cc
+index 4b31b78..aedf7bb 100644
+--- a/sql/mysqld.cc
++++ b/sql/mysqld.cc
+@@ -4997,8 +4997,10 @@ static void init_ssl()
+   {
+     have_ssl= SHOW_OPTION_DISABLED;
+   }
++#ifndef OPENSSL_NO_DES
+   if (des_key_file)
+     load_des_key_file(des_key_file);
++#endif /* OPENSSL_NO_DES */
+ #endif /* HAVE_OPENSSL && ! EMBEDDED_LIBRARY */
+ }
+ 
+diff --git a/sql/sql_reload.cc b/sql/sql_reload.cc
+index 930c00f..da710ef 100644
+--- a/sql/sql_reload.cc
++++ b/sql/sql_reload.cc
+@@ -367,6 +367,7 @@ bool reload_acl_and_cache(THD *thd, unsigned long long options,
+   }
+ #endif
+ #ifdef HAVE_OPENSSL
++#ifndef OPENSSL_NO_DES
+    if (options & REFRESH_DES_KEY_FILE)
+    {
+      if (des_key_file && load_des_key_file(des_key_file))
+@@ -375,6 +376,7 @@ bool reload_acl_and_cache(THD *thd, unsigned long long options,
+        result= 1;
+      }
+    }
++#endif /* OPENSSL_NO_DES */
+ #endif
+ #ifdef HAVE_REPLICATION
+  if (options & REFRESH_SLAVE)
+-- 
+2.7.4
+
