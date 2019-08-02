@@ -105,7 +105,6 @@ PNWHITELIST_security += " \
 "
 
 PNWHITELIST_integrity += " \
-    keyutils \
     ima-inspect \
     ima-evm-utils \
 "
