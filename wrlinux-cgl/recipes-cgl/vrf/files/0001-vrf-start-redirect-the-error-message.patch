@@ -1,0 +1,47 @@
+From 0031d1fed44c23fc82e16a6961d0eb822043f47a Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Fri, 2 Aug 2019 10:21:20 +0800
+Subject: [PATCH] vrf-start: redirect the error message
+
+After vrf started via "lxc-start", we check
+the service files such as below to double check
+the vrf started successfully.
+/sys/fs/cgroup/systemd/lxc.payload/vrf_1/system.slice/zebra.service/tasks
+/sys/fs/cgroup/systemd/lxc.payload/vrf_1/system.slice/systemd-tmpfiles-setup-dev.service/tasks
+
+The above tasks files are gotten via "find $VRF_PATH -name tasks",
+but the service such as systemd-tmpfiles-setup-dev.service
+is special, it will exit once it finishs its start.
+So once use "find $VRF_PATH -name tasks |xargs -d'\n' cat |wc -l",
+there maybe come below error message depends
+on the service exits or not when execute cat:
+cat: /sys/fs/cgroup/systemd/lxc.payload/vrf_1/system.slice/systemd-tmpfiles-setup-dev.service/tasks: No such file or directory
+
+Actually the vrf starts successfully and it is
+normal to print the above error message as the
+service type(exit once it finishs its start),
+so redirect it to avoid confusing.
+
+Upstream-Status: Inappropriate [no upstream]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ src/vrf-start | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/vrf-start b/src/vrf-start
+index 4ecb8bf..4dfd2da 100755
+--- a/src/vrf-start
++++ b/src/vrf-start
+@@ -66,7 +66,7 @@ sleep 1
+ debug_log -e "cgroup mounted at \"$CGROUP_MNT\""
+ 
+ VRF_PATH=$(find $CGROUP_MNT -name $VRF_NAME)
+-if [ -n "$VRF_PATH" ] && [ "$(find $VRF_PATH -name tasks |xargs -d'\n' cat |wc -l)" -gt 0 ] ; then
++if [ -n "$VRF_PATH" ] && [ "$(find $VRF_PATH -name tasks |xargs -d'\n' cat 2> /dev/null|wc -l)" -gt 0 ] ; then
+     echo "$VRF_NAME successfully started"
+     exit $VRF_SUCCESS
+ else
+-- 
+2.7.4
+

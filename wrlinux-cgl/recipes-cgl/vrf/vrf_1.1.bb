@@ -25,6 +25,7 @@ SRC_URI    = "file://vrf-1.1.tgz \
               file://vrf-fix-missing-var-and-lxc-rootfs-populating.patch \
               file://vrf-enable-systemd-tmpfiles-service-for-unionfs.patch \
               file://vrf-disable-systemd-tmpfiles-to-create-run-nologin.patch \
+              file://0001-vrf-start-redirect-the-error-message.patch \
 "
 
 
