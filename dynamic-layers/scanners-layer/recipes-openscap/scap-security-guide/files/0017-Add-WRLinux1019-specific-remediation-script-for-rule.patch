@@ -1,0 +1,29 @@
+From df4da461a371ef0f3fb3565fab38d9a8dfcd5e7b Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Fri, 26 Jul 2019 17:15:34 +0800
+Subject: [PATCH] Add WRLinux1019 specific remediation script for rule
+ disable_ctrlaltdel_reboot
+
+Add WRLinux1019 relevant remediation script for rule
+ disable_ctrlaltdel_reboot.
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../accounts-physical/disable_ctrlaltdel_reboot/bash/wrlinux1019.sh    | 3 +++
+ 1 file changed, 3 insertions(+)
+ create mode 100644 linux_os/guide/system/accounts/accounts-physical/disable_ctrlaltdel_reboot/bash/wrlinux1019.sh
+
+diff --git a/linux_os/guide/system/accounts/accounts-physical/disable_ctrlaltdel_reboot/bash/wrlinux1019.sh b/linux_os/guide/system/accounts/accounts-physical/disable_ctrlaltdel_reboot/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..3540483
+--- /dev/null
++++ b/linux_os/guide/system/accounts/accounts-physical/disable_ctrlaltdel_reboot/bash/wrlinux1019.sh
+@@ -0,0 +1,3 @@
++# platform = multi_platform_wrlinux
++rm -rf /etc/systemd/system/ctrl-alt-del.target
++systemctl mask ctrl-alt-del.target
+-- 
+1.9.1
+

@@ -1,0 +1,34 @@
+From ca5e9242222f0eac6c06e2a1b4fe97c411471795 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Fri, 12 Jul 2019 10:45:49 +0800
+Subject: [PATCH] Add sssd platform to WRLinux1019 CPE directory
+
+Add sssd platform to WRLinux1019 CPE directory, since some
+ shared sssd rules in WRLinux1019 profile are based on sssd platform.
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ wrlinux1019/cpe/wrlinux1019-cpe-dictionary.xml | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/wrlinux1019/cpe/wrlinux1019-cpe-dictionary.xml b/wrlinux1019/cpe/wrlinux1019-cpe-dictionary.xml
+index 4e5f527..5a8546e 100644
+--- a/wrlinux1019/cpe/wrlinux1019-cpe-dictionary.xml
++++ b/wrlinux1019/cpe/wrlinux1019-cpe-dictionary.xml
+@@ -46,6 +46,11 @@
+             <!-- the check references an OVAL file that contains an inventory definition -->
+             <check system="http://oval.mitre.org/XMLSchema/oval-definitions-5" href="filename">installed_env_has_systemd_package</check>
+       </cpe-item>
++      <cpe-item name="cpe:/a:sssd">
++            <title xml:lang="en-us">Package sssd-common is installed</title>
++            <!-- the check references an OVAL file that contains an inventory definition -->
++            <check system="http://oval.mitre.org/XMLSchema/oval-definitions-5" href="filename">installed_env_has_sssd-common_package</check>
++      </cpe-item>
+       <cpe-item name="cpe:/a:yum">
+             <title xml:lang="en-us">Package yum is installed</title>
+             <!-- the check references an OVAL file that contains an inventory definition -->
+-- 
+1.9.1
+

@@ -1,0 +1,49 @@
+From f1a324761bc796550a5057ebb71147d5a8eb7198 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Fri, 19 Jul 2019 15:46:02 +0800
+Subject: [PATCH] Add WRLinux1019 test case for rule
+ package_openssh-server_installed
+
+Add rule package_openssh-server_installed for WRLinux1019 product.
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../oval/wrlinux1019.xml                           | 24 ++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+ create mode 100644 linux_os/guide/services/ssh/package_openssh-server_installed/oval/wrlinux1019.xml
+
+diff --git a/linux_os/guide/services/ssh/package_openssh-server_installed/oval/wrlinux1019.xml b/linux_os/guide/services/ssh/package_openssh-server_installed/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..639fa45
+--- /dev/null
++++ b/linux_os/guide/services/ssh/package_openssh-server_installed/oval/wrlinux1019.xml
+@@ -0,0 +1,24 @@
++<def-group>
++  <definition class="compliance" id="package_openssh-server_installed"
++  version="1">
++    <metadata>
++      <title>Package openssh-sshd Installed</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The RPM package openssh-sshd should be installed.</description>
++    </metadata>
++    <criteria>
++      <criterion comment="package openssh-sshd is installed"
++      test_ref="test_package_openssh-sshd_installed" />
++    </criteria>
++  </definition>
++  <linux:rpminfo_test check="all" check_existence="all_exist"
++  id="test_package_openssh-sshd_installed" version="1"
++  comment="package openssh-sshd is installed">
++    <linux:object object_ref="obj_package_openssh-sshd_installed" />
++  </linux:rpminfo_test>
++  <linux:rpminfo_object id="obj_package_openssh-sshd_installed" version="1">
++    <linux:name>openssh-sshd</linux:name>
++  </linux:rpminfo_object>
++</def-group>
+-- 
+1.9.1
+

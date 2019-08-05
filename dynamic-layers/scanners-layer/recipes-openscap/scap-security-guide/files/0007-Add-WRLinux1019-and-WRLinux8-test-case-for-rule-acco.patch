@@ -1,0 +1,104 @@
+From f9ed433b545c675af51f80da52553f7202b95851 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Fri, 19 Jul 2019 15:46:57 +0800
+Subject: [PATCH] Add WRLinux1019 and WRLinux8 test case for rule
+ accounts_logon_fail_delay
+
+Add WRLinux1019 and WRLinux8 specific test case for rule
+ accounts_logon_fail_delay
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../accounts_logon_fail_delay/oval/wrlinux1019.xml | 35 ++++++++++++++++++++++
+ .../accounts_logon_fail_delay/oval/wrlinux8.xml    | 35 ++++++++++++++++++++++
+ 2 files changed, 70 insertions(+)
+ create mode 100644 linux_os/guide/system/accounts/accounts-session/accounts_logon_fail_delay/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/accounts/accounts-session/accounts_logon_fail_delay/oval/wrlinux8.xml
+
+diff --git a/linux_os/guide/system/accounts/accounts-session/accounts_logon_fail_delay/oval/wrlinux1019.xml b/linux_os/guide/system/accounts/accounts-session/accounts_logon_fail_delay/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..b1b9629
+--- /dev/null
++++ b/linux_os/guide/system/accounts/accounts-session/accounts_logon_fail_delay/oval/wrlinux1019.xml
+@@ -0,0 +1,35 @@
++<def-group>
++
++  <definition class="compliance" id="accounts_logon_fail_delay" version="1">
++    <metadata>
++      <title>Ensure that FAIL_DELAY is Configured in /etc/login.defs</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>
++      The delay between failed authentication attempts should be set for all users specified in /etc/login.defs
++      </description>
++    </metadata>
++    <criteria>
++      <criterion test_ref="test_accounts_logon_fail_delay" />
++    </criteria>
++  </definition>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="check FAIL_DELAY in /etc/login.defs" id="test_accounts_logon_fail_delay" version="1">
++    <ind:object object_ref="object_accounts_logon_fail_delay" />
++    <ind:state state_ref="state_accounts_logon_fail_delay" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_object id="object_accounts_logon_fail_delay" comment="FAIL_DELAY value from /etc/login.defs" version="1">
++    <ind:filepath>/etc/login.defs</ind:filepath>
++    <ind:pattern operation="pattern match">^[\s]*(?i)FAIL_DELAY(?-i)[\s]+([^#\s]*)</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_state id="state_accounts_logon_fail_delay" version="1">
++    <ind:subexpression operation="greater than or equal" var_ref="var_accounts_fail_delay" datatype="int" />
++  </ind:textfilecontent54_state>
++
++  <external_variable id="var_accounts_fail_delay" datatype="int" version="1" comment="Expected fail_delay" />
++
++</def-group>
+diff --git a/linux_os/guide/system/accounts/accounts-session/accounts_logon_fail_delay/oval/wrlinux8.xml b/linux_os/guide/system/accounts/accounts-session/accounts_logon_fail_delay/oval/wrlinux8.xml
+new file mode 100644
+index 0000000..b1b9629
+--- /dev/null
++++ b/linux_os/guide/system/accounts/accounts-session/accounts_logon_fail_delay/oval/wrlinux8.xml
+@@ -0,0 +1,35 @@
++<def-group>
++
++  <definition class="compliance" id="accounts_logon_fail_delay" version="1">
++    <metadata>
++      <title>Ensure that FAIL_DELAY is Configured in /etc/login.defs</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>
++      The delay between failed authentication attempts should be set for all users specified in /etc/login.defs
++      </description>
++    </metadata>
++    <criteria>
++      <criterion test_ref="test_accounts_logon_fail_delay" />
++    </criteria>
++  </definition>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="check FAIL_DELAY in /etc/login.defs" id="test_accounts_logon_fail_delay" version="1">
++    <ind:object object_ref="object_accounts_logon_fail_delay" />
++    <ind:state state_ref="state_accounts_logon_fail_delay" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_object id="object_accounts_logon_fail_delay" comment="FAIL_DELAY value from /etc/login.defs" version="1">
++    <ind:filepath>/etc/login.defs</ind:filepath>
++    <ind:pattern operation="pattern match">^[\s]*(?i)FAIL_DELAY(?-i)[\s]+([^#\s]*)</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_state id="state_accounts_logon_fail_delay" version="1">
++    <ind:subexpression operation="greater than or equal" var_ref="var_accounts_fail_delay" datatype="int" />
++  </ind:textfilecontent54_state>
++
++  <external_variable id="var_accounts_fail_delay" datatype="int" version="1" comment="Expected fail_delay" />
++
++</def-group>
+-- 
+1.9.1
+

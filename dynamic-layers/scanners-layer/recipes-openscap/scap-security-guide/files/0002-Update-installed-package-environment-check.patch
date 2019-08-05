@@ -1,0 +1,136 @@
+From 6ff4f7bbbccb8be89ece22fa7aa84b79ae631c45 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Thu, 11 Jul 2019 17:53:47 +0800
+Subject: [PATCH] Update installed package environment check
+
+Update installed package environment check with package name
+ in WRLinux1019 when the product is WRLinux1019.
+Use package names libpam, shadow and sssd to replace
+pam, shadow-common and sssd-common in WRLinux1019 product. 
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../checks/oval/installed_env_has_pam_package.xml  | 27 +++++++++++++++-------
+ .../installed_env_has_shadow-utils_package.xml     | 27 +++++++++++++++-------
+ .../oval/installed_env_has_sssd-common_package.xml | 27 +++++++++++++++-------
+ 3 files changed, 57 insertions(+), 24 deletions(-)
+
+diff --git a/shared/checks/oval/installed_env_has_pam_package.xml b/shared/checks/oval/installed_env_has_pam_package.xml
+index dee3bcd..952cd91 100644
+--- a/shared/checks/oval/installed_env_has_pam_package.xml
++++ b/shared/checks/oval/installed_env_has_pam_package.xml
+@@ -16,14 +16,25 @@
+   </definition>
+ 
+ {{% if pkg_system == "rpm" %}}
+-  <linux:rpminfo_test check="all" check_existence="at_least_one_exists"
+-  id="test_env_has_pam_installed" version="1"
+-  comment="system has package pam installed">
+-    <linux:object object_ref="obj_env_has_pam_installed" />
+-  </linux:rpminfo_test>
+-  <linux:rpminfo_object id="obj_env_has_pam_installed" version="1">
+-    <linux:name>pam</linux:name>
+-  </linux:rpminfo_object>
++  {{% if product == "wrlinux1019" %}}
++    <linux:rpminfo_test check="all" check_existence="at_least_one_exists"
++    id="test_env_has_pam_installed" version="1"
++    comment="system has package pam installed">
++      <linux:object object_ref="obj_env_has_pam_installed" />
++    </linux:rpminfo_test>
++    <linux:rpminfo_object id="obj_env_has_pam_installed" version="1">
++      <linux:name>libpam</linux:name>
++    </linux:rpminfo_object>
++  {{% else %}}
++    <linux:rpminfo_test check="all" check_existence="at_least_one_exists"
++    id="test_env_has_pam_installed" version="1"
++    comment="system has package pam installed">
++      <linux:object object_ref="obj_env_has_pam_installed" />
++    </linux:rpminfo_test>
++    <linux:rpminfo_object id="obj_env_has_pam_installed" version="1">
++      <linux:name>pam</linux:name>
++    </linux:rpminfo_object>
++  {{% endif %}}
+ {{% elif pkg_system == "dpkg" %}}
+   <linux:dpkginfo_test check="all" check_existence="all_exist"
+   id="test_env_has_pam_installed" version="1"
+diff --git a/shared/checks/oval/installed_env_has_shadow-utils_package.xml b/shared/checks/oval/installed_env_has_shadow-utils_package.xml
+index 11f40a3..6a9f184 100644
+--- a/shared/checks/oval/installed_env_has_shadow-utils_package.xml
++++ b/shared/checks/oval/installed_env_has_shadow-utils_package.xml
+@@ -15,14 +15,25 @@
+   </definition>
+ 
+ {{% if pkg_system == "rpm" %}}
+-  <linux:rpminfo_test check="all" check_existence="at_least_one_exists"
+-  id="test_env_has_shadow-utils_installed" version="1"
+-  comment="system has package shadow-utils installed">
+-    <linux:object object_ref="obj_env_has_shadow-utils_installed" />
+-  </linux:rpminfo_test>
+-  <linux:rpminfo_object id="obj_env_has_shadow-utils_installed" version="1">
+-    <linux:name>shadow-utils</linux:name>
+-  </linux:rpminfo_object>
++  {{% if product == "wrlinux1019" %}}
++    <linux:rpminfo_test check="all" check_existence="at_least_one_exists"
++    id="test_env_has_shadow-utils_installed" version="1"
++    comment="system has package shadow-utils installed">
++      <linux:object object_ref="obj_env_has_shadow-utils_installed" />
++    </linux:rpminfo_test>
++    <linux:rpminfo_object id="obj_env_has_shadow-utils_installed" version="1">
++      <linux:name>shadow</linux:name>
++    </linux:rpminfo_object>
++  {{% else %}}
++    <linux:rpminfo_test check="all" check_existence="at_least_one_exists"
++    id="test_env_has_shadow-utils_installed" version="1"
++    comment="system has package shadow-utils installed">
++      <linux:object object_ref="obj_env_has_shadow-utils_installed" />
++    </linux:rpminfo_test>
++    <linux:rpminfo_object id="obj_env_has_shadow-utils_installed" version="1">
++      <linux:name>shadow-utils</linux:name>
++    </linux:rpminfo_object>
++  {{% endif %}}
+ {{% elif pkg_system == "dpkg" %}}
+   <linux:dpkginfo_test check="all" check_existence="all_exist"
+   id="test_env_has_shadow-utils_installed" version="1"
+diff --git a/shared/checks/oval/installed_env_has_sssd-common_package.xml b/shared/checks/oval/installed_env_has_sssd-common_package.xml
+index c0cc4b6..8c8b92b 100644
+--- a/shared/checks/oval/installed_env_has_sssd-common_package.xml
++++ b/shared/checks/oval/installed_env_has_sssd-common_package.xml
+@@ -15,14 +15,25 @@
+   </definition>
+ 
+ {{% if pkg_system == "rpm" %}}
+-  <linux:rpminfo_test check="all" check_existence="at_least_one_exists"
+-  id="test_env_has_sssd-common_installed" version="1"
+-  comment="system has package sssd-common installed">
+-    <linux:object object_ref="obj_env_has_sssd-common_installed" />
+-  </linux:rpminfo_test>
+-  <linux:rpminfo_object id="obj_env_has_sssd-common_installed" version="1">
+-    <linux:name>sssd-common</linux:name>
+-  </linux:rpminfo_object>
++  {{% if product == "wrlinux1019" %}}
++    <linux:rpminfo_test check="all" check_existence="at_least_one_exists"
++    id="test_env_has_sssd-common_installed" version="1"
++    comment="system has package sssd-common installed">
++      <linux:object object_ref="obj_env_has_sssd-common_installed" />
++    </linux:rpminfo_test>
++    <linux:rpminfo_object id="obj_env_has_sssd-common_installed" version="1">
++      <linux:name>sssd</linux:name>
++    </linux:rpminfo_object>
++  {{% else %}}
++    <linux:rpminfo_test check="all" check_existence="at_least_one_exists"
++    id="test_env_has_sssd-common_installed" version="1"
++    comment="system has package sssd-common installed">
++      <linux:object object_ref="obj_env_has_sssd-common_installed" />
++    </linux:rpminfo_test>
++    <linux:rpminfo_object id="obj_env_has_sssd-common_installed" version="1">
++      <linux:name>sssd-common</linux:name>
++    </linux:rpminfo_object>
++  {{% endif %}}
+ {{% elif pkg_system == "dpkg" %}}
+   <linux:dpkginfo_test check="all" check_existence="all_exist"
+   id="test_env_has_sssd-common_installed" version="1"
+-- 
+1.9.1
+

@@ -1,0 +1,137 @@
+From f673483ad5b2a73a5939cb9e2b628f96dd212cbe Mon Sep 17 00:00:00 2001
+From: dhuo <dhuo@windriver.com>
+Date: Tue, 21 May 2019 19:15:11 -0700
+Subject: [PATCH] Updte auditd.service path
+
+Replace auditd.service path from /usr/lib/systemd/system/auditd.service
+to /lib/systemd/system/auditd.service which conforms to WRLinux's product.
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../audit_rules_kernel_module_loading_insmod/oval/shared.xml      | 4 ++--
+ .../audit_rules_kernel_module_loading_modprobe/oval/shared.xml    | 4 ++--
+ .../audit_rules_kernel_module_loading_rmmod/oval/shared.xml       | 4 ++--
+ linux_os/guide/system/auditing/group.yml                          | 8 ++++----
+ shared/checks/oval/audit_rules_auditctl.xml                       | 2 +-
+ shared/checks/oval/audit_rules_augenrules.xml                     | 2 +-
+ 6 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_kernel_module_loading/audit_rules_kernel_module_loading_insmod/oval/shared.xml b/linux_os/guide/system/auditing/auditd_configure_rules/audit_kernel_module_loading/audit_rules_kernel_module_loading_insmod/oval/shared.xml
+index 7c2709751..9672bfb66 100644
+--- a/linux_os/guide/system/auditing/auditd_configure_rules/audit_kernel_module_loading/audit_rules_kernel_module_loading_insmod/oval/shared.xml
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_kernel_module_loading/audit_rules_kernel_module_loading_insmod/oval/shared.xml
+@@ -13,14 +13,14 @@
+     </metadata>
+     <criteria operator="OR">
+       <!-- First check the default configuraton: 'augenrules' tool specified in 'ExecStartPost' directive of
+-           /usr/lib/systemd/system/auditd.service (in other words case when final /etc/audit/audit.rules
++           /lib/systemd/system/auditd.service (in other words case when final /etc/audit/audit.rules
+            configuration is generated from *.rules files' content present in the /etc/audit/rules.d directory) -->
+       <criteria operator="AND">
+         <extend_definition comment="audit augenrules" definition_ref="audit_rules_augenrules" />
+         <criterion comment="audit augenrules insmod" test_ref="test_audit_rule_kernel_module_loading_insmod_augenrules" />
+       </criteria>
+       <!-- Check the modified configuration: 'auditctl' tool specified in 'ExecStartPost' directive of
+-           /usr/lib/systemd/system/auditd.service (in other words case when final /etc/audit/audit.rules is
++           /lib/systemd/system/auditd.service (in other words case when final /etc/audit/audit.rules is
+            just loaded by 'auditctl' tool into memory) -->
+       <criteria operator="AND">
+         <extend_definition comment="audit auditctl" definition_ref="audit_rules_auditctl" />
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_kernel_module_loading/audit_rules_kernel_module_loading_modprobe/oval/shared.xml b/linux_os/guide/system/auditing/auditd_configure_rules/audit_kernel_module_loading/audit_rules_kernel_module_loading_modprobe/oval/shared.xml
+index d559a2f4d..97e721ad8 100644
+--- a/linux_os/guide/system/auditing/auditd_configure_rules/audit_kernel_module_loading/audit_rules_kernel_module_loading_modprobe/oval/shared.xml
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_kernel_module_loading/audit_rules_kernel_module_loading_modprobe/oval/shared.xml
+@@ -13,14 +13,14 @@
+     </metadata>
+     <criteria operator="OR">
+       <!-- First check the default configuraton: 'augenrules' tool specified in 'ExecStartPost' directive of
+-           /usr/lib/systemd/system/auditd.service (in other words case when final /etc/audit/audit.rules
++           /lib/systemd/system/auditd.service (in other words case when final /etc/audit/audit.rules
+            configuration is generated from *.rules files' content present in the /etc/audit/rules.d directory) -->
+       <criteria operator="AND">
+         <extend_definition comment="audit augenrules" definition_ref="audit_rules_augenrules" />
+         <criterion comment="audit augenrules modprobe" test_ref="test_audit_rule_kernel_module_loading_modprobe_augenrules" />
+       </criteria>
+       <!-- Check the modified configuration: 'auditctl' tool specified in 'ExecStartPost' directive of
+-           /usr/lib/systemd/system/auditd.service (in other words case when final /etc/audit/audit.rules is
++           /lib/systemd/system/auditd.service (in other words case when final /etc/audit/audit.rules is
+            just loaded by 'auditctl' tool into memory) -->
+       <criteria operator="AND">
+         <extend_definition comment="audit auditctl" definition_ref="audit_rules_auditctl" />
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_kernel_module_loading/audit_rules_kernel_module_loading_rmmod/oval/shared.xml b/linux_os/guide/system/auditing/auditd_configure_rules/audit_kernel_module_loading/audit_rules_kernel_module_loading_rmmod/oval/shared.xml
+index 17ad73813..4dc931738 100644
+--- a/linux_os/guide/system/auditing/auditd_configure_rules/audit_kernel_module_loading/audit_rules_kernel_module_loading_rmmod/oval/shared.xml
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_kernel_module_loading/audit_rules_kernel_module_loading_rmmod/oval/shared.xml
+@@ -13,14 +13,14 @@
+     </metadata>
+     <criteria operator="OR">
+       <!-- First check the default configuraton: 'augenrules' tool specified in 'ExecStartPost' directive of
+-           /usr/lib/systemd/system/auditd.service (in other words case when final /etc/audit/audit.rules
++           /lib/systemd/system/auditd.service (in other words case when final /etc/audit/audit.rules
+            configuration is generated from *.rules files' content present in the /etc/audit/rules.d directory) -->
+       <criteria operator="AND">
+         <extend_definition comment="audit augenrules" definition_ref="audit_rules_augenrules" />
+         <criterion comment="audit augenrules rmmod" test_ref="test_audit_rule_kernel_module_loading_rmmod_augenrules" />
+       </criteria>
+       <!-- Check the modified configuration: 'auditctl' tool specified in 'ExecStartPost' directive of
+-           /usr/lib/systemd/system/auditd.service (in other words case when final /etc/audit/audit.rules is
++           /lib/systemd/system/auditd.service (in other words case when final /etc/audit/audit.rules is
+            just loaded by 'auditctl' tool into memory) -->
+       <criteria operator="AND">
+         <extend_definition comment="audit auditctl" definition_ref="audit_rules_auditctl" />
+diff --git a/linux_os/guide/system/auditing/group.yml b/linux_os/guide/system/auditing/group.yml
+index 586caa9c6..611050564 100644
+--- a/linux_os/guide/system/auditing/group.yml
++++ b/linux_os/guide/system/auditing/group.yml
+@@ -20,16 +20,16 @@ description: |-
+     <tt>/etc/audit/audit.rules</tt> configuration file during daemon startup,
+     and load them into the kernel. The expected behavior is configured via the
+     appropriate <tt>ExecStartPost</tt> directive setting in the
+-    <tt>/usr/lib/systemd/system/auditd.service</tt> configuration file.
++    <tt>/lib/systemd/system/auditd.service</tt> configuration file.
+     To instruct the <tt>auditd</tt> daemon to use the <tt>augenrules</tt> program
+     to read audit rules (default configuration), use the following setting:
+     <br /> <pre>ExecStartPost=-/sbin/augenrules --load</pre>
+-    in the <tt>/usr/lib/systemd/system/auditd.service</tt> configuration file.
++    in the <tt>/lib/systemd/system/auditd.service</tt> configuration file.
+     In order to instruct the <tt>auditd</tt> daemon to use the <tt>auditctl</tt>
+     utility to read audit rules, use the following setting:
+     <br /> <pre>ExecStartPost=-/sbin/auditctl -R /etc/audit/audit.rules</pre>
+-    in the <tt>/usr/lib/systemd/system/auditd.service</tt> configuration file.
+-    Refer to <tt>[Service]</tt> section of the <tt>/usr/lib/systemd/system/auditd.service</tt>
++    in the <tt>/lib/systemd/system/auditd.service</tt> configuration file.
++    Refer to <tt>[Service]</tt> section of the <tt>/lib/systemd/system/auditd.service</tt>
+     configuration file for further details.
+     <br /><br />
+     Government networks often have substantial auditing
+diff --git a/shared/checks/oval/audit_rules_auditctl.xml b/shared/checks/oval/audit_rules_auditctl.xml
+index eb731ab5d..ec9a39c5e 100644
+--- a/shared/checks/oval/audit_rules_auditctl.xml
++++ b/shared/checks/oval/audit_rules_auditctl.xml
+@@ -21,7 +21,7 @@
+     <ind:object object_ref="object_audit_rules_auditctl" />
+   </ind:textfilecontent54_test>
+   <ind:textfilecontent54_object id="object_audit_rules_auditctl" version="1">
+-    <ind:filepath>/usr/lib/systemd/system/auditd.service</ind:filepath>
++    <ind:filepath>/lib/systemd/system/auditd.service</ind:filepath>
+     <ind:pattern operation="pattern match">^ExecStartPost=\-\/sbin\/auditctl.*$</ind:pattern>
+     <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
+   </ind:textfilecontent54_object>
+diff --git a/shared/checks/oval/audit_rules_augenrules.xml b/shared/checks/oval/audit_rules_augenrules.xml
+index 0961dc503..a93c53621 100644
+--- a/shared/checks/oval/audit_rules_augenrules.xml
++++ b/shared/checks/oval/audit_rules_augenrules.xml
+@@ -21,7 +21,7 @@
+   </ind:textfilecontent54_test>
+ {{% if init_system == "systemd" %}}
+   <ind:textfilecontent54_object id="object_audit_rules_augenrules" version="1">
+-    <ind:filepath>/usr/lib/systemd/system/auditd.service</ind:filepath>
++    <ind:filepath>/lib/systemd/system/auditd.service</ind:filepath>
+     <ind:pattern operation="pattern match">^ExecStartPost=\-\/sbin\/augenrules.*$</ind:pattern>
+     <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
+   </ind:textfilecontent54_object>
+-- 
+2.14.1
+

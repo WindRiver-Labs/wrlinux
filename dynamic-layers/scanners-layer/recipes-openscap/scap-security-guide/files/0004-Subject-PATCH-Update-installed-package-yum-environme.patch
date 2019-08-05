@@ -1,0 +1,58 @@
+From 6ab936c4f4b9ff419289deb4b412068e5ad9c424 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Fri, 12 Jul 2019 11:06:30 +0800
+Subject: [PATCH] Subject: [PATCH] Update installed package yum environment
+ check
+
+Update installed package environment check with package name
+ in WRLinux1019 when the product is WRLinux1019.
+Use package names dnf to replace yum in WRLinux1019 product.
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../checks/oval/installed_env_has_yum_package.xml  | 27 +++++++++++++++-------
+ 1 file changed, 19 insertions(+), 8 deletions(-)
+
+diff --git a/shared/checks/oval/installed_env_has_yum_package.xml b/shared/checks/oval/installed_env_has_yum_package.xml
+index 916d568..c42fa1e 100644
+--- a/shared/checks/oval/installed_env_has_yum_package.xml
++++ b/shared/checks/oval/installed_env_has_yum_package.xml
+@@ -15,14 +15,25 @@
+   </definition>
+ 
+ {{% if pkg_system == "rpm" %}}
+-  <linux:rpminfo_test check="all" check_existence="at_least_one_exists"
+-  id="test_env_has_yum_installed" version="1"
+-  comment="system has package yum installed">
+-    <linux:object object_ref="obj_env_has_yum_installed" />
+-  </linux:rpminfo_test>
+-  <linux:rpminfo_object id="obj_env_has_yum_installed" version="1">
+-    <linux:name>yum</linux:name>
+-  </linux:rpminfo_object>
++  {{% if product == "wrlinux1019" %}}
++    <linux:rpminfo_test check="all" check_existence="at_least_one_exists"
++    id="test_env_has_yum_installed" version="1"
++    comment="system has package yum installed">
++      <linux:object object_ref="obj_env_has_yum_installed" />
++    </linux:rpminfo_test>
++    <linux:rpminfo_object id="obj_env_has_yum_installed" version="1">
++      <linux:name>dnf</linux:name>
++    </linux:rpminfo_object>
++  {{% else %}}
++    <linux:rpminfo_test check="all" check_existence="at_least_one_exists"
++    id="test_env_has_yum_installed" version="1"
++    comment="system has package yum installed">
++      <linux:object object_ref="obj_env_has_yum_installed" />
++    </linux:rpminfo_test>
++    <linux:rpminfo_object id="obj_env_has_yum_installed" version="1">
++      <linux:name>yum</linux:name>
++    </linux:rpminfo_object>
++  {{% endif %}}
+ {{% elif pkg_system == "dpkg" %}}
+   <linux:dpkginfo_test check="all" check_existence="all_exist"
+   id="test_env_has_yum_installed" version="1"
+-- 
+1.9.1
+

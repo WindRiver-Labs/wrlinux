@@ -1,0 +1,593 @@
+From 437056d40a7a5e80934ec7d3b38851263955e17b Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Thu, 1 Aug 2019 16:48:07 +0800
+Subject: [PATCH] Use WRLinux1019 package samhain to do integrity work instead
+ of aide
+
+Use WRLinux1019 package samhain to do integrity work instead
+ of aide, since there is no aide packaged in WRLinux1019 product.
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../integrity/software-integrity/samhain/group.yml |  9 +++
+ .../package_samhain_installed/oval/wrlinux1019.xml | 66 ++++++++++++++++++++++
+ .../samhain/package_samhain_installed/rule.yml     | 18 ++++++
+ .../samhain_build_database/bash/wrlinux1019.sh     |  3 +
+ .../samhain_build_database/oval/wrlinux1019.xml    | 62 ++++++++++++++++++++
+ .../samhain/samhain_build_database/rule.yml        | 35 ++++++++++++
+ .../ansible/shared.yml                             | 20 +++++++
+ .../bash/wrlinux1019.sh                            |  6 ++
+ .../oval/wrlinux1019.xml                           | 62 ++++++++++++++++++++
+ .../samhain_periodic_cron_checking/rule.yml        | 50 ++++++++++++++++
+ .../samhain_scan_notification/bash/wrlinux1019.sh  | 16 ++++++
+ .../samhain_scan_notification/oval/wrlinux1019.xml | 49 ++++++++++++++++
+ .../samhain/samhain_scan_notification/rule.yml     | 52 +++++++++++++++++
+ .../profiles/draft_stig_wrlinux_disa.profile       |  6 +-
+ 14 files changed, 452 insertions(+), 2 deletions(-)
+ create mode 100644 linux_os/guide/system/software/integrity/software-integrity/samhain/group.yml
+ create mode 100644 linux_os/guide/system/software/integrity/software-integrity/samhain/package_samhain_installed/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/software/integrity/software-integrity/samhain/package_samhain_installed/rule.yml
+ create mode 100644 linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_build_database/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_build_database/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_build_database/rule.yml
+ create mode 100644 linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_periodic_cron_checking/ansible/shared.yml
+ create mode 100644 linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_periodic_cron_checking/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_periodic_cron_checking/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_periodic_cron_checking/rule.yml
+ create mode 100644 linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_scan_notification/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_scan_notification/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_scan_notification/rule.yml
+
+diff --git a/linux_os/guide/system/software/integrity/software-integrity/samhain/group.yml b/linux_os/guide/system/software/integrity/software-integrity/samhain/group.yml
+new file mode 100644
+index 0000000..248b278
+--- /dev/null
++++ b/linux_os/guide/system/software/integrity/software-integrity/samhain/group.yml
+@@ -0,0 +1,9 @@
++documentation_complete: true
++
++title: 'Verify Integrity with Samhain'
++
++description: |-
++    By default, Samhain does not install itself for periodic execution. Periodically
++    running Samhain is necessary to reveal unexpected changes in installed files.
++
++platform: machine
+diff --git a/linux_os/guide/system/software/integrity/software-integrity/samhain/package_samhain_installed/oval/wrlinux1019.xml b/linux_os/guide/system/software/integrity/software-integrity/samhain/package_samhain_installed/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..bc9521f
+--- /dev/null
++++ b/linux_os/guide/system/software/integrity/software-integrity/samhain/package_samhain_installed/oval/wrlinux1019.xml
+@@ -0,0 +1,66 @@
++<def-group>
++  <definition class="compliance" id="package_samhain_installed"
++  version="1">
++    <metadata>
++      <title>Package samhain Installed</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The package samhain should be installed.</description>
++    </metadata>
++    <criteria operator="AND">
++      <criterion comment="The /usr/sbin/samhain file is present" test_ref="test_usr_sbin_samhain_is_present" />
++	  <criterion comment="The /etc/samhainrc file is present" test_ref="test_etc_samhainrc_is_present" />
++      <criterion comment="The /lib/systemd/system/samhain.service file is present" test_ref="test_lib_systemd_system_samhain_service_is_present" />
++    </criteria>
++  </definition>
++
++  <unix:file_test id="test_usr_sbin_samhain_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/sbin/samhain file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_sbin_samhain_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_sbin_samhain_is_present"
++	comment="The /usr/sbin/samhain file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/sbin/samhain</unix:filepath>
++  </unix:file_object>
++
++  <unix:file_test id="test_etc_samhainrc_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /etc/samhainrc file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_etc_samhainrc_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_etc_samhainrc_is_present"
++	comment="The /etc/samhainrc file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/etc/samhainrc</unix:filepath>
++  </unix:file_object>
++
++  <unix:file_test id="test_lib_systemd_system_samhain_service_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /lib/systemd/system/samhain.service file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_lib_systemd_system_samhain_service_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_lib_systemd_system_samhain_service_is_present"
++	comment="The /lib/systemd/system/samhain.service file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/lib/systemd/system/samhain.service</unix:filepath>
++  </unix:file_object>
++
++</def-group>
+diff --git a/linux_os/guide/system/software/integrity/software-integrity/samhain/package_samhain_installed/rule.yml b/linux_os/guide/system/software/integrity/software-integrity/samhain/package_samhain_installed/rule.yml
+new file mode 100644
+index 0000000..072fc9b
+--- /dev/null
++++ b/linux_os/guide/system/software/integrity/software-integrity/samhain/package_samhain_installed/rule.yml
+@@ -0,0 +1,18 @@
++documentation_complete: true
++
++prodtype: wrlinux1019
++
++title: 'Install the Samhain Package'
++
++description: |-
++    The <tt>samhain</tt> package should be installed.
++    {{{ describe_package_install(package="samhain") }}}
++
++rationale: |-
++    The Samhain package must be installed if it is to be available for integrity checking.
++
++severity: medium
++
++ocil_clause: 'the package Samhain is not installed'
++
++ocil: '{{{ ocil_package(package="samhain") }}}'
+diff --git a/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_build_database/bash/wrlinux1019.sh b/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_build_database/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..422dafc
+--- /dev/null
++++ b/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_build_database/bash/wrlinux1019.sh
+@@ -0,0 +1,3 @@
++# platform = multi_platform_wrlinux
++
++/usr/sbin/samhain -t init
+diff --git a/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_build_database/oval/wrlinux1019.xml b/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_build_database/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..41f4a15
+--- /dev/null
++++ b/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_build_database/oval/wrlinux1019.xml
+@@ -0,0 +1,62 @@
++<def-group>
++  <definition class="compliance" id="samhain_build_database" version="1">
++    <metadata>
++      <title>Samhain Database Must Exist</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The Samhain database must be initialized.</description>
++    </metadata>
++    <criteria operator="OR">
++	<criteria operator="AND">
++	    <criterion test_ref="test_samhain_custom_database_path" />
++	    <criterion test_ref="test_samhain_custom_database_exist" />
++	</criteria>
++
++	<criteria operator="AND">
++	    <criterion test_ref="test_samhain_custom_database_path" negate="true"/>
++	    <criterion test_ref="test_samhain_default_database_exists" />
++	</criteria>
++    </criteria>
++  </definition>
++
++  <ind:textfilecontent54_test id="test_samhain_custom_database_path" check="all" check_existence="all_exist"
++	  comment="Testing setting of custom samhain database file in /etc/samhainrc" version="1">
++    <ind:object object_ref="object_samhain_custom_database_path" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_object id="object_samhain_custom_database_path" version="1">
++    <ind:filepath>/etc/samhainrc</ind:filepath>
++    <ind:pattern operation="pattern match">^\s*SetDatabasePath\s*=\s*(.*)</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <unix:file_test id="test_samhain_custom_database_exist" check="all" check_existence="all_exist"
++          comment="Check custom samhain database file exists" version="1">
++    <unix:object object_ref="object_samhain_custom_database_exist" />
++  </unix:file_test>
++
++  <unix:file_object id="object_samhain_custom_database_exist" version="1">
++    <unix:filepath var_ref="var_samhain_custom_database_path" var_check="at least one" />
++  </unix:file_object>
++
++  <local_variable id="var_samhain_custom_database_path" datatype="string" comment="Absolute path of samhain database file which is set in /etc/samhainrc" version="1">
++    <object_component item_field="subexpression" object_ref="object_samhain_custom_database_path" />
++  </local_variable>
++
++<!--
++  <ind:textfilecontent54_test id="test_samhain_no_custom_database_path" check="all" check_existence="none_exist"
++	  comment="Testing no setting of custom samhain database file in /etc/samhainrc" version="1">
++    <ind:object object_ref="object_samhain_custom_database_path_samhainrc" />
++  </ind:textfilecontent54_test>
++-->
++  <unix:file_test id="test_samhain_default_database_exists" check="all" check_existence="all_exist"
++      comment="Testing existence of default samhain database file" version="1">
++    <unix:object object_ref="object_samhain_default_database_exists" />
++  </unix:file_test>
++
++  <unix:file_object id="object_samhain_default_database_exists" version="1">
++    <unix:filepath>/var/lib/samhain/samhain_file</unix:filepath>
++  </unix:file_object>
++
++</def-group>
+diff --git a/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_build_database/rule.yml b/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_build_database/rule.yml
+new file mode 100644
+index 0000000..69453b8
+--- /dev/null
++++ b/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_build_database/rule.yml
+@@ -0,0 +1,35 @@
++documentation_complete: true
++
++prodtype: wrlinux1019
++
++title: 'Build and Test Samhain Database'
++
++description: |-
++    Run the following command to generate a new database:
++    <tt>$ sudo /usr/sbin/samhain -t init</tt>
++    By default, the database will be written to the file <tt>/var/lib/samhain/samhain_file</tt>.
++    To initiate a manual check, run the following command:
++    <tt>$ sudo /usr/sbin/samhain -t check</tt>
++    If this check produces any unexpected output, investigate.
++
++rationale: |-
++    For Samhain to be effective, an initial database of "known-good" information about files
++    must be captured and it should be able to be verified against the installed files.
++
++severity: medium
++
++identifiers:
++    cce@rhel7: 27220-3
++
++references:
++    nist: CM-3(5),CM-3(6)
++
++ocil_clause: 'The Samhain Database is not built and tested'
++
++ocil: |-
++    Run the following command to generate a new database:
++    <pre>$ sudo /usr/sbin/samhain -t init</pre>
++    By default, the database will be written to the file <pre>/var/lib/samhain/samhain_file</pre>.
++    To initiate a manual check, run the following command:
++    <pre>$ sudo /usr/sbin/samhain -t check</pre>
++    If this check produces any unexpected output, investigate.
+diff --git a/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_periodic_cron_checking/ansible/shared.yml b/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_periodic_cron_checking/ansible/shared.yml
+new file mode 100644
+index 0000000..44543fd
+--- /dev/null
++++ b/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_periodic_cron_checking/ansible/shared.yml
+@@ -0,0 +1,20 @@
++# platform = multi_platform_all
++# reboot = false
++# strategy = restrict
++# complexity = low
++# disruption = low
++- name: "Ensure Samhain is installed"
++  package:
++    name: "{{ item }}"
++    state: present
++  with_items:
++    - samhain
++
++- name: "{{{ rule_title }}}"
++  cron:
++    name: "run Samhain check"
++    minute: 05
++    hour: 04
++    weekday: 0
++    user: root
++    job: "/usr/sbin/samhain -t --check"
+diff --git a/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_periodic_cron_checking/bash/wrlinux1019.sh b/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_periodic_cron_checking/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..ddbb9d3
+--- /dev/null
++++ b/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_periodic_cron_checking/bash/wrlinux1019.sh
+@@ -0,0 +1,6 @@
++# platform = multi_platform_wrlinux
++package_install samhain
++
++if ! grep -q "/usr/sbin/samhain -t --check" /etc/crontab ; then
++    echo "05 4 * * * root /usr/sbin/samhain -t check" >> /etc/crontab
++fi
+diff --git a/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_periodic_cron_checking/oval/wrlinux1019.xml b/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_periodic_cron_checking/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..5244655
+--- /dev/null
++++ b/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_periodic_cron_checking/oval/wrlinux1019.xml
+@@ -0,0 +1,62 @@
++<def-group>
++  <definition class="compliance" id="samhain_periodic_cron_checking" version="3">
++    <metadata>
++      <title>Configure Periodic Execution of Samhain</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>By default, samhain does not install itself for periodic
++      execution. Periodically running samhain is necessary to reveal
++      unexpected changes in installed files.
++      </description>
++    </metadata>
++    <criteria operator="AND">
++      <extend_definition comment="samhain is installed" definition_ref="package_samhain_installed" />
++      <criteria operator="OR">
++        <criterion comment="run samhain daily with cron" test_ref="test_samhain_periodic_cron_checking" />
++        <criterion comment="run samhain daily with cron" test_ref="test_samhain_crond_checking" />
++        <criterion comment="run samhain daily with cron" test_ref="test_samhain_var_cron_checking" />
++        <criterion comment="run samhain daily with cron.(daily|weekly|monthly)" test_ref="test_samhain_crontabs_checking" />
++      </criteria>
++    </criteria>
++  </definition>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="run samhain daily with cron" id="test_samhain_periodic_cron_checking" version="1">
++    <ind:object object_ref="object_test_samhain_periodic_cron_checking" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object comment="run samhain daily with cron" id="object_test_samhain_periodic_cron_checking" version="1">
++    <ind:filepath>/etc/crontab</ind:filepath>
++    <ind:pattern operation="pattern match">^[0-9]*[\s]*[0-9]*[\s]*\*[\s]*\*[\s]*\*[\s]*root[\s]*/usr/sbin/samhain[\s]*(?:-t[\s]*|--set-checksum-test=)check.*$</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="run samhain daily with cron" id="test_samhain_crond_checking" version="1">
++    <ind:object object_ref="object_test_samhain_crond_checking" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object comment="run samhain daily with cron" id="object_test_samhain_crond_checking" version="1">
++    <ind:path>/etc/cron.d</ind:path>
++    <ind:filename operation="pattern match">^.*$</ind:filename>
++    <ind:pattern operation="pattern match">^[0-9]*[\s]*[0-9]*[\s]*\*[\s]*\*[\s]*\*[\s]*root[\s]*/usr/sbin/samhain[\s]*(?:-t[\s]*|--set-checksum-test=)check.*$</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="run samhain daily with cron" id="test_samhain_var_cron_checking" version="1">
++    <ind:object object_ref="object_samhain_var_cron_checking" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object comment="run samhain daily with cron" id="object_samhain_var_cron_checking" version="1">
++    <ind:filepath>/var/spool/cron/root</ind:filepath>
++    <ind:pattern operation="pattern match">^[0-9]*[\s]*[0-9]*[\s]*\*[\s]*\*[\s]*\*[\s]*(root|)/usr/sbin/samhain[\s]*(?:-t[\s]*|--set-checksum-test=)check.*$</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="run samhain daily with cron.(daily|weekly|monthly)" id="test_samhain_crontabs_checking" version="2">
++    <ind:object object_ref="object_samhain_crontabs_checking" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object comment="run samhain daily with cron.(daily|weekly|monthly)" id="object_samhain_crontabs_checking" version="1">
++    <ind:path operation="pattern match">/etc/cron.(daily|weekly|monthly)</ind:path>
++    <ind:filename operation="pattern match">^.*$</ind:filename>
++    <ind:pattern operation="pattern match">^\s*/usr/sbin/samhain[\s]*(?:-t[\s]*|--set-checksum-test=)check.*$</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++   
++</def-group>
+diff --git a/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_periodic_cron_checking/rule.yml b/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_periodic_cron_checking/rule.yml
+new file mode 100644
+index 0000000..44a423c
+--- /dev/null
++++ b/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_periodic_cron_checking/rule.yml
+@@ -0,0 +1,50 @@
++documentation_complete: true
++
++prodtype: wrlinux1019
++
++title: 'Configure Periodic Execution of Samhain'
++
++description: |-
++    To implement a daily execution of Samhain at 4:05am using cron, add the following line to <tt>/etc/crontab</tt>:
++    <pre>05 4 * * * root /usr/sbin/samhain -t check</pre>
++    Samhain can be executed periodically through other means; this is merely one example.
++
++rationale: |-
++    By default, Samhain does not install itself for periodic execution. Periodically
++    running Samhain is necessary to reveal unexpected changes in installed files.
++
++severity: medium
++
++identifiers:
++    cce@rhel6: 27222-9
++    cce@rhel7: 26952-2
++    cce@rhel8: 80676-0
++
++references:
++    anssi: NT28(R51),NT28(R52)
++    disa@rhel6: 374,416,1069,1263,1297,1589
++    srg@rhel6: SRG-OS-000202,SRG-OS-000094,SRG-OS-000098,SRG-OS-000232,SRG-OS-000196,SRG-OS-000265
++    stigid@rhel6: RHEL-06-000306
++    cis: 1.3.2
++    cjis: 5.10.1.3
++    disa: "1744"
++    nist: CM-3(d),CM-3(e),CM-3(5),CM-6(d),CM-6(3),SC-28,SI-7
++    nist-csf: DE.CM-1,DE.CM-7,PR.DS-1,PR.DS-6,PR.DS-8,PR.IP-1,PR.IP-3
++    pcidss: Req-11.5
++    srg: SRG-OS-000363-GPOS-00150
++    stigid@rhel7: "020030"
++    isa-62443-2013: 'SR 3.1,SR 3.3,SR 3.4,SR 3.8,SR 4.1,SR 6.2,SR 7.6'
++    isa-62443-2009: 4.3.4.3.2,4.3.4.3.3,4.3.4.4.4
++    cobit5: APO01.06,BAI01.06,BAI02.01,BAI03.05,BAI06.01,BAI10.01,BAI10.02,BAI10.03,BAI10.05,DSS01.03,DSS03.05,DSS04.07,DSS05.02,DSS05.03,DSS05.05,DSS05.07,DSS06.02,DSS06.06
++    iso27001-2013: A.11.2.4,A.12.1.2,A.12.2.1,A.12.4.1,A.12.5.1,A.12.6.2,A.14.1.2,A.14.1.3,A.14.2.2,A.14.2.3,A.14.2.4,A.14.2.7,A.15.2.1,A.8.2.3
++    cis-csc: 1,11,12,13,14,15,16,2,3,5,7,8,9
++
++ocil_clause: 'there is no output'
++
++ocil: |-
++    To determine that periodic Samhain execution has been scheduled, run the following command:
++    <pre>$ grep samhain /etc/crontab</pre>
++    The output should return some similiar to the following:
++    <pre>05 4 * * * root /usr/sbin/samhain -t --check</pre>
++
++    NOTE: The usage of special cron times, such as @daily or @weekly, is acceptable.
+diff --git a/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_scan_notification/bash/wrlinux1019.sh b/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_scan_notification/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..e9e20ba
+--- /dev/null
++++ b/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_scan_notification/bash/wrlinux1019.sh
+@@ -0,0 +1,16 @@
++# platform = multi_platform_wrlinux
++. /usr/share/scap-security-guide/remediation_functions
++
++package_install samhain
++
++CRONTAB=/etc/crontab
++CRONDIRS='/etc/cron.d /etc/cron.daily /etc/cron.weekly /etc/cron.monthly'
++
++if [ -f /var/spool/cron/root ]; then
++	VARSPOOL=/var/spool/cron/root
++fi
++
++if ! grep -qR '^.*\/usr\/sbin\/samhain\s*.*check.*|.*\/usr/bin\/mailx\s*\-s\s*".*"\s*root@.*$' $CRONTAB $VARSPOOL $CRONDIRS; then
++	echo '0 5 * * * root /usr/sbin/samhain --set-checksum-test=check | /usr/bin/mailx -s "$(hostname) - Samhain Integrity Check" root@localhost' >> $CRONTAB
++fi
++
+diff --git a/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_scan_notification/oval/wrlinux1019.xml b/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_scan_notification/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..c20aa78
+--- /dev/null
++++ b/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_scan_notification/oval/wrlinux1019.xml
+@@ -0,0 +1,49 @@
++<def-group>
++  <definition class="compliance" id="samhain_scan_notification" version="1">
++    <metadata>
++      <title>Configure Notification of Post-Samhain Scan Details</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>Samhain should notify appropriate personnel of the details
++      of a scan after the scan has been run.</description>
++    </metadata>
++    <criteria operator="AND">
++      <extend_definition comment="Samhain is installed" definition_ref="package_samhain_installed" />
++      <criteria operator="OR">
++        <criterion comment="notify personnel when samhain completes" test_ref="test_samhain_scan_notification" />
++        <criterion comment="notify personnel when samhain completes" test_ref="test_samhain_var_cron_notification" />
++        <criterion comment="notify personnel when samhain completes in cron.(d|daily|weekly|monthly)" test_ref="test_samhain_crontabs_notification" />
++      </criteria>
++    </criteria>
++  </definition>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="notify personnel when samhain completes" id="test_samhain_scan_notification" version="1">
++    <ind:object object_ref="object_test_samhain_scan_notification" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object comment="notify personnel when samhain completes" id="object_test_samhain_scan_notification" version="1">
++    <ind:filepath>/etc/crontab</ind:filepath>
++    <ind:pattern operation="pattern match">^.*/usr/sbin/samhain[\s]*(?:-t[\s]*|--set-checksum-test=)check.*\|.*/usr/bin/mailx[\s]*-s[\s]*".*"[\s]*root@.*$</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="notify personnel when samhain completes" id="test_samhain_var_cron_notification" version="1">
++    <ind:object object_ref="object_samhain_var_cron_notification" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object comment="notify personnel when samhain completes" id="object_samhain_var_cron_notification" version="1">
++    <ind:filepath>/var/spool/cron/root</ind:filepath>
++    <ind:pattern operation="pattern match">^.*/usr/sbin/samhain[\s]*(?:-t[\s]*|--set-checksum-test=)check.*\|.*/usr/bin/mailx[\s]*-s[\s]*".*"[\s]*root@.*$</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="notify personnel when samhain completes in cron.(daily|weekly|monthly)" id="test_samhain_crontabs_notification" version="1">
++    <ind:object object_ref="object_samhain_crontabs_notification" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object comment="notify personnel when samhain completes in cron.(d|daily|weekly|monthly)" id="object_samhain_crontabs_notification" version="1">
++    <ind:path operation="pattern match">/etc/cron.(d|daily|weekly|monthly)</ind:path>
++    <ind:filename operation="pattern match">^.*$</ind:filename>
++    <ind:pattern operation="pattern match">^.*/usr/sbin/samhain[\s]*(?:-t[\s]*|--set-checksum-test=)check.*\|.*/usr/bin/mailx[\s]*-s[\s]*".*"[\s]*root@.*$</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++   
++</def-group>
+diff --git a/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_scan_notification/rule.yml b/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_scan_notification/rule.yml
+new file mode 100644
+index 0000000..dc37da3
+--- /dev/null
++++ b/linux_os/guide/system/software/integrity/software-integrity/samhain/samhain_scan_notification/rule.yml
+@@ -0,0 +1,52 @@
++documentation_complete: true
++
++prodtype: wrlinux1019
++
++title: 'Configure Notification of Post-Samhain Scan Details'
++
++description: |-
++    Samhain should notify appropriate personnel of the details of a scan after the scan has been run.
++    If Samhain has already been configured for periodic execution in <tt>/etc/crontab</tt>, append the
++    following line to the existing Samhain line:
++    <tt> | /usr/bin/mailx -s "$(hostname) - Samhain Integrity Check" root@localhost</tt>
++    Otherwise, add the following line to <tt>/etc/crontab</tt>:
++    <tt>05 4 * * * root /usr/sbin/samhain -t check | /usr/bin/mailx -s "$(hostname) - Samhain Integrity Check" root@localhost</tt>
++    Samhain can be executed periodically through other means; this is merely one example.
++
++rationale: |-
++    Unauthorized changes to the baseline configuration could make the system vulnerable
++    to various attacks or allow unauthorized access to the operating system. Changes to
++    operating system configurations can have unintended side effects, some of which may
++    be relevant to security.
++    <br /><br />
++    Detecting such changes and providing an automated response can help avoid unintended,
++    negative consequences that could ultimately affect the security state of the operating
++    system. The operating system's Information Management Officer (IMO)/Information System
++    Security Officer (ISSO) and System Administrators (SAs) must be notified via email and/or
++    monitoring system trap when there is an unauthorized modification of a configuration item.
++
++severity: medium
++
++identifiers:
++    cce@rhel7: 80374-2
++
++references:
++    anssi: NT28(R51),NT28(R52)
++    disa: "1744"
++    nist: CM-3(5)
++    nist-csf: DE.CM-1,DE.CM-7,PR.IP-1,PR.IP-3
++    srg: SRG-OS-000363-GPOS-00150
++    stigid@rhel7: "020040"
++    isa-62443-2013: 'SR 6.2,SR 7.6'
++    isa-62443-2009: 4.3.4.3.2,4.3.4.3.3
++    cobit5: BAI01.06,BAI06.01,BAI10.01,BAI10.02,BAI10.03,BAI10.05,DSS01.03,DSS03.05,DSS05.02,DSS05.05,DSS05.07
++    iso27001-2013: A.12.1.2,A.12.4.1,A.12.5.1,A.12.6.2,A.14.2.2,A.14.2.3,A.14.2.4,A.14.2.7,A.15.2.1
++    cis-csc: 1,11,12,13,15,16,2,3,5,7,8,9
++
++ocil_clause: 'AIDE has not been configured or has not been configured to notify personnel of scan details'
++
++ocil: |-
++    To determine that periodic Samhain execution has been scheduled, run the following command:
++    <pre>$ grep samhain /etc/crontab</pre>
++    The output should return something similar to the following:
++    <pre>05 4 * * * root /usr/sbin/samhain --check | /bin/mail -s "$(hostname) - Samhain Integrity Check" root@localhost</pre>
+diff --git a/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile b/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
+index c1c79a2..572656a 100644
+--- a/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
++++ b/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
+@@ -221,8 +221,6 @@ selections:
+     - sssd_ldap_configure_tls_ca_dir
+     - sssd_ldap_configure_tls_ca
+     - accounts_password_pam_ocredit
+-    - aide_periodic_cron_checking
+-    - aide_scan_notification
+     - ensure_gpgcheck_local_packages
+     - grub2_no_removeable_media
+     - auditd_data_retention_admin_space_left_action
+@@ -230,4 +228,8 @@ selections:
+     - audit_rules_usergroup_modification
+     - accounts_passwords_pam_tally2_deny
+     - accounts_passwords_pam_tally2_deny_root
++    - package_samhain_installed
++    - samhain_build_database
++    - samhain_periodic_cron_checking
++    - samhain_scan_notification
+     - package_openssh-server_installed
+-- 
+1.9.1
+
