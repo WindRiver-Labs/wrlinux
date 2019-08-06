@@ -1,0 +1,42 @@
+From 87a3bd34e0b0613c83eebd3f2cba8d3b0d93073d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 4 Mar 2018 22:30:30 -0800
+Subject: [PATCH] replace SIGCLD with SIGCHLD and include sys/types.h
+
+Fixes
+main.c:129:10: error: 'SIGCLD' undeclared (first use in this function); did you mean 'SIGCHLD'?
+   signal(SIGCLD, sig_child);
+          ^~~~~~
+          SIGCHLD
+
+main.c:125:2: warning: implicit declaration of function 'umask' [-Wimplicit-function-declaration]
+  umask(0);
+  ^~~~~
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ src/main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/main.c b/src/main.c
+index 79db0ec..8b09603 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -133,9 +133,9 @@ static void daemon_start(int ignsigcld)
+ 
+ 	if (ignsigcld) {
+ #ifdef SIGTSTP
+-		signal(SIGCLD, sig_child);
++		signal(SIGCHLD, sig_child);
+ #else
+-		signal(SIGCLD, SIG_IGN);
++		signal(SIGCHLD, SIG_IGN);
+ #endif
+ 	}
+ }
+-- 
+2.7.4
+

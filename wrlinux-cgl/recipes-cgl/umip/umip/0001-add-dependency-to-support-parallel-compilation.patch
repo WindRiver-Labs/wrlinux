@@ -1,0 +1,34 @@
+From 767cdd9b95b2c76cb2adde0271689377b727a66c Mon Sep 17 00:00:00 2001
+From: "Roy.Li" <RongQing.Li@windriver.com>
+Date: Mon, 5 Aug 2019 15:25:38 +0800
+Subject: [PATCH] add dependency to support parallel compilation
+
+When "make -j10", the compilation will fail,
+because scan.c has included gram.h, but gram.h was produced
+after scan.c was compiled
+
+So add this dependency to ensure that gram.h is produced
+before scan.c is produced.
+
+Upstream-Status: Inappropriate [upstream is not active]
+
+Signed-off-by: Roy.Li <RongQing.Li@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ src/Makefile.am | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index e49cb4f..746baf2 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -81,3 +81,5 @@ CLEANFILES = gram.c gram.h \
+ 
+ DISTCLEANFILES = $(BUILT_SOURCES)
+ MAINTAINERCLEANFILES = Makefile.in
++
++scan.c: gram.h
+-- 
+2.7.4
+
