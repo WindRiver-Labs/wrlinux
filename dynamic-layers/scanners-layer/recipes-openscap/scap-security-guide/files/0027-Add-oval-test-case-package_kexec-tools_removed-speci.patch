@@ -1,0 +1,154 @@
+From 182b6e8095342f7b72c8cb2e26060d7396409004 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Tue, 6 Aug 2019 14:37:31 +0800
+Subject: [PATCH] Add oval test case package_kexec-tools_removed
+
+Add oval test case package_kexec-tools_removed WRLinux1019 
+specific realization.
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../oval/wrlinux1019.xml                           | 101 +++++++++++++++++++++
+ .../base/package_kexec-tools_removed/rule.yml      |  20 ++++
+ 2 files changed, 121 insertions(+)
+ create mode 100644 linux_os/guide/services/base/package_kexec-tools_removed/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/services/base/package_kexec-tools_removed/rule.yml
+
+diff --git a/linux_os/guide/services/base/package_kexec-tools_removed/oval/wrlinux1019.xml b/linux_os/guide/services/base/package_kexec-tools_removed/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..471d5d9
+--- /dev/null
++++ b/linux_os/guide/services/base/package_kexec-tools_removed/oval/wrlinux1019.xml
+@@ -0,0 +1,101 @@
++<def-group>
++  <definition class="compliance" id="package_kexec-tools_removed"
++  version="1">
++    <metadata>
++      <title>Package kexec-tools Removed</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The package kexec-tools should be removed.</description>
++    </metadata>
++
++    <criteria operator="AND">
++		<criterion comment="The /usr/sbin/kdump file is present" test_ref="test_usr_sbin_kdump_is_present" />
++		<criterion comment="The /usr/sbin/kexec file is present" test_ref="test_usr_sbin_kexec_is_present" />
++		<criterion comment="The /usr/sbin/vmcore-dmesg file is present" test_ref="test_usr_sbin_vmcore_dmesg_is_present" />
++		<criterion comment="The /etc/sysconfig/kdump.conf file is present" test_ref="test_etc_sysconfig_kdump_conf_is_present" />
++      <criterion comment="The /lib/systemd/system/kdump.service file is present" test_ref="test_lib_systemd_system_kdump_service_is_present" />
++    </criteria>
++  </definition>
++
++  <unix:file_test id="test_usr_sbin_kdump_is_present"
++	check="all"
++	check_existence="none_exist"
++	comment="The /usr/sbin/kdump file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_sbin_kdump_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_sbin_kdump_is_present"
++	comment="The /usr/sbin/kdump file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/sbin/kdump</unix:filepath>
++  </unix:file_object>
++
++  <unix:file_test id="test_usr_sbin_kexec_is_present"
++	check="all"
++	check_existence="none_exist"
++	comment="The /usr/sbin/kexec file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_sbin_kexec_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_sbin_kexec_is_present"
++	comment="The /usr/sbin/kexec file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/sbin/kexec</unix:filepath>
++  </unix:file_object>
++
++  <unix:file_test id="test_usr_sbin_vmcore_dmesg_is_present"
++	check="all"
++	check_existence="none_exist"
++	comment="The /usr/sbin/vmcore-dmesg file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_sbin_vmcore_dmesg_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_sbin_vmcore_dmesg_is_present"
++	comment="The /usr/sbin/vmcore-dmesg file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/sbin/vmcore-dmesg</unix:filepath>
++  </unix:file_object>
++
++  <unix:file_test id="test_etc_sysconfig_kdump_conf_is_present"
++	check="all"
++	check_existence="none_exist"
++	comment="The /etc/sysconfig/kdump.conf file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_etc_sysconfig_kdump_conf_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_etc_sysconfig_kdump_conf_is_present"
++	comment="The /etc/sysconfig/kdump.conf file is present on the system"
++	version="1"
++	>
++	<unix:filepath operation="equals">/etc/sysconfig/kdump.conf</unix:filepath>
++  </unix:file_object>
++
++  <unix:file_test id="test_lib_systemd_system_kdump_service_is_present"
++	check="all"
++	check_existence="none_exist"
++	comment="The /lib/systemd/system/kdump.service file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_lib_systemd_system_kdump_service_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_lib_systemd_system_kdump_service_is_present"
++	comment="The /lib/systemd/system/kdump.service file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/lib/systemd/system/kdump.service</unix:filepath>
++  </unix:file_object>
++
++</def-group>
+diff --git a/linux_os/guide/services/base/package_kexec-tools_removed/rule.yml b/linux_os/guide/services/base/package_kexec-tools_removed/rule.yml
+new file mode 100644
+index 0000000..36cd7bc
+--- /dev/null
++++ b/linux_os/guide/services/base/package_kexec-tools_removed/rule.yml
+@@ -0,0 +1,20 @@
++documentation_complete: true
++
++prodtype: wrlinux1019
++
++title: 'kexec related tool packages should be removed '
++
++description: |-
++    The kexec, kdump and vmcore-dmesg should be removed.
++    {{{ describe_package_remove(package="kexec") }}}
++    {{{ describe_package_remove(package="kdump") }}}
++    {{{ describe_package_remove(package="vmcore-dmesg") }}}
++
++rationale: |-
++    kexec related tools should be removed.
++
++severity: medium
++
++{{{ complete_ocil_entry_package(package="kexec") }}}
++{{{ complete_ocil_entry_package(package="kdump") }}}
++{{{ complete_ocil_entry_package(package="vmcore-dmesg") }}}
+-- 
+1.9.1
+

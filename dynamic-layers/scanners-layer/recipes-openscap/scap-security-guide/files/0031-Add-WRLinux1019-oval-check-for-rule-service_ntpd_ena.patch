@@ -1,0 +1,57 @@
+From 6f847aa7ed8e0815a76644bfed1c62e1ed6ea384 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Tue, 6 Aug 2019 16:33:24 +0800
+Subject: [PATCH] Add WRLinux1019 oval check for rule service_ntpd_enabled
+
+Add WRLinux1019 specific oval check for rule service_ntpd_enabled
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../ntp/service_ntpd_enabled/oval/wrlinux1019.xml  | 33 ++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
+ create mode 100644 linux_os/guide/services/ntp/service_ntpd_enabled/oval/wrlinux1019.xml
+
+diff --git a/linux_os/guide/services/ntp/service_ntpd_enabled/oval/wrlinux1019.xml b/linux_os/guide/services/ntp/service_ntpd_enabled/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..6c04a44
+--- /dev/null
++++ b/linux_os/guide/services/ntp/service_ntpd_enabled/oval/wrlinux1019.xml
+@@ -0,0 +1,33 @@
++<def-group>
++
++  <definition class="compliance" id="service_ntpd_enabled" version="1">
++    <metadata>
++      <title>Service ntpd Enabled</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The ntpd service should be enabled if possible.</description>
++      <reference source="JL" ref_id="RHEL7_20150605" ref_url="test_attestation" />
++    </metadata>
++    <criteria comment="package ntp installed and service ntpd is configured to start" operator="AND">
++    <extend_definition comment="ntp installed" definition_ref="package_ntp_installed" />
++    <criteria operator="OR" comment="service ntpd is configured to start">
++      <criterion comment="multi-user.target wants ntpd" test_ref="test_multi_user_wants_ntpd" />
++    </criteria>
++    </criteria>
++  </definition>
++
++  <linux:systemdunitdependency_test check="all" check_existence="any_exist" comment="systemd test" id="test_multi_user_wants_ntpd" version="1">
++    <linux:object object_ref="object_multi_user_target_for_ntpd" />
++    <linux:state state_ref="state_systemd_ntpd_on"/>
++  </linux:systemdunitdependency_test>
++
++  <linux:systemdunitdependency_object id="object_multi_user_target_for_ntpd" comment="list of dependencies of multi-user.target" version="1">
++    <linux:unit>multi-user.target</linux:unit>
++  </linux:systemdunitdependency_object>
++
++  <linux:systemdunitdependency_state id="state_systemd_ntpd_on" comment="ntpd listed at least once in the dependencies" version="1">
++    <linux:dependency entity_check="at least one">ntpd.service</linux:dependency>
++  </linux:systemdunitdependency_state>
++
++</def-group>
+-- 
+1.9.1
+

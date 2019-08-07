@@ -1,0 +1,90 @@
+From feb1149c8bd2c997ca656df0ae4f6bc9cfefee7e Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Tue, 6 Aug 2019 18:19:08 +0800
+Subject: [PATCH] Add WRLinux1019 oval check for rule package_ntp_installed
+
+Add WRLinux1019 specific oval check for rule package_ntp_installed
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../ntp/package_ntp_installed/oval/wrlinux1019.xml | 66 ++++++++++++++++++++++
+ 1 file changed, 66 insertions(+)
+ create mode 100644 linux_os/guide/services/ntp/package_ntp_installed/oval/wrlinux1019.xml
+
+diff --git a/linux_os/guide/services/ntp/package_ntp_installed/oval/wrlinux1019.xml b/linux_os/guide/services/ntp/package_ntp_installed/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..720f964
+--- /dev/null
++++ b/linux_os/guide/services/ntp/package_ntp_installed/oval/wrlinux1019.xml
+@@ -0,0 +1,66 @@
++<def-group>
++  <definition class="compliance" id="package_ntp_installed"
++  version="1">
++    <metadata>
++      <title>Package ntp Installed</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The ntp daemon should be installed.</description>
++    </metadata>
++    <criteria operator="AND">
++      <criterion comment="ntp executable is installed" test_ref="test_ntp_executable_is_installed" />
++      <criterion comment="ntp configuration file is installed" test_ref="test_ntp_conf_is_present" />
++      <criterion comment="ntp service startup file is installed" test_ref="test_ntp_service_is_present" />
++    </criteria>
++  </definition>
++
++  <unix:file_test id="test_ntp_executable_is_installed"
++        check="all"
++        check_existence="all_exist"
++        comment="The ntp executable should be installed."
++        version="1"
++        >
++    <unix:object object_ref="object_ntp_package_installed" />
++  </unix:file_test>
++
++  <unix:file_object id="object_ntp_package_installed"
++        comment="ntp package files present on the system"
++        version="1"
++        >
++    <unix:filepath operation="equals">/usr/sbin/ntpd</unix:filepath>
++  </unix:file_object>
++
++  <unix:file_test id="test_ntp_conf_is_present"
++        check="all"
++        check_existence="all_exist"
++        comment="The ntp configuration file should be installed."
++        version="1"
++        >
++    <unix:object object_ref="object_ntp_config_installed" />
++  </unix:file_test>
++
++  <unix:file_object id="object_ntp_config_installed"
++        comment="ntp configuration file is present on the system"
++        version="1"
++        >
++    <unix:filepath operation="equals">/etc/ntp.conf</unix:filepath>
++  </unix:file_object>
++
++  <unix:file_test id="test_ntp_service_is_present"
++        check="all"
++        check_existence="all_exist"
++        comment="The ntp configuration file should be installed."
++        version="1"
++        >
++    <unix:object object_ref="object_ntp_startup_installed" />
++  </unix:file_test>
++
++  <unix:file_object id="object_ntp_startup_installed"
++        comment="ntp daemon startup file is present on the system"
++        version="1"
++        >
++    <unix:filepath operation="equals">/lib/systemd/system/ntpd.service</unix:filepath>
++  </unix:file_object>
++
++</def-group>
+-- 
+1.9.1
+

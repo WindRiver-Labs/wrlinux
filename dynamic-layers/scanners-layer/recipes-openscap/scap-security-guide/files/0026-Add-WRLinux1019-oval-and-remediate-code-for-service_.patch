@@ -1,0 +1,73 @@
+From 6a63c58265823e3b07b53bb30272aa6ce427ae04 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Tue, 6 Aug 2019 11:19:27 +0800
+Subject: [PATCH] Add WRLinux1019 oval and remediate code for
+ service_kdump_disabled
+
+Add WRLinux1019 specific oval realization and
+remediation bash scripts for rule service_kdump_disabled. 
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../service_kdump_disabled/bash/wrlinux1019.sh     |  6 ++++
+ .../service_kdump_disabled/oval/wrlinux1019.xml    | 33 ++++++++++++++++++++++
+ 2 files changed, 39 insertions(+)
+ create mode 100644 linux_os/guide/services/base/service_kdump_disabled/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/services/base/service_kdump_disabled/oval/wrlinux1019.xml
+
+diff --git a/linux_os/guide/services/base/service_kdump_disabled/bash/wrlinux1019.sh b/linux_os/guide/services/base/service_kdump_disabled/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..1e143cd
+--- /dev/null
++++ b/linux_os/guide/services/base/service_kdump_disabled/bash/wrlinux1019.sh
+@@ -0,0 +1,6 @@
++# platform = multi_platform_wrlinux
++
++rpm -e --nodeps kdump
++rpm -e --nodeps kexec
++rpm -e --nodeps vmcore-dmesg
++
+diff --git a/linux_os/guide/services/base/service_kdump_disabled/oval/wrlinux1019.xml b/linux_os/guide/services/base/service_kdump_disabled/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..12d2d07
+--- /dev/null
++++ b/linux_os/guide/services/base/service_kdump_disabled/oval/wrlinux1019.xml
+@@ -0,0 +1,33 @@
++<def-group>
++
++  <definition class="compliance" id="service_kdump_disabled" version="1">
++    <metadata>
++      <title>Service kdump Disabled</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The kdump service should be disabled if possible.</description>
++      <reference source="JL" ref_id="RHEL7_20150605" ref_url="test_attestation" />
++    </metadata>
++    <criteria comment="package kexec-tools removed or service kdump is not configured to start" operator="OR">
++      <extend_definition comment="kexec-tools removed" definition_ref="package_kexec-tools_removed" />
++      <criteria operator="OR" comment="service kdump is not configured to start">
++        <criterion comment="kdump not wanted by multi-user.target" test_ref="test_kdump_not_wanted_by_multi_user_target" />
++      </criteria>
++    </criteria>
++  </definition>
++
++  <linux:systemdunitdependency_test check="all" check_existence="any_exist" comment="systemd test" id="test_kdump_not_wanted_by_multi_user_target" version="1">
++    <linux:object object_ref="object_multi_user_target_for_kdump" />
++    <linux:state state_ref="state_systemd_kdump_off"/>
++  </linux:systemdunitdependency_test>
++
++  <linux:systemdunitdependency_object id="object_multi_user_target_for_kdump" comment="list of dependencies of multi-user.target" version="1">
++    <linux:unit>multi-user.target</linux:unit>
++  </linux:systemdunitdependency_object>
++
++  <linux:systemdunitdependency_state id="state_systemd_kdump_off" comment="kdump is not listed in the dependencies" version="1">
++    <linux:dependency entity_check="none satisfy">kdump.service</linux:dependency>
++  </linux:systemdunitdependency_state>
++
++</def-group>
+-- 
+1.9.1
+

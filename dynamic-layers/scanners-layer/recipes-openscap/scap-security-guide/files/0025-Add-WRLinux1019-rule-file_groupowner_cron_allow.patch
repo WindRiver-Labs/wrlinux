@@ -1,0 +1,52 @@
+From da28c24db35d861bf09c445219165dd49e12c840 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Mon, 5 Aug 2019 18:29:00 +0800
+Subject: [PATCH] Add WRLinux1019 rule file_groupowner_cron_allow
+
+Add WRLinux1019 private realization for rule file_groupowner_cron_allow.
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../oval/wrlinux1019.xml                           | 28 ++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+ create mode 100644 linux_os/guide/services/cron_and_at/restrict_at_cron_users/file_groupowner_cron_allow/oval/wrlinux1019.xml
+
+diff --git a/linux_os/guide/services/cron_and_at/restrict_at_cron_users/file_groupowner_cron_allow/oval/wrlinux1019.xml b/linux_os/guide/services/cron_and_at/restrict_at_cron_users/file_groupowner_cron_allow/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..7e37c8c
+--- /dev/null
++++ b/linux_os/guide/services/cron_and_at/restrict_at_cron_users/file_groupowner_cron_allow/oval/wrlinux1019.xml
+@@ -0,0 +1,28 @@
++<def-group>
++  <definition class="compliance" id="file_groupowner_cron_allow" version="1">
++    <metadata>
++      <title>Verify group who owns 'cron.allow' file</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The /etc/cron.allow file should be owned by the appropriate
++      group.</description>
++    </metadata>
++    <criteria>
++      <criterion test_ref="test_groupowner_etc_cron_allow" />
++    </criteria>
++  </definition>
++  <unix:file_test check="all" check_existence="any_exist"
++  comment="Testing group ownership /etc/cron.allow" id="test_groupowner_etc_cron_allow"
++  version="1">
++    <unix:object object_ref="object_groupowner_cron_allow_file" />
++    <unix:state state_ref="state_groupowner_cron_allow_file" />
++  </unix:file_test>
++  <unix:file_state id="state_groupowner_cron_allow_file" version="1">
++    <unix:group_id datatype="int">0</unix:group_id>
++  </unix:file_state>
++  <unix:file_object comment="/etc/cron.allow"
++  id="object_groupowner_cron_allow_file" version="1">
++    <unix:filepath>/etc/cron.allow</unix:filepath>
++  </unix:file_object>
++</def-group>
+-- 
+1.9.1
+

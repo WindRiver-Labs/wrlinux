@@ -26,6 +26,18 @@ SRC_URI = "git://github.com/OpenSCAP/scap-security-guide.git \
             file://0022-Fix-rule-accounts_passwords_pam_tally2_interval-reme.patch \
             file://0023-Add-iptable-relevant-rules.patch \
             file://0024-Add-WRLinux-specific-rule-package_strongswan_install.patch \
+            file://0025-Add-WRLinux1019-rule-file_groupowner_cron_allow.patch \
+            file://0026-Add-WRLinux1019-oval-and-remediate-code-for-service_.patch \
+            file://0027-Add-oval-test-case-package_kexec-tools_removed-speci.patch \
+            file://0028-Add-WRLinux1019-specific-oval-check-for-rule-file_ow.patch \
+            file://0029-Add-WRLinux1019-oval-check-for-rule-package_vsftpd_r.patch \
+            file://0030-Add-WRLinux1019-oval-check-for-rule-mount_option_krb.patch \
+            file://0031-Add-WRLinux1019-oval-check-for-rule-service_ntpd_ena.patch \
+            file://0032-Add-WRLinux1019-oval-check-rule-package_ypserv_remov.patch \
+            file://0033-Add-WRLinux1019-oval-check-for-rule-package_rsh-serv.patch \
+            file://0034-Add-WRLinux1019-oval-check-for-rule-package_telnet-s.patch \
+            file://0035-Add-WRLinux1019-oval-check-for-rule-package_tftp-ser.patch \
+            file://0036-Add-WRLinux1019-oval-check-for-rule-package_ntp_inst.patch \
            "
 PV = "0.1.45+git${SRCPV}"
 
