@@ -63,19 +63,15 @@ cp ipsec.conf ipsec.secrets /etc
 
 which systemctl
 if [ $? -eq 0 ]; then
-	systemctl stop racoon || cuterr "Failed to stop racoon on local target"
-	systemctl restart strongswan || cuterr "Failed to restart strongswan on local target"
+	systemctl restart strongswan-starter || cuterr "Failed to restart strongswan on local target"
 else
-	service stop racoon || cuterr "Failed to stop racoon on local target"
-	service restart strongswan || cuterr "Failed to restart strongswan on local target"
+	service restart strongswan-started || cuterr "Failed to restart strongswan on local target"
 fi
 
 scp /opt/cut/ipsec-strongswan/ipsec.* root@$CLIENT_IP:/etc || 
 	cuterr "Failed to customize ipsec configuration on remote target"
 
-ssh root@$CLIENT_IP -- "which systemctl && systemctl stop racoon || service stop racoon" \
-	cuterr "Failed to stop racoon on remote target"
-ssh root@$CLIENT_IP -- "which systemctl && systemctl restart strongswan || service restart strongswan" \
+ssh root@$CLIENT_IP -- "which systemctl && systemctl restart strongswan-starter || service restart strongswan-started" \
 	cuterr "Failed to restart strongswan on remote target"
 
 # establish the link
