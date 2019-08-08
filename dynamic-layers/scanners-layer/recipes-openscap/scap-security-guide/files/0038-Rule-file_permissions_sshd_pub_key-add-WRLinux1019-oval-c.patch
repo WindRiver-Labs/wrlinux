@@ -1,0 +1,90 @@
+From 003a3931c083bb7a9fc39864d05afaa2a145ca60 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Wed, 7 Aug 2019 15:46:26 +0800
+Subject: [PATCH] file_permissions_sshd_pub_key add WRLinux1019 oval check
+
+For rule file_permissions_sshd_pub_key add WRLinux1019 oval check
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../bash/wrlinux1019.sh                            | 25 ++++++++++++++++
+ .../oval/wrlinux1019.xml                           | 33 ++++++++++++++++++++++
+ 2 files changed, 58 insertions(+)
+ create mode 100644 linux_os/guide/services/ssh/file_permissions_sshd_pub_key/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/services/ssh/file_permissions_sshd_pub_key/oval/wrlinux1019.xml
+
+diff --git a/linux_os/guide/services/ssh/file_permissions_sshd_pub_key/bash/wrlinux1019.sh b/linux_os/guide/services/ssh/file_permissions_sshd_pub_key/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..3367720
+--- /dev/null
++++ b/linux_os/guide/services/ssh/file_permissions_sshd_pub_key/bash/wrlinux1019.sh
+@@ -0,0 +1,25 @@
++# platform = multi_platform_wrlinux
++
++SYSCONFDIR=/etc/ssh
++
++if [ ! -d $SYSCONFDIR ]; then
++	/bin/mkdir -p $SYSCONFDIR
++fi
++
++if [ ! -f /etc/ssh/ssh_host_rsa_key.pub ]; then
++	/usr/bin/ssh-keygen -q -f ${SYSCONFDIR}/ssh_host_rsa_key -N '' -t rsa 
++fi
++
++if [ ! -f /etc/ssh/ssh_host_dsa_key.pub ]; then
++	/usr/bin/ssh-keygen -q -f ${SYSCONFDIR}/ssh_host_dsa_key -N '' -t dsa 
++fi
++
++if [ ! -f /etc/ssh/ssh_host_ecdsa_key.pub ]; then
++	/usr/bin/ssh-keygen -q -f ${SYSCONFDIR}/ssh_host_ecdsa_key -N '' -t ecdsa
++fi
++
++if [ ! -f /etc/ssh/ssh_host_ed25519_key.pub ]; then
++	/usr/bin/ssh-keygen -q -f ${SYSCONFDIR}/ssh_host_ed25519_key -N '' -t ed25519
++fi
++
++chmod 0644 /etc/ssh/*.pub
+diff --git a/linux_os/guide/services/ssh/file_permissions_sshd_pub_key/oval/wrlinux1019.xml b/linux_os/guide/services/ssh/file_permissions_sshd_pub_key/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..b26ca96
+--- /dev/null
++++ b/linux_os/guide/services/ssh/file_permissions_sshd_pub_key/oval/wrlinux1019.xml
+@@ -0,0 +1,33 @@
++<def-group>
++  <definition class="compliance" id="file_permissions_sshd_pub_key" version="1">
++    <metadata>
++      <title>SSHD Service Public Key Permissions</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>File permissions for the SSH Server's public keys should be
++set to 0644 (or stronger). By default, these files are located at /etc/ssh.</description>
++    </metadata>
++    <criteria>
++      <criterion test_ref="test_file_permissions_sshd_pub_key" />
++    </criteria>
++  </definition>
++
++  <unix:file_test check="all" check_existence="all_exist" comment="Testing file permissions" id="test_file_permissions_sshd_pub_key" version="1">
++    <unix:object object_ref="object_file_permissions_sshd_pub_key" />
++    <unix:state state_ref="state_file_permissions_sshd_pub_key" />
++  </unix:file_test>
++
++  <unix:file_object comment="/etc/ssh" id="object_file_permissions_sshd_pub_key" version="1">
++    <unix:path>/etc/ssh/</unix:path>
++    <unix:filename operation="pattern match">^.*key.pub$</unix:filename>
++  </unix:file_object>
++
++  <unix:file_state id="state_file_permissions_sshd_pub_key" version="1">
++    <unix:uexec datatype="boolean">false</unix:uexec>
++    <unix:gwrite datatype="boolean">false</unix:gwrite>
++    <unix:gexec datatype="boolean">false</unix:gexec>
++    <unix:owrite datatype="boolean">false</unix:owrite>
++    <unix:oexec datatype="boolean">false</unix:oexec>
++  </unix:file_state>
++</def-group>
+-- 
+1.9.1
+

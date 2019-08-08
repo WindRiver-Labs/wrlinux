@@ -38,6 +38,13 @@ SRC_URI = "git://github.com/OpenSCAP/scap-security-guide.git \
             file://0034-Add-WRLinux1019-oval-check-for-rule-package_telnet-s.patch \
             file://0035-Add-WRLinux1019-oval-check-for-rule-package_tftp-ser.patch \
             file://0036-Add-WRLinux1019-oval-check-for-rule-package_ntp_inst.patch \
+            file://0037-Rule-file_permissions_sshd_private_key-add-WRLin.patch \
+            file://0038-Rule-file_permissions_sshd_pub_key-add-WRLinux1019-oval-c.patch \
+            file://0039-Rule-service_sshd_enabled-add-WRLinux1019-oval-check.patch \
+            file://0040-Rule-package_screen_installed-add-oval-check.patch \
+            file://0041-Rule-service_auditd_enabled-add-oval-check.patch \
+            file://0042-Rule-kernel_module_usb-storage_disabled-add-oval-che.patch \
+            file://0043-Rule-service_autofs_disabled-add-oval-check.patch \
            "
 PV = "0.1.45+git${SRCPV}"
 

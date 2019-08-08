@@ -1,0 +1,73 @@
+From 35c0082eda720012b7e45e7f410784b32193630b Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Wed, 7 Aug 2019 15:32:40 +0800
+Subject: [PATCH] For rule file_permissions_sshd_private_key add WRLinux1019
+ oval check
+
+For rule file_permissions_sshd_private_key add WRLinux1019 oval check
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+---
+ .../bash/wrlinux1019.sh                            |  3 ++
+ .../oval/wrlinux1019.xml                           | 36 ++++++++++++++++++++++
+ 2 files changed, 39 insertions(+)
+ create mode 100644 linux_os/guide/services/ssh/file_permissions_sshd_private_key/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/services/ssh/file_permissions_sshd_private_key/oval/wrlinux1019.xml
+
+diff --git a/linux_os/guide/services/ssh/file_permissions_sshd_private_key/bash/wrlinux1019.sh b/linux_os/guide/services/ssh/file_permissions_sshd_private_key/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..78395dd
+--- /dev/null
++++ b/linux_os/guide/services/ssh/file_permissions_sshd_private_key/bash/wrlinux1019.sh
+@@ -0,0 +1,3 @@
++# platform = multi_platform_wrlinux
++
++chmod 0600 /etc/ssh/*_key
+diff --git a/linux_os/guide/services/ssh/file_permissions_sshd_private_key/oval/wrlinux1019.xml b/linux_os/guide/services/ssh/file_permissions_sshd_private_key/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..39affb4
+--- /dev/null
++++ b/linux_os/guide/services/ssh/file_permissions_sshd_private_key/oval/wrlinux1019.xml
+@@ -0,0 +1,36 @@
++<def-group>
++  <definition class="compliance" id="file_permissions_sshd_private_key" version="1">
++    <metadata>
++      <title>SSH Server Private Key Permissions</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>File permissions for the SSH Server's private keys should be
++set to 0600 (or stronger). By default, these files are located at /etc/ssh.</description>
++    </metadata>
++    <criteria>
++      <criterion test_ref="test_file_permissions_sshd_private_key" />
++    </criteria>
++  </definition>
++
++  <unix:file_test check="all" check_existence="all_exist" comment="Testing file permissions" id="test_file_permissions_sshd_private_key" version="1">
++    <unix:object object_ref="object_file_permissions_sshd_private_key" />
++    <unix:state state_ref="state_file_permissions_sshd_private_key" />
++  </unix:file_test>
++
++  <unix:file_object comment="/etc/ssh" id="object_file_permissions_sshd_private_key" version="1">
++    <unix:path>/etc/ssh/</unix:path>
++    <unix:filename operation="pattern match">^.*key$</unix:filename>
++  </unix:file_object>
++
++  <unix:file_state id="state_file_permissions_sshd_private_key" version="1">
++    <unix:uexec datatype="boolean">false</unix:uexec>
++    <unix:gread datatype="boolean">false</unix:gread>
++    <unix:gwrite datatype="boolean">false</unix:gwrite>
++    <unix:gexec datatype="boolean">false</unix:gexec>
++    <unix:oread datatype="boolean">false</unix:oread>
++    <unix:owrite datatype="boolean">false</unix:owrite>
++    <unix:oexec datatype="boolean">false</unix:oexec>
++  </unix:file_state>
++
++</def-group>
+-- 
+1.9.1
+

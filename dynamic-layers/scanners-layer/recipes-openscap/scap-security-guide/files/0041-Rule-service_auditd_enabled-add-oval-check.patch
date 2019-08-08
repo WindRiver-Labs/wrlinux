@@ -1,0 +1,59 @@
+From 6b9b61678e647e33141e7f7444fcabd80dc0950a Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Wed, 7 Aug 2019 18:09:26 +0800
+Subject: [PATCH] Rule service_auditd_enabled add oval check
+
+For rule service_auditd_enabled add WRLinux1019 oval check
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../service_auditd_enabled/oval/wrlinux1019.xml    | 35 ++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+ create mode 100644 linux_os/guide/system/auditing/service_auditd_enabled/oval/wrlinux1019.xml
+
+diff --git a/linux_os/guide/system/auditing/service_auditd_enabled/oval/wrlinux1019.xml b/linux_os/guide/system/auditing/service_auditd_enabled/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..07a3e1d
+--- /dev/null
++++ b/linux_os/guide/system/auditing/service_auditd_enabled/oval/wrlinux1019.xml
+@@ -0,0 +1,35 @@
++<def-group>
++  <definition class="compliance" id="service_auditd_enabled" version="1">
++    <metadata>
++      <title>Service auditd Disabled</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The auditd service should be enabled.</description>
++    </metadata>
++    <criteria comment="package service auditd is present and configured to start" operator="AND">
++      <criterion comment="auditd enabled in multi-user.target" test_ref="test_auditd_enabled_multi_user_target" />
++    </criteria>
++  </definition>
++
++  <unix:file_test id="test_auditd_enabled_multi_user_target"
++	check="all" check_existence="any_exist"
++	comment="look for auditd.service in /etc/systemd/system/multi-user.target.wants"
++	version="1"
++	>
++    <unix:object object_ref="object_auditd_enabled_multi_user_target" />
++  </unix:file_test>
++
++  <unix:file_object id="object_auditd_enabled_multi_user_target"
++	comment="look for auditd.service in /etc/systemd/system/multi-user.target.wants"
++	version="1"
++	>
++    <unix:filepath>/etc/systemd/system/multi-user.target.wants/auditd.service</unix:filepath>
++    <filter action="include">state_symlink</filter>
++  </unix:file_object>
++
++  <unix:file_state id="state_symlink" version="1">
++    <unix:type operation="equals">symbolic link</unix:type>
++  </unix:file_state>
++
++</def-group>
+-- 
+1.9.1
+
