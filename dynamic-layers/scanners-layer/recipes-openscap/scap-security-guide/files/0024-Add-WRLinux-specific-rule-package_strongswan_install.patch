@@ -36,7 +36,7 @@ index 0000000..745ca71
 +    <criteria operator="AND">
 +      <criterion comment="The /etc/ipsec.conf file is present" test_ref="test_etc_ipsec_conf_is_present" />
 +      <criterion comment="The /etc/strongswan.conf file is present" test_ref="test_etc_strongswan_conf_is_present" />
-+      <criterion comment="The /lib/systemd/system/strongswan.service file is present" test_ref="test_lib_systemd_system_strongswan_service_is_present" />
++      <criterion comment="The /lib/systemd/system/strongswan-starter.service file is present" test_ref="test_lib_systemd_system_strongswan_service_is_present" />
 +      <criterion comment="The /usr/bin/pki file is present" test_ref="test_usr_bin_pki_is_present" />
 +      <criterion comment="The /usr/sbin/ipsec file is present" test_ref="test_usr_sbin_ipsec_is_present" />
 +    </criteria>
@@ -79,17 +79,17 @@ index 0000000..745ca71
 +  <unix:file_test id="test_lib_systemd_system_strongswan_service_is_present"
 +	check="all"
 +	check_existence="all_exist"
-+	comment="The /lib/systemd/system/strongswan.service file is present on the system"
++	comment="The /lib/systemd/system/strongswan-starter.service file is present on the system"
 +	version="1"
 +	>
 +    <unix:object object_ref="object_lib_systemd_system_strongswan_service_is_present" />
 +  </unix:file_test>
 +
 +  <unix:file_object id="object_lib_systemd_system_strongswan_service_is_present"
-+	comment="The /lib/systemd/system/strongswan.service file is present on the system"
++	comment="The /lib/systemd/system/strongswan-starter.service file is present on the system"
 +	version="1"
 +	>
-+    <unix:filepath operation="equals">/lib/systemd/system/strongswan.service</unix:filepath>
++    <unix:filepath operation="equals">/lib/systemd/system/strongswan-starter.service</unix:filepath>
 +  </unix:file_object>
 +
 +
