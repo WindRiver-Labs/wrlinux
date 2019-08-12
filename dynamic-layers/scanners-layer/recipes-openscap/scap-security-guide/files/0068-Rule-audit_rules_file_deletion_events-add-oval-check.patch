@@ -1,0 +1,114 @@
+From ec32c998f2a3344e5149718c30f8cc51a8d5d284 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Fri, 9 Aug 2019 16:48:09 +0800
+Subject: [PATCH] Rule audit_rules_file_deletion_events add oval check
+ and remediate scripts
+
+Rule audit_rules_file_deletion_events add oval check and remediate scripts
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../bash/wrlinux1019.sh                            | 19 +++++++
+ .../oval/wrlinux1019.xml                           | 62 ++++++++++++++++++++++
+ 2 files changed, 81 insertions(+)
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_file_deletion_events/audit_rules_file_deletion_events/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_file_deletion_events/audit_rules_file_deletion_events/oval/wrlinux1019.xml
+
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_file_deletion_events/audit_rules_file_deletion_events/bash/wrlinux1019.sh b/linux_os/guide/system/auditing/auditd_configure_rules/audit_file_deletion_events/audit_rules_file_deletion_events/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..dd6c6ae
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_file_deletion_events/audit_rules_file_deletion_events/bash/wrlinux1019.sh
+@@ -0,0 +1,19 @@
++# platform = multi_platform_wrlinux
++
++# Include source function library.
++. /usr/share/scap-security-guide/remediation_functions
++
++# Perform the remediation for the syscall rule
++# Retrieve hardware architecture of the underlying system
++[ $(getconf LONG_BIT) = "32" ] && RULE_ARCHS=("b32") || RULE_ARCHS=("b32" "b64")
++
++for ARCH in "${RULE_ARCHS[@]}"
++do
++	PATTERN="-a always,exit -F arch=$ARCH -S .* -F auid>=1000 -F auid!=4294967295 -k *"
++	# Use escaped BRE regex to specify rule group
++	GROUP="\(rmdir\|unlink\|rename\)"
++	FULL_RULE="-a always,exit -F arch=$ARCH -S rmdir -S unlink -S unlinkat -S rename -S renameat -F auid>=1000 -F auid!=4294967295 -k delete"
++	# Perform the remediation for both possible tools: 'auditctl' and 'augenrules'
++	fix_audit_syscall_rule "auditctl" "$PATTERN" "$GROUP" "$ARCH" "$FULL_RULE"
++	fix_audit_syscall_rule "augenrules" "$PATTERN" "$GROUP" "$ARCH" "$FULL_RULE"
++done
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_file_deletion_events/audit_rules_file_deletion_events/oval/wrlinux1019.xml b/linux_os/guide/system/auditing/auditd_configure_rules/audit_file_deletion_events/audit_rules_file_deletion_events/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..c8842bc
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_file_deletion_events/audit_rules_file_deletion_events/oval/wrlinux1019.xml
+@@ -0,0 +1,62 @@
++<def-group>
++  <definition class="compliance" id="audit_rules_file_deletion_events" version="1">
++    <metadata>
++      <title>Audit File Deletion Events</title>
++      <affected family="unix">
++        <platform>Red Hat Enterprise Linux 7</platform>
++        <platform>multi_platform_fedora</platform>
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>Audit files deletion events.</description>
++      <reference source="JL" ref_id="RHEL7_20150326" ref_url="test_attestation" />
++      <reference source="JL" ref_id="FEDORA20_20150326" ref_url="test_attestation" />
++    </metadata>
++    <criteria operator="OR">
++      <criteria operator="AND">
++        <criterion comment="audit augenrules" test_ref="test_audit_rules_file_deletion_events_augenrules" />
++        <criterion comment="audit augenrules file delete" test_ref="test_audit_rules_file_deletion_events_file_delete_augenrules" />
++      </criteria>
++      <criteria operator="AND">
++        <criterion comment="audit auditctl" test_ref="test_audit_rules_file_deletion_events_auditctl" />
++        <criterion comment="audit auditctl file delete" test_ref="test_audit_rules_file_deletion_events_file_delete_auditctl" />
++      </criteria>
++    </criteria>
++  </definition>
++
++  <!-- Test the augenrules case -->
++  <ind:textfilecontent54_test check="all" comment="audit augenrules" id="test_audit_rules_file_deletion_events_augenrules" version="1">
++    <ind:object object_ref="object_audit_rules_file_deletion_events_augenrules" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object id="object_audit_rules_file_deletion_events_augenrules" version="1">
++    <ind:filepath>/lib/systemd/system/auditd.service</ind:filepath>
++    <ind:pattern operation="pattern match">^ExecStartPost=\-\/sbin\/augenrules.*$</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++  <ind:textfilecontent54_test check="all" comment="audit augenrules file delete" id="test_audit_rules_file_deletion_events_file_delete_augenrules" version="1">
++    <ind:object object_ref="object_audit_rules_file_deletion_events_file_delete_augenrules" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object id="object_audit_rules_file_deletion_events_file_delete_augenrules" version="1">
++    <ind:filepath operation="pattern match">/etc/audit/rules\.d/.*\.rules</ind:filepath>
++    <ind:pattern operation="pattern match">^\-a\s+always,exit\s+(\-F\s+arch=(b64|b32)\s+)?\-S\s+rmdir\s+\-S\s+unlink\s+\-S\s+unlinkat\s+\-S\s+rename\s+\-S\s+renameat\s+\-F\s+auid>=1000\s+\-F\s+auid!=4294967295\s+\-k\s+[-\w]+\s*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <!-- Test the auditctl case -->
++  <ind:textfilecontent54_test check="all" comment="audit auditctl" id="test_audit_rules_file_deletion_events_auditctl" version="1">
++    <ind:object object_ref="object_audit_rules_file_deletion_events_auditctl" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object id="object_audit_rules_file_deletion_events_auditctl" version="1">
++    <ind:filepath>/lib/systemd/system/auditd.service</ind:filepath>
++    <ind:pattern operation="pattern match">^ExecStartPost=\-\/sbin\/auditctl.*$</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++  <ind:textfilecontent54_test check="all" comment="audit auditctl file delete" id="test_audit_rules_file_deletion_events_file_delete_auditctl" version="1">
++    <ind:object object_ref="object_audit_rules_file_deletion_events_file_delete_auditctl" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object id="object_audit_rules_file_deletion_events_file_delete_auditctl" version="1">
++    <ind:filepath>/etc/audit/audit.rules</ind:filepath>
++    <ind:pattern operation="pattern match">^\-a\s+always,exit\s+(\-F\s+arch=(b64|b32)\s+)?\-S\s+rmdir\s+\-S\s+unlink\s+\-S\s+unlinkat\s+\-S\s+rename\s+\-S\s+renameat\s+\-F\s+auid>=1000\s+\-F\s+auid!=4294967295\s+\-k\s+[-\w]+\s*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++</def-group>
+-- 
+1.9.1
+

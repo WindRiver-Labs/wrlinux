@@ -1,0 +1,151 @@
+From 9fb93f9c6d689edb9346ba2e473b639ba3ac7d35 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Fri, 9 Aug 2019 15:41:24 +0800
+Subject: [PATCH] Rule audit_rules_dac_modification_fchmod add oval check
+ and remediate scripts
+
+Rule audit_rules_dac_modification_fchmod add oval check and remediate scripts
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../bash/wrlinux1019.sh                            |  18 ++++
+ .../oval/wrlinux1019.xml                           | 100 +++++++++++++++++++++
+ 2 files changed, 118 insertions(+)
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_dac_actions/audit_rules_dac_modification_fchmod/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_dac_actions/audit_rules_dac_modification_fchmod/oval/wrlinux1019.xml
+
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_dac_actions/audit_rules_dac_modification_fchmod/bash/wrlinux1019.sh b/linux_os/guide/system/auditing/auditd_configure_rules/audit_dac_actions/audit_rules_dac_modification_fchmod/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..688fa5b
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_dac_actions/audit_rules_dac_modification_fchmod/bash/wrlinux1019.sh
+@@ -0,0 +1,18 @@
++# platform = multi_platform_wrlinux
++
++# Include source function library.
++. /usr/share/scap-security-guide/remediation_functions
++
++# Perform the remediation for the syscall rule
++# Retrieve hardware architecture of the underlying system
++[ $(getconf LONG_BIT) = "32" ] && RULE_ARCHS=("b32") || RULE_ARCHS=("b32" "b64")
++
++for ARCH in "${RULE_ARCHS[@]}"
++do
++	PATTERN="-a always,exit -F arch=$ARCH -S .* -F auid>=1000 -F auid!=4294967295 -k *"
++	GROUP="chmod"
++	FULL_RULE="-a always,exit -F arch=$ARCH -S chmod -S fchmod -S fchmodat -F auid>=1000 -F auid!=4294967295 -k perm_mod"
++	# Perform the remediation for both possible tools: 'auditctl' and 'augenrules'
++	fix_audit_syscall_rule "auditctl" "$PATTERN" "$GROUP" "$ARCH" "$FULL_RULE"
++	fix_audit_syscall_rule "augenrules" "$PATTERN" "$GROUP" "$ARCH" "$FULL_RULE"
++done
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_dac_actions/audit_rules_dac_modification_fchmod/oval/wrlinux1019.xml b/linux_os/guide/system/auditing/auditd_configure_rules/audit_dac_actions/audit_rules_dac_modification_fchmod/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..0e28300
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_dac_actions/audit_rules_dac_modification_fchmod/oval/wrlinux1019.xml
+@@ -0,0 +1,100 @@
++<def-group>
++  <definition class="compliance" id="audit_rules_dac_modification_fchmod" version="1">
++    <metadata>
++      <title>Audit Discretionary Access Control Modification Events - fchmod</title>
++      <affected family="unix">
++        <platform>Red Hat Enterprise Linux 7</platform>
++        <platform>multi_platform_fedora</platform>
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The changing of file permissions and attributes should be audited.</description>
++      <reference source="JL" ref_id="RHEL7_20150421" ref_url="test_attestation" />
++      <reference source="JL" ref_id="FEDORA20_20150421" ref_url="test_attestation" />
++    </metadata>
++
++    <criteria operator="OR">
++
++      <!-- Test the augenrules case -->
++      <criteria operator="AND">
++        <criterion comment="audit augenrules" test_ref="test_ardm_fchmod_augenrules" />
++        <criterion comment="audit augenrules 32-bit fchmod" test_ref="test_32bit_ardm_fchmod_augenrules" />
++        <criteria operator="OR">
++          <!-- System either isn't 64-bit => we just check presence of 32-bit version of fchmod audit DAC rule -->
++          <extend_definition comment="64-bit system" definition_ref="system_info_architecture_64bit" negate="true" />
++          <!-- Or system is 64-bit => in that case we also need to verify the presence of 64-bit version of fchmod audit DAC rule -->
++          <criterion comment="audit augenrules 64-bit fchmod" test_ref="test_64bit_ardm_fchmod_augenrules" />
++        </criteria>
++      </criteria>
++
++      <!-- OR test the auditctl case -->
++      <criteria operator="AND">
++        <criterion comment="audit auditctl" test_ref="test_ardm_fchmod_auditctl" />
++        <criterion comment="audit auditctl 32-bit fchmod" test_ref="test_32bit_ardm_fchmod_auditctl" />
++        <criteria operator="OR">
++          <!-- System either isn't 64-bit => we just check presence of 32-bit version of fchmod audit DAC rule -->
++          <extend_definition comment="64-bit system" definition_ref="system_info_architecture_64bit" negate="true" />
++          <!-- Or system is 64-bit => in that case we also need to verify the presence of 64-bit version of fchmod audit DAC rule -->
++          <criterion comment="audit auditctl 64-bit fchmod" test_ref="test_64bit_ardm_fchmod_auditctl" />
++        </criteria>
++      </criteria>
++
++    </criteria>
++  </definition>
++
++  <!-- Test the augenrules case -->
++  <ind:textfilecontent54_test check="all" comment="audit augenrules" id="test_ardm_fchmod_augenrules" version="1">
++    <ind:object object_ref="object_ardm_fchmod_augenrules" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object id="object_ardm_fchmod_augenrules" version="1">
++    <ind:filepath>/lib/systemd/system/auditd.service</ind:filepath>
++    <ind:pattern operation="pattern match">^ExecStartPost=\-\/sbin\/augenrules.*$</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_test check="all" comment="audit augenrules 32-bit fchmod" id="test_32bit_ardm_fchmod_augenrules" version="1">
++    <ind:object object_ref="object_32bit_ardm_fchmod_augenrules" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object id="object_32bit_ardm_fchmod_augenrules" version="1">
++    <ind:filepath operation="pattern match">/etc/audit/rules\.d/.*\.rules</ind:filepath>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b32[\s]+)(?:.*-S[\s]+fchmod[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_test check="all" comment="audit augenrules 64-bit fchmod" id="test_64bit_ardm_fchmod_augenrules" version="1">
++    <ind:object object_ref="object_64bit_ardm_fchmod_augenrules" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object id="object_64bit_ardm_fchmod_augenrules" version="1">
++    <ind:filepath operation="pattern match">/etc/audit/rules\.d/.*\.rules</ind:filepath>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b64[\s]+)(?:.*-S[\s]+fchmod[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <!-- Test the auditctl case -->
++  <ind:textfilecontent54_test check="all" comment="audit auditctl" id="test_ardm_fchmod_auditctl" version="1">
++    <ind:object object_ref="object_ardm_fchmod_auditctl" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object id="object_ardm_fchmod_auditctl" version="1">
++    <ind:filepath>/lib/systemd/system/auditd.service</ind:filepath>
++    <ind:pattern operation="pattern match">^ExecStartPost=\-\/sbin\/auditctl.*$</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_test check="all" comment="audit auditctl 32-bit fchmod" id="test_32bit_ardm_fchmod_auditctl" version="1">
++    <ind:object object_ref="object_32bit_ardm_fchmod_auditctl" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object id="object_32bit_ardm_fchmod_auditctl" version="1">
++    <ind:filepath>/etc/audit/audit.rules</ind:filepath>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b32[\s]+)(?:.*-S[\s]+fchmod[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_test check="all" comment="audit auditctl 64-bit fchmod" id="test_64bit_ardm_fchmod_auditctl" version="1">
++    <ind:object object_ref="object_64bit_ardm_fchmod_auditctl" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object id="object_64bit_ardm_fchmod_auditctl" version="1">
++    <ind:filepath>/etc/audit/audit.rules</ind:filepath>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b64[\s]+)(?:.*-S[\s]+fchmod[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++</def-group>
+-- 
+1.9.1
+

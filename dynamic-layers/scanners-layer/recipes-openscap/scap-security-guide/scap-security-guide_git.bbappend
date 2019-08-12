@@ -45,6 +45,47 @@ SRC_URI = "git://github.com/OpenSCAP/scap-security-guide.git \
             file://0041-Rule-service_auditd_enabled-add-oval-check.patch \
             file://0042-Rule-kernel_module_usb-storage_disabled-add-oval-che.patch \
             file://0043-Rule-service_autofs_disabled-add-oval-check.patch \
+            file://0044-Rule-cracklib_accounts_password_pam_dcredit-add-oval.patch \
+            file://0045-Rule-cracklib_accounts_password_pam_difok-add-oval-c.patch \
+            file://0046-Rule-cracklib_accounts_password_pam_lcredit-add-oval.patch \
+            file://0047-Rule-cracklib_accounts_password_pam_maxrepeat-add-ov.patch \
+            file://0048-Rule-cracklib_accounts_password_pam_minclass-add-oval-check.patch \
+            file://0049-Rule-cracklib_accounts_password_pam_ocredit-add-oval-check.patch \
+            file://0050-Rule-cracklib_accounts_password_pam_ucredit-add-oval-check.patch \
+            file://0051-Replace-rules-accounts_password_pam_-with-cracklib_a.patch \
+            file://0052-Rule-dac_modification_chmod-add-oval-check-and-remed.patch \
+            file://0053-Rule-audit_rules_dac_modification_chown-add-oval-che.patch \
+            file://0054-Rule-audit_rules_dac_modification_fchmod-add-oval-ch.patch \
+            file://0055-Rule-audit_rules_dac_modification_fchmodat-add-oval-.patch \
+            file://0056-Rule-audit_rules_dac_modification_fchown-add-oval-ch.patch \
+            file://0057-Rule-audit_rules_dac_modification_fchownat-add-oval-.patch \
+            file://0058-Rule-audit_rules_dac_modification_fremovexattr-add-o.patch \
+            file://0059-Rule-audit_rules_dac_modification_fsetxattr-add-oval.patch \
+            file://0060-Rule-audit_rules_dac_modification_lchown-add-oval-ch.patch \
+            file://0061-Rule-audit_rules_dac_modification_lremovexattr-add-o.patch \
+            file://0062-Rule-audit_rules_dac_modification_lsetxattr-add-oval.patch \
+            file://0063-Rule-audit_rules_dac_modification_removexattr-add-ov.patch \
+            file://0064-Rule-audit_rules_dac_modification_setxattr-add-oval-.patch \
+            file://0065-Rule-audit_rules_execution_chcon-add-oval-check-and-.patch \
+            file://0066-Rule-audit_rules_execution_semanage-add-oval-check-a.patch \
+            file://0067-Rule-audit_rules_execution_setsebool-add-oval-check-.patch \
+            file://0068-Rule-audit_rules_file_deletion_events-add-oval-check.patch \
+            file://0069-Rule-audit_rules_unsuccessful_file_modification-add-.patch \
+            file://0070-Use-rule-audit_rules_file_deletion_events-to-replace.patch \
+            file://0071-Use-rule-audit_rules_unsuccessful_file_modification-.patch \
+            file://0072-Rule-audit_rules_privileged_commands_chage-add-oval-.patch \
+            file://0073-Rule-audit_rules_privileged_commands_chsh-add-oval-c.patch \
+            file://0074-Rule-audit_rules_privileged_commands_crontab-add-ova.patch \
+            file://0075-Rule-audit_rules_privileged_commands_gpasswd-add-ova.patch \
+            file://0076-Rule-audit_rules_privileged_commands_pam_timestamp_c.patch \
+            file://0077-Rule-audit_rules_privileged_commands_passwd-add-oval.patch \
+            file://0078-Rule-audit_rules_privileged_commands_postdrop-add-ov.patch \
+            file://0079-Rule-audit_rules_privileged_commands_postqueue-add-o.patch \
+            file://0080-Rule-audit_rules_privileged_commands_ssh_keysign-add.patch \
+            file://0081-Rule-audit_rules_privileged_commands_su-add-oval-che.patch \
+            file://0082-Rule-audit_rules_privileged_commands_sudo-add-oval-c.patch \
+            file://0083-Rule-audit_rules_privileged_commands_umount-add-oval.patch \
+            file://0084-Rule-audit_rules_privileged_commands_pam_timestamp_c.patch \
            "
 PV = "0.1.45+git${SRCPV}"
 

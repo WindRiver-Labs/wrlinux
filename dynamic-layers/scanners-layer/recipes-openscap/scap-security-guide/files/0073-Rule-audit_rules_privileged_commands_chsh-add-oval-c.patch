@@ -1,0 +1,71 @@
+From 94bf9d988f26940c54492888098fa57765eefb67 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Sat, 10 Aug 2019 12:10:49 +0800
+Subject: [PATCH 02/13] Rule audit_rules_privileged_commands_chsh add oval
+ check
+
+For rule audit_rules_privileged_commands_chsh add oval check
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../oval/wrlinux1019.xml                           | 46 ++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_chsh/oval/wrlinux1019.xml
+
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_chsh/oval/wrlinux1019.xml b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_chsh/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..409f7cb
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_chsh/oval/wrlinux1019.xml
+@@ -0,0 +1,46 @@
++<def-group>
++  <definition class="compliance" id="audit_rules_privileged_commands_chsh" version="1">
++    <metadata>
++      <title>Ensure auditd Collects Information on the Use of Privileged Commands - chsh</title>
++      <affected family="unix">
++        <platform>WRLinux</platform>
++	<platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>Audit rules about the information on the use of chsh is enabled.</description>
++    </metadata>
++
++    <criteria operator="OR">
++
++      <!-- Test the augenrules case -->
++      <criteria operator="AND">
++        <extend_definition comment="audit augenrules" definition_ref="audit_rules_augenrules" />
++        <criterion comment="audit augenrules chsh" test_ref="test_audit_rules_privileged_commands_chsh_augenrules" />
++      </criteria>
++
++      <!-- Test the auditctl case -->
++      <criteria operator="AND">
++        <extend_definition comment="audit auditctl" definition_ref="audit_rules_auditctl" />
++        <criterion comment="audit auditctl chsh" test_ref="test_audit_rules_privileged_commands_chsh_auditctl" />
++      </criteria>
++    </criteria>
++  </definition>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="audit augenrules chsh" id="test_audit_rules_privileged_commands_chsh_augenrules" version="1">
++    <ind:object object_ref="object_audit_rules_privileged_commands_chsh_augenrules" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object id="object_audit_rules_privileged_commands_chsh_augenrules" version="1">
++    <ind:filepath operation="pattern match">/etc/audit/rules\.d/.*\.rules</ind:filepath>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/usr\/bin\/chsh[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=4294967295[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="audit auditctl chsh" id="test_audit_rules_privileged_commands_chsh_auditctl" version="1">
++    <ind:object object_ref="object_audit_rules_privileged_commands_chsh_auditctl" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object id="object_audit_rules_privileged_commands_chsh_auditctl" version="1">
++    <ind:filepath>/etc/audit/audit.rules</ind:filepath>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/usr\/bin\/chsh[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=4294967295[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++</def-group>
+-- 
+1.9.1
+

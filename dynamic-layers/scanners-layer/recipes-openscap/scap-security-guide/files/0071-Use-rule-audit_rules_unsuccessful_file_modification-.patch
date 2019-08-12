@@ -1,0 +1,38 @@
+From 674c1ee7aa54704daf01b4eb2163fab308fd4d22 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Fri, 9 Aug 2019 17:38:03 +0800
+Subject: [PATCH] Use rule audit_rules_unsuccessful_file_modification to
+ replace audit_rules_unsuccessful_file_modification_*
+
+Use rule audit_rules_unsuccessful_file_modification to
+ replace audit_rules_unsuccessful_file_modification_* rules 
+in WRLinux1019 profile
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ wrlinux1019/profiles/draft_stig_wrlinux_disa.profile | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile b/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
+index 9872495..a4188f6 100644
+--- a/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
++++ b/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
+@@ -167,12 +167,7 @@ selections:
+     - audit_rules_usergroup_modification_gshadow
+     - audit_rules_usergroup_modification_shadow
+     - audit_rules_usergroup_modification_opasswd
+-    - audit_rules_unsuccessful_file_modification_creat
+-    - audit_rules_unsuccessful_file_modification_open
+-    - audit_rules_unsuccessful_file_modification_openat
+-    - audit_rules_unsuccessful_file_modification_open_by_handle_at
+-    - audit_rules_unsuccessful_file_modification_truncate
+-    - audit_rules_unsuccessful_file_modification_ftruncate
++    - audit_rules_unsuccessful_file_modification
+     - audit_rules_file_deletion_events
+     - audit_rules_kernel_module_loading_init
+     - audit_rules_kernel_module_loading_delete
+-- 
+1.9.1
+
