@@ -1,0 +1,110 @@
+From f4ee681f64d3e7914d63efbe0a2a7da9f3b799fc Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Mon, 12 Aug 2019 18:09:25 +0800
+Subject: [PATCH] Update commands path in audit_rules_privileged_commands*
+ rules oval check
+
+Update commands path in audit_rules_privileged_commands*
+ rules oval check with the linked binary name.
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../audit_rules_privileged_commands_chsh/oval/wrlinux1019.xml         | 4 ++--
+ .../audit_rules_privileged_commands_passwd/oval/wrlinux1019.xml       | 4 ++--
+ .../audit_rules_privileged_commands_su/oval/wrlinux1019.xml           | 4 ++--
+ .../audit_rules_privileged_commands_umount/oval/wrlinux1019.xml       | 4 ++--
+ 4 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_chsh/oval/wrlinux1019.xml b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_chsh/oval/wrlinux1019.xml
+index 04a8761..cf6b00a 100644
+--- a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_chsh/oval/wrlinux1019.xml
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_chsh/oval/wrlinux1019.xml
+@@ -30,7 +30,7 @@
+   </ind:textfilecontent54_test>
+   <ind:textfilecontent54_object id="object_audit_rules_privileged_commands_chsh_augenrules" version="1">
+     <ind:filepath operation="pattern match">/etc/audit/rules\.d/.*\.rules</ind:filepath>
+-    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/usr\/bin\/chsh[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=unset[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/usr\/bin\/chsh\..*[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=unset[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
+     <ind:instance datatype="int">1</ind:instance>
+   </ind:textfilecontent54_object>
+ 
+@@ -39,7 +39,7 @@
+   </ind:textfilecontent54_test>
+   <ind:textfilecontent54_object id="object_audit_rules_privileged_commands_chsh_auditctl" version="1">
+     <ind:filepath>/etc/audit/audit.rules</ind:filepath>
+-    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/usr\/bin\/chsh[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=unset[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/usr\/bin\/chsh\..*[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=unset[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
+     <ind:instance datatype="int">1</ind:instance>
+   </ind:textfilecontent54_object>
+ 
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_passwd/oval/wrlinux1019.xml b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_passwd/oval/wrlinux1019.xml
+index a0ad0e7..be09d9a 100644
+--- a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_passwd/oval/wrlinux1019.xml
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_passwd/oval/wrlinux1019.xml
+@@ -30,7 +30,7 @@
+   </ind:textfilecontent54_test>
+   <ind:textfilecontent54_object id="object_audit_rules_privileged_commands_passwd_augenrules" version="1">
+     <ind:filepath operation="pattern match">/etc/audit/rules\.d/.*\.rules</ind:filepath>
+-    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/usr\/bin\/passwd[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=unset[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/usr\/bin\/passwd\..*[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=unset[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
+     <ind:instance datatype="int">1</ind:instance>
+   </ind:textfilecontent54_object>
+ 
+@@ -39,7 +39,7 @@
+   </ind:textfilecontent54_test>
+   <ind:textfilecontent54_object id="object_audit_rules_privileged_commands_passwd_auditctl" version="1">
+     <ind:filepath>/etc/audit/audit.rules</ind:filepath>
+-    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/usr\/bin\/passwd[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=unset[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/usr\/bin\/passwd\..*[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=unset[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
+     <ind:instance datatype="int">1</ind:instance>
+   </ind:textfilecontent54_object>
+ 
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_su/oval/wrlinux1019.xml b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_su/oval/wrlinux1019.xml
+index bf1c496..ac9c455 100644
+--- a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_su/oval/wrlinux1019.xml
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_su/oval/wrlinux1019.xml
+@@ -30,7 +30,7 @@
+   </ind:textfilecontent54_test>
+   <ind:textfilecontent54_object id="object_audit_rules_privileged_commands_su_augenrules" version="1">
+     <ind:filepath operation="pattern match">/etc/audit/rules\.d/.*\.rules</ind:filepath>
+-    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/bin\/su[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=unset[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/bin\/su\..*[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=unset[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
+     <ind:instance datatype="int">1</ind:instance>
+   </ind:textfilecontent54_object>
+ 
+@@ -39,7 +39,7 @@
+   </ind:textfilecontent54_test>
+   <ind:textfilecontent54_object id="object_audit_rules_privileged_commands_su_auditctl" version="1">
+     <ind:filepath>/etc/audit/audit.rules</ind:filepath>
+-    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/bin\/su[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=unset[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/bin\/su\..*[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=unset[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
+     <ind:instance datatype="int">1</ind:instance>
+   </ind:textfilecontent54_object>
+ 
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_umount/oval/wrlinux1019.xml b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_umount/oval/wrlinux1019.xml
+index 98fd9c3..3e03f6a 100644
+--- a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_umount/oval/wrlinux1019.xml
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_umount/oval/wrlinux1019.xml
+@@ -30,7 +30,7 @@
+   </ind:textfilecontent54_test>
+   <ind:textfilecontent54_object id="object_audit_rules_privileged_commands_umount_augenrules" version="1">
+     <ind:filepath operation="pattern match">/etc/audit/rules\.d/.*\.rules</ind:filepath>
+-    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/bin\/umount[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=unset[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/bin\/umount\..*[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=unset[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
+     <ind:instance datatype="int">1</ind:instance>
+   </ind:textfilecontent54_object>
+ 
+@@ -39,7 +39,7 @@
+   </ind:textfilecontent54_test>
+   <ind:textfilecontent54_object id="object_audit_rules_privileged_commands_umount_auditctl" version="1">
+     <ind:filepath>/etc/audit/audit.rules</ind:filepath>
+-    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/bin\/umount[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=unset[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/bin\/umount\..*[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=unset[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
+     <ind:instance datatype="int">1</ind:instance>
+   </ind:textfilecontent54_object>
+ 
+-- 
+1.9.1
+

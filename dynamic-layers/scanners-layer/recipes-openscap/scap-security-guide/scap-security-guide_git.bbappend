@@ -86,6 +86,8 @@ SRC_URI = "git://github.com/OpenSCAP/scap-security-guide.git \
             file://0082-Rule-audit_rules_privileged_commands_sudo-add-oval-c.patch \
             file://0083-Rule-audit_rules_privileged_commands_umount-add-oval.patch \
             file://0084-Rule-audit_rules_privileged_commands_pam_timestamp_c.patch \
+            file://0085-Fix-audit_rules_privileged_commands-related-rules-fa.patch \
+            file://0086-Update-commands-path-in-audit_rules_privileged_comma.patch \
            "
 PV = "0.1.45+git${SRCPV}"
 
