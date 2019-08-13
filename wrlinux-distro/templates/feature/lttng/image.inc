@@ -4,6 +4,8 @@ IMAGE_INSTALL += "lttng-ust"
 IMAGE_INSTALL += "babeltrace"
 IMAGE_INSTALL += "python-core"
 
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'api-documentation', 'lttng-tools-doc', '', d)}"
+
 # To avoid build warnings, add this explicitly only if it would not get pulled
 # in automatically.  Historically, we have provided this all the time.
 #
