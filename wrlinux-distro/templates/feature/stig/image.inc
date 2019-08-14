@@ -4,4 +4,5 @@ IMAGE_INSTALL += "openscap \
                   pam-plugin-cracklib \
                   samhain \
                   strongswan \
+                  libuser \
                   "
