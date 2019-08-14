@@ -1,0 +1,41 @@
+From 2be4becbbcfaa9e8eb49ffe88db2b785e501000a Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 14 Aug 2019 16:11:01 +0800
+Subject: [PATCH] force to disable gpgcheck of base config
+
+There are two gpgcheck options, one is base config, another is repo config,
+In order to support rpm keyring path, we force to disable base config
+
+In this situation:
+- If keyring works in /etc/rpm/keys, dnf install <pkg> succeed,
+  even though repo.gpgkey is not set
+
+- If keyring does not work, and repo config gpgcheck is enabled
+  (default set), dnf install <pkg> failed with
+  `Error: GPG check FAILED'
+
+Both of them satisfy rpm keyring path support
+
+Upstream-Status: Inappropriate [wrlinux specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ dnf/cli/commands/__init__.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dnf/cli/commands/__init__.py b/dnf/cli/commands/__init__.py
+index 4c68b5a..2956821 100644
+--- a/dnf/cli/commands/__init__.py
++++ b/dnf/cli/commands/__init__.py
+@@ -71,7 +71,7 @@ def _checkGPGKey(base, cli):
+     :param base: a :class:`dnf.Base` object.
+     :raises: :class:`cli.CliError`
+     """
+-    if not base.conf.gpgcheck:
++    if True:
+         return
+     if not base._gpg_key_check():
+         for repo in base.repos.iter_enabled():
+-- 
+2.7.4
+
