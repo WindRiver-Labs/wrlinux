@@ -1,0 +1,45 @@
+From 965a185c0f111afad9fada3d3960e2bb85e323bf Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Thu, 15 Aug 2019 14:32:05 +0800
+Subject: Rule sysctl_net_ipv4_conf_default_send_redirects add bash
+ script
+
+Rule sysctl_net_ipv4_conf_default_send_redirects add oval check for WRLinux1019.
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../bash/wrlinux1019.sh                              | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+ create mode 100644 linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_net_ipv4_conf_default_send_redirects/bash/wrlinux1019.sh
+
+diff --git a/linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_net_ipv4_conf_default_send_redirects/bash/wrlinux1019.sh b/linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_net_ipv4_conf_default_send_redirects/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..fd61630
+--- /dev/null
++++ b/linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_net_ipv4_conf_default_send_redirects/bash/wrlinux1019.sh
+@@ -0,0 +1,20 @@
++# platform = multi_platform_wrlinux
++
++. /usr/share/scap-security-guide/remediation_functions
++
++#
++# Set runtime for net.ipv4.conf.default.send_redirects
++#
++/sbin/sysctl -q -n -w net.ipv4.conf.default.send_redirects=0
++
++#
++# If net.ipv4.conf.default.send_redirects in /etc/sysctl.conf, change value to appropriate value
++#       else, add "net.ipv4.conf.default.send_redirects = 0" to /etc/sysctl.conf
++#
++if grep --silent ^net.ipv4.conf.default.send_redirects /etc/sysctl.conf ; then
++        sed -i "s/^net.ipv4.conf.default.send_redirects.*/net.ipv4.conf.default.send_redirects = 0/g" /etc/sysctl.conf
++else
++        echo -e "\n# Set net.ipv4.conf.default.send_redirects to 0 per security requirements" >> /etc/sysctl.conf
++        echo "net.ipv4.conf.default.send_redirects = 0" >> /etc/sysctl.conf
++fi
++
+-- 
+1.9.1
+

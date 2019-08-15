@@ -1,0 +1,245 @@
+From 70f2a9298e3ca846e595cd36e264886741bf77bd Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Wed, 14 Aug 2019 18:42:44 +0800
+Subject: [PATCH] Rule sysctl_net_ipv4_ip_forward add oval check
+
+Rule sysctl_net_ipv4_ip_forward add oval check for WRLinux1019.
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../oval/wrlinux1019.xml                           | 15 ++++++
+ .../oval/wrlinux1019.xml                           | 27 ++++++++++
+ .../sysctl_runtime_net_ipv4_ip_forward/rule.yml    | 43 +++++++++++++++
+ .../oval/wrlinux1019.xml                           | 61 ++++++++++++++++++++++
+ .../sysctl_static_net_ipv4_ip_forward/rule.yml     | 43 +++++++++++++++
+ 5 files changed, 189 insertions(+)
+ create mode 100644 linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_net_ipv4_ip_forward/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_runtime_net_ipv4_ip_forward/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_runtime_net_ipv4_ip_forward/rule.yml
+ create mode 100644 linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_static_net_ipv4_ip_forward/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_static_net_ipv4_ip_forward/rule.yml
+
+diff --git a/linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_net_ipv4_ip_forward/oval/wrlinux1019.xml b/linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_net_ipv4_ip_forward/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..0e2120a
+--- /dev/null
++++ b/linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_net_ipv4_ip_forward/oval/wrlinux1019.xml
+@@ -0,0 +1,15 @@
++<def-group>
++  <definition class="compliance" id="sysctl_net_ipv4_ip_forward" version="3">
++    <metadata>
++      <title>Kernel "net.ipv4.ip_forward" Parameter Configuration and Runtime Check</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The "net.ipv4.ip_forward" kernel parameter should be set to the appropriate value in both system configuration and system runtime.</description>
++    </metadata>
++    <criteria operator="AND">
++      <extend_definition comment="net.ipv4.ip_forward configuration setting check" definition_ref="sysctl_static_net_ipv4_ip_forward" />
++      <extend_definition comment="net.ipv4.ip_forward runtime setting check" definition_ref="sysctl_runtime_net_ipv4_ip_forward" />
++    </criteria>
++  </definition>
++</def-group>
+diff --git a/linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_runtime_net_ipv4_ip_forward/oval/wrlinux1019.xml b/linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_runtime_net_ipv4_ip_forward/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..3ab2cf8
+--- /dev/null
++++ b/linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_runtime_net_ipv4_ip_forward/oval/wrlinux1019.xml
+@@ -0,0 +1,27 @@
++<def-group>
++  <definition class="compliance" id="sysctl_runtime_net_ipv4_ip_forward" version="3">
++    <metadata>
++      <title>Kernel "net.ipv4.ip_forward" Parameter Runtime Check</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The kernel "net.ipv4.ip_forward" parameter should be set to "0" in system runtime.</description>
++    </metadata>
++    <criteria operator="AND">
++      <criterion comment="kernel runtime parameter net.ipv4.ip_forward set to 0" test_ref="test_runtime_sysctl_net_ipv4_ip_forward" />
++    </criteria>
++  </definition>
++
++  <unix:sysctl_test check="all" check_existence="all_exist" comment="kernel runtime parameter net.ipv4.ip_forward set to 0" id="test_runtime_sysctl_net_ipv4_ip_forward" version="1">
++    <unix:object object_ref="object_sysctl_net_ipv4_ip_forward" />
++    <unix:state state_ref="state_sysctl_net_ipv4_ip_forward" />
++  </unix:sysctl_test>
++
++  <unix:sysctl_object id="object_sysctl_net_ipv4_ip_forward" version="1">
++    <unix:name>net.ipv4.ip_forward</unix:name>
++  </unix:sysctl_object>
++
++  <unix:sysctl_state id="state_sysctl_net_ipv4_ip_forward" version="1">
++    <unix:value datatype="int" operation="equals">0</unix:value>
++  </unix:sysctl_state>
++</def-group>
+diff --git a/linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_runtime_net_ipv4_ip_forward/rule.yml b/linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_runtime_net_ipv4_ip_forward/rule.yml
+new file mode 100644
+index 0000000..25f896c
+--- /dev/null
++++ b/linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_runtime_net_ipv4_ip_forward/rule.yml
+@@ -0,0 +1,43 @@
++documentation_complete: true
++
++prodtype: wrlinux1019
++
++title: 'Kernel "net.ipv4.ip_forward" Parameter Runtime Check'
++
++description: '{{{ describe_sysctl_option_value(sysctl="net.ipv4.ip_forward", value="0") }}}'
++
++rationale: |-
++    Routing protocol daemons are typically used on routers to exchange
++    network topology information with other routers. If this capability is used when
++    not required, system network information may be unnecessarily transmitted across
++    the network.
++
++severity: medium
++
++identifiers:
++    cce@rhel6: 26866-4
++    cce@rhel7: 80157-1
++    cce@rhel8: 81024-2
++
++references:
++    anssi: NT28(R22)
++    stigid@rhel6: RHEL-06-000082
++    srg@rhel6: SRG-OS-999999
++    cis: 3.1.1
++    cui: 3.1.20
++    disa: "366"
++    nist: CM-7,SC-5,SC-32
++    nist-csf: DE.CM-1,PR.DS-4,PR.IP-1,PR.PT-3,PR.PT-4
++    srg: SRG-OS-000480-GPOS-00227
++    stigid@rhel7: "040740"
++    isa-62443-2013: 'SR 1.1,SR 1.10,SR 1.11,SR 1.12,SR 1.13,SR 1.2,SR 1.3,SR 1.4,SR 1.5,SR 1.6,SR 1.7,SR 1.8,SR 1.9,SR 2.1,SR 2.2,SR 2.3,SR 2.4,SR 2.5,SR 2.6,SR 2.7,SR 3.1,SR 3.5,SR 3.8,SR 4.1,SR 4.3,SR 5.1,SR 5.2,SR 5.3,SR 6.2,SR 7.1,SR 7.2,SR 7.6'
++    isa-62443-2009: 4.3.3.5.1,4.3.3.5.2,4.3.3.5.3,4.3.3.5.4,4.3.3.5.5,4.3.3.5.6,4.3.3.5.7,4.3.3.5.8,4.3.3.6.1,4.3.3.6.2,4.3.3.6.3,4.3.3.6.4,4.3.3.6.5,4.3.3.6.6,4.3.3.6.7,4.3.3.6.8,4.3.3.6.9,4.3.3.7.1,4.3.3.7.2,4.3.3.7.3,4.3.3.7.4,4.3.4.3.2,4.3.4.3.3
++    cobit5: APO13.01,BAI04.04,BAI10.01,BAI10.02,BAI10.03,BAI10.05,DSS01.03,DSS03.05,DSS05.02,DSS05.05,DSS05.07,DSS06.06
++    iso27001-2013: A.12.1.2,A.12.1.3,A.12.5.1,A.12.6.2,A.13.1.1,A.13.2.1,A.14.1.3,A.14.2.2,A.14.2.3,A.14.2.4,A.17.2.1,A.9.1.2
++    cis-csc: 1,11,12,13,14,15,16,2,3,7,8,9
++
++ocil: |-
++    {{{ ocil_sysctl_option_value(sysctl="net.ipv4.ip_forward", value="0") }}}
++    The ability to forward packets is only appropriate for routers.
++
++platform: machine
+diff --git a/linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_static_net_ipv4_ip_forward/oval/wrlinux1019.xml b/linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_static_net_ipv4_ip_forward/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..5ee7c57
+--- /dev/null
++++ b/linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_static_net_ipv4_ip_forward/oval/wrlinux1019.xml
+@@ -0,0 +1,61 @@
++<def-group>
++  <definition class="compliance" id="sysctl_static_net_ipv4_ip_forward" version="3">
++    <metadata>
++      <title>Kernel "net.ipv4.ip_forward" Parameter Configuration Check</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The kernel "net.ipv4.ip_forward" parameter should be set to "0" in the system configuration.</description>
++    </metadata>
++    <criteria operator="OR">
++      <criterion comment="kernel static parameter net.ipv4.ip_forward set to 0 in /etc/sysctl.conf" test_ref="test_static_sysctl_net_ipv4_ip_forward" />
++      <!-- see sysctl.d(5) -->
++      <criterion comment="kernel static parameter net.ipv4.ip_forward set to 0 in /etc/sysctl.d/*.conf" test_ref="test_static_etc_sysctld_net_ipv4_ip_forward" />
++      <criterion comment="kernel static parameter net.ipv4.ip_forward set to 0 in /run/sysctl.d/*.conf" test_ref="test_static_run_sysctld_net_ipv4_ip_forward" />
++      <criterion comment="kernel static parameter net.ipv4.ip_forward set to 0 in /usr/lib/sysctl.d/*.conf" test_ref="test_static_usr_lib_sysctld_net_ipv4_ip_forward" />
++    </criteria>
++  </definition>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="net.ipv4.ip_forward static configuration" id="test_static_sysctl_net_ipv4_ip_forward" version="1">
++    <ind:object object_ref="object_static_sysctl_net_ipv4_ip_forward" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_test check="all" comment="net.ipv4.ip_forward static configuration in /etc/sysctl.d/*.conf" id="test_static_etc_sysctld_net_ipv4_ip_forward" version="1">
++    <ind:object object_ref="object_static_etc_sysctld_net_ipv4_ip_forward" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_test check="all" comment="net.ipv4.ip_forward static configuration in /etc/sysctl.d/*.conf" id="test_static_run_sysctld_net_ipv4_ip_forward" version="1">
++    <ind:object object_ref="object_static_run_sysctld_net_ipv4_ip_forward" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_test check="all" comment="net.ipv4.ip_forward static configuration in /etc/sysctl.d/*.conf" id="test_static_usr_lib_sysctld_net_ipv4_ip_forward" version="1">
++    <ind:object object_ref="object_static_usr_lib_sysctld_net_ipv4_ip_forward" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_object id="object_static_sysctl_net_ipv4_ip_forward" version="1">
++    <ind:filepath>/etc/sysctl.conf</ind:filepath>
++    <ind:pattern operation="pattern match">^[\s]*net.ipv4.ip_forward[\s]*=[\s]*0[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_object id="object_static_etc_sysctld_net_ipv4_ip_forward" version="1">
++    <ind:path>/etc/sysctl.d</ind:path>
++    <ind:filename operation="pattern match">^.*\.conf$</ind:filename>
++    <ind:pattern operation="pattern match">^[\s]*net.ipv4.ip_forward[\s]*=[\s]*0[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_object id="object_static_run_sysctld_net_ipv4_ip_forward" version="1">
++    <ind:path>/run/sysctl.d</ind:path>
++    <ind:filename operation="pattern match">^.*\.conf$</ind:filename>
++    <ind:pattern operation="pattern match">^[\s]*net.ipv4.ip_forward[\s]*=[\s]*0[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_object id="object_static_usr_lib_sysctld_net_ipv4_ip_forward" version="1">
++    <ind:path>/usr/lib/sysctl.d</ind:path>
++    <ind:filename operation="pattern match">^.*\.conf$</ind:filename>
++    <ind:pattern operation="pattern match">^[\s]*net.ipv4.ip_forward[\s]*=[\s]*0[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++</def-group>
+diff --git a/linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_static_net_ipv4_ip_forward/rule.yml b/linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_static_net_ipv4_ip_forward/rule.yml
+new file mode 100644
+index 0000000..d0371f6
+--- /dev/null
++++ b/linux_os/guide/system/network/network-kernel/network_host_parameters/sysctl_static_net_ipv4_ip_forward/rule.yml
+@@ -0,0 +1,43 @@
++documentation_complete: true
++
++prodtype: wrlinux1019
++
++title: 'Kernel "net.ipv4.ip_forward" Parameter Configuration Check'
++
++description: '{{{ describe_sysctl_option_value(sysctl="net.ipv4.ip_forward", value="0") }}}'
++
++rationale: |-
++    Routing protocol daemons are typically used on routers to exchange
++    network topology information with other routers. If this capability is used when
++    not required, system network information may be unnecessarily transmitted across
++    the network.
++
++severity: medium
++
++identifiers:
++    cce@rhel6: 26866-4
++    cce@rhel7: 80157-1
++    cce@rhel8: 81024-2
++
++references:
++    anssi: NT28(R22)
++    stigid@rhel6: RHEL-06-000082
++    srg@rhel6: SRG-OS-999999
++    cis: 3.1.1
++    cui: 3.1.20
++    disa: "366"
++    nist: CM-7,SC-5,SC-32
++    nist-csf: DE.CM-1,PR.DS-4,PR.IP-1,PR.PT-3,PR.PT-4
++    srg: SRG-OS-000480-GPOS-00227
++    stigid@rhel7: "040740"
++    isa-62443-2013: 'SR 1.1,SR 1.10,SR 1.11,SR 1.12,SR 1.13,SR 1.2,SR 1.3,SR 1.4,SR 1.5,SR 1.6,SR 1.7,SR 1.8,SR 1.9,SR 2.1,SR 2.2,SR 2.3,SR 2.4,SR 2.5,SR 2.6,SR 2.7,SR 3.1,SR 3.5,SR 3.8,SR 4.1,SR 4.3,SR 5.1,SR 5.2,SR 5.3,SR 6.2,SR 7.1,SR 7.2,SR 7.6'
++    isa-62443-2009: 4.3.3.5.1,4.3.3.5.2,4.3.3.5.3,4.3.3.5.4,4.3.3.5.5,4.3.3.5.6,4.3.3.5.7,4.3.3.5.8,4.3.3.6.1,4.3.3.6.2,4.3.3.6.3,4.3.3.6.4,4.3.3.6.5,4.3.3.6.6,4.3.3.6.7,4.3.3.6.8,4.3.3.6.9,4.3.3.7.1,4.3.3.7.2,4.3.3.7.3,4.3.3.7.4,4.3.4.3.2,4.3.4.3.3
++    cobit5: APO13.01,BAI04.04,BAI10.01,BAI10.02,BAI10.03,BAI10.05,DSS01.03,DSS03.05,DSS05.02,DSS05.05,DSS05.07,DSS06.06
++    iso27001-2013: A.12.1.2,A.12.1.3,A.12.5.1,A.12.6.2,A.13.1.1,A.13.2.1,A.14.1.3,A.14.2.2,A.14.2.3,A.14.2.4,A.17.2.1,A.9.1.2
++    cis-csc: 1,11,12,13,14,15,16,2,3,7,8,9
++
++ocil: |-
++    {{{ ocil_sysctl_option_value(sysctl="net.ipv4.ip_forward", value="0") }}}
++    The ability to forward packets is only appropriate for routers.
++
++platform: machine
+-- 
+1.9.1
+

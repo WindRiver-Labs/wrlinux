@@ -88,6 +88,19 @@ SRC_URI = "git://github.com/OpenSCAP/scap-security-guide.git \
             file://0084-Rule-audit_rules_privileged_commands_pam_timestamp_c.patch \
             file://0085-Fix-audit_rules_privileged_commands-related-rules-fa.patch \
             file://0086-Update-commands-path-in-audit_rules_privileged_comma.patch \
+            file://0087-Rule-sysctl_net_ipv6_conf_all_accept_source_route-ad.patch \
+            file://0088-Rule-sysctl_net_ipv4_conf_all_accept_redirects-add-o.patch \
+            file://0089-Rule-sysctl_net_ipv4_conf_all_accept_source_route-ad.patch \
+            file://0090-Rule-sysctl_net_ipv4_icmp_echo_ignore_broadcasts-add.patch \
+            file://0091-Rule-sysctl_net_ipv4_conf_all_send_redirects-add-ova.patch \
+            file://0092-Rule-sysctl_net_ipv4_conf_default_send_redirects-add.patch \
+            file://0093-Rule-sysctl_net_ipv4_ip_forward-add-oval-check.patch \
+            file://0094-Rule-kernel_module_dccp_disabled-add-oval-check.patch \
+            file://0095-Rule-sysctl_net_ipv4_conf_all_send_redirects-add-bas.patch \
+            file://0096-Rule-sysctl_net_ipv4_conf_default_send_redirects-add.patch \
+            file://0097-Rule-sysctl_net_ipv4_ip_forward-add-bash-script.patch \
+            file://0098-Rule-kernel_module_dccp_disabled-add-bash-script.patch \
+            file://0099-Rule-sysctl_net_ipv4_conf_default_accept_source_rout.patch \
            "
 PV = "0.1.45+git${SRCPV}"
 

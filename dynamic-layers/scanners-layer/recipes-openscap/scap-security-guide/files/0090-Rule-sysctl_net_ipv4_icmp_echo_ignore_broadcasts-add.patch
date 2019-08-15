@@ -1,0 +1,258 @@
+From f0e61f7edbb67ecaf380e590d6187297ca94bd13 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Wed, 14 Aug 2019 17:13:15 +0800
+Subject: [PATCH] Rule sysctl_net_ipv4_icmp_echo_ignore_broadcasts add oval
+ check
+
+For rule sysctl_net_ipv4_icmp_echo_ignore_broadcasts add oval check
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../oval/wrlinux1019.xml                           | 15 +++++
+ .../oval/wrlinux1019.xml                           | 29 +++++++++
+ .../rule.yml                                       | 43 +++++++++++++
+ .../oval/wrlinux1019.xml                           | 71 ++++++++++++++++++++++
+ .../rule.yml                                       | 43 +++++++++++++
+ 5 files changed, 201 insertions(+)
+ create mode 100644 linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_net_ipv4_icmp_echo_ignore_broadcasts/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_runtime_net_ipv4_icmp_echo_ignore_broadcasts/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_runtime_net_ipv4_icmp_echo_ignore_broadcasts/rule.yml
+ create mode 100644 linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_static_net_ipv4_icmp_echo_ignore_broadcasts/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_static_net_ipv4_icmp_echo_ignore_broadcasts/rule.yml
+
+diff --git a/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_net_ipv4_icmp_echo_ignore_broadcasts/oval/wrlinux1019.xml b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_net_ipv4_icmp_echo_ignore_broadcasts/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..b04ef76
+--- /dev/null
++++ b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_net_ipv4_icmp_echo_ignore_broadcasts/oval/wrlinux1019.xml
+@@ -0,0 +1,15 @@
++<def-group>
++  <definition class="compliance" id="sysctl_net_ipv4_icmp_echo_ignore_broadcasts" version="3">
++    <metadata>
++      <title>Kernel "net.ipv4.icmp_echo_ignore_broadcasts" Parameter Configuration and Runtime Check</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The "net.ipv4.icmp_echo_ignore_broadcasts" kernel parameter should be set to the appropriate value in both system configuration and system runtime.</description>
++    </metadata>
++    <criteria operator="AND">
++      <extend_definition comment="net.ipv4.icmp_echo_ignore_broadcasts configuration setting check" definition_ref="sysctl_static_net_ipv4_icmp_echo_ignore_broadcasts" />
++      <extend_definition comment="net.ipv4.icmp_echo_ignore_broadcasts runtime setting check" definition_ref="sysctl_runtime_net_ipv4_icmp_echo_ignore_broadcasts" />
++    </criteria>
++  </definition>
++</def-group>
+diff --git a/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_runtime_net_ipv4_icmp_echo_ignore_broadcasts/oval/wrlinux1019.xml b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_runtime_net_ipv4_icmp_echo_ignore_broadcasts/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..0504398
+--- /dev/null
++++ b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_runtime_net_ipv4_icmp_echo_ignore_broadcasts/oval/wrlinux1019.xml
+@@ -0,0 +1,29 @@
++<def-group>
++  <definition class="compliance" id="sysctl_runtime_net_ipv4_icmp_echo_ignore_broadcasts" version="3">
++    <metadata>
++      <title>Kernel "net.ipv4.icmp_echo_ignore_broadcasts" Parameter Runtime Check</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The kernel "net.ipv4.icmp_echo_ignore_broadcasts" parameter should be set to the appropriate value in system runtime.</description>
++    </metadata>
++    <criteria operator="AND">
++      <criterion comment="kernel runtime parameter net.ipv4.icmp_echo_ignore_broadcasts set to the appropriate value" test_ref="test_runtime_sysctl_net_ipv4_icmp_echo_ignore_broadcasts" />
++    </criteria>
++  </definition>
++
++  <unix:sysctl_test check="all" check_existence="all_exist" comment="kernel runtime parameter net.ipv4.icmp_echo_ignore_broadcasts set to the appropriate value" id="test_runtime_sysctl_net_ipv4_icmp_echo_ignore_broadcasts" version="1">
++    <unix:object object_ref="object_sysctl_net_ipv4_icmp_echo_ignore_broadcasts" />
++    <unix:state state_ref="state_sysctl_net_ipv4_icmp_echo_ignore_broadcasts" />
++  </unix:sysctl_test>
++
++  <unix:sysctl_object id="object_sysctl_net_ipv4_icmp_echo_ignore_broadcasts" version="1">
++    <unix:name>net.ipv4.icmp_echo_ignore_broadcasts</unix:name>
++  </unix:sysctl_object>
++
++  <unix:sysctl_state id="state_sysctl_net_ipv4_icmp_echo_ignore_broadcasts" version="1">
++    <unix:value datatype="int" operation="equals" var_ref="sysctl_net_ipv4_icmp_echo_ignore_broadcasts_value" />
++  </unix:sysctl_state>
++
++  <external_variable comment="External variable for net.ipv4.icmp_echo_ignore_broadcasts" datatype="int" id="sysctl_net_ipv4_icmp_echo_ignore_broadcasts_value" version="1" />
++</def-group>
+diff --git a/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_runtime_net_ipv4_icmp_echo_ignore_broadcasts/rule.yml b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_runtime_net_ipv4_icmp_echo_ignore_broadcasts/rule.yml
+new file mode 100644
+index 0000000..90771f2
+--- /dev/null
++++ b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_runtime_net_ipv4_icmp_echo_ignore_broadcasts/rule.yml
+@@ -0,0 +1,43 @@
++documentation_complete: true
++
++prodtype: wrlinux1019
++
++title: 'Kernel "net.ipv4.icmp_echo_ignore_broadcasts" Parameter Runtime Check'
++
++description: '{{{ describe_sysctl_option_value(sysctl="net.ipv4.icmp_echo_ignore_broadcasts", value="1") }}}'
++
++rationale: |-
++    Responding to broadcast (ICMP) echoes facilitates network mapping
++    and provides a vector for amplification attacks.
++    <br />
++    Ignoring ICMP echo requests (pings) sent to broadcast or multicast
++    addresses makes the system slightly more difficult to enumerate on the network.
++
++severity: medium
++
++identifiers:
++    cce@rhel6: 26883-9
++    cce@rhel7: 80165-4
++    cce@rhel8: 80922-8
++
++references:
++    stigid@rhel6: RHEL-06-000092
++    srg@rhel6: SRG-OS-999999
++    disa@rhel6: '1551'
++    cis: 3.2.5
++    cjis: 5.10.1.1
++    cui: 3.1.20
++    disa: "366"
++    nist: AC-4,CM-7,SC-5
++    nist-csf: DE.AE-1,DE.CM-1,ID.AM-3,PR.AC-5,PR.DS-4,PR.DS-5,PR.IP-1,PR.PT-3,PR.PT-4
++    srg: SRG-OS-000480-GPOS-00227
++    stigid@rhel7: "040630"
++    isa-62443-2013: 'SR 1.1,SR 1.10,SR 1.11,SR 1.12,SR 1.13,SR 1.2,SR 1.3,SR 1.4,SR 1.5,SR 1.6,SR 1.7,SR 1.8,SR 1.9,SR 2.1,SR 2.2,SR 2.3,SR 2.4,SR 2.5,SR 2.6,SR 2.7,SR 3.1,SR 3.5,SR 3.8,SR 4.1,SR 4.3,SR 5.1,SR 5.2,SR 5.3,SR 6.2,SR 7.1,SR 7.2,SR 7.6'
++    isa-62443-2009: 4.2.3.4,4.3.3.4,4.3.3.5.1,4.3.3.5.2,4.3.3.5.3,4.3.3.5.4,4.3.3.5.5,4.3.3.5.6,4.3.3.5.7,4.3.3.5.8,4.3.3.6.1,4.3.3.6.2,4.3.3.6.3,4.3.3.6.4,4.3.3.6.5,4.3.3.6.6,4.3.3.6.7,4.3.3.6.8,4.3.3.6.9,4.3.3.7.1,4.3.3.7.2,4.3.3.7.3,4.3.3.7.4,4.3.4.3.2,4.3.4.3.3,4.4.3.3
++    cobit5: APO01.06,APO13.01,BAI04.04,BAI10.01,BAI10.02,BAI10.03,BAI10.05,DSS01.03,DSS01.05,DSS03.01,DSS03.05,DSS05.02,DSS05.04,DSS05.05,DSS05.07,DSS06.02,DSS06.06
++    iso27001-2013: A.10.1.1,A.11.1.4,A.11.1.5,A.11.2.1,A.12.1.1,A.12.1.2,A.12.1.3,A.12.5.1,A.12.6.2,A.13.1.1,A.13.1.2,A.13.1.3,A.13.2.1,A.13.2.2,A.13.2.3,A.13.2.4,A.14.1.2,A.14.1.3,A.14.2.2,A.14.2.3,A.14.2.4,A.17.2.1,A.6.1.2,A.7.1.1,A.7.1.2,A.7.3.1,A.8.2.2,A.8.2.3,A.9.1.1,A.9.1.2,A.9.2.3,A.9.4.1,A.9.4.4,A.9.4.5
++    cis-csc: 1,11,12,13,14,15,16,18,2,3,4,6,7,8,9
++
++{{{ complete_ocil_entry_sysctl_option_value(sysctl="net.ipv4.icmp_echo_ignore_broadcasts", value="1") }}}
++
++platform: machine
+diff --git a/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_static_net_ipv4_icmp_echo_ignore_broadcasts/oval/wrlinux1019.xml b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_static_net_ipv4_icmp_echo_ignore_broadcasts/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..676a99f
+--- /dev/null
++++ b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_static_net_ipv4_icmp_echo_ignore_broadcasts/oval/wrlinux1019.xml
+@@ -0,0 +1,71 @@
++<def-group>
++  <definition class="compliance" id="sysctl_static_net_ipv4_icmp_echo_ignore_broadcasts" version="3">
++    <metadata>
++      <title>Kernel "net.ipv4.icmp_echo_ignore_broadcasts" Parameter Configuration Check</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The kernel "net.ipv4.icmp_echo_ignore_broadcasts" parameter should be set to the appropriate value in the system configuration.</description>
++    </metadata>
++    <criteria operator="OR">
++      <criterion comment="kernel static parameter net.ipv4.icmp_echo_ignore_broadcasts set to the appropriate value in /etc/sysctl.conf" test_ref="test_static_sysctl_net_ipv4_icmp_echo_ignore_broadcasts" />
++      <!-- see sysctl.d(5) -->
++      <criterion comment="kernel static parameter net.ipv4.icmp_echo_ignore_broadcasts set to the appropriate value in /etc/sysctl.d/*.conf" test_ref="test_static_etc_sysctld_net_ipv4_icmp_echo_ignore_broadcasts" />
++      <criterion comment="kernel static parameter net.ipv4.icmp_echo_ignore_broadcasts set to the appropriate value in /run/sysctl.d/*.conf" test_ref="test_static_run_sysctld_net_ipv4_icmp_echo_ignore_broadcasts" />
++      <criterion comment="kernel static parameter net.ipv4.icmp_echo_ignore_broadcasts set to the appropriate value in /usr/lib/sysctl.d/*.conf" test_ref="test_static_usr_lib_sysctld_net_ipv4_icmp_echo_ignore_broadcasts" />
++    </criteria>
++  </definition>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="net.ipv4.icmp_echo_ignore_broadcasts static configuration" id="test_static_sysctl_net_ipv4_icmp_echo_ignore_broadcasts" version="1">
++    <ind:object object_ref="object_static_sysctl_net_ipv4_icmp_echo_ignore_broadcasts" />
++    <ind:state state_ref="state_static_sysctld_net_ipv4_icmp_echo_ignore_broadcasts" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_test check="all" comment="net.ipv4.icmp_echo_ignore_broadcasts static configuration in /etc/sysctl.d/*.conf" id="test_static_etc_sysctld_net_ipv4_icmp_echo_ignore_broadcasts" version="1">
++    <ind:object object_ref="object_static_etc_sysctld_net_ipv4_icmp_echo_ignore_broadcasts" />
++    <ind:state state_ref="state_static_sysctld_net_ipv4_icmp_echo_ignore_broadcasts" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_test check="all" comment="net.ipv4.icmp_echo_ignore_broadcasts static configuration in /etc/sysctl.d/*.conf" id="test_static_run_sysctld_net_ipv4_icmp_echo_ignore_broadcasts" version="1">
++    <ind:object object_ref="object_static_run_sysctld_net_ipv4_icmp_echo_ignore_broadcasts" />
++    <ind:state state_ref="state_static_sysctld_net_ipv4_icmp_echo_ignore_broadcasts" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_test check="all" comment="net.ipv4.icmp_echo_ignore_broadcasts static configuration in /etc/sysctl.d/*.conf" id="test_static_usr_lib_sysctld_net_ipv4_icmp_echo_ignore_broadcasts" version="1">
++    <ind:object object_ref="object_static_usr_lib_sysctld_net_ipv4_icmp_echo_ignore_broadcasts" />
++    <ind:state state_ref="state_static_sysctld_net_ipv4_icmp_echo_ignore_broadcasts" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_object id="object_static_sysctl_net_ipv4_icmp_echo_ignore_broadcasts" version="1">
++    <ind:filepath>/etc/sysctl.conf</ind:filepath>
++    <ind:pattern operation="pattern match">(?:^|.*\n)[^#]*net.ipv4.icmp_echo_ignore_broadcasts[\s]*=[\s]*(\d+)[\s]*\n</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_object id="object_static_etc_sysctld_net_ipv4_icmp_echo_ignore_broadcasts" version="1">
++    <ind:path>/etc/sysctl.d</ind:path>
++    <ind:filename operation="pattern match">^.*\.conf$</ind:filename>
++    <ind:pattern operation="pattern match">(?:^|.*\n)[^#]*net.ipv4.icmp_echo_ignore_broadcasts[\s]*=[\s]*(\d+)[\s]*\n</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_object id="object_static_run_sysctld_net_ipv4_icmp_echo_ignore_broadcasts" version="1">
++    <ind:path>/run/sysctl.d</ind:path>
++    <ind:filename operation="pattern match">^.*\.conf$</ind:filename>
++    <ind:pattern operation="pattern match">(?:^|.*\n)[^#]*net.ipv4.icmp_echo_ignore_broadcasts[\s]*=[\s]*(\d+)[\s]*\n</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_object id="object_static_usr_lib_sysctld_net_ipv4_icmp_echo_ignore_broadcasts" version="1">
++    <ind:path>/usr/lib/sysctl.d</ind:path>
++    <ind:filename operation="pattern match">^.*\.conf$</ind:filename>
++    <ind:pattern operation="pattern match">(?:^|.*\n)[^#]*net.ipv4.icmp_echo_ignore_broadcasts[\s]*=[\s]*(\d+)[\s]*\n</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_state id="state_static_sysctld_net_ipv4_icmp_echo_ignore_broadcasts" version="1">
++    <ind:subexpression operation="equals"  var_ref="sysctl_net_ipv4_icmp_echo_ignore_broadcasts_value" datatype="int" />
++  </ind:textfilecontent54_state>
++
++  <external_variable comment="External variable for net.ipv4.icmp_echo_ignore_broadcasts" datatype="int" id="sysctl_net_ipv4_icmp_echo_ignore_broadcasts_value" version="1" />
++</def-group>
+diff --git a/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_static_net_ipv4_icmp_echo_ignore_broadcasts/rule.yml b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_static_net_ipv4_icmp_echo_ignore_broadcasts/rule.yml
+new file mode 100644
+index 0000000..52e2b54
+--- /dev/null
++++ b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_static_net_ipv4_icmp_echo_ignore_broadcasts/rule.yml
+@@ -0,0 +1,43 @@
++documentation_complete: true
++
++prodtype: wrlinux1019
++
++title: 'Kernel "net.ipv4.icmp_echo_ignore_broadcasts" Parameter Configuration Check'
++
++description: '{{{ describe_sysctl_option_value(sysctl="net.ipv4.icmp_echo_ignore_broadcasts", value="1") }}}'
++
++rationale: |-
++    Responding to broadcast (ICMP) echoes facilitates network mapping
++    and provides a vector for amplification attacks.
++    <br />
++    Ignoring ICMP echo requests (pings) sent to broadcast or multicast
++    addresses makes the system slightly more difficult to enumerate on the network.
++
++severity: medium
++
++identifiers:
++    cce@rhel6: 26883-9
++    cce@rhel7: 80165-4
++    cce@rhel8: 80922-8
++
++references:
++    stigid@rhel6: RHEL-06-000092
++    srg@rhel6: SRG-OS-999999
++    disa@rhel6: '1551'
++    cis: 3.2.5
++    cjis: 5.10.1.1
++    cui: 3.1.20
++    disa: "366"
++    nist: AC-4,CM-7,SC-5
++    nist-csf: DE.AE-1,DE.CM-1,ID.AM-3,PR.AC-5,PR.DS-4,PR.DS-5,PR.IP-1,PR.PT-3,PR.PT-4
++    srg: SRG-OS-000480-GPOS-00227
++    stigid@rhel7: "040630"
++    isa-62443-2013: 'SR 1.1,SR 1.10,SR 1.11,SR 1.12,SR 1.13,SR 1.2,SR 1.3,SR 1.4,SR 1.5,SR 1.6,SR 1.7,SR 1.8,SR 1.9,SR 2.1,SR 2.2,SR 2.3,SR 2.4,SR 2.5,SR 2.6,SR 2.7,SR 3.1,SR 3.5,SR 3.8,SR 4.1,SR 4.3,SR 5.1,SR 5.2,SR 5.3,SR 6.2,SR 7.1,SR 7.2,SR 7.6'
++    isa-62443-2009: 4.2.3.4,4.3.3.4,4.3.3.5.1,4.3.3.5.2,4.3.3.5.3,4.3.3.5.4,4.3.3.5.5,4.3.3.5.6,4.3.3.5.7,4.3.3.5.8,4.3.3.6.1,4.3.3.6.2,4.3.3.6.3,4.3.3.6.4,4.3.3.6.5,4.3.3.6.6,4.3.3.6.7,4.3.3.6.8,4.3.3.6.9,4.3.3.7.1,4.3.3.7.2,4.3.3.7.3,4.3.3.7.4,4.3.4.3.2,4.3.4.3.3,4.4.3.3
++    cobit5: APO01.06,APO13.01,BAI04.04,BAI10.01,BAI10.02,BAI10.03,BAI10.05,DSS01.03,DSS01.05,DSS03.01,DSS03.05,DSS05.02,DSS05.04,DSS05.05,DSS05.07,DSS06.02,DSS06.06
++    iso27001-2013: A.10.1.1,A.11.1.4,A.11.1.5,A.11.2.1,A.12.1.1,A.12.1.2,A.12.1.3,A.12.5.1,A.12.6.2,A.13.1.1,A.13.1.2,A.13.1.3,A.13.2.1,A.13.2.2,A.13.2.3,A.13.2.4,A.14.1.2,A.14.1.3,A.14.2.2,A.14.2.3,A.14.2.4,A.17.2.1,A.6.1.2,A.7.1.1,A.7.1.2,A.7.3.1,A.8.2.2,A.8.2.3,A.9.1.1,A.9.1.2,A.9.2.3,A.9.4.1,A.9.4.4,A.9.4.5
++    cis-csc: 1,11,12,13,14,15,16,18,2,3,4,6,7,8,9
++
++{{{ complete_ocil_entry_sysctl_option_value(sysctl="net.ipv4.icmp_echo_ignore_broadcasts", value="1") }}}
++
++platform: machine
+-- 
+1.9.1
+

@@ -1,0 +1,392 @@
+From f141d6ed102af1aa1151c45d560744ec4b2cac41 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Wed, 14 Aug 2019 14:12:09 +0800
+Subject: [PATCH] Rule sysctl_net_ipv6_conf_all_accept_source_route add oval
+ check and remediate
+
+Rule sysctl_net_ipv6_conf_all_accept_source_route add oval check and remediate
+script.
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../bash/wrlinux1019.sh                            | 20 ++++++
+ .../oval/wrlinux1019.xml                           | 18 ++++++
+ .../oval/wrlinux1019.xml                           | 29 +++++++++
+ .../rule.yml                                       | 42 +++++++++++++
+ .../oval/wrlinux1019.xml                           | 27 ++++++++
+ .../oval/wrlinux1019.xml                           | 71 ++++++++++++++++++++++
+ .../rule.yml                                       | 42 +++++++++++++
+ .../oval/wrlinux1019.xml                           | 61 +++++++++++++++++++
+ 8 files changed, 310 insertions(+)
+ create mode 100644 linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_net_ipv6_conf_all_accept_source_route/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_net_ipv6_conf_all_accept_source_route/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_runtime_net_ipv6_conf_all_accept_source_route/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_runtime_net_ipv6_conf_all_accept_source_route/rule.yml
+ create mode 100644 linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_runtime_net_ipv6_conf_all_disable_ipv6/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_static_net_ipv6_conf_all_accept_source_route/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_static_net_ipv6_conf_all_accept_source_route/rule.yml
+ create mode 100644 linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_static_net_ipv6_conf_all_disable_ipv6/oval/wrlinux1019.xml
+
+diff --git a/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_net_ipv6_conf_all_accept_source_route/bash/wrlinux1019.sh b/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_net_ipv6_conf_all_accept_source_route/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..e55c440
+--- /dev/null
++++ b/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_net_ipv6_conf_all_accept_source_route/bash/wrlinux1019.sh
+@@ -0,0 +1,20 @@
++# platform = multi_platform_wrlinux
++
++. /usr/share/scap-security-guide/remediation_functions
++populate sysctl_net_ipv6_conf_all_accept_source_route_value
++
++#
++# Set runtime for net.ipv6.conf.all.accept_source_route
++#
++/sbin/sysctl -q -n -w net.ipv6.conf.all.accept_source_route=$sysctl_net_ipv6_conf_all_accept_source_route_value
++
++#
++# If net.ipv6.conf.all.accept_source_route present in /etc/sysctl.conf, change value to appropriate value
++#	else, add "net.ipv6.conf.all.accept_source_route = value" to /etc/sysctl.conf
++#
++if grep --silent ^net.ipv6.conf.all.accept_source_route /etc/sysctl.conf ; then
++	sed -i "s/^net.ipv6.conf.all.accept_source_route.*/net.ipv6.conf.all.accept_source_route = $sysctl_net_ipv6_conf_all_accept_source_route_value/g" /etc/sysctl.conf
++else
++	echo -e "\n# Set net.ipv6.conf.all.accept_source_route to $sysctl_net_ipv6_conf_all_accept_source_route_value per security requirements" >> /etc/sysctl.conf
++	echo "net.ipv6.conf.all.accept_source_route = $sysctl_net_ipv6_conf_all_accept_source_route_value" >> /etc/sysctl.conf
++fi
+diff --git a/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_net_ipv6_conf_all_accept_source_route/oval/wrlinux1019.xml b/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_net_ipv6_conf_all_accept_source_route/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..219d8ef
+--- /dev/null
++++ b/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_net_ipv6_conf_all_accept_source_route/oval/wrlinux1019.xml
+@@ -0,0 +1,18 @@
++<def-group>
++  <definition class="compliance" id="sysctl_net_ipv6_conf_all_accept_source_route" version="4">
++    <metadata>
++      <title>Kernel "net.ipv6.conf.all.accept_source_route" Parameter Configuration and Runtime Check</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The "net.ipv6.conf.all.accept_source_route" kernel parameter should be set to the appropriate value in both system configuration and system runtime.</description>
++    </metadata>
++    <criteria comment="IPv6 disabled or net.ipv6.conf.all.accept_source_route set correctly" operator="OR">
++      <extend_definition comment="is IPv6 enabled?" definition_ref="sysctl_kernel_ipv6_disable" />
++      <criteria operator="AND">
++        <extend_definition comment="net.ipv6.conf.all.accept_source_route configuration setting check" definition_ref="sysctl_static_net_ipv6_conf_all_accept_source_route" />
++        <extend_definition comment="net.ipv6.conf.all.accept_source_route runtime setting check" definition_ref="sysctl_runtime_net_ipv6_conf_all_accept_source_route" />
++      </criteria>
++    </criteria>
++  </definition>
++</def-group>
+diff --git a/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_runtime_net_ipv6_conf_all_accept_source_route/oval/wrlinux1019.xml b/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_runtime_net_ipv6_conf_all_accept_source_route/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..19e3be0
+--- /dev/null
++++ b/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_runtime_net_ipv6_conf_all_accept_source_route/oval/wrlinux1019.xml
+@@ -0,0 +1,29 @@
++<def-group>
++  <definition class="compliance" id="sysctl_runtime_net_ipv6_conf_all_accept_source_route" version="3">
++    <metadata>
++      <title>Kernel "net.ipv6.conf.all.accept_source_route" Parameter Runtime Check</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The kernel "net.ipv6.conf.all.accept_source_route" parameter should be set to the appropriate value in system runtime.</description>
++    </metadata>
++    <criteria operator="AND">
++      <criterion comment="kernel runtime parameter net.ipv6.conf.all.accept_source_route set to the appropriate value" test_ref="test_runtime_sysctl_net_ipv6_conf_all_accept_source_route" />
++    </criteria>
++  </definition>
++
++  <unix:sysctl_test check="all" check_existence="all_exist" comment="kernel runtime parameter net.ipv6.conf.all.accept_source_route set to the appropriate value" id="test_runtime_sysctl_net_ipv6_conf_all_accept_source_route" version="1">
++    <unix:object object_ref="object_sysctl_net_ipv6_conf_all_accept_source_route" />
++    <unix:state state_ref="state_sysctl_net_ipv6_conf_all_accept_source_route" />
++  </unix:sysctl_test>
++
++  <unix:sysctl_object id="object_sysctl_net_ipv6_conf_all_accept_source_route" version="1">
++    <unix:name>net.ipv6.conf.all.accept_source_route</unix:name>
++  </unix:sysctl_object>
++
++  <unix:sysctl_state id="state_sysctl_net_ipv6_conf_all_accept_source_route" version="1">
++    <unix:value datatype="int" operation="equals" var_ref="sysctl_net_ipv6_conf_all_accept_source_route_value" />
++  </unix:sysctl_state>
++
++  <external_variable comment="External variable for net.ipv6.conf.all.accept_source_route" datatype="int" id="sysctl_net_ipv6_conf_all_accept_source_route_value" version="1" />
++</def-group>
+diff --git a/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_runtime_net_ipv6_conf_all_accept_source_route/rule.yml b/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_runtime_net_ipv6_conf_all_accept_source_route/rule.yml
+new file mode 100644
+index 0000000..d869424
+--- /dev/null
++++ b/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_runtime_net_ipv6_conf_all_accept_source_route/rule.yml
+@@ -0,0 +1,42 @@
++documentation_complete: true
++
++prodtype: wrlinux1019
++
++title: 'Kernel "net.ipv6.conf.all.accept_source_route" Parameter Runtime Check'
++
++description: '{{{ describe_sysctl_option_value(sysctl="net.ipv6.conf.all.accept_source_route", value="0") }}}'
++
++rationale: |-
++    Source-routed packets allow the source of the packet to suggest routers
++    forward the packet along a different path than configured on the router, which can
++    be used to bypass network security measures. This requirement applies only to the
++    forwarding of source-routerd traffic, such as when IPv6 forwarding is enabled and
++    the system is functioning as a router.
++    <br /><br />
++    Accepting source-routed packets in the IPv6 protocol has few legitimate
++    uses. It should be disabled unless it is absolutely required.
++
++severity: medium
++
++identifiers:
++    cce@rhel6: 81012-7
++    cce@rhel7: 80179-5
++    cce@rhel8: 81013-5
++
++references:
++    anssi: NT28(R22)
++    cui: 3.1.20
++    disa: "366"
++    nist: AC-4
++    nist-csf: DE.AE-1,ID.AM-3,PR.AC-5,PR.DS-5,PR.PT-4
++    srg: SRG-OS-000480-GPOS-00227
++    stigid@rhel7: "040830"
++    isa-62443-2013: 'SR 3.1,SR 3.5,SR 3.8,SR 4.1,SR 4.3,SR 5.1,SR 5.2,SR 5.3,SR 7.1,SR 7.6'
++    isa-62443-2009: 4.2.3.4,4.3.3.4,4.4.3.3
++    cobit5: APO01.06,APO13.01,DSS01.05,DSS03.01,DSS05.02,DSS05.04,DSS05.07,DSS06.02
++    iso27001-2013: A.10.1.1,A.11.1.4,A.11.1.5,A.11.2.1,A.12.1.1,A.12.1.2,A.13.1.1,A.13.1.2,A.13.1.3,A.13.2.1,A.13.2.2,A.13.2.3,A.13.2.4,A.14.1.2,A.14.1.3,A.6.1.2,A.7.1.1,A.7.1.2,A.7.3.1,A.8.2.2,A.8.2.3,A.9.1.1,A.9.1.2,A.9.2.3,A.9.4.1,A.9.4.4,A.9.4.5
++    cis-csc: 1,12,13,14,15,16,18,4,6,8,9
++
++{{{ complete_ocil_entry_sysctl_option_value(sysctl="net.ipv6.conf.all.accept_source_route", value="0") }}}
++
++platform: machine
+diff --git a/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_runtime_net_ipv6_conf_all_disable_ipv6/oval/wrlinux1019.xml b/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_runtime_net_ipv6_conf_all_disable_ipv6/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..c271f2a
+--- /dev/null
++++ b/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_runtime_net_ipv6_conf_all_disable_ipv6/oval/wrlinux1019.xml
+@@ -0,0 +1,27 @@
++<def-group>
++  <definition class="compliance" id="sysctl_runtime_net_ipv6_conf_all_disable_ipv6" version="3">
++    <metadata>
++      <title>Kernel "net.ipv6.conf.all.disable_ipv6" Parameter Runtime Check</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The kernel "net.ipv6.conf.all.disable_ipv6" parameter should be set to "1" in system runtime.</description>
++    </metadata>
++    <criteria operator="AND">
++      <criterion comment="kernel runtime parameter net.ipv6.conf.all.disable_ipv6 set to 1" test_ref="test_runtime_sysctl_net_ipv6_conf_all_disable_ipv6" />
++    </criteria>
++  </definition>
++
++  <unix:sysctl_test check="all" check_existence="all_exist" comment="kernel runtime parameter net.ipv6.conf.all.disable_ipv6 set to 1" id="test_runtime_sysctl_net_ipv6_conf_all_disable_ipv6" version="1">
++    <unix:object object_ref="object_sysctl_net_ipv6_conf_all_disable_ipv6" />
++    <unix:state state_ref="state_sysctl_net_ipv6_conf_all_disable_ipv6" />
++  </unix:sysctl_test>
++
++  <unix:sysctl_object id="object_sysctl_net_ipv6_conf_all_disable_ipv6" version="1">
++    <unix:name>net.ipv6.conf.all.disable_ipv6</unix:name>
++  </unix:sysctl_object>
++
++  <unix:sysctl_state id="state_sysctl_net_ipv6_conf_all_disable_ipv6" version="1">
++    <unix:value datatype="int" operation="equals">1</unix:value>
++  </unix:sysctl_state>
++</def-group>
+diff --git a/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_static_net_ipv6_conf_all_accept_source_route/oval/wrlinux1019.xml b/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_static_net_ipv6_conf_all_accept_source_route/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..c4ba16f
+--- /dev/null
++++ b/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_static_net_ipv6_conf_all_accept_source_route/oval/wrlinux1019.xml
+@@ -0,0 +1,71 @@
++<def-group>
++  <definition class="compliance" id="sysctl_static_net_ipv6_conf_all_accept_source_route" version="3">
++    <metadata>
++      <title>Kernel "net.ipv6.conf.all.accept_source_route" Parameter Configuration Check</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The kernel "net.ipv6.conf.all.accept_source_route" parameter should be set to the appropriate value in the system configuration.</description>
++    </metadata>
++    <criteria operator="OR">
++      <criterion comment="kernel static parameter net.ipv6.conf.all.accept_source_route set to the appropriate value in /etc/sysctl.conf" test_ref="test_static_sysctl_net_ipv6_conf_all_accept_source_route" />
++      <!-- see sysctl.d(5) -->
++      <criterion comment="kernel static parameter net.ipv6.conf.all.accept_source_route set to the appropriate value in /etc/sysctl.d/*.conf" test_ref="test_static_etc_sysctld_net_ipv6_conf_all_accept_source_route" />
++      <criterion comment="kernel static parameter net.ipv6.conf.all.accept_source_route set to the appropriate value in /run/sysctl.d/*.conf" test_ref="test_static_run_sysctld_net_ipv6_conf_all_accept_source_route" />
++      <criterion comment="kernel static parameter net.ipv6.conf.all.accept_source_route set to the appropriate value in /usr/lib/sysctl.d/*.conf" test_ref="test_static_usr_lib_sysctld_net_ipv6_conf_all_accept_source_route" />
++    </criteria>
++  </definition>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="net.ipv6.conf.all.accept_source_route static configuration" id="test_static_sysctl_net_ipv6_conf_all_accept_source_route" version="1">
++    <ind:object object_ref="object_static_sysctl_net_ipv6_conf_all_accept_source_route" />
++    <ind:state state_ref="state_static_sysctld_net_ipv6_conf_all_accept_source_route" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_test check="all" comment="net.ipv6.conf.all.accept_source_route static configuration in /etc/sysctl.d/*.conf" id="test_static_etc_sysctld_net_ipv6_conf_all_accept_source_route" version="1">
++    <ind:object object_ref="object_static_etc_sysctld_net_ipv6_conf_all_accept_source_route" />
++    <ind:state state_ref="state_static_sysctld_net_ipv6_conf_all_accept_source_route" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_test check="all" comment="net.ipv6.conf.all.accept_source_route static configuration in /etc/sysctl.d/*.conf" id="test_static_run_sysctld_net_ipv6_conf_all_accept_source_route" version="1">
++    <ind:object object_ref="object_static_run_sysctld_net_ipv6_conf_all_accept_source_route" />
++    <ind:state state_ref="state_static_sysctld_net_ipv6_conf_all_accept_source_route" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_test check="all" comment="net.ipv6.conf.all.accept_source_route static configuration in /etc/sysctl.d/*.conf" id="test_static_usr_lib_sysctld_net_ipv6_conf_all_accept_source_route" version="1">
++    <ind:object object_ref="object_static_usr_lib_sysctld_net_ipv6_conf_all_accept_source_route" />
++    <ind:state state_ref="state_static_sysctld_net_ipv6_conf_all_accept_source_route" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_object id="object_static_sysctl_net_ipv6_conf_all_accept_source_route" version="1">
++    <ind:filepath>/etc/sysctl.conf</ind:filepath>
++    <ind:pattern operation="pattern match">(?:^|.*\n)[^#]*net.ipv6.conf.all.accept_source_route[\s]*=[\s]*(\d+)[\s]*\n</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_object id="object_static_etc_sysctld_net_ipv6_conf_all_accept_source_route" version="1">
++    <ind:path>/etc/sysctl.d</ind:path>
++    <ind:filename operation="pattern match">^.*\.conf$</ind:filename>
++    <ind:pattern operation="pattern match">(?:^|.*\n)[^#]*net.ipv6.conf.all.accept_source_route[\s]*=[\s]*(\d+)[\s]*\n</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_object id="object_static_run_sysctld_net_ipv6_conf_all_accept_source_route" version="1">
++    <ind:path>/run/sysctl.d</ind:path>
++    <ind:filename operation="pattern match">^.*\.conf$</ind:filename>
++    <ind:pattern operation="pattern match">(?:^|.*\n)[^#]*net.ipv6.conf.all.accept_source_route[\s]*=[\s]*(\d+)[\s]*\n</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_object id="object_static_usr_lib_sysctld_net_ipv6_conf_all_accept_source_route" version="1">
++    <ind:path>/usr/lib/sysctl.d</ind:path>
++    <ind:filename operation="pattern match">^.*\.conf$</ind:filename>
++    <ind:pattern operation="pattern match">(?:^|.*\n)[^#]*net.ipv6.conf.all.accept_source_route[\s]*=[\s]*(\d+)[\s]*\n</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_state id="state_static_sysctld_net_ipv6_conf_all_accept_source_route" version="1">
++    <ind:subexpression operation="equals"  var_ref="sysctl_net_ipv6_conf_all_accept_source_route_value" datatype="int" />
++  </ind:textfilecontent54_state>
++
++  <external_variable comment="External variable for net.ipv6.conf.all.accept_source_route" datatype="int" id="sysctl_net_ipv6_conf_all_accept_source_route_value" version="1" />
++</def-group>
+diff --git a/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_static_net_ipv6_conf_all_accept_source_route/rule.yml b/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_static_net_ipv6_conf_all_accept_source_route/rule.yml
+new file mode 100644
+index 0000000..29bdb41
+--- /dev/null
++++ b/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_static_net_ipv6_conf_all_accept_source_route/rule.yml
+@@ -0,0 +1,42 @@
++documentation_complete: true
++
++prodtype: wrlinux1019
++
++title: 'The kernel "net.ipv6.conf.all.accept_source_route" parameter should be set to the appropriate value in the system configuration.'
++
++description: '{{{ describe_sysctl_option_value(sysctl="net.ipv6.conf.all.accept_source_route", value="0") }}}'
++
++rationale: |-
++    Source-routed packets allow the source of the packet to suggest routers
++    forward the packet along a different path than configured on the router, which can
++    be used to bypass network security measures. This requirement applies only to the
++    forwarding of source-routerd traffic, such as when IPv6 forwarding is enabled and
++    the system is functioning as a router.
++    <br /><br />
++    Accepting source-routed packets in the IPv6 protocol has few legitimate
++    uses. It should be disabled unless it is absolutely required.
++
++severity: medium
++
++identifiers:
++    cce@rhel6: 81012-7
++    cce@rhel7: 80179-5
++    cce@rhel8: 81013-5
++
++references:
++    anssi: NT28(R22)
++    cui: 3.1.20
++    disa: "366"
++    nist: AC-4
++    nist-csf: DE.AE-1,ID.AM-3,PR.AC-5,PR.DS-5,PR.PT-4
++    srg: SRG-OS-000480-GPOS-00227
++    stigid@rhel7: "040830"
++    isa-62443-2013: 'SR 3.1,SR 3.5,SR 3.8,SR 4.1,SR 4.3,SR 5.1,SR 5.2,SR 5.3,SR 7.1,SR 7.6'
++    isa-62443-2009: 4.2.3.4,4.3.3.4,4.4.3.3
++    cobit5: APO01.06,APO13.01,DSS01.05,DSS03.01,DSS05.02,DSS05.04,DSS05.07,DSS06.02
++    iso27001-2013: A.10.1.1,A.11.1.4,A.11.1.5,A.11.2.1,A.12.1.1,A.12.1.2,A.13.1.1,A.13.1.2,A.13.1.3,A.13.2.1,A.13.2.2,A.13.2.3,A.13.2.4,A.14.1.2,A.14.1.3,A.6.1.2,A.7.1.1,A.7.1.2,A.7.3.1,A.8.2.2,A.8.2.3,A.9.1.1,A.9.1.2,A.9.2.3,A.9.4.1,A.9.4.4,A.9.4.5
++    cis-csc: 1,12,13,14,15,16,18,4,6,8,9
++
++{{{ complete_ocil_entry_sysctl_option_value(sysctl="net.ipv6.conf.all.accept_source_route", value="0") }}}
++
++platform: machine
+diff --git a/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_static_net_ipv6_conf_all_disable_ipv6/oval/wrlinux1019.xml b/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_static_net_ipv6_conf_all_disable_ipv6/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..e572ea8
+--- /dev/null
++++ b/linux_os/guide/system/network/network-ipv6/configuring_ipv6/disabling_ipv6_autoconfig/sysctl_static_net_ipv6_conf_all_disable_ipv6/oval/wrlinux1019.xml
+@@ -0,0 +1,61 @@
++<def-group>
++  <definition class="compliance" id="sysctl_static_net_ipv6_conf_all_disable_ipv6" version="3">
++    <metadata>
++      <title>Kernel "net.ipv6.conf.all.disable_ipv6" Parameter Configuration Check</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The kernel "net.ipv6.conf.all.disable_ipv6" parameter should be set to "1" in the system configuration.</description>
++    </metadata>
++    <criteria operator="OR">
++      <criterion comment="kernel static parameter net.ipv6.conf.all.disable_ipv6 set to 1 in /etc/sysctl.conf" test_ref="test_static_sysctl_net_ipv6_conf_all_disable_ipv6" />
++      <!-- see sysctl.d(5) -->
++      <criterion comment="kernel static parameter net.ipv6.conf.all.disable_ipv6 set to 1 in /etc/sysctl.d/*.conf" test_ref="test_static_etc_sysctld_net_ipv6_conf_all_disable_ipv6" />
++      <criterion comment="kernel static parameter net.ipv6.conf.all.disable_ipv6 set to 1 in /run/sysctl.d/*.conf" test_ref="test_static_run_sysctld_net_ipv6_conf_all_disable_ipv6" />
++      <criterion comment="kernel static parameter net.ipv6.conf.all.disable_ipv6 set to 1 in /usr/lib/sysctl.d/*.conf" test_ref="test_static_usr_lib_sysctld_net_ipv6_conf_all_disable_ipv6" />
++    </criteria>
++  </definition>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="net.ipv6.conf.all.disable_ipv6 static configuration" id="test_static_sysctl_net_ipv6_conf_all_disable_ipv6" version="1">
++    <ind:object object_ref="object_static_sysctl_net_ipv6_conf_all_disable_ipv6" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_test check="all" comment="net.ipv6.conf.all.disable_ipv6 static configuration in /etc/sysctl.d/*.conf" id="test_static_etc_sysctld_net_ipv6_conf_all_disable_ipv6" version="1">
++    <ind:object object_ref="object_static_etc_sysctld_net_ipv6_conf_all_disable_ipv6" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_test check="all" comment="net.ipv6.conf.all.disable_ipv6 static configuration in /etc/sysctl.d/*.conf" id="test_static_run_sysctld_net_ipv6_conf_all_disable_ipv6" version="1">
++    <ind:object object_ref="object_static_run_sysctld_net_ipv6_conf_all_disable_ipv6" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_test check="all" comment="net.ipv6.conf.all.disable_ipv6 static configuration in /etc/sysctl.d/*.conf" id="test_static_usr_lib_sysctld_net_ipv6_conf_all_disable_ipv6" version="1">
++    <ind:object object_ref="object_static_usr_lib_sysctld_net_ipv6_conf_all_disable_ipv6" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_object id="object_static_sysctl_net_ipv6_conf_all_disable_ipv6" version="1">
++    <ind:filepath>/etc/sysctl.conf</ind:filepath>
++    <ind:pattern operation="pattern match">^[\s]*net.ipv6.conf.all.disable_ipv6[\s]*=[\s]*1[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_object id="object_static_etc_sysctld_net_ipv6_conf_all_disable_ipv6" version="1">
++    <ind:path>/etc/sysctl.d</ind:path>
++    <ind:filename operation="pattern match">^.*\.conf$</ind:filename>
++    <ind:pattern operation="pattern match">^[\s]*net.ipv6.conf.all.disable_ipv6[\s]*=[\s]*1[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_object id="object_static_run_sysctld_net_ipv6_conf_all_disable_ipv6" version="1">
++    <ind:path>/run/sysctl.d</ind:path>
++    <ind:filename operation="pattern match">^.*\.conf$</ind:filename>
++    <ind:pattern operation="pattern match">^[\s]*net.ipv6.conf.all.disable_ipv6[\s]*=[\s]*1[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_object id="object_static_usr_lib_sysctld_net_ipv6_conf_all_disable_ipv6" version="1">
++    <ind:path>/usr/lib/sysctl.d</ind:path>
++    <ind:filename operation="pattern match">^.*\.conf$</ind:filename>
++    <ind:pattern operation="pattern match">^[\s]*net.ipv6.conf.all.disable_ipv6[\s]*=[\s]*1[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++</def-group>
+-- 
+1.9.1
+

@@ -1,0 +1,29 @@
+From 1fa176e5802f2af554a3cb9fa4ecc6d1e09af8f2 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Thu, 15 Aug 2019 14:41:21 +0800
+Subject: [PATCH] Rule kernel_module_dccp_disabled add bash script
+
+Rule kernel_module_dccp_disabled add oval check for WRLinux1019.
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../kernel_module_dccp_disabled/bash/wrlinux1019.sh                 | 5 +++++
+ 1 file changed, 5 insertions(+)
+ create mode 100644 linux_os/guide/system/network/network-uncommon/kernel_module_dccp_disabled/bash/wrlinux1019.sh
+
+diff --git a/linux_os/guide/system/network/network-uncommon/kernel_module_dccp_disabled/bash/wrlinux1019.sh b/linux_os/guide/system/network/network-uncommon/kernel_module_dccp_disabled/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..aa079fd
+--- /dev/null
++++ b/linux_os/guide/system/network/network-uncommon/kernel_module_dccp_disabled/bash/wrlinux1019.sh
+@@ -0,0 +1,5 @@
++# platform = multi_platform_wrlinux
++
++echo "install dccp /bin/true" >> /etc/modprobe.d/dccp.conf
++echo "install dccp_ipv4 /bin/true" >> /etc/modprobe.d/dccp.conf
++echo "install dccp_ipv6 /bin/true" >> /etc/modprobe.d/dccp.conf
+-- 
+1.9.1
+
