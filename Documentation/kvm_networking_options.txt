@@ -55,7 +55,7 @@ on Intel platform):
 CONFIG_DMAR_TABLE=y
 CONFIG_INTEL_IOMMU=y
 
-They are enabled by default in feature/kvm template.
+They are enabled by default in feature/libvirt template.
 
 Optional:
 CONFIG_IRQ_REMAP=y
@@ -136,7 +136,7 @@ as a normal network card would appear to an operating system.
 Make sure CONFIG_PCI_IOV and CONFIG_PCI_MMCONFIG are eanbled on host kernel,
 CONFIG_IGBVF is enabled on guest kernel.
 
-They are selected in feature/kvm template and guest x86 BSPs kernel configs
+They are selected in feature/libvirt template and guest x86 BSPs kernel configs
 by default respectively.
 
 a. Verify if the PCI device with SR-IOV capabilities are detected.
@@ -245,7 +245,7 @@ Notes:
 Make sure CONFIG_MACVLAN and CONFIG_MACVTAP are enabled in host kernel. If
 they are modules, please load them.
 
-They are selected as kernel modules by default in feature/kvm template.
+They are selected as kernel modules by default in feature/libvirt template.
 
 5.1 Setup via commandline
 -------------------------   
@@ -284,7 +284,7 @@ Make sure bridge-utils is built in the host rootfs and virtio dirver is enabled.
 Make sure CONFIG_VHOST_NET is enabled in host kernel. If it is module,
 load it.
 
-It's selected as kernel module by default in feature/kvm template.
+It's selected as kernel module by default in feature/libvirt template.
 
 6.1 Setup via commandline
 -------------------------

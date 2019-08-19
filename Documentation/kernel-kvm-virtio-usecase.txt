@@ -65,7 +65,7 @@ Normal Execution Flow
 KVM HOST preparation
 
    1. Setup your a new build project by selecting either intel-x86-64 or qemux86-64
-   BSP, also enable the template feature/kvm.  See the product documentation for
+   BSP, also enable the template feature/libvirt.  See the product documentation for
    the steps to do this.
 
    2. Acknowledge the non-free license status of the 'netperf' package.
@@ -100,7 +100,7 @@ KVM HOST preparation
 KVM GUEST preparation
 
    1. Setup your a new build project by selecting intel-x86-64 BSP, also 
-   enable the template feature/kvm.  See the product documentation for
+   enable the template feature/libvirt.  See the product documentation for
    the steps to do this.
 
    2. Acknowledge the non-free license status of the 'netperf' package.
