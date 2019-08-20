@@ -97,7 +97,7 @@ SRCREV_machine_kb-v4.18-standard-qemuarm64 ?= "500fabbcb60fc2127b27e6bb7ddeb5c27
 LINUX_VERSION_kb-v4.18-standard-qemuarm64 ?= "4.18.41"
 SRCREV_machine_kb-v4.18-standard-qemuppc ?= "512b42fa9225ff179c99074f3e89a6f2349372bd"
 LINUX_VERSION_kb-v4.18-standard-qemuppc ?= "4.18.41"
-SRCREV_machine_kb-v4.18-standard-renesas-rcar-3.9.4-renesas-rcar ?= "1727fc5874630d610d6cd50880c08ec7019dc65a"
+SRCREV_machine_kb-v4.18-standard-renesas-rcar-3.9.4-renesas-rcar ?= "4f45c00d96bc1fc684cab3de7cd8d30301bbed5c"
 LINUX_VERSION_kb-v4.18-standard-renesas-rcar-3.9.4-renesas-rcar ?= "4.18.41"
 SRCREV_machine_kb-v4.18-standard-ti-am335x ?= "24e8d497e52601d35a294cea74dfb87bd8e4d289"
 LINUX_VERSION_kb-v4.18-standard-ti-am335x ?= "4.18.41"
@@ -120,5 +120,5 @@ LINUX_VERSION_kb-v4.18-standard-xilinx-sdk2018-03-xilinx-zynqmp ?= "4.18.41"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_4.18 = "yocto-4.18-wr"
-SRCREV_meta_4.18 = "ba9e9c409098ff93954ae0a54b803da2629974cd"
+SRCREV_meta_4.18 = "fbcc73db59e0c5b63e8e65117ab640a43cd1012d"
 LINUX_VERSION_4.18 = "4.18.41"
