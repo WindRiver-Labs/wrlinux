@@ -15,17 +15,18 @@ class SignatureGeneratorOverCBasicHash(oe.sstatesig.SignatureGeneratorOEBasicHas
             # Clear the locked sigs, to avoid contamination in devel mode
             self.lockedsigs = {}
 
-    def get_taskhash(self, fn, task, deps, dataCache):
+    def get_taskhash(self, tid, deps, dataCache):
         if self.dev_mode == "0":
+            (mc, _, task, fn) = bb.runqueue.split_tid_mcfn(tid)
             recipename = dataCache.pkg_fn[fn]
             if recipename not in self.lockedsigs:
                 self.undefined_msgs.append('The %s:%s task does not have a defined signature.'
                                       % (recipename, task))
 
-        h = oe.sstatesig.SignatureGeneratorOEBasicHash.get_taskhash(self, fn, task, deps, dataCache)
+        h = oe.sstatesig.SignatureGeneratorOEBasicHash.get_taskhash(self, tid, deps, dataCache)
         return h
 
-    def checkhashes(self, missed, ret, sq_fn, sq_task, sq_hash, sq_hashfn, d):
+    def checkhashes(self, sq_data, missed, found, d):
         if self.mismatch_msgs or self.undefined_msgs:
             if self.mismatch_msgs:
                 bb.error("\n".join(self.mismatch_msgs))
@@ -37,6 +38,6 @@ class SignatureGeneratorOverCBasicHash(oe.sstatesig.SignatureGeneratorOEBasicHas
                      "configuration steps exactly. If you believe this "
                      "message is in error, please open a support ticket.")
 
-        oe.sstatesig.SignatureGeneratorOEBasicHash.checkhashes(self, missed, ret, sq_fn, sq_task, sq_hash, sq_hashfn, d)
+        oe.sstatesig.SignatureGeneratorOEBasicHash.checkhashes(self, sq_data, missed, found, d)
 
 bb.siggen.SignatureGeneratorOverCBasicHash = SignatureGeneratorOverCBasicHash
