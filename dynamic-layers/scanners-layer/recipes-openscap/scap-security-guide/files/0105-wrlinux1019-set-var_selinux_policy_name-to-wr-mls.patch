@@ -1,0 +1,47 @@
+From 1cb6da0d28b1bff7990460e7052852b0cb692990 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 20 Aug 2019 11:35:45 +0800
+Subject: [PATCH] wrlinux1019: set var_selinux_policy_name to wr-mls
+
+WRLinux1019 uses wr-mls as default SELinux policy.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ linux_os/guide/system/selinux/var_selinux_policy_name.var | 2 ++
+ wrlinux1019/profiles/draft_stig_wrlinux_disa.profile      | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/linux_os/guide/system/selinux/var_selinux_policy_name.var b/linux_os/guide/system/selinux/var_selinux_policy_name.var
+index 891c581..e385875 100644
+--- a/linux_os/guide/system/selinux/var_selinux_policy_name.var
++++ b/linux_os/guide/system/selinux/var_selinux_policy_name.var
+@@ -7,6 +7,7 @@ description: |-
+     <br />targeted - Only targeted network daemons are protected.
+     <br />strict - Full SELinux protection.
+     <br />mls - Multiple levels of security
++    <br />wr-mls - Multiple levels of security on WRLinux
+ 
+ type: string
+ 
+@@ -18,3 +19,4 @@ options:
+     default: targeted
+     mls: mls
+     targeted: targeted
++    wr-mls: wr-mls
+diff --git a/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile b/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
+index b2c2a48..987fa70 100644
+--- a/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
++++ b/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
+@@ -30,6 +30,7 @@ selections:
+     - var_account_disable_post_pw_expiration=0
+     - var_accounts_tmout=10_min
+     - var_selinux_state=enforcing
++    - var_selinux_policy_name=wr-mls
+     - var_accounts_passwords_pam_faillock_deny=3
+     - banner_etc_issue
+     - sshd_enable_warning_banner
+-- 
+2.7.4
+

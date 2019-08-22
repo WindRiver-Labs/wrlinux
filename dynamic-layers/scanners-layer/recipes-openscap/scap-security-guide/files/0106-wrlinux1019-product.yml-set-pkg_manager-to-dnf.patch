@@ -1,0 +1,29 @@
+From fdb9ea87559f396cf1cca3f9ae5573873e53db3d Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 23 Aug 2019 11:35:23 +0800
+Subject: [PATCH] wrlinux1019/product.yml: set pkg_manager to dnf
+
+The package manager on WRLinux should be dnf, not yum.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ wrlinux1019/product.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wrlinux1019/product.yml b/wrlinux1019/product.yml
+index 28a1dc8..c45d065 100644
+--- a/wrlinux1019/product.yml
++++ b/wrlinux1019/product.yml
+@@ -6,6 +6,6 @@ benchmark_root: "../linux_os/guide"
+ 
+ profiles_root: "./profiles"
+ 
+-pkg_manager: "yum"
++pkg_manager: "dnf"
+ 
+ init_system: "systemd"
+-- 
+2.7.4
+

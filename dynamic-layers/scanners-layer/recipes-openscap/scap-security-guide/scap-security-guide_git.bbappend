@@ -106,6 +106,8 @@ SRC_URI = "git://github.com/OpenSCAP/scap-security-guide.git \
             file://0102-Rule-postfix_client-postfix_network_listening_disabl.patch \
             file://0103-Rule-service_ntpdate_disabled-add-oval-check.patch \
             file://0104-Remove-rule-configure_firewalld_ports-from-WRLinux10.patch \
+            file://0105-wrlinux1019-set-var_selinux_policy_name-to-wr-mls.patch \
+            file://0106-wrlinux1019-product.yml-set-pkg_manager-to-dnf.patch \
            "
 PV = "0.1.45+git${SRCPV}"
 
