@@ -1,0 +1,30 @@
+From 48c91915cc9814de61c7c6861eb69709efac551a Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Thu, 22 Aug 2019 16:12:06 +0800
+Subject: [PATCH] Remove rule configure_firewalld_ports from WRLinux1019
+ profile
+
+Remove rule configure_firewalld_ports from WRLinux1019 profile
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ wrlinux1019/profiles/draft_stig_wrlinux_disa.profile | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile b/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
+index 429502d..085d0e4 100644
+--- a/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
++++ b/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
+@@ -208,7 +208,6 @@ selections:
+     - package_iptables_installed
+     - iptables_input_reject_rule
+     - package_tftp-server_removed
+-    - configure_firewalld_ports
+     - sssd_ldap_start_tls
+     - sssd_ldap_configure_tls_ca_dir
+     - sssd_ldap_configure_tls_ca
+-- 
+1.9.1
+

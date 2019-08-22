@@ -1,0 +1,181 @@
+From 8c1dbd12c8a329dcbe402118ae6f183845e61e22 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Thu, 22 Aug 2019 15:17:46 +0800
+Subject: [PATCH] Rule service_ntpdate_disabled add oval check
+
+Rule service_ntpdate_disabled add oval check
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../service_ntpdate_disabled/oval/wrlinux1019.xml  | 31 ++++++++
+ .../base/service_ntpdate_disabled/rule.yml         |  2 +-
+ .../package_ntpdate_removed/oval/wrlinux1019.xml   | 82 ++++++++++++++++++++++
+ .../deprecated/package_ntpdate_removed/rule.yml    |  2 +
+ .../profiles/draft_stig_wrlinux_disa.profile       |  1 +
+ 5 files changed, 117 insertions(+), 1 deletion(-)
+ create mode 100644 linux_os/guide/services/base/service_ntpdate_disabled/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/services/deprecated/package_ntpdate_removed/oval/wrlinux1019.xml
+
+diff --git a/linux_os/guide/services/base/service_ntpdate_disabled/oval/wrlinux1019.xml b/linux_os/guide/services/base/service_ntpdate_disabled/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..b25d316
+--- /dev/null
++++ b/linux_os/guide/services/base/service_ntpdate_disabled/oval/wrlinux1019.xml
+@@ -0,0 +1,31 @@
++<def-group>
++  <definition class="compliance" id="service_ntpdate_disabled" version="1">
++    <metadata>
++      <title>Service ntpdate Disabled</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The ntpdate service should be disabled if possible.</description>
++    </metadata>
++    <criteria comment="package ntpdate removed or service ntpdate is not configured to start" operator="OR">
++      <extend_definition comment="ntpdate removed" definition_ref="package_ntpdate_removed" />
++      <criteria operator="OR" comment="service ntpdate is not configured to start">
++        <criterion comment="ntpdate not wanted by multi-user.target" test_ref="test_ntpdate_not_wanted_by_multi_user_target" />
++      </criteria>
++    </criteria>
++  </definition>
++
++  <linux:systemdunitdependency_test check="all" check_existence="any_exist" comment="systemd test" id="test_ntpdate_not_wanted_by_multi_user_target" version="1">
++    <linux:object object_ref="object_multi_user_target_for_ntpdate" />
++    <linux:state state_ref="state_systemd_ntpdate_off"/>
++  </linux:systemdunitdependency_test>
++
++  <linux:systemdunitdependency_object id="object_multi_user_target_for_ntpdate" comment="list of dependencies of multi-user.target" version="1">
++    <linux:unit>multi-user.target</linux:unit>
++  </linux:systemdunitdependency_object>
++
++  <linux:systemdunitdependency_state id="state_systemd_ntpdate_off" comment="ntpdate is not listed in the dependencies" version="1">
++    <linux:dependency entity_check="none satisfy">ntpdate.service</linux:dependency>
++  </linux:systemdunitdependency_state>
++
++</def-group>
+diff --git a/linux_os/guide/services/base/service_ntpdate_disabled/rule.yml b/linux_os/guide/services/base/service_ntpdate_disabled/rule.yml
+index 1a20f8f..4a1da66 100644
+--- a/linux_os/guide/services/base/service_ntpdate_disabled/rule.yml
++++ b/linux_os/guide/services/base/service_ntpdate_disabled/rule.yml
+@@ -1,6 +1,6 @@
+ documentation_complete: true
+ 
+-prodtype: rhel6,rhel7,rhel8,ol7,ol8
++prodtype: wrlinux1019,rhel6,rhel7,rhel8,ol7,ol8
+ 
+ title: 'Disable ntpdate Service (ntpdate)'
+ 
+diff --git a/linux_os/guide/services/deprecated/package_ntpdate_removed/oval/wrlinux1019.xml b/linux_os/guide/services/deprecated/package_ntpdate_removed/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..ef30ce6
+--- /dev/null
++++ b/linux_os/guide/services/deprecated/package_ntpdate_removed/oval/wrlinux1019.xml
+@@ -0,0 +1,82 @@
++<def-group>
++  <definition class="compliance" id="package_ntpdate_removed"
++  version="1">
++    <metadata>
++      <title>Package ntpdate Removed</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The package ntpdate should be removed.</description>
++    </metadata>
++    <criteria operator="AND">
++      <criterion comment="The /usr/sbin/ntpdate file is present" test_ref="test_usr_sbin_ntpdate_is_present" />
++      <criterion comment="The /usr/bin/ntpdate-sync file is present" test_ref="test_usr_bin_ntpdate_sync_is_present" />
++      <criterion comment="The /etc/default/ntpdate file is present" test_ref="test_etc_default_ntpdate_is_present" />
++      <criterion comment="The /lib/systemd/system/ntpdate.service file is present" test_ref="test_lib_systemd_system_ntpdate_service_is_present" />
++    </criteria>
++  </definition>
++
++  <unix:file_test id="test_usr_sbin_ntpdate_is_present"
++	check="all"
++	check_existence="none_exist"
++	comment="The /usr/sbin/ntpdate file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_sbin_ntpdate_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_sbin_ntpdate_is_present"
++	comment="The /usr/sbin/ntpdate file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/sbin/ntpdate</unix:filepath>
++  </unix:file_object>
++
++  <unix:file_test id="test_usr_bin_ntpdate_sync_is_present"
++	check="all"
++	check_existence="none_exist"
++	comment="The /usr/bin/ntpdate-sync file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_bin_ntpdate_sync_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_bin_ntpdate_sync_is_present"
++	comment="The /usr/bin/ntpdate-sync file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/bin/ntpdate-sync</unix:filepath>
++  </unix:file_object>
++
++  <unix:file_test id="test_etc_default_ntpdate_is_present"
++	check="all"
++	check_existence="none_exist"
++	comment="The /etc/default/ntpdate file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_etc_default_ntpdate_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_etc_default_ntpdate_is_present"
++	comment="The /etc/default/ntpdate file is present on the system"
++	version="1"
++	>
++	<unix:filepath operation="equals">/etc/default/ntpdate</unix:filepath>
++  </unix:file_object>
++
++  <unix:file_test id="test_lib_systemd_system_ntpdate_service_is_present"
++	check="all"
++	check_existence="none_exist"
++	comment="The /lib/systemd/system/ntpdate.service file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_lib_systemd_system_ntpdate_service_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_lib_systemd_system_ntpdate_service_is_present"
++	comment="The /lib/systemd/system/ntpdate.service file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/lib/systemd/system/ntpdate.service</unix:filepath>
++  </unix:file_object>
++</def-group>
+diff --git a/linux_os/guide/services/deprecated/package_ntpdate_removed/rule.yml b/linux_os/guide/services/deprecated/package_ntpdate_removed/rule.yml
+index dcfc984..5b5e10d 100644
+--- a/linux_os/guide/services/deprecated/package_ntpdate_removed/rule.yml
++++ b/linux_os/guide/services/deprecated/package_ntpdate_removed/rule.yml
+@@ -1,5 +1,7 @@
+ documentation_complete: true
+ 
++prodtype: wrlinux1019
++
+ title: 'Uninstall the ntpdate package'
+ 
+ description: 'ntpdate is a historical ntp synchronization client for unixes. It sould be uninstalled.'
+diff --git a/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile b/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
+index 5e69959..429502d 100644
+--- a/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
++++ b/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
+@@ -228,3 +228,4 @@ selections:
+     - package_openssh-server_installed
+     - package_strongswan_installed
+     - postfix_network_listening_disabled
++    - service_ntpdate_disabled
+-- 
+1.9.1
+

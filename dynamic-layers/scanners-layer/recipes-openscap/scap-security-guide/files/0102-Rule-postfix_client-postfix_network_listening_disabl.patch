@@ -1,0 +1,531 @@
+From 0be647fb10e8939107390766f554f5126925a736 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Thu, 22 Aug 2019 15:13:49 +0800
+Subject: [PATCH] Rule postfix_client/postfix_network_listening_disabled add
+ oval check for WRLinux1019
+
+Rule postfix_client/postfix_network_listening_disabled add
+ oval check for WRLinux1019
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../package_postfix_installed/oval/wrlinux1019.xml | 356 +++++++++++++++++++++
+ .../package_postfix_installed/rule.yml             |  17 +
+ .../oval/shared.xml                                |   1 +
+ .../oval/wrlinux1019.xml                           |  28 ++
+ .../postfix_network_listening_disabled/rule.yml    |   2 +-
+ .../service_postfix_enabled/oval/wrlinux1019.xml   |  31 ++
+ .../services/mail/service_postfix_enabled/rule.yml |   2 +-
+ .../profiles/draft_stig_wrlinux_disa.profile       |   1 +
+ 8 files changed, 436 insertions(+), 2 deletions(-)
+ create mode 100644 linux_os/guide/services/mail/postfix_client/package_postfix_installed/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/services/mail/postfix_client/package_postfix_installed/rule.yml
+ create mode 100644 linux_os/guide/services/mail/postfix_client/postfix_network_listening_disabled/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/services/mail/service_postfix_enabled/oval/wrlinux1019.xml
+
+diff --git a/linux_os/guide/services/mail/postfix_client/package_postfix_installed/oval/wrlinux1019.xml b/linux_os/guide/services/mail/postfix_client/package_postfix_installed/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..582dc26
+--- /dev/null
++++ b/linux_os/guide/services/mail/postfix_client/package_postfix_installed/oval/wrlinux1019.xml
+@@ -0,0 +1,356 @@
++<def-group>
++  <definition class="compliance" id="package_postfix_installed"
++  version="1">
++    <metadata>
++      <title>Package postfix Installed</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The postfix package is installed</description>
++    </metadata>
++    <criteria operator="AND">
++      <criterion comment="The /etc/postfix/access file is present" test_ref="test_etc_postfix_access_is_present" />
++      <criterion comment="The /etc/postfix/aliases file is present" test_ref="test_etc_postfix_aliases_is_present" />
++      <criterion comment="The /etc/postfix/main.cf file is present" test_ref="test_etc_postfix_main_cf_is_present" />
++      <criterion comment="The /etc/postfix/master.cf file is present" test_ref="test_etc_postfix_master_cf_is_present" />
++      <criterion comment="The /lib/systemd/system/postfix.service file is present" test_ref="test_lib_systemd_system_postfix_service_is_present" />
++      <criterion comment="The /usr/sbin/postalias file is present" test_ref="test_usr_sbin_postalias_is_present" />
++      <criterion comment="The /usr/sbin/postcat file is present" test_ref="test_usr_sbin_postcat_is_present" />
++      <criterion comment="The /usr/sbin/postconf file is present" test_ref="test_usr_sbin_postconf_is_present" />
++      <criterion comment="The /usr/sbin/postdrop file is present" test_ref="test_usr_sbin_postdrop_is_present" />
++      <criterion comment="The /usr/sbin/postfix file is present" test_ref="test_usr_sbin_postfix_is_present" />
++      <criterion comment="The /usr/sbin/postkick file is present" test_ref="test_usr_sbin_postkick_is_present" />
++      <criterion comment="The /usr/sbin/postlock file is present" test_ref="test_usr_sbin_postlock_is_present" />
++      <criterion comment="The /usr/sbin/postlog file is present" test_ref="test_usr_sbin_postlog_is_present" />
++      <criterion comment="The /usr/sbin/postmap file is present" test_ref="test_usr_sbin_postmap_is_present" />
++      <criterion comment="The /usr/sbin/postmulti file is present" test_ref="test_usr_sbin_postmulti_is_present" />
++      <criterion comment="The /usr/sbin/postqueue file is present" test_ref="test_usr_sbin_postqueue_is_present" />
++      <criterion comment="The /usr/sbin/postsuper file is present" test_ref="test_usr_sbin_postsuper_is_present" />
++      <criterion comment="The /usr/sbin/sendmail.postfix file is present" test_ref="test_usr_sbin_sendmail_postfix_is_present" />
++      <criterion comment="The /usr/sbin/smtp-sink file is present" test_ref="test_usr_sbin_smtp_sink_is_present" />
++    </criteria>
++  </definition>
++
++  <unix:file_test id="test_etc_postfix_access_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /etc/postfix/access file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_etc_postfix_access_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_etc_postfix_access_is_present"
++	comment="The /etc/postfix/access file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/etc/postfix/access</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_etc_postfix_aliases_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /etc/postfix/aliases file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_etc_postfix_aliases_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_etc_postfix_aliases_is_present"
++	comment="The /etc/postfix/aliases file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/etc/postfix/aliases</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_etc_postfix_main_cf_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /etc/postfix/main.cf file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_etc_postfix_main_cf_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_etc_postfix_main_cf_is_present"
++	comment="The /etc/postfix/main.cf file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/etc/postfix/main.cf</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_etc_postfix_master_cf_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /etc/postfix/master.cf file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_etc_postfix_master_cf_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_etc_postfix_master_cf_is_present"
++	comment="The /etc/postfix/master.cf file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/etc/postfix/master.cf</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_lib_systemd_system_postfix_service_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /lib/systemd/system/postfix.service file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_lib_systemd_system_postfix_service_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_lib_systemd_system_postfix_service_is_present"
++	comment="The /lib/systemd/system/postfix.service file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/lib/systemd/system/postfix.service</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_sbin_postalias_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/sbin/postalias file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_sbin_postalias_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_sbin_postalias_is_present"
++	comment="The /usr/sbin/postalias file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/sbin/postalias</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_sbin_postcat_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/sbin/postcat file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_sbin_postcat_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_sbin_postcat_is_present"
++	comment="The /usr/sbin/postcat file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/sbin/postcat</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_sbin_postconf_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/sbin/postconf file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_sbin_postconf_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_sbin_postconf_is_present"
++	comment="The /usr/sbin/postconf file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/sbin/postconf</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_sbin_postdrop_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/sbin/postdrop file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_sbin_postdrop_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_sbin_postdrop_is_present"
++	comment="The /usr/sbin/postdrop file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/sbin/postdrop</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_sbin_postfix_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/sbin/postfix file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_sbin_postfix_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_sbin_postfix_is_present"
++	comment="The /usr/sbin/postfix file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/sbin/postfix</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_sbin_postkick_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/sbin/postkick file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_sbin_postkick_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_sbin_postkick_is_present"
++	comment="The /usr/sbin/postkick file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/sbin/postkick</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_sbin_postlock_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/sbin/postlock file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_sbin_postlock_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_sbin_postlock_is_present"
++	comment="The /usr/sbin/postlock file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/sbin/postlock</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_sbin_postlog_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/sbin/postlog file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_sbin_postlog_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_sbin_postlog_is_present"
++	comment="The /usr/sbin/postlog file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/sbin/postlog</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_sbin_postmap_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/sbin/postmap file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_sbin_postmap_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_sbin_postmap_is_present"
++	comment="The /usr/sbin/postmap file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/sbin/postmap</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_sbin_postmulti_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/sbin/postmulti file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_sbin_postmulti_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_sbin_postmulti_is_present"
++	comment="The /usr/sbin/postmulti file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/sbin/postmulti</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_sbin_postqueue_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/sbin/postqueue file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_sbin_postqueue_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_sbin_postqueue_is_present"
++	comment="The /usr/sbin/postqueue file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/sbin/postqueue</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_sbin_postsuper_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/sbin/postsuper file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_sbin_postsuper_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_sbin_postsuper_is_present"
++	comment="The /usr/sbin/postsuper file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/sbin/postsuper</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_sbin_sendmail_postfix_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/sbin/sendmail.postfix file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_sbin_sendmail_postfix_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_sbin_sendmail_postfix_is_present"
++	comment="The /usr/sbin/sendmail.postfix file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/sbin/sendmail.postfix</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_sbin_smtp_sink_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/sbin/smtp-sink file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_sbin_smtp_sink_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_sbin_smtp_sink_is_present"
++	comment="The /usr/sbin/smtp-sink file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/sbin/smtp-sink</unix:filepath>
++  </unix:file_object>
++
++</def-group>
+diff --git a/linux_os/guide/services/mail/postfix_client/package_postfix_installed/rule.yml b/linux_os/guide/services/mail/postfix_client/package_postfix_installed/rule.yml
+new file mode 100644
+index 0000000..2dbbc63
+--- /dev/null
++++ b/linux_os/guide/services/mail/postfix_client/package_postfix_installed/rule.yml
+@@ -0,0 +1,17 @@
++documentation_complete: true
++
++prodtype: wrlinux1019
++
++title: 'Install postfix Package'
++
++description: |-
++    {{{ describe_package_install(package="postfix") }}}
++
++rationale: |-
++    Install postfix Package  <tt>vi</tt>. 
++
++severity: low
++
++ocil_clause: 'the package is not installed'
++
++ocil: '{{{ ocil_package(package="postfix") }}}'
+diff --git a/linux_os/guide/services/mail/postfix_client/postfix_network_listening_disabled/oval/shared.xml b/linux_os/guide/services/mail/postfix_client/postfix_network_listening_disabled/oval/shared.xml
+index f6212e9..77f3599 100644
+--- a/linux_os/guide/services/mail/postfix_client/postfix_network_listening_disabled/oval/shared.xml
++++ b/linux_os/guide/services/mail/postfix_client/postfix_network_listening_disabled/oval/shared.xml
+@@ -5,6 +5,7 @@
+       <affected family="unix">
+         <platform>multi_platform_rhel</platform>
+         <platform>multi_platform_fedora</platform>
++        <platform>multi_platform_wrlinux</platform>
+       </affected>
+       <description>Postfix network listening should be disabled</description>
+     </metadata>
+diff --git a/linux_os/guide/services/mail/postfix_client/postfix_network_listening_disabled/oval/wrlinux1019.xml b/linux_os/guide/services/mail/postfix_client/postfix_network_listening_disabled/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..babad44
+--- /dev/null
++++ b/linux_os/guide/services/mail/postfix_client/postfix_network_listening_disabled/oval/wrlinux1019.xml
+@@ -0,0 +1,28 @@
++<def-group>
++  <definition class="compliance" id="postfix_network_listening_disabled" version="2">
++    <metadata>
++      <title>Postfix network listening should be disabled</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>Postfix network listening should be disabled</description>
++    </metadata>
++    <criteria operator="OR">
++      <!-- postfix package not installed or postfix service not configured to start -->
++      <extend_definition comment="Postfix installed and configured to start" negate="true" definition_ref="service_postfix_enabled" />
++      <!-- postfix network listening disabled -->
++      <criterion comment="Check inet_interfaces in /etc/postfix/main.cf" test_ref="test_postfix_network_listening_disabled" />
++    </criteria>
++  </definition>
++
++  <ind:textfilecontent54_test id="test_postfix_network_listening_disabled" check="all" check_existence="at_least_one_exists" comment="inet_interfaces in /etc/postfix/main.cf should be set correctly" version="1">
++    <ind:object object_ref="obj_postfix_network_listening_disabled" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_object id="obj_postfix_network_listening_disabled" comment="inet_interfaces in /etc/postfix/main.cf should be set correctly" version="1">
++    <ind:filepath>/etc/postfix/main.cf</ind:filepath>
++    <ind:pattern operation="pattern match">^[\s]*inet_interfaces[\s]*=[\s]*(localhost|127\.0\.0\.1)[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++</def-group>
+diff --git a/linux_os/guide/services/mail/postfix_client/postfix_network_listening_disabled/rule.yml b/linux_os/guide/services/mail/postfix_client/postfix_network_listening_disabled/rule.yml
+index dc03818..c2d82b1 100644
+--- a/linux_os/guide/services/mail/postfix_client/postfix_network_listening_disabled/rule.yml
++++ b/linux_os/guide/services/mail/postfix_client/postfix_network_listening_disabled/rule.yml
+@@ -1,6 +1,6 @@
+ documentation_complete: true
+ 
+-prodtype: rhel6,rhel7,rhel8
++prodtype: wrlinux1019,rhel6,rhel7,rhel8
+ 
+ title: 'Disable Postfix Network Listening'
+ 
+diff --git a/linux_os/guide/services/mail/service_postfix_enabled/oval/wrlinux1019.xml b/linux_os/guide/services/mail/service_postfix_enabled/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..5d28ef5
+--- /dev/null
++++ b/linux_os/guide/services/mail/service_postfix_enabled/oval/wrlinux1019.xml
+@@ -0,0 +1,31 @@
++<def-group>
++  <definition class="compliance" id="service_postfix_enabled" version="1">
++    <metadata>
++      <title>Service postfix Enabled</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The postfix service should be enabled if possible.</description>
++    </metadata>
++    <criteria comment="package postfix installed and service postfix is configured to start" operator="AND">
++    <extend_definition comment="postfix installed" definition_ref="package_postfix_installed" />
++    <criteria operator="OR" comment="service postfix is configured to start">
++      <criterion comment="multi-user.target wants postfix" test_ref="test_multi_user_wants_postfix" />
++    </criteria>
++    </criteria>
++  </definition>
++
++  <linux:systemdunitdependency_test check="all" check_existence="any_exist" comment="systemd test" id="test_multi_user_wants_postfix" version="1">
++    <linux:object object_ref="object_multi_user_target_for_postfix" />
++    <linux:state state_ref="state_systemd_postfix_on"/>
++  </linux:systemdunitdependency_test>
++
++  <linux:systemdunitdependency_object id="object_multi_user_target_for_postfix" comment="list of dependencies of multi-user.target" version="1">
++    <linux:unit>multi-user.target</linux:unit>
++  </linux:systemdunitdependency_object>
++
++  <linux:systemdunitdependency_state id="state_systemd_postfix_on" comment="postfix listed at least once in the dependencies" version="1">
++    <linux:dependency entity_check="at least one">postfix.service</linux:dependency>
++  </linux:systemdunitdependency_state>
++
++</def-group>
+diff --git a/linux_os/guide/services/mail/service_postfix_enabled/rule.yml b/linux_os/guide/services/mail/service_postfix_enabled/rule.yml
+index 505dca3..5c3c308 100644
+--- a/linux_os/guide/services/mail/service_postfix_enabled/rule.yml
++++ b/linux_os/guide/services/mail/service_postfix_enabled/rule.yml
+@@ -1,6 +1,6 @@
+ documentation_complete: true
+ 
+-prodtype: rhel6,rhel7,rhel8
++prodtype: wrlinux1019,rhel6,rhel7,rhel8
+ 
+ title: 'Enable Postfix Service'
+ 
+diff --git a/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile b/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
+index a4188f6..5e69959 100644
+--- a/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
++++ b/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
+@@ -227,3 +227,4 @@ selections:
+     - samhain_scan_notification
+     - package_openssh-server_installed
+     - package_strongswan_installed
++    - postfix_network_listening_disabled
+-- 
+1.9.1
+

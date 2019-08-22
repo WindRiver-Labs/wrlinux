@@ -1,0 +1,421 @@
+From 6f68c927fb41ce8335c3fe2081c25d0d884e6bf7 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Fri, 16 Aug 2019 16:16:28 +0800
+Subject: [PATCH] Add rules package_openssh-sshd_installed and
+ package_openssh_installed
+
+Add rules package_openssh-sshd_installed and
+ package_openssh_installed
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../oval/wrlinux1019.xml                           |  19 ++
+ .../ssh/package_openssh-sshd_installed/rule.yml    |  34 +++
+ .../package_openssh_installed/oval/wrlinux1019.xml | 284 +++++++++++++++++++++
+ .../ssh/package_openssh_installed/rule.yml         |  34 +++
+ 4 files changed, 371 insertions(+)
+ create mode 100644 linux_os/guide/services/ssh/package_openssh-sshd_installed/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/services/ssh/package_openssh-sshd_installed/rule.yml
+ create mode 100644 linux_os/guide/services/ssh/package_openssh_installed/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/services/ssh/package_openssh_installed/rule.yml
+
+diff --git a/linux_os/guide/services/ssh/package_openssh-sshd_installed/oval/wrlinux1019.xml b/linux_os/guide/services/ssh/package_openssh-sshd_installed/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..b487540
+--- /dev/null
++++ b/linux_os/guide/services/ssh/package_openssh-sshd_installed/oval/wrlinux1019.xml
+@@ -0,0 +1,19 @@
++<def-group>
++  <definition class="compliance" id="package_openssh-sshd_installed"
++  version="1">
++    <metadata>
++      <title>Package openssh-sshd Installed</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The package openssh-sshd should be installed.</description>
++    </metadata>
++
++    <criteria operator="AND">
++      <criterion comment="The /usr/sbin/sshd file is present" test_ref="test_usr_sbin_sshd_is_present" />
++	  <criterion comment="The /etc/ssh/sshd_config file is present" test_ref="test_etc_ssh_sshd_config_is_present" />
++      <criterion comment="The /lib/systemd/system/sshdgenkeys.service file is present" test_ref="test_lib_systemd_system_sshdgenkeys_service_is_present" />
++    </criteria>
++  </definition>
++
++</def-group>
+diff --git a/linux_os/guide/services/ssh/package_openssh-sshd_installed/rule.yml b/linux_os/guide/services/ssh/package_openssh-sshd_installed/rule.yml
+new file mode 100644
+index 0000000..dc13e52
+--- /dev/null
++++ b/linux_os/guide/services/ssh/package_openssh-sshd_installed/rule.yml
+@@ -0,0 +1,34 @@
++documentation_complete: true
++
++prodtype: wrlinux1019
++
++title: 'Install the OpenSSH Sshd Package'
++
++description: |-
++    The <tt>openssh-sshd</tt> package should be installed.
++    {{{ describe_package_install(package="openssh-sshd") }}}
++
++rationale: |-
++    Without protection of the transmitted information, confidentiality, and
++    integrity may be compromised because unprotected communications can be
++    intercepted and either read or altered.
++
++severity: medium
++
++identifiers:
++    cce@rhel7: 80215-7
++
++references:
++    disa: 2418,2420,2421,2422
++    nist: SC-8
++    nist-csf: PR.DS-2,PR.DS-5
++    srg: SRG-OS-000423-GPOS-00187,SRG-OS-000423-GPOS-00188,SRG-OS-000423-GPOS-00189,SRG-OS000423-GPOS-00190
++    stigid@rhel7: "040300"
++    isa-62443-2013: 'SR 3.1,SR 3.8,SR 4.1,SR 4.2,SR 5.2'
++    cobit5: APO01.06,DSS05.02,DSS05.04,DSS05.07,DSS06.02,DSS06.06
++    iso27001-2013: A.10.1.1,A.11.1.4,A.11.1.5,A.11.2.1,A.13.1.1,A.13.1.3,A.13.2.1,A.13.2.3,A.13.2.4,A.14.1.2,A.14.1.3,A.6.1.2,A.7.1.1,A.7.1.2,A.7.3.1,A.8.2.2,A.8.2.3,A.9.1.1,A.9.1.2,A.9.2.3,A.9.4.1,A.9.4.4,A.9.4.5
++    cis-csc: 13,14
++
++ocil_clause: 'the package is not installed'
++
++ocil: '{{{ ocil_package(package="openssh-sshd") }}}'
+diff --git a/linux_os/guide/services/ssh/package_openssh_installed/oval/wrlinux1019.xml b/linux_os/guide/services/ssh/package_openssh_installed/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..98bd3e3
+--- /dev/null
++++ b/linux_os/guide/services/ssh/package_openssh_installed/oval/wrlinux1019.xml
+@@ -0,0 +1,284 @@
++<def-group>
++  <definition class="compliance" id="package_openssh_installed"
++  version="1">
++    <metadata>
++      <title>Package openssh Installed</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The openssh package is installed</description>
++    </metadata>
++    <criteria operator="AND">
++      <criterion comment="The /etc/default/volatiles/99_sshd file is present" test_ref="test_etc_default_volatiles_99_sshd_is_present" />
++      <criterion comment="The /etc/ssh/ssh_config file is present" test_ref="test_etc_ssh_ssh_config_is_present" />
++      <criterion comment="The /etc/ssh/sshd_config file is present" test_ref="test_etc_ssh_sshd_config_is_present" />
++      <criterion comment="The /etc/ssh/sshd_config_readonly file is present" test_ref="test_etc_ssh_sshd_config_readonly_is_present" />
++      <criterion comment="The /lib/systemd/system/sshdgenkeys.service file is present" test_ref="test_lib_systemd_system_sshdgenkeys_service_is_present" />
++      <criterion comment="The /lib/systemd/system/sshd.socket file is present" test_ref="test_lib_systemd_system_sshd_socket_is_present" />
++      <criterion comment="The /usr/bin/scp file is present" test_ref="test_usr_bin_scp_is_present" />
++      <criterion comment="The /usr/bin/sftp file is present" test_ref="test_usr_bin_sftp_is_present" />
++      <criterion comment="The /usr/bin/ssh file is present" test_ref="test_usr_bin_ssh_is_present" />
++      <criterion comment="The /usr/bin/ssh-add file is present" test_ref="test_usr_bin_ssh_add_is_present" />
++      <criterion comment="The /usr/bin/ssh-agent file is present" test_ref="test_usr_bin_ssh_agent_is_present" />
++      <criterion comment="The /usr/bin/ssh-copy-id file is present" test_ref="test_usr_bin_ssh_copy_id_is_present" />
++      <criterion comment="The /usr/bin/ssh-keygen file is present" test_ref="test_usr_bin_ssh_keygen_is_present" />
++      <criterion comment="The /usr/bin/ssh-keyscan file is present" test_ref="test_usr_bin_ssh_keyscan_is_present" />
++      <criterion comment="The /usr/sbin/sshd file is present" test_ref="test_usr_sbin_sshd_is_present" />
++    </criteria>
++  </definition>
++
++  <unix:file_test id="test_etc_default_volatiles_99_sshd_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /etc/default/volatiles/99_sshd file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_etc_default_volatiles_99_sshd_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_etc_default_volatiles_99_sshd_is_present"
++	comment="The /etc/default/volatiles/99_sshd file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/etc/default/volatiles/99_sshd</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_etc_ssh_ssh_config_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /etc/ssh/ssh_config file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_etc_ssh_ssh_config_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_etc_ssh_ssh_config_is_present"
++	comment="The /etc/ssh/ssh_config file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/etc/ssh/ssh_config</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_etc_ssh_sshd_config_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /etc/ssh/sshd_config file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_etc_ssh_sshd_config_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_etc_ssh_sshd_config_is_present"
++	comment="The /etc/ssh/sshd_config file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/etc/ssh/sshd_config</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_etc_ssh_sshd_config_readonly_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /etc/ssh/sshd_config_readonly file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_etc_ssh_sshd_config_readonly_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_etc_ssh_sshd_config_readonly_is_present"
++	comment="The /etc/ssh/sshd_config_readonly file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/etc/ssh/sshd_config_readonly</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_lib_systemd_system_sshdgenkeys_service_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /lib/systemd/system/sshdgenkeys.service file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_lib_systemd_system_sshdgenkeys_service_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_lib_systemd_system_sshdgenkeys_service_is_present"
++	comment="The /lib/systemd/system/sshdgenkeys.service file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/lib/systemd/system/sshdgenkeys.service</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_lib_systemd_system_sshd_socket_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /lib/systemd/system/sshd.socket file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_lib_systemd_system_sshd_socket_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_lib_systemd_system_sshd_socket_is_present"
++	comment="The /lib/systemd/system/sshd.socket file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/lib/systemd/system/sshd.socket</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_bin_scp_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/bin/scp file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_bin_scp_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_bin_scp_is_present"
++	comment="The /usr/bin/scp file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/bin/scp</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_bin_sftp_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/bin/sftp file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_bin_sftp_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_bin_sftp_is_present"
++	comment="The /usr/bin/sftp file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/bin/sftp</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_bin_ssh_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/bin/ssh file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_bin_ssh_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_bin_ssh_is_present"
++	comment="The /usr/bin/ssh file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/bin/ssh</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_bin_ssh_add_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/bin/ssh-add file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_bin_ssh_add_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_bin_ssh_add_is_present"
++	comment="The /usr/bin/ssh-add file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/bin/ssh-add</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_bin_ssh_agent_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/bin/ssh-agent file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_bin_ssh_agent_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_bin_ssh_agent_is_present"
++	comment="The /usr/bin/ssh-agent file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/bin/ssh-agent</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_bin_ssh_copy_id_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/bin/ssh-copy-id file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_bin_ssh_copy_id_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_bin_ssh_copy_id_is_present"
++	comment="The /usr/bin/ssh-copy-id file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/bin/ssh-copy-id</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_bin_ssh_keygen_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/bin/ssh-keygen file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_bin_ssh_keygen_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_bin_ssh_keygen_is_present"
++	comment="The /usr/bin/ssh-keygen file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/bin/ssh-keygen</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_bin_ssh_keyscan_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/bin/ssh-keyscan file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_bin_ssh_keyscan_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_bin_ssh_keyscan_is_present"
++	comment="The /usr/bin/ssh-keyscan file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/bin/ssh-keyscan</unix:filepath>
++  </unix:file_object>
++
++
++  <unix:file_test id="test_usr_sbin_sshd_is_present"
++	check="all"
++	check_existence="all_exist"
++	comment="The /usr/sbin/sshd file is present on the system"
++	version="1"
++	>
++    <unix:object object_ref="object_usr_sbin_sshd_is_present" />
++  </unix:file_test>
++
++  <unix:file_object id="object_usr_sbin_sshd_is_present"
++	comment="The /usr/sbin/sshd file is present on the system"
++	version="1"
++	>
++    <unix:filepath operation="equals">/usr/sbin/sshd</unix:filepath>
++  </unix:file_object>
++
++</def-group>
+diff --git a/linux_os/guide/services/ssh/package_openssh_installed/rule.yml b/linux_os/guide/services/ssh/package_openssh_installed/rule.yml
+new file mode 100644
+index 0000000..30bef0d
+--- /dev/null
++++ b/linux_os/guide/services/ssh/package_openssh_installed/rule.yml
+@@ -0,0 +1,34 @@
++documentation_complete: true
++
++prodtype: wrlinux1019
++
++title: 'Install the OpenSSH Package'
++
++description: |-
++    The <tt>openssh</tt> package should be installed.
++    {{{ describe_package_install(package="openssh") }}}
++
++rationale: |-
++    Without protection of the transmitted information, confidentiality, and
++    integrity may be compromised because unprotected communications can be
++    intercepted and either read or altered.
++
++severity: medium
++
++identifiers:
++    cce@rhel7: 80215-7
++
++references:
++    disa: 2418,2420,2421,2422
++    nist: SC-8
++    nist-csf: PR.DS-2,PR.DS-5
++    srg: SRG-OS-000423-GPOS-00187,SRG-OS-000423-GPOS-00188,SRG-OS-000423-GPOS-00189,SRG-OS000423-GPOS-00190
++    stigid@rhel7: "040300"
++    isa-62443-2013: 'SR 3.1,SR 3.8,SR 4.1,SR 4.2,SR 5.2'
++    cobit5: APO01.06,DSS05.02,DSS05.04,DSS05.07,DSS06.02,DSS06.06
++    iso27001-2013: A.10.1.1,A.11.1.4,A.11.1.5,A.11.2.1,A.13.1.1,A.13.1.3,A.13.2.1,A.13.2.3,A.13.2.4,A.14.1.2,A.14.1.3,A.6.1.2,A.7.1.1,A.7.1.2,A.7.3.1,A.8.2.2,A.8.2.3,A.9.1.1,A.9.1.2,A.9.2.3,A.9.4.1,A.9.4.4,A.9.4.5
++    cis-csc: 13,14
++
++ocil_clause: 'the package is not installed'
++
++ocil: '{{{ ocil_package(package="openssh") }}}'
+-- 
+1.9.1
+

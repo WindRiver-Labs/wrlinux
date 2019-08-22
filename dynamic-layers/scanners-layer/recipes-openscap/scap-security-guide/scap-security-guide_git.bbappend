@@ -101,6 +101,11 @@ SRC_URI = "git://github.com/OpenSCAP/scap-security-guide.git \
             file://0097-Rule-sysctl_net_ipv4_ip_forward-add-bash-script.patch \
             file://0098-Rule-kernel_module_dccp_disabled-add-bash-script.patch \
             file://0099-Rule-sysctl_net_ipv4_conf_default_accept_source_rout.patch \
+            file://0100-Add-rules-package_openssh-sshd_installed-and-package.patch \
+            file://0101-Fix-rule-audit_rules_privileged_commands-error-after.patch \
+            file://0102-Rule-postfix_client-postfix_network_listening_disabl.patch \
+            file://0103-Rule-service_ntpdate_disabled-add-oval-check.patch \
+            file://0104-Remove-rule-configure_firewalld_ports-from-WRLinux10.patch \
            "
 PV = "0.1.45+git${SRCPV}"
 
