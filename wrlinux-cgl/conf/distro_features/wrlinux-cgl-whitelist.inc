@@ -68,7 +68,6 @@ PNWHITELIST_META_NETWORKING = " \
     rdate \
     rdist \
     samba \
-    strongswan \
     tftp-hpa \
     tnftp \
     traceroute \

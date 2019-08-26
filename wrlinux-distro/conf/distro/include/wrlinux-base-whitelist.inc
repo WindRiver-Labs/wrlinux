@@ -22,6 +22,7 @@ PNWHITELIST_networking-layer += " \
     postfix \
     tcpdump \
     crda \
+    strongswan \
 "
 
 PNWHITELIST_openembedded-layer += " \
