@@ -1,0 +1,24 @@
+This template generates a container image.
+
+To use this template, add
+
+--templates=feature/container-base
+
+as a setup.sh option.
+
+
+* To make the base image smaller:
+  - Add the following line in conf/local.conf:
+    PACKAGE_CLASSES = "package_ipk"
+
+  - Comment the following lines in conf/local.conf to use 'sysvinit' as the
+    init manager:
+    DISTRO_FEATURES_append = " systemd"
+    DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
+    VIRTUAL-RUNTIME_init_manager = "systemd"
+    VIRTUAL-RUNTIME_initscripts = "systemd-compat-units"
+    KERNEL_FEATURES_append = " cfg/systemd.scc"
+
+#@TYPE: Wrtemplate
+#@NAME: container
+#@DESCRIPTION: Generate a container image
