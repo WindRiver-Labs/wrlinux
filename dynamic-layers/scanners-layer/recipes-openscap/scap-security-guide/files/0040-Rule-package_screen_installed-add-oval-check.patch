@@ -1,4 +1,4 @@
-From 93693a42882ae09decc475bc1f8370c7bb9bcaf2 Mon Sep 17 00:00:00 2001
+From 20922e68e2171e71f1ae5434b9b3452f67be3ce7 Mon Sep 17 00:00:00 2001
 From: De Huo <De.Huo@windriver.com>
 Date: Wed, 7 Aug 2019 17:47:43 +0800
 Subject: [PATCH] Rule package_screen_installed add oval check
@@ -8,17 +8,18 @@ For rule package_screen_installed add WRLinux1019 oval check
 Upstream-Status: Pending
 
 Signed-off-by: De Huo <De.Huo@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 ---
- .../package_screen_installed/oval/wrlinux1019.xml  | 50 ++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
+ .../package_screen_installed/oval/wrlinux1019.xml  | 32 ++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
  create mode 100644 linux_os/guide/system/accounts/accounts-physical/screen_locking/console_screen_locking/package_screen_installed/oval/wrlinux1019.xml
 
 diff --git a/linux_os/guide/system/accounts/accounts-physical/screen_locking/console_screen_locking/package_screen_installed/oval/wrlinux1019.xml b/linux_os/guide/system/accounts/accounts-physical/screen_locking/console_screen_locking/package_screen_installed/oval/wrlinux1019.xml
 new file mode 100644
-index 0000000..8e89825
+index 0000000..a0ad805
 --- /dev/null
 +++ b/linux_os/guide/system/accounts/accounts-physical/screen_locking/console_screen_locking/package_screen_installed/oval/wrlinux1019.xml
-@@ -0,0 +1,50 @@
+@@ -0,0 +1,32 @@
 +<def-group>
 +  <definition class="compliance" id="package_screen_installed"
 +  version="1">
@@ -29,28 +30,10 @@ index 0000000..8e89825
 +      </affected>
 +      <description>The screen package is installed</description>
 +    </metadata>
-+    <criteria operator="AND">
-+      <criterion comment="The /etc/screenrc file is present" test_ref="test_etc_screenrc_is_present" />
++    <criteria>
 +      <criterion comment="The /usr/bin/screen file is present" test_ref="test_usr_bin_screen_is_present" />
 +    </criteria>
 +  </definition>
-+
-+  <unix:file_test id="test_etc_screenrc_is_present"
-+	check="all"
-+	check_existence="all_exist"
-+	comment="The /etc/screenrc file is present on the system"
-+	version="1"
-+	>
-+    <unix:object object_ref="object_etc_screenrc_is_present" />
-+  </unix:file_test>
-+
-+  <unix:file_object id="object_etc_screenrc_is_present"
-+	comment="The /etc/screenrc file is present on the system"
-+	version="1"
-+	>
-+    <unix:filepath operation="equals">/etc/screenrc</unix:filepath>
-+  </unix:file_object>
-+
 +
 +  <unix:file_test id="test_usr_bin_screen_is_present"
 +	check="all"
@@ -70,5 +53,5 @@ index 0000000..8e89825
 +
 +</def-group>
 -- 
-1.9.1
+2.7.4
 
