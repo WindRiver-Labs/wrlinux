@@ -1,0 +1,315 @@
+From 9daa0e9e7d74af4f525f96de604cc44dbcab30a6 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Wed, 28 Aug 2019 16:41:07 +0800
+Subject: [PATCH] Rules audit_rules_privileged_commands_* add remediation
+ scripts
+
+For below rules add remediation  scripts
+
+audit_rules_privileged_commands_chage
+audit_rules_privileged_commands_chsh
+audit_rules_privileged_commands_crontab
+audit_rules_privileged_commands_gpasswd
+audit_rules_privileged_commands_passwd
+audit_rules_privileged_commands_postdrop
+audit_rules_privileged_commands_postqueue
+audit_rules_privileged_commands_su
+audit_rules_privileged_commands_sudo
+audit_rules_privileged_commands_umount
+audit_rules_privileged_commands_unix_chkpwd
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../bash/wrlinux1019.sh                                | 18 ++++++++++++++++++
+ .../bash/wrlinux1019.sh                                | 18 ++++++++++++++++++
+ .../bash/wrlinux1019.sh                                | 18 ++++++++++++++++++
+ .../bash/wrlinux1019.sh                                | 18 ++++++++++++++++++
+ .../bash/wrlinux1019.sh                                | 18 ++++++++++++++++++
+ .../bash/wrlinux1019.sh                                | 18 ++++++++++++++++++
+ .../bash/wrlinux1019.sh                                | 18 ++++++++++++++++++
+ .../bash/wrlinux1019.sh                                | 18 ++++++++++++++++++
+ .../bash/wrlinux1019.sh                                | 18 ++++++++++++++++++
+ .../bash/wrlinux1019.sh                                | 18 ++++++++++++++++++
+ .../bash/wrlinux1019.sh                                | 18 ++++++++++++++++++
+ 11 files changed, 198 insertions(+)
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_chage/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_chsh/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_crontab/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_gpasswd/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_passwd/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_postdrop/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_postqueue/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_su/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_sudo/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_umount/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_unix_chkpwd/bash/wrlinux1019.sh
+
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_chage/bash/wrlinux1019.sh b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_chage/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..e233f73
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_chage/bash/wrlinux1019.sh
+@@ -0,0 +1,18 @@
++# platform = multi_platform_wrlinux
++
++slash_sbinary="\/usr\/bin\/chage"
++sbinary="/usr/bin/chage"
++afile="/etc/audit/audit.rules"
++min_auid="1000"
++
++expected_rule="-a always,exit -F path=${sbinary} -F perm=x -F auid>=${min_auid} -F auid!=unset -k privileged"
++
++base_search=$(sed -e '/-a always,exit/!d' -e '/-F path='"${slash_sbinary} "'/!d'          \
++                                -e '/-F path=[^[:space:]]\+/!d'   -e '/-F perm=.*/!d'                                           \
++                                -e '/-F auid>='"${min_auid}"'/!d' -e '/-F auid!=\(4294967295\|unset\)/!d'       \
++                                -e '/-k \|-F key=/!d' "$afile")
++
++
++if [ -z  "$base_search" ]; then
++	echo "${expected_rule}" >>$afile
++fi
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_chsh/bash/wrlinux1019.sh b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_chsh/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..5dc6ec3
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_chsh/bash/wrlinux1019.sh
+@@ -0,0 +1,18 @@
++# platform = multi_platform_wrlinux
++
++slash_sbinary="\/usr\/bin\/chsh.shadow"
++sbinary="/usr/bin/chsh.shadow"
++afile="/etc/audit/audit.rules"
++min_auid="1000"
++
++expected_rule="-a always,exit -F path=${sbinary} -F perm=x -F auid>=${min_auid} -F auid!=unset -k privileged"
++
++base_search=$(sed -e '/-a always,exit/!d' -e '/-F path='"${slash_sbinary} "'/!d'          \
++                                -e '/-F path=[^[:space:]]\+/!d'   -e '/-F perm=.*/!d'                                           \
++                                -e '/-F auid>='"${min_auid}"'/!d' -e '/-F auid!=\(4294967295\|unset\)/!d'       \
++                                -e '/-k \|-F key=/!d' "$afile")
++
++
++if [ -z  "$base_search" ]; then
++	echo "${expected_rule}" >>$afile
++fi
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_crontab/bash/wrlinux1019.sh b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_crontab/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..f219d63
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_crontab/bash/wrlinux1019.sh
+@@ -0,0 +1,18 @@
++# platform = multi_platform_wrlinux
++
++slash_sbinary="\/usr\/bin\/crontab"
++sbinary="/usr/bin/crontab"
++afile="/etc/audit/audit.rules"
++min_auid="1000"
++
++expected_rule="-a always,exit -F path=${sbinary} -F perm=x -F auid>=${min_auid} -F auid!=unset -k privileged"
++
++base_search=$(sed -e '/-a always,exit/!d' -e '/-F path='"${slash_sbinary} "'/!d'          \
++                                -e '/-F path=[^[:space:]]\+/!d'   -e '/-F perm=.*/!d'                                           \
++                                -e '/-F auid>='"${min_auid}"'/!d' -e '/-F auid!=\(4294967295\|unset\)/!d'       \
++                                -e '/-k \|-F key=/!d' "$afile")
++
++
++if [ -z  "$base_search" ]; then
++	echo "${expected_rule}" >>$afile
++fi
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_gpasswd/bash/wrlinux1019.sh b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_gpasswd/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..8f7c643
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_gpasswd/bash/wrlinux1019.sh
+@@ -0,0 +1,18 @@
++# platform = multi_platform_wrlinux
++
++slash_sbinary="\/usr\/bin\/gpasswd"
++sbinary="/usr/bin/gpasswd"
++afile="/etc/audit/audit.rules"
++min_auid="1000"
++
++expected_rule="-a always,exit -F path=${sbinary} -F perm=x -F auid>=${min_auid} -F auid!=unset -k privileged"
++
++base_search=$(sed -e '/-a always,exit/!d' -e '/-F path='"${slash_sbinary} "'/!d'          \
++                                -e '/-F path=[^[:space:]]\+/!d'   -e '/-F perm=.*/!d'                                           \
++                                -e '/-F auid>='"${min_auid}"'/!d' -e '/-F auid!=\(4294967295\|unset\)/!d'       \
++                                -e '/-k \|-F key=/!d' "$afile")
++
++
++if [ -z  "$base_search" ]; then
++	echo "${expected_rule}" >>$afile
++fi
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_passwd/bash/wrlinux1019.sh b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_passwd/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..b204709
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_passwd/bash/wrlinux1019.sh
+@@ -0,0 +1,18 @@
++# platform = multi_platform_wrlinux
++
++slash_sbinary="\/usr\/bin\/passwd.shadow"
++sbinary="/usr/bin/passwd.shadow"
++afile="/etc/audit/audit.rules"
++min_auid="1000"
++
++expected_rule="-a always,exit -F path=${sbinary} -F perm=x -F auid>=${min_auid} -F auid!=unset -k privileged"
++
++base_search=$(sed -e '/-a always,exit/!d' -e '/-F path='"${slash_sbinary} "'/!d'          \
++                                -e '/-F path=[^[:space:]]\+/!d'   -e '/-F perm=.*/!d'                                           \
++                                -e '/-F auid>='"${min_auid}"'/!d' -e '/-F auid!=\(4294967295\|unset\)/!d'       \
++                                -e '/-k \|-F key=/!d' "$afile")
++
++
++if [ -z  "$base_search" ]; then
++	echo "${expected_rule}" >>$afile
++fi
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_postdrop/bash/wrlinux1019.sh b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_postdrop/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..a0e880e
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_postdrop/bash/wrlinux1019.sh
+@@ -0,0 +1,18 @@
++# platform = multi_platform_wrlinux
++
++slash_sbinary="\/usr\/bin\/postdrop"
++sbinary="/usr/bin/postdrop"
++afile="/etc/audit/audit.rules"
++min_auid="1000"
++
++expected_rule="-a always,exit -F path=${sbinary} -F perm=x -F auid>=${min_auid} -F auid!=unset -k privileged"
++
++base_search=$(sed -e '/-a always,exit/!d' -e '/-F path='"${slash_sbinary} "'/!d'          \
++                                -e '/-F path=[^[:space:]]\+/!d'   -e '/-F perm=.*/!d'                                           \
++                                -e '/-F auid>='"${min_auid}"'/!d' -e '/-F auid!=\(4294967295\|unset\)/!d'       \
++                                -e '/-k \|-F key=/!d' "$afile")
++
++
++if [ -z  "$base_search" ]; then
++	echo "${expected_rule}" >>$afile
++fi
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_postqueue/bash/wrlinux1019.sh b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_postqueue/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..0d04154
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_postqueue/bash/wrlinux1019.sh
+@@ -0,0 +1,18 @@
++# platform = multi_platform_wrlinux
++
++slash_sbinary="\/usr\/bin\/postqueue"
++sbinary="/usr/bin/postqueue"
++afile="/etc/audit/audit.rules"
++min_auid="1000"
++
++expected_rule="-a always,exit -F path=${sbinary} -F perm=x -F auid>=${min_auid} -F auid!=unset -k privileged"
++
++base_search=$(sed -e '/-a always,exit/!d' -e '/-F path='"${slash_sbinary} "'/!d'          \
++                                -e '/-F path=[^[:space:]]\+/!d'   -e '/-F perm=.*/!d'                                           \
++                                -e '/-F auid>='"${min_auid}"'/!d' -e '/-F auid!=\(4294967295\|unset\)/!d'       \
++                                -e '/-k \|-F key=/!d' "$afile")
++
++
++if [ -z  "$base_search" ]; then
++	echo "${expected_rule}" >>$afile
++fi
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_su/bash/wrlinux1019.sh b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_su/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..ef2a9a4
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_su/bash/wrlinux1019.sh
+@@ -0,0 +1,18 @@
++# platform = multi_platform_wrlinux
++
++slash_sbinary="\/usr\/bin\/su.shadow"
++sbinary="/usr/bin/su.shadow"
++afile="/etc/audit/audit.rules"
++min_auid="1000"
++
++expected_rule="-a always,exit -F path=${sbinary} -F perm=x -F auid>=${min_auid} -F auid!=unset -k privileged"
++
++base_search=$(sed -e '/-a always,exit/!d' -e '/-F path='"${slash_sbinary} "'/!d'          \
++                                -e '/-F path=[^[:space:]]\+/!d'   -e '/-F perm=.*/!d'                                           \
++                                -e '/-F auid>='"${min_auid}"'/!d' -e '/-F auid!=\(4294967295\|unset\)/!d'       \
++                                -e '/-k \|-F key=/!d' "$afile")
++
++
++if [ -z  "$base_search" ]; then
++	echo "${expected_rule}" >>$afile
++fi
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_sudo/bash/wrlinux1019.sh b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_sudo/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..4bd9028
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_sudo/bash/wrlinux1019.sh
+@@ -0,0 +1,18 @@
++# platform = multi_platform_wrlinux
++
++slash_sbinary="\/usr\/bin\/sudo"
++sbinary="/usr/bin/sudo"
++afile="/etc/audit/audit.rules"
++min_auid="1000"
++
++expected_rule="-a always,exit -F path=${sbinary} -F perm=x -F auid>=${min_auid} -F auid!=unset -k privileged"
++
++base_search=$(sed -e '/-a always,exit/!d' -e '/-F path='"${slash_sbinary} "'/!d'          \
++                                -e '/-F path=[^[:space:]]\+/!d'   -e '/-F perm=.*/!d'                                           \
++                                -e '/-F auid>='"${min_auid}"'/!d' -e '/-F auid!=\(4294967295\|unset\)/!d'       \
++                                -e '/-k \|-F key=/!d' "$afile")
++
++
++if [ -z  "$base_search" ]; then
++	echo "${expected_rule}" >>$afile
++fi
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_umount/bash/wrlinux1019.sh b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_umount/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..09bca6d
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_umount/bash/wrlinux1019.sh
+@@ -0,0 +1,18 @@
++# platform = multi_platform_wrlinux
++
++slash_sbinary="\/usr\/bin\/umount.util-linux"
++sbinary="/usr/bin/umount.util-linux"
++afile="/etc/audit/audit.rules"
++min_auid="1000"
++
++expected_rule="-a always,exit -F path=${sbinary} -F perm=x -F auid>=${min_auid} -F auid!=unset -k privileged"
++
++base_search=$(sed -e '/-a always,exit/!d' -e '/-F path='"${slash_sbinary} "'/!d'          \
++                                -e '/-F path=[^[:space:]]\+/!d'   -e '/-F perm=.*/!d'                                           \
++                                -e '/-F auid>='"${min_auid}"'/!d' -e '/-F auid!=\(4294967295\|unset\)/!d'       \
++                                -e '/-k \|-F key=/!d' "$afile")
++
++
++if [ -z  "$base_search" ]; then
++	echo "${expected_rule}" >>$afile
++fi
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_unix_chkpwd/bash/wrlinux1019.sh b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_unix_chkpwd/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..5d8c2ed
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_unix_chkpwd/bash/wrlinux1019.sh
+@@ -0,0 +1,18 @@
++# platform = multi_platform_wrlinux
++
++slash_sbinary="\/usr\/bin\/unix_chkpwd"
++sbinary="/usr/bin/unix_chkpwd"
++afile="/etc/audit/audit.rules"
++min_auid="1000"
++
++expected_rule="-a always,exit -F path=${sbinary} -F perm=x -F auid>=${min_auid} -F auid!=unset -k privileged"
++
++base_search=$(sed -e '/-a always,exit/!d' -e '/-F path='"${slash_sbinary} "'/!d'          \
++                                -e '/-F path=[^[:space:]]\+/!d'   -e '/-F perm=.*/!d'                                           \
++                                -e '/-F auid>='"${min_auid}"'/!d' -e '/-F auid!=\(4294967295\|unset\)/!d'       \
++                                -e '/-k \|-F key=/!d' "$afile")
++
++
++if [ -z  "$base_search" ]; then
++	echo "${expected_rule}" >>$afile
++fi
+-- 
+1.9.1
+

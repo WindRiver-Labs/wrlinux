@@ -1,0 +1,41 @@
+From 847c36b87ed520f142edb7626723ab30e36d2880 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Thu, 22 Aug 2019 17:35:39 +0800
+Subject: [PATCH] Remove rules audit_rules_usergroup_modification_* from
+ WRLinux1019 profile
+
+Remove below rules from WRLinux1019 profile since there is already
+rule audit_rules_usergroup_modification existed.
+
+audit_rules_usergroup_modification_passwd
+audit_rules_usergroup_modification_group
+audit_rules_usergroup_modification_gshadow
+audit_rules_usergroup_modification_shadow
+audit_rules_usergroup_modification_opasswd
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ wrlinux1019/profiles/draft_stig_wrlinux_disa.profile | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile b/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
+index 085d0e4..709d10f 100644
+--- a/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
++++ b/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
+@@ -162,11 +162,6 @@ selections:
+     - audit_rules_execution_setsebool
+     - audit_rules_execution_chcon
+     - service_auditd_enabled
+-    - audit_rules_usergroup_modification_passwd
+-    - audit_rules_usergroup_modification_group
+-    - audit_rules_usergroup_modification_gshadow
+-    - audit_rules_usergroup_modification_shadow
+-    - audit_rules_usergroup_modification_opasswd
+     - audit_rules_unsuccessful_file_modification
+     - audit_rules_file_deletion_events
+     - audit_rules_kernel_module_loading_init
+-- 
+1.9.1
+
