@@ -56,8 +56,6 @@ PNWHITELIST_openembedded-layer += " \
     unixodbc \
     usleep \
     uw-imap \
-    vim \
-    vim-tiny \
     vlock \
     iperf3 \
 "

@@ -20,7 +20,6 @@ PNWHITELIST_meta-python += "\
     python3-blivet \
     python3-blivetgui \
     python3-coverage \
-    python3-dbus \
     python3-langtable \
     python3-meh \
     python3-ntplib \
@@ -49,7 +48,6 @@ PNWHITELIST_filesystems-layer += "\
 # Whitelist for meta-openembedded/meta-oe
 PNWHITELIST_openembedded-layer += "\
     augeas \
-    efibootmgr \
     efivar \
     libpwquality \
     libreport \
