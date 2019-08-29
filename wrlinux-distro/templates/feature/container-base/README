@@ -17,6 +17,14 @@ as a setup.sh option.
     DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
     KERNEL_FEATURES_append = " cfg/systemd.scc"
 
+* Set packages feed for opkg, the format is like:
+EXTERNAL_FEED_URL = "\n\
+src oe http://feed_url.com\n\
+src oe-all http://feed_url.com/all\n\
+src oe-core2-64 http://feed_url.com/core2-64\n\
+src oe-qemux86_64 http://feed_url.com/qemux86_64\n\
+"
+
 #@TYPE: Wrtemplate
 #@NAME: container
 #@DESCRIPTION: Generate a container image
