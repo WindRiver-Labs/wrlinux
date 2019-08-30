@@ -1,0 +1,3 @@
+Force clear KERNEL_FEATURES. Use this with caution, since this breaks the
+binding between userspace and kernel capabilities.
+For more details please read wrlinux-kernel-dev/README.
