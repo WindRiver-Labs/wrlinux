@@ -1,0 +1,28 @@
+This template enables lttng tool set along with babeltrace as a trace converter
+and processor.
+
+The Linux Trace Toolkit: next generation is an open source software toolkit
+which you can use to simultaneously trace the Linux kernel, user applications,
+and user libraries.
+
+LTTng consists of:
+ - Kernel modules to trace the Linux kernel.
+ - Shared libraries to trace user applications written in C or C++.
+ - A Python package to trace Python applications which use the standard logging
+   package.
+ - A kernel module to trace shell scripts and other user applications without a
+   dedicated instrumentation mechanism.
+ - Daemons and a command-line tool, lttng, to control the LTTng tracers.
+
+Packages:
+LTTng-tools: Libraries and command-line interface to control tracing sessions.
+LTTng-UST: Libraries and Java/Python packages to trace user applications.
+LTTng-modules: Linux kernel modules to trace the kernel.
+babeltrace: an open-source trace converter and processor. The tool can convert
+            from one trace format to another, possibly with one or more filters
+            in the conversion path, and perform other operations depending on
+            the command
+python-core: used with Python bindings of babeltrace library
+
+For more details of lttng please refer to
+https://lttng.org/docs/v2.10/#doc-plumbing
