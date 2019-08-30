@@ -1,0 +1,4 @@
+Enable a kernel config fragment CONFIG_PROFILING which enables the extended
+profiling support mechanisms including kernel events of timer tick, process
+schedule, process sleep and kvm vcpu_enter_guest. It can be used by profilers
+such as perf.
