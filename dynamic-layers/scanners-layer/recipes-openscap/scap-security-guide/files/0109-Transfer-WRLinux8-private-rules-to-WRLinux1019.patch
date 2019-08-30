@@ -1,0 +1,854 @@
+From 1ece92763ed82e77bbd4f616e26d67cde43f2395 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Fri, 30 Aug 2019 10:42:16 +0800
+Subject: [PATCH] Transfer WRLinux8 private rules to WRLinux1019
+
+Supply below WRLinux private rules for WRLinux1019
+
+audit_rules_privileged_commands_newgrp
+audit_rules_privileged_commands_sudoedit
+audit_rules_privileged_commands_mount
+accounts_remove_unneeded
+sysctl_net_ipv4_tcp_syncookies
+file_permissions_unauthorized_suid
+audit_rules_execution_restorecon
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../account_temp_expire_date/rule.yml              |  2 +-
+ .../accounts_remove_unneeded/oval/wrlinux1019.xml  | 38 ++++++++++++
+ .../accounts_remove_unneeded/rule.yml              | 42 +++++++++++++
+ .../bash/wrlinux1019.sh                            | 21 +++++++
+ .../oval/wrlinux1019.xml                           | 45 ++++++++++++++
+ .../audit_rules_execution_restorecon/rule.yml      |  2 +-
+ .../bash/wrlinux1019.sh                            | 18 ++++++
+ .../oval/wrlinux1019.xml                           | 45 ++++++++++++++
+ .../audit_rules_privileged_commands_mount/rule.yml |  2 +-
+ .../bash/wrlinux1019.sh                            | 18 ++++++
+ .../oval/wrlinux1019.xml                           | 45 ++++++++++++++
+ .../rule.yml                                       |  2 +-
+ .../oval/wrlinux1019.xml                           | 45 ++++++++++++++
+ .../rule.yml                                       |  2 +-
+ .../bash/wrlinux1019.sh                            | 20 ++++++
+ .../oval/wrlinux1019.xml                           | 15 +++++
+ .../sysctl_net_ipv4_tcp_syncookies/rule.yml        |  2 +-
+ .../oval/wrlinux1019.xml                           | 29 +++++++++
+ .../rule.yml                                       | 44 ++++++++++++++
+ .../oval/wrlinux1019.xml                           | 71 ++++++++++++++++++++++
+ .../sysctl_static_net_ipv4_tcp_syncookies/rule.yml | 44 ++++++++++++++
+ .../oval/wrlinux1019.xml                           | 68 +++++++++++++++++++++
+ .../profiles/draft_stig_wrlinux_disa.profile       |  7 +++
+ 23 files changed, 621 insertions(+), 6 deletions(-)
+ create mode 100644 linux_os/guide/system/accounts/accounts-session/accounts_remove_unneeded/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/accounts/accounts-session/accounts_remove_unneeded/rule.yml
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_execution_selinux_commands/audit_rules_execution_restorecon/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_execution_selinux_commands/audit_rules_execution_restorecon/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_mount/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_mount/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_newgrp/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_newgrp/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_sudoedit/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_net_ipv4_tcp_syncookies/bash/wrlinux1019.sh
+ create mode 100644 linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_net_ipv4_tcp_syncookies/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_runtime_net_ipv4_tcp_syncookies/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_runtime_net_ipv4_tcp_syncookies/rule.yml
+ create mode 100644 linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_static_net_ipv4_tcp_syncookies/oval/wrlinux1019.xml
+ create mode 100644 linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_static_net_ipv4_tcp_syncookies/rule.yml
+ create mode 100644 linux_os/guide/system/permissions/files/file_permissions_unauthorized_suid/oval/wrlinux1019.xml
+
+diff --git a/linux_os/guide/system/accounts/accounts-restrictions/account_expiration/account_temp_expire_date/rule.yml b/linux_os/guide/system/accounts/accounts-restrictions/account_expiration/account_temp_expire_date/rule.yml
+index 78084d2..47fec89 100644
+--- a/linux_os/guide/system/accounts/accounts-restrictions/account_expiration/account_temp_expire_date/rule.yml
++++ b/linux_os/guide/system/accounts/accounts-restrictions/account_expiration/account_temp_expire_date/rule.yml
+@@ -1,6 +1,6 @@
+ documentation_complete: true
+ 
+-prodtype: rhel6,rhel7,rhel8,fedora,rhv4
++prodtype: wrlinux1019,rhel6,rhel7,rhel8,fedora,rhv4
+ 
+ title: 'Assign Expiration Date to Temporary Accounts'
+ 
+diff --git a/linux_os/guide/system/accounts/accounts-session/accounts_remove_unneeded/oval/wrlinux1019.xml b/linux_os/guide/system/accounts/accounts-session/accounts_remove_unneeded/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..4c5c232
+--- /dev/null
++++ b/linux_os/guide/system/accounts/accounts-session/accounts_remove_unneeded/oval/wrlinux1019.xml
+@@ -0,0 +1,38 @@
++<def-group>
++  <definition class="compliance" id="accounts_remove_unneeded" version="1">
++    <metadata>
++      <title>Remove unneeded accounts</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The system must not have the unnecessary accounts.</description>
++    </metadata>
++    <criteria operator="AND">
++      <criterion comment="remove games account" test_ref="remove_games_account" />
++    </criteria>
++  </definition>
++
++  <ind:textfilecontent54_test id="remove_games_account"
++	check="none satisfy" check_existence="all_exist"
++	comment="games account must not be present"
++	version="1"
++	>
++    <ind:object object_ref="object_remove_games_account" />
++    <ind:state state_ref="state_remove_games_account" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_object id="object_remove_games_account" version="1" >
++	<ind:path>/etc</ind:path>
++	<ind:filename>passwd</ind:filename>
++	<ind:pattern operation="pattern match">^games:</ind:pattern>
++	<ind:instance operation="greater than or equal" datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_state id="state_remove_games_account"
++	comment="games account must not be present"
++	version="1"
++	>
++    <ind:pattern operation="pattern match">^games:</ind:pattern>
++  </ind:textfilecontent54_state>
++
++</def-group>
+diff --git a/linux_os/guide/system/accounts/accounts-session/accounts_remove_unneeded/rule.yml b/linux_os/guide/system/accounts/accounts-session/accounts_remove_unneeded/rule.yml
+new file mode 100644
+index 0000000..80cafbf
+--- /dev/null
++++ b/linux_os/guide/system/accounts/accounts-session/accounts_remove_unneeded/rule.yml
+@@ -0,0 +1,42 @@
++documentation_complete: true
++
++prodtype: wrlinux1019
++
++title: 'Remove unneeded accounts'
++
++description: |-
++    Avoid the <tt>games:</tt> in <tt>/etc/passwd</tt> ensures that
++    account games not exist in the system.
++
++rationale: |-
++    The system must not have the unnecessary accounts.
++
++severity: medium
++
++identifiers:
++    cce@rhel6: 27333-4
++    cce@rhel7: 27557-8
++    cce@rhel8: 80673-7
++
++references:
++    cui: 3.1.11
++    disa: 1133,0361
++    nist: AC-12,SC-10
++    nist-csf: PR.AC-7
++    ospp: FMT_MOF_EXT.1
++    srg: SRG-OS-000163-GPOS-00072
++    vmmsrg: SRG-OS-000163-VMM-000700,SRG-OS-000279-VMM-001010
++    stigid@rhel7: "040160"
++    isa-62443-2013: 'SR 1.1,SR 1.10,SR 1.2,SR 1.5,SR 1.7,SR 1.8,SR 1.9'
++    isa-62443-2009: 4.3.3.6.1,4.3.3.6.2,4.3.3.6.3,4.3.3.6.4,4.3.3.6.5,4.3.3.6.6,4.3.3.6.7,4.3.3.6.8,4.3.3.6.9
++    cobit5: DSS05.04,DSS05.10,DSS06.10
++    iso27001-2013: A.18.1.4,A.9.2.1,A.9.2.4,A.9.3.1,A.9.4.2,A.9.4.3
++    cis-csc: 1,12,15,16
++    anssi: NT28(R29)
++
++ocil_clause: 'value of TMOUT is not less than or equal to expected setting'
++
++ocil: |-
++    Run the following command to ensure the <tt>games:</tt> value is not in /etc/passwd
++    on the system:
++    <pre>$ sudo grep ^games: /etc/passwd</pre>
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_execution_selinux_commands/audit_rules_execution_restorecon/bash/wrlinux1019.sh b/linux_os/guide/system/auditing/auditd_configure_rules/audit_execution_selinux_commands/audit_rules_execution_restorecon/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..af5e7a6
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_execution_selinux_commands/audit_rules_execution_restorecon/bash/wrlinux1019.sh
+@@ -0,0 +1,21 @@
++# platform = multi_platform_wrlinux
++
++# Include source function library.
++. /usr/share/scap-security-guide/remediation_functions
++
++# First perform the remediation of the syscall rule
++# Retrieve hardware architecture of the underlying system
++# Note: 32-bit kernel modules can't be loaded / unloaded on 64-bit kernel =>
++#       it's not required on a 64-bit system to check also for the presence
++#       of 32-bit's equivalent of the corresponding rule. Therefore for
++#       each system it's enought to check presence of system's native rule form.
++[ $(getconf LONG_BIT) = "32" ] && RULE_ARCHS=("b32") || RULE_ARCHS=("b64")
++
++for ARCH in "${RULE_ARCHS[@]}"
++do
++	PATTERN="-a always,exit -F path=/sbin/restorecon.*"
++	GROUP="privileged"
++	FULL_RULE="-a always,exit -F path=/sbin/restorecon -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged"
++	fix_audit_syscall_rule "auditctl" "$PATTERN" "$GROUP" "$ARCH" "$FULL_RULE"
++	fix_audit_syscall_rule "augenrules" "$PATTERN" "$GROUP" "$ARCH" "$FULL_RULE"
++done
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_execution_selinux_commands/audit_rules_execution_restorecon/oval/wrlinux1019.xml b/linux_os/guide/system/auditing/auditd_configure_rules/audit_execution_selinux_commands/audit_rules_execution_restorecon/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..fcfeb9a
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_execution_selinux_commands/audit_rules_execution_restorecon/oval/wrlinux1019.xml
+@@ -0,0 +1,45 @@
++<def-group>
++  <definition class="compliance" id="audit_rules_execution_restorecon" version="1">
++    <metadata>
++      <title>Record Any Attempts to Run restorecon</title>
++      <affected family="unix">
++	<platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>Audit rules about the information on the use of restorecon is enabled.</description>
++    </metadata>
++
++    <criteria operator="OR">
++
++      <!-- Test the augenrules case -->
++      <criteria operator="AND">
++        <extend_definition comment="audit augenrules" definition_ref="audit_rules_augenrules" />
++        <criterion comment="audit augenrules restorecon" test_ref="test_audit_rules_execution_restorecon_augenrules" />
++      </criteria>
++
++      <!-- Test the auditctl case -->
++      <criteria operator="AND">
++        <extend_definition comment="audit auditctl" definition_ref="audit_rules_auditctl" />
++        <criterion comment="audit auditctl restorecon" test_ref="test_audit_rules_execution_restorecon_auditctl" />
++      </criteria>
++    </criteria>
++  </definition>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="audit augenrules restorecon" id="test_audit_rules_execution_restorecon_augenrules" version="1">
++    <ind:object object_ref="object_audit_rules_execution_restorecon_augenrules" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object id="object_audit_rules_execution_restorecon_augenrules" version="1">
++    <ind:filepath operation="pattern match">/etc/audit/rules\.d/.*\.rules</ind:filepath>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/sbin\/restorecon[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=4294967295[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="audit auditctl restorecon" id="test_audit_rules_execution_restorecon_auditctl" version="1">
++    <ind:object object_ref="object_audit_rules_execution_restorecon_auditctl" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object id="object_audit_rules_execution_restorecon_auditctl" version="1">
++    <ind:filepath>/etc/audit/audit.rules</ind:filepath>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/sbin\/restorecon[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=4294967295[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++</def-group>
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_execution_selinux_commands/audit_rules_execution_restorecon/rule.yml b/linux_os/guide/system/auditing/auditd_configure_rules/audit_execution_selinux_commands/audit_rules_execution_restorecon/rule.yml
+index 8626090..b9090e1 100644
+--- a/linux_os/guide/system/auditing/auditd_configure_rules/audit_execution_selinux_commands/audit_rules_execution_restorecon/rule.yml
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_execution_selinux_commands/audit_rules_execution_restorecon/rule.yml
+@@ -1,6 +1,6 @@
+ documentation_complete: true
+ 
+-prodtype: rhel7,rhel8,fedora,ol7,ol8,rhv4
++prodtype: wrlinux1019,rhel7,rhel8,fedora,ol7,ol8,rhv4
+ 
+ title: 'Record Any Attempts to Run restorecon'
+ 
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_mount/bash/wrlinux1019.sh b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_mount/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..8cfaaab
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_mount/bash/wrlinux1019.sh
+@@ -0,0 +1,18 @@
++# platform = multi_platform_wrlinux
++
++slash_sbinary="\/usr\/bin\/mount.util-linux"
++sbinary="/usr/bin/mount.util-linux"
++afile="/etc/audit/audit.rules"
++min_auid="1000"
++
++expected_rule="-a always,exit -F path=${sbinary} -F perm=x -F auid>=${min_auid} -F auid!=unset -k privileged"
++
++base_search=$(sed -e '/-a always,exit/!d' -e '/-F path='"${slash_sbinary} "'/!d'          \
++                                -e '/-F path=[^[:space:]]\+/!d'   -e '/-F perm=.*/!d'                                           \
++                                -e '/-F auid>='"${min_auid}"'/!d' -e '/-F auid!=\(4294967295\|unset\)/!d'       \
++                                -e '/-k \|-F key=/!d' "$afile")
++
++
++if [ -z  "$base_search" ]; then
++	echo "${expected_rule}" >>$afile
++fi
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_mount/oval/wrlinux1019.xml b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_mount/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..9cbc304
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_mount/oval/wrlinux1019.xml
+@@ -0,0 +1,45 @@
++<def-group>
++  <definition class="compliance" id="audit_rules_privileged_commands_mount" version="1">
++    <metadata>
++      <title>Ensure auditd Collects Information on the Use of Privileged Commands - mount</title>
++      <affected family="unix">
++	<platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>Audit rules about the information on the use of mount is enabled.</description>
++    </metadata>
++
++    <criteria operator="OR">
++
++      <!-- Test the augenrules case -->
++      <criteria operator="AND">
++        <extend_definition comment="audit augenrules" definition_ref="audit_rules_augenrules" />
++        <criterion comment="audit augenrules mount" test_ref="test_audit_rules_privileged_commands_mount_augenrules" />
++      </criteria>
++
++      <!-- Test the auditctl case -->
++      <criteria operator="AND">
++        <extend_definition comment="audit auditctl" definition_ref="audit_rules_auditctl" />
++        <criterion comment="audit auditctl mount" test_ref="test_audit_rules_privileged_commands_mount_auditctl" />
++      </criteria>
++    </criteria>
++  </definition>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="audit augenrules mount" id="test_audit_rules_privileged_commands_mount_augenrules" version="1">
++    <ind:object object_ref="object_audit_rules_privileged_commands_mount_augenrules" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object id="object_audit_rules_privileged_commands_mount_augenrules" version="1">
++    <ind:filepath operation="pattern match">/etc/audit/rules\.d/.*\.rules</ind:filepath>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/bin\/mount\..*[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=4294967295[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="audit auditctl mount" id="test_audit_rules_privileged_commands_mount_auditctl" version="1">
++    <ind:object object_ref="object_audit_rules_privileged_commands_mount_auditctl" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object id="object_audit_rules_privileged_commands_mount_auditctl" version="1">
++    <ind:filepath>/etc/audit/audit.rules</ind:filepath>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/bin\/mount\..*[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=4294967295[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++</def-group>
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_mount/rule.yml b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_mount/rule.yml
+index f16f512..d6cfd22 100644
+--- a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_mount/rule.yml
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_mount/rule.yml
+@@ -1,6 +1,6 @@
+ documentation_complete: true
+ 
+-prodtype: rhel6,rhel7,rhel8,fedora,ol7,ol8
++prodtype: wrlinux1019,rhel6,rhel7,rhel8,fedora,ol7,ol8
+ 
+ title: 'Ensure auditd Collects Information on the Use of Privileged Commands - mount'
+ 
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_newgrp/bash/wrlinux1019.sh b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_newgrp/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..3bf5610
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_newgrp/bash/wrlinux1019.sh
+@@ -0,0 +1,18 @@
++# platform = multi_platform_wrlinux
++
++slash_sbinary="\/usr\/bin\/newgrp.shadow"
++sbinary="/usr/bin/newgrp.shadow"
++afile="/etc/audit/audit.rules"
++min_auid="1000"
++
++expected_rule="-a always,exit -F path=${sbinary} -F perm=x -F auid>=${min_auid} -F auid!=unset -k privileged"
++
++base_search=$(sed -e '/-a always,exit/!d' -e '/-F path='"${slash_sbinary} "'/!d'          \
++                                -e '/-F path=[^[:space:]]\+/!d'   -e '/-F perm=.*/!d'                                           \
++                                -e '/-F auid>='"${min_auid}"'/!d' -e '/-F auid!=\(4294967295\|unset\)/!d'       \
++                                -e '/-k \|-F key=/!d' "$afile")
++
++
++if [ -z  "$base_search" ]; then
++	echo "${expected_rule}" >>$afile
++fi
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_newgrp/oval/wrlinux1019.xml b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_newgrp/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..924bba7
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_newgrp/oval/wrlinux1019.xml
+@@ -0,0 +1,45 @@
++<def-group>
++  <definition class="compliance" id="audit_rules_privileged_commands_newgrp" version="1">
++    <metadata>
++      <title>Ensure auditd Collects Information on the Use of Privileged Commands - newgrp</title>
++      <affected family="unix">
++	<platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>Audit rules about the information on the use of newgrp is enabled.</description>
++    </metadata>
++
++    <criteria operator="OR">
++
++      <!-- Test the augenrules case -->
++      <criteria operator="AND">
++        <extend_definition comment="audit augenrules" definition_ref="audit_rules_augenrules" />
++        <criterion comment="audit augenrules newgrp" test_ref="test_audit_rules_privileged_commands_newgrp_augenrules" />
++      </criteria>
++
++      <!-- Test the auditctl case -->
++      <criteria operator="AND">
++        <extend_definition comment="audit auditctl" definition_ref="audit_rules_auditctl" />
++        <criterion comment="audit auditctl newgrp" test_ref="test_audit_rules_privileged_commands_newgrp_auditctl" />
++      </criteria>
++    </criteria>
++  </definition>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="audit augenrules newgrp" id="test_audit_rules_privileged_commands_newgrp_augenrules" version="1">
++    <ind:object object_ref="object_audit_rules_privileged_commands_newgrp_augenrules" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object id="object_audit_rules_privileged_commands_newgrp_augenrules" version="1">
++    <ind:filepath operation="pattern match">/etc/audit/rules\.d/.*\.rules</ind:filepath>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/usr\/bin\/newgrp\..*[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=4294967295[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="audit auditctl newgrp" id="test_audit_rules_privileged_commands_newgrp_auditctl" version="1">
++    <ind:object object_ref="object_audit_rules_privileged_commands_newgrp_auditctl" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object id="object_audit_rules_privileged_commands_newgrp_auditctl" version="1">
++    <ind:filepath>/etc/audit/audit.rules</ind:filepath>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/usr\/bin\/newgrp\..*[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=4294967295[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++</def-group>
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_newgrp/rule.yml b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_newgrp/rule.yml
+index f02dc0a..cf59270 100644
+--- a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_newgrp/rule.yml
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_newgrp/rule.yml
+@@ -1,6 +1,6 @@
+ documentation_complete: true
+ 
+-prodtype: rhel6,rhel7,rhel8,fedora,ol7,ol8,rhv4
++prodtype: wrlinux1019,rhel6,rhel7,rhel8,fedora,ol7,ol8,rhv4
+ 
+ title: 'Ensure auditd Collects Information on the Use of Privileged Commands - newgrp'
+ 
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_sudoedit/oval/wrlinux1019.xml b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_sudoedit/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..b255a49
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_sudoedit/oval/wrlinux1019.xml
+@@ -0,0 +1,45 @@
++<def-group>
++  <definition class="compliance" id="audit_rules_privileged_commands_sudoedit" version="1">
++    <metadata>
++      <title>Ensure auditd Collects Information on the Use of Privileged Commands - sudoedit</title>
++      <affected family="unix">
++	<platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>Audit rules about the information on the use of sudoedit is enabled.</description>
++    </metadata>
++
++    <criteria operator="OR">
++
++      <!-- Test the augenrules case -->
++      <criteria operator="AND">
++        <extend_definition comment="audit augenrules" definition_ref="audit_rules_augenrules" />
++        <criterion comment="audit augenrules sudoedit" test_ref="test_audit_rules_privileged_commands_sudoedit_augenrules" />
++      </criteria>
++
++      <!-- Test the auditctl case -->
++      <criteria operator="AND">
++        <extend_definition comment="audit auditctl" definition_ref="audit_rules_auditctl" />
++        <criterion comment="audit auditctl sudoedit" test_ref="test_audit_rules_privileged_commands_sudoedit_auditctl" />
++      </criteria>
++    </criteria>
++  </definition>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="audit augenrules sudoedit" id="test_audit_rules_privileged_commands_sudoedit_augenrules" version="1">
++    <ind:object object_ref="object_audit_rules_privileged_commands_sudoedit_augenrules" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object id="object_audit_rules_privileged_commands_sudoedit_augenrules" version="1">
++    <ind:filepath operation="pattern match">/etc/audit/rules\.d/.*\.rules</ind:filepath>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/usr\/bin\/sudoedit[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=4294967295[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="audit auditctl sudoedit" id="test_audit_rules_privileged_commands_sudoedit_auditctl" version="1">
++    <ind:object object_ref="object_audit_rules_privileged_commands_sudoedit_auditctl" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object id="object_audit_rules_privileged_commands_sudoedit_auditctl" version="1">
++    <ind:filepath>/etc/audit/audit.rules</ind:filepath>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/usr\/bin\/sudoedit[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=4294967295[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++</def-group>
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_sudoedit/rule.yml b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_sudoedit/rule.yml
+index e003d17..a958895 100644
+--- a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_sudoedit/rule.yml
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_sudoedit/rule.yml
+@@ -1,6 +1,6 @@
+ documentation_complete: true
+ 
+-prodtype: rhel7,rhel8,fedora,ol7,ol8,rhv4
++prodtype: wrlinux1019,rhel7,rhel8,fedora,ol7,ol8,rhv4
+ 
+ title: 'Ensure auditd Collects Information on the Use of Privileged Commands - sudoedit'
+ 
+diff --git a/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_net_ipv4_tcp_syncookies/bash/wrlinux1019.sh b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_net_ipv4_tcp_syncookies/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..aaf4478
+--- /dev/null
++++ b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_net_ipv4_tcp_syncookies/bash/wrlinux1019.sh
+@@ -0,0 +1,20 @@
++# platform = multi_platform_wrlinux
++
++. /usr/share/scap-security-guide/remediation_functions
++populate sysctl_net_ipv4_tcp_syncookies_value
++
++#
++# Set runtime for net.ipv4.tcp_syncookies
++#
++/sbin/sysctl -q -n -w net.ipv4.tcp_syncookies=$sysctl_net_ipv4_tcp_syncookies_value
++
++#
++# If net.ipv4.tcp_syncookies present in /etc/sysctl.conf, change value to appropriate value
++#	else, add "net.ipv4.tcp_syncookies = value" to /etc/sysctl.conf
++#
++if grep --silent ^net.ipv4.tcp_syncookies /etc/sysctl.conf ; then
++	sed -i "s/^net.ipv4.tcp_syncookies.*/net.ipv4.tcp_syncookies = $sysctl_net_ipv4_tcp_syncookies_value/g" /etc/sysctl.conf
++else
++	echo -e "\n# Set net.ipv4.tcp_syncookies to $sysctl_net_ipv4_tcp_syncookies_value per security requirements" >> /etc/sysctl.conf
++	echo "net.ipv4.tcp_syncookies = $sysctl_net_ipv4_tcp_syncookies_value" >> /etc/sysctl.conf
++fi
+diff --git a/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_net_ipv4_tcp_syncookies/oval/wrlinux1019.xml b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_net_ipv4_tcp_syncookies/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..fd38c95
+--- /dev/null
++++ b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_net_ipv4_tcp_syncookies/oval/wrlinux1019.xml
+@@ -0,0 +1,15 @@
++<def-group>
++  <definition class="compliance" id="sysctl_net_ipv4_tcp_syncookies" version="3">
++    <metadata>
++      <title>Kernel "net.ipv4.tcp_syncookies" Parameter Configuration and Runtime Check</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The "net.ipv4.tcp_syncookies" kernel parameter should be set to the appropriate value in both system configuration and system runtime.</description>
++    </metadata>
++    <criteria operator="AND">
++      <extend_definition comment="net.ipv4.tcp_syncookies configuration setting check" definition_ref="sysctl_static_net_ipv4_tcp_syncookies" />
++      <extend_definition comment="net.ipv4.tcp_syncookies runtime setting check" definition_ref="sysctl_runtime_net_ipv4_tcp_syncookies" />
++    </criteria>
++  </definition>
++</def-group>
+diff --git a/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_net_ipv4_tcp_syncookies/rule.yml b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_net_ipv4_tcp_syncookies/rule.yml
+index 888f40f..b519408 100644
+--- a/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_net_ipv4_tcp_syncookies/rule.yml
++++ b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_net_ipv4_tcp_syncookies/rule.yml
+@@ -1,6 +1,6 @@
+ documentation_complete: true
+ 
+-prodtype: rhel6,rhel7,rhel8,fedora,ol7,ol8,rhv4
++prodtype: wrlinux1019,rhel6,rhel7,rhel8,fedora,ol7,ol8,rhv4
+ 
+ title: 'Enable Kernel Parameter to Use TCP Syncookies on IPv4 Interfaces'
+ 
+diff --git a/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_runtime_net_ipv4_tcp_syncookies/oval/wrlinux1019.xml b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_runtime_net_ipv4_tcp_syncookies/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..9c2f5be
+--- /dev/null
++++ b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_runtime_net_ipv4_tcp_syncookies/oval/wrlinux1019.xml
+@@ -0,0 +1,29 @@
++<def-group>
++  <definition class="compliance" id="sysctl_runtime_net_ipv4_tcp_syncookies" version="3">
++    <metadata>
++      <title>Kernel "net.ipv4.tcp_syncookies" Parameter Runtime Check</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The kernel "net.ipv4.tcp_syncookies" parameter should be set to the appropriate value in system runtime.</description>
++    </metadata>
++    <criteria operator="AND">
++      <criterion comment="kernel runtime parameter net.ipv4.tcp_syncookies set to the appropriate value" test_ref="test_runtime_sysctl_net_ipv4_tcp_syncookies" />
++    </criteria>
++  </definition>
++
++  <unix:sysctl_test check="all" check_existence="all_exist" comment="kernel runtime parameter net.ipv4.tcp_syncookies set to the appropriate value" id="test_runtime_sysctl_net_ipv4_tcp_syncookies" version="1">
++    <unix:object object_ref="object_sysctl_net_ipv4_tcp_syncookies" />
++    <unix:state state_ref="state_sysctl_net_ipv4_tcp_syncookies" />
++  </unix:sysctl_test>
++
++  <unix:sysctl_object id="object_sysctl_net_ipv4_tcp_syncookies" version="1">
++    <unix:name>net.ipv4.tcp_syncookies</unix:name>
++  </unix:sysctl_object>
++
++  <unix:sysctl_state id="state_sysctl_net_ipv4_tcp_syncookies" version="1">
++    <unix:value datatype="int" operation="equals" var_ref="sysctl_net_ipv4_tcp_syncookies_value" />
++  </unix:sysctl_state>
++
++  <external_variable comment="External variable for net.ipv4.tcp_syncookies" datatype="int" id="sysctl_net_ipv4_tcp_syncookies_value" version="1" />
++</def-group>
+diff --git a/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_runtime_net_ipv4_tcp_syncookies/rule.yml b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_runtime_net_ipv4_tcp_syncookies/rule.yml
+new file mode 100644
+index 0000000..ea48ddb
+--- /dev/null
++++ b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_runtime_net_ipv4_tcp_syncookies/rule.yml
+@@ -0,0 +1,44 @@
++documentation_complete: true
++
++prodtype: wrlinux1019
++
++title: 'Enable Kernel "net.ipv4.tcp_syncookies" Parameter Runtime Check'
++
++description: '{{{ describe_sysctl_option_value(sysctl="net.ipv4.tcp_syncookies", value="1") }}}'
++
++rationale: |-
++    A TCP SYN flood attack can cause a denial of service by filling a
++    system's TCP connection table with connections in the SYN_RCVD state.
++    Syncookies can be used to track a connection when a subsequent ACK is received,
++    verifying the initiator is attempting a valid connection and is not a flood
++    source. This feature is activated when a flood condition is detected, and
++    enables the system to continue servicing valid connection requests.
++
++severity: medium
++
++identifiers:
++    cce@rhel6: 27053-8
++    cce@rhel7: 27495-1
++    cce@rhel8: 80923-6
++
++references:
++    anssi: NT28(R22)
++    stigid@rhel6: RHEL-06-000095
++    srg@rhel6: SRG-OS-000142
++    disa@rhel6: 1092,1095
++    cis: 3.2.8
++    cjis: 5.10.1.1
++    cui: 3.1.20
++    disa: "366"
++    nist: AC-4,SC-5(1)(2),SC-5(2),SC-5(3)
++    nist-csf: DE.AE-1,DE.CM-1,ID.AM-3,PR.AC-5,PR.DS-4,PR.DS-5,PR.PT-4
++    srg: SRG-OS-000480-GPOS-00227
++    isa-62443-2013: 'SR 3.1,SR 3.5,SR 3.8,SR 4.1,SR 4.3,SR 5.1,SR 5.2,SR 5.3,SR 6.2,SR 7.1,SR 7.2,SR 7.6'
++    isa-62443-2009: 4.2.3.4,4.3.3.4,4.4.3.3
++    cobit5: APO01.06,APO13.01,BAI04.04,DSS01.03,DSS01.05,DSS03.01,DSS03.05,DSS05.02,DSS05.04,DSS05.07,DSS06.02
++    iso27001-2013: A.10.1.1,A.11.1.4,A.11.1.5,A.11.2.1,A.12.1.1,A.12.1.2,A.12.1.3,A.13.1.1,A.13.1.2,A.13.1.3,A.13.2.1,A.13.2.2,A.13.2.3,A.13.2.4,A.14.1.2,A.14.1.3,A.17.2.1,A.6.1.2,A.7.1.1,A.7.1.2,A.7.3.1,A.8.2.2,A.8.2.3,A.9.1.1,A.9.1.2,A.9.2.3,A.9.4.1,A.9.4.4,A.9.4.5
++    cis-csc: 1,12,13,14,15,16,18,2,4,6,7,8,9
++
++{{{ complete_ocil_entry_sysctl_option_value(sysctl="net.ipv4.tcp_syncookies", value="1") }}}
++
++platform: machine
+diff --git a/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_static_net_ipv4_tcp_syncookies/oval/wrlinux1019.xml b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_static_net_ipv4_tcp_syncookies/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..9b063fa
+--- /dev/null
++++ b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_static_net_ipv4_tcp_syncookies/oval/wrlinux1019.xml
+@@ -0,0 +1,71 @@
++<def-group>
++  <definition class="compliance" id="sysctl_static_net_ipv4_tcp_syncookies" version="3">
++    <metadata>
++      <title>Kernel "net.ipv4.tcp_syncookies" Parameter Configuration Check</title>
++      <affected family="unix">
++        <platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>The kernel "net.ipv4.tcp_syncookies" parameter should be set to the appropriate value in the system configuration.</description>
++    </metadata>
++    <criteria operator="OR">
++      <criterion comment="kernel static parameter net.ipv4.tcp_syncookies set to the appropriate value in /etc/sysctl.conf" test_ref="test_static_sysctl_net_ipv4_tcp_syncookies" />
++      <!-- see sysctl.d(5) -->
++      <criterion comment="kernel static parameter net.ipv4.tcp_syncookies set to the appropriate value in /etc/sysctl.d/*.conf" test_ref="test_static_etc_sysctld_net_ipv4_tcp_syncookies" />
++      <criterion comment="kernel static parameter net.ipv4.tcp_syncookies set to the appropriate value in /run/sysctl.d/*.conf" test_ref="test_static_run_sysctld_net_ipv4_tcp_syncookies" />
++      <criterion comment="kernel static parameter net.ipv4.tcp_syncookies set to the appropriate value in /usr/lib/sysctl.d/*.conf" test_ref="test_static_usr_lib_sysctld_net_ipv4_tcp_syncookies" />
++    </criteria>
++  </definition>
++
++  <ind:textfilecontent54_test check="all" check_existence="all_exist" comment="net.ipv4.tcp_syncookies static configuration" id="test_static_sysctl_net_ipv4_tcp_syncookies" version="1">
++    <ind:object object_ref="object_static_sysctl_net_ipv4_tcp_syncookies" />
++    <ind:state state_ref="state_static_sysctld_net_ipv4_tcp_syncookies" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_test check="all" comment="net.ipv4.tcp_syncookies static configuration in /etc/sysctl.d/*.conf" id="test_static_etc_sysctld_net_ipv4_tcp_syncookies" version="1">
++    <ind:object object_ref="object_static_etc_sysctld_net_ipv4_tcp_syncookies" />
++    <ind:state state_ref="state_static_sysctld_net_ipv4_tcp_syncookies" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_test check="all" comment="net.ipv4.tcp_syncookies static configuration in /etc/sysctl.d/*.conf" id="test_static_run_sysctld_net_ipv4_tcp_syncookies" version="1">
++    <ind:object object_ref="object_static_run_sysctld_net_ipv4_tcp_syncookies" />
++    <ind:state state_ref="state_static_sysctld_net_ipv4_tcp_syncookies" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_test check="all" comment="net.ipv4.tcp_syncookies static configuration in /etc/sysctl.d/*.conf" id="test_static_usr_lib_sysctld_net_ipv4_tcp_syncookies" version="1">
++    <ind:object object_ref="object_static_usr_lib_sysctld_net_ipv4_tcp_syncookies" />
++    <ind:state state_ref="state_static_sysctld_net_ipv4_tcp_syncookies" />
++  </ind:textfilecontent54_test>
++
++  <ind:textfilecontent54_object id="object_static_sysctl_net_ipv4_tcp_syncookies" version="1">
++    <ind:filepath>/etc/sysctl.conf</ind:filepath>
++    <ind:pattern operation="pattern match">(?:^|.*\n)[^#]*net.ipv4.tcp_syncookies[\s]*=[\s]*(\d+)[\s]*\n</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_object id="object_static_etc_sysctld_net_ipv4_tcp_syncookies" version="1">
++    <ind:path>/etc/sysctl.d</ind:path>
++    <ind:filename operation="pattern match">^.*\.conf$</ind:filename>
++    <ind:pattern operation="pattern match">(?:^|.*\n)[^#]*net.ipv4.tcp_syncookies[\s]*=[\s]*(\d+)[\s]*\n</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_object id="object_static_run_sysctld_net_ipv4_tcp_syncookies" version="1">
++    <ind:path>/run/sysctl.d</ind:path>
++    <ind:filename operation="pattern match">^.*\.conf$</ind:filename>
++    <ind:pattern operation="pattern match">(?:^|.*\n)[^#]*net.ipv4.tcp_syncookies[\s]*=[\s]*(\d+)[\s]*\n</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_object id="object_static_usr_lib_sysctld_net_ipv4_tcp_syncookies" version="1">
++    <ind:path>/usr/lib/sysctl.d</ind:path>
++    <ind:filename operation="pattern match">^.*\.conf$</ind:filename>
++    <ind:pattern operation="pattern match">(?:^|.*\n)[^#]*net.ipv4.tcp_syncookies[\s]*=[\s]*(\d+)[\s]*\n</ind:pattern>
++    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++  <ind:textfilecontent54_state id="state_static_sysctld_net_ipv4_tcp_syncookies" version="1">
++    <ind:subexpression operation="equals"  var_ref="sysctl_net_ipv4_tcp_syncookies_value" datatype="int" />
++  </ind:textfilecontent54_state>
++
++  <external_variable comment="External variable for net.ipv4.tcp_syncookies" datatype="int" id="sysctl_net_ipv4_tcp_syncookies_value" version="1" />
++</def-group>
+diff --git a/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_static_net_ipv4_tcp_syncookies/rule.yml b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_static_net_ipv4_tcp_syncookies/rule.yml
+new file mode 100644
+index 0000000..e175780
+--- /dev/null
++++ b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_static_net_ipv4_tcp_syncookies/rule.yml
+@@ -0,0 +1,44 @@
++documentation_complete: true
++
++prodtype: wrlinux1019
++
++title: 'Enable Kernel "net.ipv4.tcp_syncookies" Parameter Configuration Check'
++
++description: '{{{ describe_sysctl_option_value(sysctl="net.ipv4.tcp_syncookies", value="1") }}}'
++
++rationale: |-
++    A TCP SYN flood attack can cause a denial of service by filling a
++    system's TCP connection table with connections in the SYN_RCVD state.
++    Syncookies can be used to track a connection when a subsequent ACK is received,
++    verifying the initiator is attempting a valid connection and is not a flood
++    source. This feature is activated when a flood condition is detected, and
++    enables the system to continue servicing valid connection requests.
++
++severity: medium
++
++identifiers:
++    cce@rhel6: 27053-8
++    cce@rhel7: 27495-1
++    cce@rhel8: 80923-6
++
++references:
++    anssi: NT28(R22)
++    stigid@rhel6: RHEL-06-000095
++    srg@rhel6: SRG-OS-000142
++    disa@rhel6: 1092,1095
++    cis: 3.2.8
++    cjis: 5.10.1.1
++    cui: 3.1.20
++    disa: "366"
++    nist: AC-4,SC-5(1)(2),SC-5(2),SC-5(3)
++    nist-csf: DE.AE-1,DE.CM-1,ID.AM-3,PR.AC-5,PR.DS-4,PR.DS-5,PR.PT-4
++    srg: SRG-OS-000480-GPOS-00227
++    isa-62443-2013: 'SR 3.1,SR 3.5,SR 3.8,SR 4.1,SR 4.3,SR 5.1,SR 5.2,SR 5.3,SR 6.2,SR 7.1,SR 7.2,SR 7.6'
++    isa-62443-2009: 4.2.3.4,4.3.3.4,4.4.3.3
++    cobit5: APO01.06,APO13.01,BAI04.04,DSS01.03,DSS01.05,DSS03.01,DSS03.05,DSS05.02,DSS05.04,DSS05.07,DSS06.02
++    iso27001-2013: A.10.1.1,A.11.1.4,A.11.1.5,A.11.2.1,A.12.1.1,A.12.1.2,A.12.1.3,A.13.1.1,A.13.1.2,A.13.1.3,A.13.2.1,A.13.2.2,A.13.2.3,A.13.2.4,A.14.1.2,A.14.1.3,A.17.2.1,A.6.1.2,A.7.1.1,A.7.1.2,A.7.3.1,A.8.2.2,A.8.2.3,A.9.1.1,A.9.1.2,A.9.2.3,A.9.4.1,A.9.4.4,A.9.4.5
++    cis-csc: 1,12,13,14,15,16,18,2,4,6,7,8,9
++
++{{{ complete_ocil_entry_sysctl_option_value(sysctl="net.ipv4.tcp_syncookies", value="1") }}}
++
++platform: machine
+diff --git a/linux_os/guide/system/permissions/files/file_permissions_unauthorized_suid/oval/wrlinux1019.xml b/linux_os/guide/system/permissions/files/file_permissions_unauthorized_suid/oval/wrlinux1019.xml
+new file mode 100644
+index 0000000..c03515e
+--- /dev/null
++++ b/linux_os/guide/system/permissions/files/file_permissions_unauthorized_suid/oval/wrlinux1019.xml
+@@ -0,0 +1,68 @@
++<def-group>
++  <definition class="compliance" id="file_permissions_unauthorized_suid" version="1">
++    <metadata>
++      <title>Find setuid files from system packages</title>
++      <affected family="unix">
++	<platform>multi_platform_wrlinux</platform>
++      </affected>
++      <description>All files with setuid should be owned by a base system package</description>
++    </metadata>
++    <criteria>
++      <criterion comment="Check all setuid files" test_ref="check_setuid_files" />
++    </criteria>
++  </definition>
++
++  <unix:file_test check="all" check_existence="none_exist" comment="setuid files outside system RPMs" id="check_setuid_files" version="1">
++    <unix:object object_ref="object_file_permissions_unauthorized_suid" />
++  </unix:file_test>
++
++  <unix:file_object comment="files with suid set" id="object_file_permissions_unauthorized_suid" version="1">
++    <unix:behaviors recurse="directories" recurse_direction="down" max_depth="-1" recurse_file_system="local" />
++    <unix:path operation="equals">/</unix:path>
++    <unix:filename operation="pattern match">^.*$</unix:filename>
++    <filter action="include">state_file_permissions_unauthorized_suid</filter>
++    <filter action="exclude">state_suid_whitelist</filter>
++  </unix:file_object>
++
++  <unix:file_state id="state_file_permissions_unauthorized_suid" version="1">
++    <unix:suid datatype="boolean">true</unix:suid>
++  </unix:file_state>
++
++<!-- List of all setuid files included with base WRL8 system -->
++<!-- KEEP THE LIST BELOW SORTED !!! -->
++  <unix:file_state id="state_suid_whitelist" version="1">
++    <unix:filepath var_ref="var_suid_whitelist" var_check="at least one" />
++  </unix:file_state>
++
++  <constant_variable id="var_suid_whitelist" version="1" datatype="string" comment="suid whitelist">
++    <value>/sbin/mount.nfs</value>
++    <value>/bin/traceroute6</value>
++    <value>/bin/mount.util-linux</value>
++    <value>/bin/ping.iputils</value>
++    <value>/bin/su.shadow</value>
++    <value>/bin/clockdiff</value>
++    <value>/bin/umount.util-linux</value>
++    <value>/bin/su.util-linux</value>
++    <value>/usr/sbin/seunshare</value>
++    <value>/usr/sbin/pppd</value>
++    <value>/usr/sbin/unix_chkpwd</value>
++    <value>/usr/libexec/dbus-daemon-launch-helper</value>
++    <value>/usr/libexec/lxc/lxc-user-nic</value>
++    <value>/usr/bin/gpasswd</value>
++    <value>/usr/bin/mandb</value>
++    <value>/usr/bin/chsh.shadow</value>
++    <value>/usr/bin/expiry</value>
++    <value>/usr/bin/newgrp.shadow</value>
++    <value>/usr/bin/screen-4.6.2</value>
++    <value>/usr/bin/chage</value>
++    <value>/usr/bin/at</value>
++    <value>/usr/bin/cgexec</value>
++    <value>/usr/bin/newgidmap</value>
++    <value>/usr/bin/passwd.shadow</value>
++    <value>/usr/bin/sudo</value>
++    <value>/usr/bin/man</value>
++    <value>/usr/bin/chfn.shadow</value>
++    <value>/usr/bin/newuidmap</value>
++  </constant_variable>
++
++</def-group>
+diff --git a/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile b/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
+index 709d10f..f7a474c 100644
+--- a/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
++++ b/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
+@@ -223,3 +223,10 @@ selections:
+     - package_strongswan_installed
+     - postfix_network_listening_disabled
+     - service_ntpdate_disabled
++    - audit_rules_privileged_commands_newgrp
++    - audit_rules_privileged_commands_sudoedit
++    - audit_rules_privileged_commands_mount
++    - accounts_remove_unneeded
++    - sysctl_net_ipv4_tcp_syncookies
++    - file_permissions_unauthorized_suid
++    - audit_rules_execution_restorecon
+-- 
+1.9.1
+
