@@ -1,0 +1,3 @@
+Kexec is a fast reboot feature that lets you reboot to a new Linux kernel. For
+more details please refer to
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/admin-guide/kdump/kdump.rst
