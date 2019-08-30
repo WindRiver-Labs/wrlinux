@@ -1,0 +1,21 @@
+This template enables four related tools, as described below, which can be used
+together to load a second kernel on purpose or on crash and analyze the dumped
+data.
+
+Kexec is a fast reboot feature that lets you reboot to a new Linux kernel. For
+more details please refer to
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/admin-guide/kdump/kdump.rst
+
+Kdump is a feature of the Linux kernel that creates crash dumps in the event of
+a kernel crash. For more details please refer to
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/admin-guide/kdump/kdump.rst
+
+Makedumpfile makes a small DUMPFILE by compressing data dumped by kdump or by
+excluding unnecessary pages for analysis, or both.
+https://linux.die.net/man/8/makedumpfile
+
+Crash is a self-contained tool that can be used to investigate either live
+systems, kernel core dumps created from the netdump, diskdump and kdump packages
+from Red Hat Linux, the mcore kernel patch offered by Mission Critical Linux, or
+the LKCD kernel patch. For details please refer to
+https://people.redhat.com/anderson/crash_whitepaper/
