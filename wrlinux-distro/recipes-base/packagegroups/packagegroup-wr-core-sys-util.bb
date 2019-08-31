@@ -30,7 +30,7 @@ RDEPENDS_${PN} = " \
     lvm2 \
     mdadm \
     mtd-utils \
-    pam-plugin-wheel \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam-plugin-wheel', '', d)} \
     quota \
     sdparm \
     setserial \
