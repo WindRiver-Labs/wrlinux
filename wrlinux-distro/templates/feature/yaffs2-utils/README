@@ -1,0 +1,13 @@
+Enable kernel support for yaffs2 along with a userspace management tool
+yaffs2-utils.
+
+The yaffs2-utils is the collection of utilities to make/extract a YAFFS2/YAFFS1
+image for Linux. Currently only the following tools are installed:
+ - makeyaffsimage: Makes a YAFFS file system image that can be used to load up a
+   file system.
+ - makeyaffs2image: Makes a YAFFS2 file system image that can be used to load up
+   a file system, with default Linux MTD layout.
+
+Note that with the kernel feature of flash_fs.scc enabled in this template, we
+would enable kernel support for other three flash file systems, jffs2 cramfs and
+ubifs, at the same time.
