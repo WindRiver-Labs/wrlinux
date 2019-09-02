@@ -1,0 +1,10 @@
+Enable system wide debugging features
+
+Features
+
+sysrq
+sysrq key is a 'magical' key combo you can hit which the kernel will respond to
+regardless of whatever else it is doing, unless it is completely locked up.
+It is enabled by distro feature "systemdebug" for systemd and kernel feature
+features/sysrq. For more details please refer to
+https://github.com/torvalds/linux/blob/master/Documentation/admin-guide/sysrq.rst
