@@ -58,6 +58,7 @@ PNWHITELIST_openembedded-layer += " \
     uw-imap \
     vlock \
     iperf3 \
+    xmlsec1 \
 "
 
 PNWHITELIST_perl-layer += " \
@@ -100,7 +101,6 @@ PNWHITELIST_security += " \
     samhain-client \
     samhain-server \
     samhain-standalone \
-    xmlsec1 \
 "
 
 PNWHITELIST_integrity += " \
