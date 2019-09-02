@@ -1,0 +1,24 @@
+Enable LAMP packages and related dependencies.
+
+LAMP (Linux, Apache, MariaDB, PHP) is an archetypal model of web service stacks,
+named as an acronym of the names of its original four open-source components:
+the Linux operating system, the Apache HTTP Server, the MySQL database
+management system (MariaDB is used now), the PHP programming language.
+
+The LAMP components are largely interchangeable and not limited to the original
+selection. As a solution stack, LAMP is suitable for building dynamic web sites
+and web applications.
+
+Packages
+1. modphp contains PHP module for the Apache HTTP server
+
+2. phpMyAdmin is a free software tool written in PHP, intended to handle the
+administration of MySQL over the Web. phpMyAdmin supports a wide range of
+operations on MySQL and MariaDB. Frequently used operations (managing databases,
+tables, columns, relations, indexes, users, permissions, etc) can be performed
+via the user interface, while you still have the ability to directly execute any
+SQL statement.
+
+3. The Apache HTTP Server is a powerful, efficient, and extensible web server.
+
+4. xdebug is used for debugging and profiling extension for PHP.
