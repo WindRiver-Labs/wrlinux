@@ -1,0 +1,56 @@
+Enable kernel support for IPv6 tunnel and IPSEC and userspace utilities
+
+Kernel config fragments
+
+CONFIG_IPV6
+For general information about IPv6, see https://en.wikipedia.org/wiki/IPv6.
+For specific information about IPv6 under Linux, see
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/networking/ipv6.txt
+and read the HOWTO at http://www.tldp.org/HOWTO/Linux+IPv6-HOWTO/
+
+CONFIG_INET6_TUNNEL
+Support for generic IPv6-in-IPv6 tunnel transformation, which is required by the
+IPv6-in-IPv6 tunneling module as well as tunnel mode IPComp.
+
+CONFIG_IPV6_TUNNEL
+Support for IPv6-in-IPv6 and IPv4-in-IPv6 tunnels described in RFC 2473.
+
+CONFIG_IPV6_ROUTER_PREF
+This is an optional extension to the Router Advertisement message which improves
+the ability of hosts to pick an appropriate router, especially when the hosts
+are placed in a multi-homed network.
+
+CONFIG_XFRM
+CONFIG_XFRM_USER
+CONFIG_XFRM_SUB_POLICY
+CONFIG_INET_AH
+CONFIG_INET_ESP
+CONFIG_INET_IPCOMP
+CONFIG_INET6_AH
+CONFIG_INET6_ESP
+CONFIG_INET6_IPCOMP
+CONFIG_CRYPTO_SEQIV
+CONFIG_CRYPTO_CTR
+CONFIG_CRYPTO_XCBC
+CONFIG_CRYPTO_CAMELLIA
+These are for IPSEC, for more details please refer to
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/networking/ipsec.txt
+
+
+Packages
+
+netcat-openbsd
+A simple Unix utility which reads and writes data across network connections
+using TCP or UDP protocol. It is designed to be a reliable 'back-end' tool that
+can be used directly or easily driven by other programs and scripts. At the same
+time it is a feature-rich network debugging and exploration tool, since it can
+create almost any kind of connection you would need and has several interesting
+built-in capabilities.
+
+
+Distro feature
+
+ipv6 is also defined as a distro feature set in DISTRO_FEATURES and used as
+condition for additional configurations in other packages. Running the following
+command would give you a general picture.
+grep -rn --color '.*FEATURE.*ipv6.*' YOUR_LAYERS
