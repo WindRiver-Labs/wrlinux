@@ -111,6 +111,7 @@ SRC_URI = "git://github.com/OpenSCAP/scap-security-guide.git \
             file://0107-Remove-rules-audit_rules_usergroup_modification_-fro.patch \
             file://0108-Rules-audit_rules_privileged_commands_-add-remediati.patch \
             file://0109-Transfer-WRLinux8-private-rules-to-WRLinux1019.patch \
+            file://0110-Update-check-code-for-audit_rules_privileged_command.patch \
            "
 PV = "0.1.45+git${SRCPV}"
 
