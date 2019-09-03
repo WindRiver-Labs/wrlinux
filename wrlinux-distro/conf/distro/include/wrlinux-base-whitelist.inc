@@ -39,6 +39,7 @@ PNWHITELIST_openembedded-layer += " \
     liblockfile \
     libmcrypt \
     lockfile-progs \
+    ltrace \
     mailx \
     mariadb \
     memstat \
