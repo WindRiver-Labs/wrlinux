@@ -1,0 +1,54 @@
+From 110bb8543b5c19df7243d7207d447fbee4ec7eb8 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Wed, 4 Sep 2019 12:56:59 +0800
+Subject: [PATCH] installed_OS_is_vendor_supported: add checking for
+ wrlinux1019
+
+Fix rule_installed_OS_is_vendor_supported failure for wrlinux1019.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ .../installed_OS_is_vendor_supported/oval/shared.xml                 | 1 +
+ .../certified-vendor/installed_OS_is_vendor_supported/rule.yml       | 5 +++++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/linux_os/guide/system/software/integrity/certified-vendor/installed_OS_is_vendor_supported/oval/shared.xml b/linux_os/guide/system/software/integrity/certified-vendor/installed_OS_is_vendor_supported/oval/shared.xml
+index 5fe3a64..9ded95f 100644
+--- a/linux_os/guide/system/software/integrity/certified-vendor/installed_OS_is_vendor_supported/oval/shared.xml
++++ b/linux_os/guide/system/software/integrity/certified-vendor/installed_OS_is_vendor_supported/oval/shared.xml
+@@ -20,6 +20,7 @@
+       <extend_definition comment="Installed OS is RHEL8" definition_ref="installed_OS_is_rhel8" />
+       <extend_definition comment="Installed OS is OL7" definition_ref="installed_OS_is_ol7_family" />
+       <extend_definition comment="Installed OS is OL8" definition_ref="installed_OS_is_ol8_family" />
++      <extend_definition comment="Installed OS is WRLinux1019" definition_ref="installed_OS_is_wrlinux1019" />
+     </criteria>
+   </definition>
+ 
+diff --git a/linux_os/guide/system/software/integrity/certified-vendor/installed_OS_is_vendor_supported/rule.yml b/linux_os/guide/system/software/integrity/certified-vendor/installed_OS_is_vendor_supported/rule.yml
+index 82d9c22..dfcf554 100644
+--- a/linux_os/guide/system/software/integrity/certified-vendor/installed_OS_is_vendor_supported/rule.yml
++++ b/linux_os/guide/system/software/integrity/certified-vendor/installed_OS_is_vendor_supported/rule.yml
+@@ -9,6 +9,9 @@ description: |-
+ {{% if product in ["ol7", "ol8"] %}}
+     Oracle Linux is supported by Oracle Corporation. As the Oracle
+     Linux vendor, Oracle Corporation is responsible for providing security patches.
++{{% elif product in ["wrlinux1019"] %}}
++    Wind River Linux is supported by Wind River Systems, Inc. As the Wind River
++    Linux vendor, Wind River Systems, Inc. is responsible for providing security patches.
+ {{% else %}}
+     Red Hat Enterprise Linux is supported by Red Hat, Inc. As the Red Hat Enterprise
+     Linux vendor, Red Hat, Inc. is responsible for providing security patches.
+@@ -50,6 +53,8 @@ ocil: |-
+     <pre>$ grep -i "red hat" /etc/redhat-release</pre>
+ {{% elif product in ["ol7", "ol8"] %}}
+     <pre>$ grep -i "oracle" /etc/oracle-release</pre>
++{{% elif product in ["wrlinux1019"] %}}
++    <pre>$ grep -i "Wind River" /etc/os-release</pre>
+ {{% endif %}}
+     The output should contain something similar to:
+     <pre>{{{ full_name }}}</pre>
+-- 
+2.7.4
+
