@@ -52,7 +52,6 @@ then
 fi
 # writing a file
 dd if=/dev/zero of=$TMP_DIR/testfile bs=1024 count=400000 &
-sleep 1
 
 # Force to unmount
 umount -fl $TMP_DIR
