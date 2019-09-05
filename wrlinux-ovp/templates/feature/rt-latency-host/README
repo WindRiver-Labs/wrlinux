@@ -1,0 +1,15 @@
+This template enables a series of kernel config fragments which are expected to
+reduce real-time kernel response latency for a host system in a virtualization
+environment.
+
+The general idea is to turn off kernel options that might introduce latency. See
+inline comments in feature/files/rt-latency-host.cfg for details. For more
+details of real-time kernel please refer to
+https://wiki.linuxfoundation.org/realtime/start
+
+Note that there are various ways to tune the latency of real-time kernel via
+kernel config fragments and boot parameters and etc. Those configurations and
+parameters may vary from system to system to gain an expected result and thus
+they may change as kernel and/or hardware change.
+
+No guarantee of latency and performance can be made by using this template.
