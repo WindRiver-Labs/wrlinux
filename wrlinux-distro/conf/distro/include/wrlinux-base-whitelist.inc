@@ -7,10 +7,6 @@ PNWHITELIST_LAYERS_remove = "wrlinux-distro"
 # Define supported items from meta-openembedded
 PNWHITELIST_filesystems-layer += ""
 
-PNWHITELIST_gnome-layer += " \
-    libwnck3 \
-"
-
 PNWHITELIST_meta-initramfs += ""
 PNWHITELIST_multimedia-layer += ""
 
