@@ -25,11 +25,6 @@ def base_matches(variable, pattern, truevalue, falsevalue, d):
         return truevalue
     return falsevalue
 
-# sato & more! (x11)
-#
-WR_CORE_LSB_MORE = "${@base_matches('HOST_SYS', 'mips64.*-linux', '', 'wr-core-lsb-more', d)}"
-WR_CORE_LSB_GRAPHICS_PLUS = "${@base_matches('HOST_SYS', 'mips64.*-linux', '', 'wr-core-lsb-graphics-plus', d)}"
-
 IMAGE_FEATURES += "${WR_CORE_LSB_MORE} ${WR_CORE_LSB_GRAPHICS_PLUS} x11-base x11-sato"
 
 
