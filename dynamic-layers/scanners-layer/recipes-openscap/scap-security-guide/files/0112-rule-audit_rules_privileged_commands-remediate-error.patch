@@ -1,0 +1,28 @@
+From c672a798e2a0f5549fca1ed699eb54c35c601be3 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Mon, 9 Sep 2019 16:57:51 +0800
+Subject: [PATCH] Fix audit_rules_privileged_commands remediate fail
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../perform_audit_rules_privileged_commands_remediation.sh              | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/shared/bash_remediation_functions/perform_audit_rules_privileged_commands_remediation.sh b/shared/bash_remediation_functions/perform_audit_rules_privileged_commands_remediation.sh
+index 236c461..5923961 100644
+--- a/shared/bash_remediation_functions/perform_audit_rules_privileged_commands_remediation.sh
++++ b/shared/bash_remediation_functions/perform_audit_rules_privileged_commands_remediation.sh
+@@ -100,7 +100,7 @@ do
+ 		# * existing rule contains all arguments from expected rule form (though can contain
+ 		#   them in arbitrary order)
+ 	
+-		base_search=$(sed -e '/-a always,exit/!d' -e '/-F path='"${sbinary_esc}$"'/!d'		\
++		base_search=$(sed -e '/-a always,exit/!d' -e '/-F path='"${sbinary_esc} "'/!d'		\
+ 				-e '/-F path=[^[:space:]]\+/!d'   -e '/-F perm=.*/!d'						\
+ 				-e '/-F auid>='"${min_auid}"'/!d' -e '/-F auid!=\(4294967295\|unset\)/!d'	\
+ 				-e '/-k \|-F key=/!d' "$afile")
+-- 
+1.9.1
+
