@@ -1,0 +1,41 @@
+Consul is a service networking solution to connect and secure services across
+any runtime platform and public or private cloud.
+
+Consul provides several key features:
+
+Service Discovery - Consul makes it simple for services to register themselves
+and to discover other services via a DNS or HTTP interface. External services
+such as SaaS providers can be registered as well.
+
+Health Checking - Health Checking enables Consul to quickly alert operators
+about any issues in a cluster. The integration with service discovery prevents
+routing traffic to unhealthy hosts and enables service level circuit breakers.
+
+Key/Value Storage - A flexible key/value store enables storing dynamic
+configuration, feature flagging, coordination, leader election and more. The
+simple HTTP API makes it easy to use anywhere.
+
+Multi-Datacenter - Consul is built to be datacenter aware, and can support any
+number of regions without complex configuration.
+
+Service Segmentation - Consul Connect enables secure service-to-service
+communication with automatic TLS encryption and identity-based authorization.
+
+For more details please refer to https://www.consul.io/docs/
+
+
+Basic usage examples:
+Start server
+consul agent -server -bootstrap-expect 1 -data-dir /tmp/consul -node=s1 -bind=128.224.165.243 -ui -rejoin -client 0.0.0.0
+
+Start client
+consul agent -data-dir /tmp/consul -node=c1 -bind=128.224.165.11 -join 128.224.165.243
+
+Register service
+curl -X PUT -d '{"Datacenter": "dc1", "Node": "c2", "Address": "10.155.0.106", "Service": {"Service": "test", "tags": ["test"], "Port": 22}}' http://127.0.0.1:8500/v1/catalog/register
+
+Require service
+curl -s 127.0.0.1:8500/v1/catalog/service/test
+
+Deregister service
+curl -X PUT -d '{"Datacenter": "dc1", "Node": "c2", "Address": "10.155.0.106"}' http://127.0.0.1:8500/v1/catalog/deregister
