@@ -25,7 +25,7 @@ def base_matches(variable, pattern, truevalue, falsevalue, d):
         return truevalue
     return falsevalue
 
-IMAGE_FEATURES += "${WR_CORE_LSB_MORE} ${WR_CORE_LSB_GRAPHICS_PLUS} x11-base x11-sato"
+IMAGE_FEATURES += "x11-base x11-sato"
 
 
 # modify inittab in the image so we boot to a desktop
