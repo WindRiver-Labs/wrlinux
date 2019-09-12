@@ -1,0 +1,7 @@
+Enable OCFS2 support
+
+OCFS2 is a general-purpose shared-disk cluster file system for Linux capable of providing both high performance and high availability.
+
+#@TYPE: Wrtemplate
+#@NAME: ocfs2
+#@DESCRIPTION: Enable ocfs2 support
