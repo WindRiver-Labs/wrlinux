@@ -1,7 +1,0 @@
-This template adds demo packages, oe-core debugging packages.
-
-To use, add
-
---templates feature/demo
-
-as a setup option.
