@@ -1,0 +1,67 @@
+From 3d00d4d13067db1922adbd97ee5ddf07f5149c5f Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Tue, 17 Sep 2019 15:11:33 +0800
+Subject: [PATCH] Rule audit_rules_privileged_commands_ssh_keysign fix check
+ fail
+
+Supply remediate script for rule audit_rules_privileged_commands_ssh_keysign,
+Adjust the path of ssh-keysign in check code.
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../bash/wrlinux1019.sh                                | 18 ++++++++++++++++++
+ .../oval/wrlinux1019.xml                               |  4 ++--
+ 2 files changed, 20 insertions(+), 2 deletions(-)
+ create mode 100644 linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_ssh_keysign/bash/wrlinux1019.sh
+
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_ssh_keysign/bash/wrlinux1019.sh b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_ssh_keysign/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..86be861
+--- /dev/null
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_ssh_keysign/bash/wrlinux1019.sh
+@@ -0,0 +1,18 @@
++# platform = multi_platform_wrlinux
++
++slash_sbinary="\/usr\/libexec\/ssh-keysign"
++sbinary="/usr/libexec/ssh-keysign"
++afile="/etc/audit/audit.rules"
++min_auid="1000"
++
++expected_rule="-a always,exit -F path=${sbinary} -F perm=x -F auid>=${min_auid} -F auid!=unset -k privileged"
++
++base_search=$(sed -e '/-a always,exit/!d' -e '/-F path='"${slash_sbinary} "'/!d'          \
++                                -e '/-F path=[^[:space:]]\+/!d'   -e '/-F perm=.*/!d'                                           \
++                                -e '/-F auid>='"${min_auid}"'/!d' -e '/-F auid!=\(4294967295\|unset\)/!d'       \
++                                -e '/-k \|-F key=/!d' "$afile")
++
++
++if [ -z  "$base_search" ]; then
++	echo "${expected_rule}" >>$afile
++fi
+diff --git a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_ssh_keysign/oval/wrlinux1019.xml b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_ssh_keysign/oval/wrlinux1019.xml
+index 8c0094c..fd23170 100644
+--- a/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_ssh_keysign/oval/wrlinux1019.xml
++++ b/linux_os/guide/system/auditing/auditd_configure_rules/audit_privileged_commands/audit_rules_privileged_commands_ssh_keysign/oval/wrlinux1019.xml
+@@ -30,7 +30,7 @@
+   </ind:textfilecontent54_test>
+   <ind:textfilecontent54_object id="object_audit_rules_privileged_commands_ssh_keysign_augenrules" version="1">
+     <ind:filepath operation="pattern match">/etc/audit/rules\.d/.*\.rules</ind:filepath>
+-    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=@libdir@\/openssh\/ssh-keysign[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=(?:4294967295|unset)[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/usr\/libexec\/ssh-keysign[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=(?:4294967295|unset)[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
+     <ind:instance datatype="int">1</ind:instance>
+   </ind:textfilecontent54_object>
+ 
+@@ -39,7 +39,7 @@
+   </ind:textfilecontent54_test>
+   <ind:textfilecontent54_object id="object_audit_rules_privileged_commands_ssh_keysign_auditctl" version="1">
+     <ind:filepath>/etc/audit/audit.rules</ind:filepath>
+-    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=@libdir@\/openssh\/ssh-keysign[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=(?:4294967295|unset)[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
++    <ind:pattern operation="pattern match">^[\s]*-a[\s]+always,exit[\s]+-F[\s]+path=\/usr\/libexec\/ssh-keysign[\s]+-F[\s]+perm=x[\s]+-F[\s]+auid>=1000[\s]+-F[\s]+auid!=(?:4294967295|unset)[\s]+(-k[\s]+|-F[\s]+key=)[\S]+[\s]*$</ind:pattern>
+     <ind:instance datatype="int">1</ind:instance>
+   </ind:textfilecontent54_object>
+ 
+-- 
+1.9.1
+
