@@ -4,7 +4,6 @@ feature/kdump
 feature/kexec
 feature/libcap-ng
 feature/mip6
-feature/ocfs2
 feature/protocols
 feature/quota
 feature/sasl
