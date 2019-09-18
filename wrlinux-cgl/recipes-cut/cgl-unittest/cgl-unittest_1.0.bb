@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://license;md5=8cc536f28ecdfef562344c9fe2222252"
 
 RDEPENDS_${PN} = "ntp ntp-utils ntp-tickadj ltp \
                   e2fsprogs e2fsprogs-resize2fs \
-                  open-posix-testsuite \
+                  open-posix-testsuite bash\
 "
 
 SRC_URI = "\
