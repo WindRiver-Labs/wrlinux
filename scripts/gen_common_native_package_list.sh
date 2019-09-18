@@ -24,7 +24,9 @@ wrlinux_dir="$(readlink -f "$1")"
 #
 runbb () {
     (
-        . ./environment-setup-x86_64-wrlinuxsdk-linux
+        if [ -e ./environment-setup-x86_64-wrlinuxsdk-linux ]; then
+           . ./environment-setup-x86_64-wrlinuxsdk-linux
+        fi
         . ./oe-init-build-env "$1" > /dev/null
 
         cat >> conf/local.conf << EOF
@@ -77,9 +79,9 @@ mkdir -p plists
 for bsp in $bsps; do
     echo "Processing $bsp"
     bDir="build-$bsp"
-    runbb "$bDir" "$bsp" wrlinux-std-sato wrlinux-image-glibc-std-sato
-    if [ -f "$bDir"/recipe-depends.dot ]; then
-        cut -d\" -f 2 "$bDir"/recipe-depends.dot | grep '\-native' > "plists/${bsp}-native-packages.txt"
+    runbb "$bDir" "$bsp" wrlinux-graphics wrlinux-image-std-sato
+    if [ -f "$bDir"/task-depends.dot ]; then
+        cut -d">" -f1 "$bDir"/task-depends.dot | grep native | grep populate_sysroot | cut -d" " -f1 | uniq | cut -c 2- | cut -d"." -f1 > "plists/${bsp}-native-packages.txt"
     fi
 done
 
