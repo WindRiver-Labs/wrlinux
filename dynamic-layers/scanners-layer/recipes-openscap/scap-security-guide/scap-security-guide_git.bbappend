@@ -116,6 +116,8 @@ SRC_URI = "git://github.com/OpenSCAP/scap-security-guide.git \
             file://0112-rule-audit_rules_privileged_commands-remediate-error.patch \
             file://0113-Rule-audit_rules_privileged_commands_ssh_keysign-fix.patch \
             file://0114-Rule-cracklib_accounts_password_pam_lcredit-rename-remediation-script.patch \
+            file://0115-Rule-audit_rules_privileged_commands_sudoedit-add-re.patch \
+            file://0116-Rule-audit_rules_privileged_commands_pam_timestamp_c.patch \
            "
 PV = "0.1.45+git${SRCPV}"
 
