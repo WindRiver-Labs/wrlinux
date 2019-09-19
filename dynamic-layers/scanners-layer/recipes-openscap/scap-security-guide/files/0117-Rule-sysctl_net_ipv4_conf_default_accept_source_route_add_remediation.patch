@@ -1,0 +1,44 @@
+From 6a4163dfba921a69e4b2d47ce3a8b993599dae7e Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Thu, 19 Sep 2019 16:03:52 +0800
+Subject: [PATCH] For rule sysctl_net_ipv4_conf_default_accept_source_route add remediation
+
+Add remediate script for rule sysctl_net_ipv4_conf_default_accept_source_route
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../bash/wrlinux1019.sh                              | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+ create mode 100644 linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_net_ipv4_conf_default_accept_source_route/bash/wrlinux1019.sh
+
+diff --git a/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_net_ipv4_conf_default_accept_source_route/bash/wrlinux1019.sh b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_net_ipv4_conf_default_accept_source_route/bash/wrlinux1019.sh
+new file mode 100644
+index 0000000..d9938d3
+--- /dev/null
++++ b/linux_os/guide/system/network/network-kernel/network_host_and_router_parameters/sysctl_net_ipv4_conf_default_accept_source_route/bash/wrlinux1019.sh
+@@ -0,0 +1,20 @@
++# platform = multi_platform_wrlinux
++
++. /usr/share/scap-security-guide/remediation_functions
++populate sysctl_net_ipv4_conf_default_accept_source_route_value
++
++#
++# Set runtime for net.ipv4.tcp_syncookies
++#
++/sbin/sysctl -q -n -w net.ipv4.conf.default.accept_source_route=$sysctl_net_ipv4_conf_default_accept_source_route_value
++
++#
++# If net.ipv4.conf.default.accept_source_route in /etc/sysctl.conf, change value to appropriate value
++#       else, add "net.ipv4.conf.default.accept_source_route = value" to /etc/sysctl.conf
++#
++if grep --silent ^net.ipv4.conf.default.accept_source_route /etc/sysctl.conf ; then
++        sed -i "s/^net.ipv4.conf.default.accept_source_route = $sysctl_net_ipv4_conf_default_accept_source_route_value/g" /etc/sysctl.conf
++else
++        echo -e "\n# Set net.ipv4.conf.default.accept_source_route to $sysctl_net_ipv4_conf_default_accept_source_route_value per security requirements" >> /etc/sysctl.conf
++        echo "net.ipv4.conf.default.accept_source_route = $sysctl_net_ipv4_conf_default_accept_source_route_value" >> /etc/sysctl.conf
++fi
+-- 
+1.9.1
+
