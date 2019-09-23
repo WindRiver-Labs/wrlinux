@@ -79,7 +79,6 @@ PNWHITELIST_meta-python += " \
     python3-pyyaml \
     python3-jinja2 \
     python3-markupsafe \
-    python3-pyparsing \
     python3-cython \
 "
 
