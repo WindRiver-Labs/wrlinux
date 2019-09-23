@@ -1,0 +1,9 @@
+[Unit]
+Description=Imports container images listed in containers_to_run.txt into Docker and instructs Docker to run them.
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/run-container/run_container.sh
+
+[Install]
+WantedBy=multi-user.target
