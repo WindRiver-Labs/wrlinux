@@ -32,10 +32,10 @@ Start client
 consul agent -data-dir /tmp/consul -node=c1 -bind=128.224.165.11 -join 128.224.165.243
 
 Register service
-curl -X PUT -d '{"Datacenter": "dc1", "Node": "c2", "Address": "10.155.0.106", "Service": {"Service": "test", "tags": ["test"], "Port": 22}}' http://127.0.0.1:8500/v1/catalog/register
+curl -X PUT -d '{"ID": "t1", "name": "test-0", "Datacenter": "dc1", "Node": "c1", "Address": "10.155.0.106", "Service": {"Service": "test", "tags": ["test"], "Port": 22}}' http://127.0.0.1:8500/v1/agent/service/register
 
-Require service
-curl -s 127.0.0.1:8500/v1/catalog/service/test
+Inquire service
+curl -s 127.0.0.1:8500/v1/catalog/service/test-0
 
 Deregister service
-curl -X PUT -d '{"Datacenter": "dc1", "Node": "c2", "Address": "10.155.0.106"}' http://127.0.0.1:8500/v1/catalog/deregister
+curl -X PUT http://127.0.0.1:8500/v1/agent/service/deregister/t1
