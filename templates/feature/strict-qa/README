@@ -1,0 +1,11 @@
+This template makes all qa issues as errors
+
+To use, add
+
+--templates feature/strict-qa
+
+as a setup option.
+
+#@TYPE: Wrtemplate
+#@NAME: strict-qa
+#@DESCRIPTION: Makes all qa issues as errors
