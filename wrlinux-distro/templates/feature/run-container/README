@@ -1,0 +1,91 @@
+#@TYPE: Wrtemplate
+#@NAME: run-container
+#@DESCRIPTION: build and include container images in rootfs images
+
+Template feature/run-container
+==============================
+
+Template feature/run-container provides ability to build and include container
+images in rootfs images. It builds container images along with building host
+image such as wrlinux-image-std by bitbake mechanism multiconfig. Then create
+docker images from container images during first boot time and run them
+afterwards.
+
+In this template, it defines multiconfigs:
+
+  BBMULTICONFIG = "wr-host wr-container"
+
+and provides 2 configure files for these multiconfigs. The configure files
+should be copied to ${TOPDIR}/conf/multiconfig and users could configure for
+each multiconfig in the files.
+
+It requires 3 variables to be configured globally:
+
+* CONTAINER_NAMES
+* CONTAINER_PRIORITIES
+* HOST_IMAGES
+
+CONTAINER_NAMES and CONTAINER_PRIORITIES are associated. It should set them
+with containers which are involved and their priorities. Images set in
+HOST_IMAGES could be built as host images to include container images.
+
+
+Use Case
+========
+It demonstrates with eixsting container recipes from layer wrlinux.
+
+1. Setup a project with template feature/run-container
+
+$ setup.sh --machines qemux86-64 --distro wrlinux --templates feature/run-container --dl-layers
+
+
+2. Set required variables in local.conf
+Take existing container recipes wr-app-container and wr-systemd-container as example.
+
+$ source oe-init-build-env
+$ cat >>conf/local.conf <<EOF
+CONTAINER_NAMES = "wr-app-container wr-systemd-container"
+CONTAINER_PRIORITIES = "50 100"
+HOST_IMAGES = "wrlinux-image-std"
+
+# Following are required by example containers
+WR_APP_CONTAINER_APP = "bash"
+WR_SYSTEMD_CONTAINER_APPS = "apache2"
+EOF
+
+Note:
+-----
+This approach works when building additional container images, as documented in
+"Creating Additional Containers" in the Wind River Linux documentation. In this
+case the CONTAINER_NAMES must reflect the appropriate container names given to
+these containers and WR_APP_CONTAINER_APP or WR_SYSTEMD_CONTAINER_APPS are not
+required.
+
+
+3. Copy multiconfig files resides in this template directory
+
+$ cp -r $THIS_TEMPLATE_PATH/files/multiconfig conf/
+
+
+4. Build host image set in HOST_IMAGES and boot it
+
+$ bitbake mc:wr-host:wrlinux-image-std
+$ runqemu qemux86-64 kvm nographic qemuparams='-m 2048' host-glibc/deploy/images/qemux86-64/wrlinux-image-std-qemux86-64.ext4
+
+
+5 Check docker images created and started according to config of CONTAINER_NAMES and CONTAINER_PRIORITIES
+
+root@qemux86-64:~# docker ps
+CONTAINER ID    IMAGE                  COMMAND        CREATED           STATUS          PORTS    NAMES
+2fbee363bf51    wr-app-container       "/bin/bash"    11 seconds ago    Up 10 seconds            wr-app-container
+4fa1e4122486    wr-systemd-container   "/bin/bash"    40 seconds ago    Up 38 seconds            wr-systemd-container
+
+Then you could attach and work with the containers.
+
+
+Known Issue
+===========
+Because command docker is just a client for interacting with the daemon
+dockerd, it is impossible to create docker images with 'docker import' during
+do_rootfs. Then it may causes a lot of time depends on how many containers are
+configured. Then it may causes oeqa case fails because of timeout.
