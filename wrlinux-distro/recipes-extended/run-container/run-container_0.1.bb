@@ -6,9 +6,10 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384
 SRC_URI =  " \
     file://run_container.sh \
     file://run_container.service \
+    file://run-ptest \
 "
 
-inherit allarch systemd
+inherit allarch ptest systemd
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} = "run_container.service"

@@ -1,0 +1,39 @@
+#!/bin/sh
+#
+# check run_container.service work as expect
+
+container_list=/etc/wr-containers/containers_to_run.txt
+
+# set a very large timeout 20 mins in case too many container need to import
+TIMEOUT=20
+
+end_time=$(($TIMEOUT * 60 + `date +%s`))
+
+while true; do
+	# only 2 end status for run_container.service
+	if systemctl status run_container | grep -q 'Active: inactive'; then
+		break
+	fi
+
+	if systemctl status run_container | grep -q 'Active: failed'; then
+		echo "FAIL: failed to start run_container.service"
+		exit 1
+	fi
+
+	curtime=`date +%s`
+	if [ $curtime -gt $end_time ]; then
+		echo "FAIL: start run_container.service timeout"
+		exit 2
+	fi
+done
+
+read -ra containers <<<`head -1 $container_list`
+for container in "${containers[@]}"; do
+	c_id=`docker ps -a --filter=name=$container --format {{.ID}}`
+	if [ -z "$c_id" ]; then
+		echo "FAIL: $container is not started"
+		exit 3
+	fi
+done
+
+echo "PASS: All containers ${containers[@]} started"
