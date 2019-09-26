@@ -46,7 +46,7 @@ rootfs_install_container () {
 
     for container in ${CONTAINER_NAMES}
     do
-        image=`ls -1t ${TOPDIR}/container${TCLIBCAPPEND}/deploy/images/${MACHINE}/${container}*tar.bz2 | head -1`
+        image=`ls -1t ${TOPDIR}/tmp-container${TCLIBCAPPEND}/deploy/images/${MACHINE}/${container}*tar.bz2 | head -1`
         install ${image} ${IMAGE_ROOTFS}${CONTAINER_DEST_ON_HOST}
     done
 
