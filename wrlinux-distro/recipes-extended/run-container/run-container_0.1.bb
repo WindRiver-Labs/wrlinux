@@ -22,3 +22,5 @@ do_install () {
 }
 
 RDEPENDS_${PN} = "bash docker"
+
+EXCLUDE_FROM_WORLD = "1"
