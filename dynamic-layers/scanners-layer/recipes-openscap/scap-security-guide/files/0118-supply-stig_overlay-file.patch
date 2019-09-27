@@ -1,0 +1,1450 @@
+From d6c95c1bdb519e911e9e810ac39573706ef79d83 Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Fri, 27 Sep 2019 14:56:18 +0800
+Subject: [PATCH] Supply stig overlay for WRLinux1019 profile
+
+Supply stig overlay file for WRLinux1019 profile based on WRLinux1019 STIG
+spread sheet.
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+
+---
+ wrlinux1019/overlays/stig_overlay.xml | 1424 +++++++++++++++++++++++++++++++++
+ 1 file changed, 1424 insertions(+)
+ create mode 100644 wrlinux1019/overlays/stig_overlay.xml
+
+diff --git a/wrlinux1019/overlays/stig_overlay.xml b/wrlinux1019/overlays/stig_overlay.xml
+new file mode 100644
+index 0000000..9448fa2
+--- /dev/null
++++ b/wrlinux1019/overlays/stig_overlay.xml
+@@ -0,0 +1,1424 @@
++<?xml version="1.0"?>
++<overlays xmlns="http://checklists.nist.gov/xccdf/1.1">
++
++        <!-- line 2 CCI-000015 SRG-OS-000001-GPOS-00001         The operating system must provide automated mechanisms for supporting account management functions. -->
++        <overlay owner="disastig" ruleid="XXXX" ownerid="XXXX" disa="15" severity="low">
++                <title>The system must provide automated support for account management functions.</title>
++        </overlay>
++
++        <!-- line 3 CCI-000016 SRG-OS-000002-GPOS-00002         The operating system must automatically remove or disable temporary user accounts after 72 hours. -->
++        <overlay owner="disastig" ruleid="account_temp_expire_date" ownerid="WRL-1019-00011" disa="16" severity="low">
++                <title>Temporary accounts must be provisioned with an expiration date.</title>
++        </overlay>
++
++        <!-- line 4 CCI-000018 SRG-OS-000004-GPOS-00004         The operating system must audit all account creations. -->
++        <overlay owner="disastig" ruleid="audit_rules_usergroup_modification" ownerid="WRL-1019-00021" disa="18" severity="low">
++                <title>The operating system must automatically audit account creation.</title>
++        </overlay>
++
++        <!-- line 5 CCI-000044 SRG-OS-000021-GPOS-00005         The operating system must enforce the limit of three consecutive invalid logon attempts by a user during a 15-minute time period. -->
++	<!-- included by SRG-OS-000329-GPOS-00128 -->
++
++        <!-- line 6 CCI-000048 SRG-OS-000023-GPOS-00006         The operating system must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system. -->
++        <overlay owner="disastig" ruleid="banner_etc_issue" ownerid="WRL-1019-00031" disa="1384, 1385, 1386, 1387, 1388" severity="medium">
++                <title>The Department of Defense (DoD) login banner must be displayed immediately prior to, or as part of, console login prompts.</title>
++        </overlay>
++
++        <!-- line 7 CCI-000048 SRG-OS-000023-GPOS-00006         The operating system must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system. -->
++        <overlay owner="disastig" ruleid="sshd_enable_warning_banner" ownerid="WRL-1019-00031" disa="48" severity="medium">
++                <title>The SSH daemon must be configured with the Department of Defense (DoD) login banner.</title>
++        </overlay>
++
++        <!-- line 8 CCI-000050 SRG-OS-000024-GPOS-00007         The operating system must display the Standard Mandatory DoD Notice and Consent Banner until users acknowledge the usage conditions and take explicit actions to log on for further access. -->
++	<!-- included by SRG-OS-000023-GPOS-00006 -->
++
++        <!-- line 9 CCI-000054 SRG-OS-000027-GPOS-00008         The operating system must limit the number of concurrent sessions to ten for all accounts and/or account types. -->
++        <overlay owner="disastig" ruleid="accounts_max_concurrent_login_sessions" ownerid="WRL-1019-00051" disa="54" severity="low">
++                <title>The system must limit users to 10 simultaneous system logins, or a site-defined number, in accordance with operational requirements.</title>
++        </overlay>
++
++        <!-- line 10 CCI-000056 SRG-OS-000028-GPOS-00009                The operating system must retain a users session lock until that user reestablishes access using established identification and authentication procedures. -->
++
++        <!-- line 11 CCI-000057 SRG-OS-000029-GPOS-00010                The operating system must initiate a session lock after a 15-minute period of inactivity for all connection types. -->
++        <overlay owner="disastig" ruleid="package_screen_installed" ownerid="WRL-1019-00061" disa="57" severity="medium">
++                <title>The operating system must have the screen package installed</title>
++        </overlay>
++
++        <!-- line 12 CCI-000060 SRG-OS-000031-GPOS-00012                The operating system must conceal, via the session lock, information previously visible on the display with a publicly viewable image. -->
++
++        <!-- line 13 CCI-000126 SRG-OS-000038-GPOS-00016                The operating system must monitor remote access methods. -->
++        <overlay owner="disastig" ruleid="service_auditd_enabled" ownerid="WRL-1019-00071" disa="67" severity="medium">
++                <title>The operating system must employ automated mechanisms to facilitate the monitoring and control of remote access methods.</title>
++        </overlay>
++
++        <!-- line 14 CCI-000068 SRG-OS-000033-GPOS-00014                The operating system must implement DoD-approved encryption to protect the confidentiality of remote access sessions. -->
++        <overlay owner="disastig" ruleid="sshd_use_approved_ciphers" ownerid="WRL-1019-00081" disa="68" severity="medium">
++                <title>The SSH daemon must be configured to use only FIPS 140-2 approved ciphers.</title>
++        </overlay>
++
++        <!-- line 15 CCI-000068 SRG-OS-000033-GPOS-00014                The operating system must implement DoD-approved encryption to protect the confidentiality of remote access sessions. -->
++        <overlay owner="disastig" ruleid="grub2_enable_fips_mode" ownerid="WRL-1019-00091" disa="68" severity="medium">
++                <title>Enable FIPS Mode in GRUB2.</title>
++        </overlay>
++
++        <!-- line 16 CCI-000130 SRG-OS-000037-GPOS-00015                The operating system must produce audit records containing information to establish what type of events occurred. -->
++        <overlay owner="disastig" ruleid="audit_rules_privileged_commands_su" ownerid="WRL-1019-00101" disa="2884" severity="medium">
++                <title>Ensure auditd Collects Information on the Use of Privileged Commands - su.</title>
++        </overlay>
++
++        <!-- line 17 CCI-000130 SRG-OS-000037-GPOS-00015                The operating system must produce audit records containing information to establish what type of events occurred. -->
++        <overlay owner="disastig" ruleid="audit_rules_privileged_commands_sudo" ownerid="WRL-1019-00111" disa="2884" severity="medium">
++                <title>Ensure auditd Collects Information on the Use of Privileged Commands - sudo.</title>
++        </overlay>
++
++        <!-- line 18 CCI-000130 SRG-OS-000037-GPOS-00015                The operating system must produce audit records containing information to establish what type of events occurred. -->
++        <overlay owner="disastig" ruleid="audit_rules_sysadmin_actions" ownerid="WRL-1019-00121" disa="2884" severity="medium">
++                <title>Ensure auditd Collects System Administrator Actions.</title>
++        </overlay>
++
++        <!-- line 19 CCI-000130 SRG-OS-000037-GPOS-00015                The operating system must produce audit records containing information to establish what type of events occurred. -->
++        <overlay owner="disastig" ruleid="audit_rules_privileged_commands_newgrp" ownerid="WRL-1019-00131" disa="2884" severity="medium">
++                <title>Ensure auditd Collects Information on the Use of Privileged Commands - newgrp.</title>
++        </overlay>
++
++        <!-- line 20 CCI-000130 SRG-OS-000037-GPOS-00015                The operating system must produce audit records containing information to establish what type of events occurred. -->
++        <overlay owner="disastig" ruleid="audit_rules_privileged_commands_chsh" ownerid="WRL-1019-00141" disa="2884" severity="medium">
++                <title>Ensure auditd Collects Information on the Use of Privileged Commands - chsh.</title>
++        </overlay>
++
++        <!-- line 21 CCI-000130 SRG-OS-000037-GPOS-00015                The operating system must produce audit records containing information to establish what type of events occurred. -->
++        <overlay owner="disastig" ruleid="audit_rules_privileged_commands_sudoedit" ownerid="WRL-1019-00151" disa="2884" severity="medium">
++                <title>Ensure auditd Collects Information on the Use of Privileged Commands - sudoedit.</title>
++        </overlay>
++
++        <!-- line 22 CCI-000131 SRG-OS-000038-GPOS-00016                The operating system must produce audit records containing information to establish where the events occurred. -->
++        <overlay owner="disastig" ruleid="service_auditd_enabled" ownerid="WRL-1019-00161" disa="132" severity="high">
++                <title>Auditing must be configured to produce records containing information to establish what type of events occurred, where the events occurred, the source of the events, and the outcome of the events. These audit records must also identify individual identities of group account users.</title>
++        </overlay>
++
++        <!-- line 23 CCI-000133 SRG-OS-000040-GPOS-00018                The operating system must produce audit records containing information to establish the source of the events. -->
++        <overlay owner="disastig" ruleid="XXXX" ownerid="XXXX" disa="133" severity="medium">
++                <title>The operating system must produce audit records containing sufficient information to establish the sources of the events.</title>
++        </overlay>
++
++        <!-- line 24 CCI-000134 SRG-OS-000041-GPOS-00019                The operating system must produce audit records containing information to establish the outcome of the events. -->
++        <overlay owner="disastig" ruleid="XXXX" ownerid="XXXX" disa="134" severity="medium">
++                <title>The operating system must produce audit records containing sufficient information to establish the outcome (success or failure) of the events.</title>
++        </overlay>
++
++        <!-- line 25 CCI-000135 SRG-OS-000042-GPOS-00020                The operating system must generate audit records containing the full-text recording of privileged commands. -->
++        <overlay owner="disastig" ruleid="audit_rules_privileged_commands_passwd" ownerid="WRL-1019-00171" disa="2884" severity="low">
++                <title>Ensure auditd Collects Information on the Use of Privileged Commands - passwd.</title>
++        </overlay>
++
++        <!-- line 26 CCI-000135 SRG-OS-000042-GPOS-00020                The operating system must generate audit records containing the full-text recording of privileged commands. -->
++        <overlay owner="disastig" ruleid="audit_rules_privileged_commands_unix_chkpwd" ownerid="WRL-1019-00181" disa="2884" severity="low">
++                <title>Ensure auditd Collects Information on the Use of Privileged Commands - unix_chkpwd.</title>
++        </overlay>
++
++        <!-- line 27 CCI-000135 SRG-OS-000042-GPOS-00020                The operating system must generate audit records containing the full-text recording of privileged commands. -->
++        <overlay owner="disastig" ruleid="audit_rules_privileged_commands_gpasswd" ownerid="WRL-1019-00191" disa="2884" severity="low">
++                <title>Ensure auditd Collects Information on the Use of Privileged Commands - gpasswd.</title>
++        </overlay>
++
++        <!-- line 28 CCI-000135 SRG-OS-000042-GPOS-00020                The operating system must generate audit records containing the full-text recording of privileged commands. -->
++        <overlay owner="disastig" ruleid="audit_rules_privileged_commands_chage" ownerid="WRL-1019-00201" disa="2884" severity="low">
++                <title>Ensure auditd Collects Information on the Use of Privileged Commands - chage.</title>
++        </overlay>
++
++        <!-- line 29 CCI-000135 SRG-OS-000042-GPOS-00020                The operating system must generate audit records containing the full-text recording of privileged commands. -->
++        <overlay owner="disastig" ruleid="audit_rules_privileged_commands_mount" ownerid="WRL-1019-00211" disa="2884" severity="low">
++                <title>Ensure auditd Collects Information on the Use of Privileged Commands - mount.</title>
++        </overlay>
++
++        <!-- line 30 CCI-000135 SRG-OS-000042-GPOS-00020                The operating system must generate audit records containing the full-text recording of privileged commands. -->
++        <overlay owner="disastig" ruleid="audit_rules_privileged_commands_umount" ownerid="WRL-1019-00221" disa="2884" severity="low">
++                <title>Ensure auditd Collects Information on the Use of Privileged Commands - umount.</title>
++        </overlay>
++
++        <!-- line 31 CCI-000135 SRG-OS-000042-GPOS-00020                The operating system must generate audit records containing the full-text recording of privileged commands. -->
++        <overlay owner="disastig" ruleid="audit_rules_privileged_commands_postdrop" ownerid="WRL-1019-00231" disa="2884" severity="low">
++                <title>Ensure auditd Collects Information on the Use of Privileged Commands - postdrop.</title>
++        </overlay>
++
++        <!-- line 32 CCI-000135 SRG-OS-000042-GPOS-00020                The operating system must generate audit records containing the full-text recording of privileged commands. -->
++        <overlay owner="disastig" ruleid="audit_rules_privileged_commands_postqueue" ownerid="WRL-1019-00241" disa="2884" severity="low">
++                <title>Ensure auditd Collects Information on the Use of Privileged Commands - postqueue.</title>
++        </overlay>
++
++        <!-- line 33 CCI-000135 SRG-OS-000042-GPOS-00020                The operating system must generate audit records containing the full-text recording of privileged commands. -->
++        <overlay owner="disastig" ruleid="audit_rules_privileged_commands_ssh_keysign" ownerid="WRL-1019-00251" disa="2884" severity="low">
++                <title>Ensure auditd Collects Information on the Use of Privileged Commands - ssh_keysign.</title>
++        </overlay>
++
++        <!-- line 34 CCI-000135 SRG-OS-000042-GPOS-00020                The operating system must generate audit records containing the full-text recording of privileged commands. -->
++        <overlay owner="disastig" ruleid="audit_rules_privileged_commands_crontab" ownerid="WRL-1019-00261" disa="2884" severity="low">
++                <title>Ensure auditd Collects Information on the Use of Privileged Commands - crontab.</title>
++        </overlay>
++
++        <!-- line 35 CCI-000139 SRG-OS-000046-GPOS-00022                The operating system must alert the ISSO and SA (at a minimum) in the event of an audit processing failure. -->
++        <overlay owner="disastig" ownerid="WRL-1019-00271" ruleid="audit_rules_system_shutdown" disa="139" severity="medium">
++                <title>The operating system must shut down upon audit processing failure, unless availability is an overriding concern. If availability is a concern, the system must alert the designated staff (System Administrator [SA] and Information System Security Officer [ISSO] at a minimum) in the event of an audit processing failure.</title>
++        </overlay>
++
++        <!-- line 36 CCI-000140 SRG-OS-000047-GPOS-00023                The operating system must shut down by default upon audit failure (unless availability is an overriding concern). -->
++	<!-- included by SRG-OS-000046-GPOS-00022 -->
++
++        <!-- line 37 CCI-000154 SRG-OS-000051-GPOS-00024                The operating system must provide the capability to centrally review and analyze audit records from multiple components within the system. -->
++
++        <!-- line 38 CCI-000158 SRG-OS-000054-GPOS-00025                The operating system must provide the capability to filter audit records for events of interest based upon all audit fields within audit records. -->
++
++        <!-- line 39 CCI-000159 SRG-OS-000055-GPOS-00026                The operating system must use internal system clocks to generate time stamps for audit records. -->
++
++        <!-- line 40 CCI-000162 SRG-OS-000057-GPOS-00027                The operating system must protect audit information from unauthorized read access. -->
++
++        <!-- line 41 CCI-000163 SRG-OS-000058-GPOS-00028                The operating system must protect audit information from unauthorized modification. -->
++
++        <!-- line 42 CCI-000164 SRG-OS-000059-GPOS-00029                The operating system must protect audit information from unauthorized deletion. -->
++
++        <!-- line 43 CCI-000169 SRG-OS-000062-GPOS-00031                The operating system must provide audit record generation capability for DoD-defined auditable events for all operating system components. -->
++
++        <!-- line 44 CCI-000171 SRG-OS-000063-GPOS-00032                The operating system must allow only the ISSM (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited. -->
++
++        <!-- line 45 CCI-000172 SRG-OS-000064-GPOS-00033                The operating system must generate audit records when successful/unsuccessful attempts to access privileges occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_dac_modification_chown" ownerid="WRL-1019-00281" disa="172" severity="low">
++                <title>The audit system must be configured to audit all discretionary access control permission modifications using chown.</title>
++        </overlay>
++
++        <!-- line 46 CCI-000172 SRG-OS-000064-GPOS-00033                The operating system must generate audit records when successful/unsuccessful attempts to access privileges occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_dac_modification_fchown" ownerid="WRL-1019-00291" disa="172" severity="low">
++                <title>The audit system must be configured to audit all discretionary access control permission modifications using fchown.</title>
++        </overlay>
++
++        <!-- line 47 CCI-000172 SRG-OS-000064-GPOS-00033                The operating system must generate audit records when successful/unsuccessful attempts to access privileges occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_dac_modification_lchown" ownerid="WRL-1019-00301" disa="172" severity="low">
++                <title>The audit system must be configured to audit all discretionary access control permission modifications using lchown.</title>
++        </overlay>
++
++        <!-- line 48 CCI-000172 SRG-OS-000064-GPOS-00033                The operating system must generate audit records when successful/unsuccessful attempts to access privileges occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_dac_modification_fchownat" ownerid="WRL-1019-00311" disa="172" severity="low">
++                <title>The audit system must be configured to audit all discretionary access control permission modifications using fchownat.</title>
++        </overlay>
++
++        <!-- line 49 CCI-000172 SRG-OS-000458-GPOS-00203                The operating system must generate audit records when successful/unsuccessful attempts to modify privileges occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_dac_modification_chmod" ownerid="WRL-1019-00321" disa="172" severity="low">
++                <title>The audit system must be configured to audit all discretionary access control permission modifications using chmod.</title>
++        </overlay>
++
++        <!-- line 50 CCI-000172 SRG-OS-000458-GPOS-00203                The operating system must generate audit records when successful/unsuccessful attempts to modify privileges occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_dac_modification_fchmod" ownerid="WRL-1019-00331" disa="172" severity="low">
++                <title>The audit system must be configured to audit all discretionary access control permission modifications using fchmod.</title>
++        </overlay>
++
++        <!-- line 51 CCI-000172 SRG-OS-000458-GPOS-00203                The operating system must generate audit records when successful/unsuccessful attempts to modify privileges occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_dac_modification_fchmodat" ownerid="WRL-1019-00341" disa="172" severity="low">
++                <title>The audit system must be configured to audit all discretionary access control permission modifications using fchmodat.</title>
++        </overlay>
++
++        <!-- line 52 CCI-000172 SRG-OS-000458-GPOS-00203                The operating system must generate audit records when successful/unsuccessful attempts to modify privileges occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_dac_modification_setxattr" ownerid="WRL-1019-00351" disa="172" severity="low">
++                <title>The audit system must be configured to audit all discretionary access control permission modifications setxattr.</title>
++        </overlay>
++
++        <!-- line 53 CCI-000172 SRG-OS-000458-GPOS-00203                The operating system must generate audit records when successful/unsuccessful attempts to modify privileges occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_dac_modification_fsetxattr" ownerid="WRL-1019-00361" disa="172" severity="low">
++                <title>The audit system must be configured to audit all discretionary access control permission modifications fsetxattr.</title>
++        </overlay>
++
++        <!-- line 54 CCI-000172 SRG-OS-000458-GPOS-00203                The operating system must generate audit records when successful/unsuccessful attempts to modify privileges occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_dac_modification_lsetxattr" ownerid="WRL-1019-00371" disa="172" severity="low">
++                <title>The audit system must be configured to audit all discretionary access control permission modifications lsetxattr.</title>
++        </overlay>
++
++        <!-- line 55 CCI-000172 SRG-OS-000458-GPOS-00203                The operating system must generate audit records when successful/unsuccessful attempts to modify privileges occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_dac_modification_removexattr" ownerid="WRL-1019-00381" disa="172" severity="low">
++                <title>The audit system must be configured to audit all discretionary access control permission modifications removexattr.</title>
++        </overlay>
++
++        <!-- line 56 CCI-000172 SRG-OS-000458-GPOS-00203                The operating system must generate audit records when successful/unsuccessful attempts to modify privileges occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_dac_modification_fremovexattr" ownerid="WRL-1019-00391" disa="172" severity="low">
++                <title>The audit system must be configured to audit all discretionary access control permission modifications fremovexattr.</title>
++        </overlay>
++
++        <!-- line 57 CCI-000172 SRG-OS-000458-GPOS-00203                The operating system must generate audit records when successful/unsuccessful attempts to modify privileges occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_dac_modification_lremovexattr" ownerid="WRL-1019-00401" disa="172" severity="low">
++                <title>The audit system must be configured to audit all discretionary access control permission modifications lremovexattr.</title>
++        </overlay>
++
++        <!-- line 58 CCI-000172 SRG-OS-000064-GPOS-00033                The operating system must generate audit records when successful/unsuccessful attempts to access privileges occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_unsuccessful_file_modification" ownerid="WRL-1019-00411" disa="172" severity="low">
++                <title>The audit system must be configured to audit failed attempts to access files and programs.</title>
++        </overlay>
++
++        <!-- line 59 CCI-000172 SRG-OS-000064-GPOS-00033                The operating system must generate audit records when successful/unsuccessful attempts to access privileges occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_unsuccessful_file_modification" ownerid="WRL-1019-00421" disa="172" severity="low">
++                <title>The audit system must be configured to audit failed attempts to access files and programs.</title>
++        </overlay>
++
++        <!-- line 60 CCI-000172 SRG-OS-000064-GPOS-00033                The operating system must generate audit records when successful/unsuccessful attempts to access privileges occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_unsuccessful_file_modification" ownerid="WRL-1019-00431" disa="172" severity="low">
++                <title>The audit system must be configured to audit failed attempts to access files and programs.</title>
++        </overlay>
++
++        <!-- line 61 CCI-000172 SRG-OS-000064-GPOS-00033                The operating system must generate audit records when successful/unsuccessful attempts to access privileges occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_unsuccessful_file_modification" ownerid="WRL-1019-00441" disa="172" severity="low">
++                <title>The audit system must be configured to audit failed attempts to access files and programs.</title>
++        </overlay>
++
++        <!-- line 62 CCI-000172 SRG-OS-000064-GPOS-00033                The operating system must generate audit records when successful/unsuccessful attempts to access privileges occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_unsuccessful_file_modification" ownerid="WRL-1019-00451" disa="172" severity="low">
++                <title>The audit system must be configured to audit failed attempts to access files and programs.</title>
++        </overlay>
++
++        <!-- line 63 CCI-000172 SRG-OS-000064-GPOS-00033                The operating system must generate audit records when successful/unsuccessful attempts to access privileges occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_unsuccessful_file_modification" ownerid="WRL-1019-00461" disa="172" severity="low">
++                <title>The audit system must be configured to audit failed attempts to access files and programs.</title>
++        </overlay>
++
++        <!-- line 64 CCI-000172 SRG-OS-000461-GPOS-00205                The operating system must generate audit records when successful/unsuccessful attempts to access categories of information (e.g., classification levels) occur. -->
++	<!-- included by SRG-OS-000064-GPOS-00033 -->
++
++        <!-- line 65 CCI-000172 SRG-OS-000462-GPOS-00206                The operating system must generate audit records when successful/unsuccessful attempts to modify privileges occur. -->
++	<!-- included by SRG-OS-000037-GPOS-00015 -->
++
++        <!-- line 66 CCI-000172 SRG-OS-000463-GPOS-00207                The operating system must generate audit records when successful/unsuccessful attempts to modify security objects occur. -->
++	<!-- included by SRG-OS-000392-GPOS-00172 -->
++
++        <!-- line 67 CCI-000172 SRG-OS-000465-GPOS-00209                The operating system must generate audit records when successful/unsuccessful attempts to modify categories of information (e.g., classification levels) occur. -->
++	<!-- included by  SRG-OS-000392-GPOS-00172 -->
++
++        <!-- line 68 CCI-000172 SRG-OS-000466-GPOS-00210                The operating system must generate audit records when successful/unsuccessful attempts to delete privileges occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_file_deletion_events" ownerid="WRL-1019-00421" disa="172" severity="low">
++                <title>Ensure auditd collects file deletion events by user.</title>
++        </overlay>
++
++        <!-- line 69 CCI-000172 SRG-OS-000466-GPOS-00210                The operating system must generate audit records when successful/unsuccessful attempts to delete security levels occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_file_deletion_events" ownerid="WRL-1019-00422" disa="172" severity="low">
++                <title>Ensure auditd collects file deletion events by user.</title>
++        </overlay>
++
++        <!-- line 70 CCI-000172 SRG-OS-000466-GPOS-00210                The operating system must generate audit records when successful/unsuccessful attempts to delete security levels occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_file_deletion_events" ownerid="WRL-1019-00423" disa="172" severity="low">
++                <title>Ensure auditd collects file deletion events by user.</title>
++        </overlay>
++
++        <!-- line 71 CCI-000172 SRG-OS-000466-GPOS-00210                The operating system must generate audit records when successful/unsuccessful attempts to delete security levels occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_file_deletion_events" ownerid="WRL-1019-00424" disa="172" severity="low">
++                <title>Ensure auditd collects file deletion events by user.</title>
++        </overlay>
++
++        <!-- line 72 CCI-000172 SRG-OS-000466-GPOS-00210                The operating system must generate audit records when successful/unsuccessful attempts to delete security levels occur. -->
++        <overlay owner="disastig" ruleid="audit_rules_file_deletion_events" ownerid="WRL-1019-00425" disa="172" severity="low">
++                <title>Ensure auditd collects file deletion events by user.</title>
++        </overlay>
++
++        <!-- line 73 CCI-000172 SRG-OS-000467-GPOS-00211                The operating system must generate audit records when successful/unsuccessful attempts to delete security levels occur. -->
++	<!-- included by SRG-OS-000466-GPOS-00210 -->
++
++        <!-- line 74 CCI-000172 SRG-OS-000468-GPOS-00212                The operating system must generate audit records when successful/unsuccessful attempts to delete security objects occur. -->
++	<!-- included by SRG-OS-000466-GPOS-00210 -->
++
++        <!-- line 75 CCI-000172 SRG-OS-000470-GPOS-00214                The operating system must generate audit records when successful/unsuccessful logon attempts occur. -->
++	<!-- included by SRG-OS-000392-GPOS-00172 -->
++
++        <!-- line 76 CCI-000172 SRG-OS-000471-GPOS-00215                The operating system must generate audit records for privileged activities or other system-level access. -->
++        <overlay owner="disastig" ruleid="audit_rules_privileged_commands_pam_timestamp_check" ownerid="WRL-1019-00431" disa="172" severity="medium">
++                <title>Ensure auditd Collects Information on the Use of Privileged Commands - pam_timestamp_check.</title>
++        </overlay>
++
++	<!-- line 77 CCI-000172 SRG-OS-000471-GPOS-00216		The audit system must be configured to audit the loading and unloading of dynamic kernel modules. -->
++	<overlay owner="disastig" ruleid="audit_rules_kernel_module_loading_init" ownerid="WRL-1019-00441" disa="172" severity="medium">
++		<title>Ensure auditd Collects Information on Kernel Module Loading - init_module.</title>
++	</overlay>
++
++	<!-- line 78 CCI-000172 SRG-OS-000471-GPOS-00216		The audit system must be configured to audit the loading and unloading of dynamic kernel modules. -->
++	<overlay owner="disastig" ruleid="audit_rules_kernel_module_loading_delete" ownerid="WRL-1019-00442" disa="172" severity="medium">
++		<title>Ensure auditd Collects Information on Kernel Module Unloading - delete_module.</title>
++	</overlay>
++
++	<!-- line 79 CCI-000172 SRG-OS-000471-GPOS-00216		The audit system must be configured to audit the loading and unloading of dynamic kernel modules. -->
++	<overlay owner="disastig" ruleid="audit_rules_kernel_module_loading_insmod" ownerid="WRL-1019-00443" disa="172" severity="medium">
++		<title>Ensure auditd Collects Information on Kernel Module Loading - insmod.</title>
++	</overlay>
++
++	<!-- line 80 CCI-000172 SRG-OS-000471-GPOS-00216		The audit system must be configured to audit the loading and unloading of dynamic kernel modules. -->
++	<overlay owner="disastig" ruleid="audit_rules_kernel_module_loading_create" ownerid="WRL-1019-00444" disa="172" severity="medium">
++		<title>Ensure auditd Collects Information on Kernel Module Loading - create_module.</title>
++	</overlay>
++
++	<!-- line 81 CCI-000172 SRG-OS-000471-GPOS-00216		The audit system must be configured to audit the loading and unloading of dynamic kernel modules. -->
++	<overlay owner="disastig" ruleid="audit_rules_kernel_module_loading_finit" ownerid="WRL-1019-00444" disa="172" severity="medium">
++		<title>Ensure auditd Collects Information on Kernel Module Loading - finit_module.</title>
++	</overlay>
++
++	<!-- line 82 CCI-000172 SRG-OS-000472-GPOS-00217		The operating system must generate audit records showing starting and ending time for user access to the system. -->
++
++	<!-- line 83 CCI-000172 SRG-OS-000473-GPOS-00218		The operating system must generate audit records when concurrent logons to the same account occur from different sources. -->
++	<!-- included by SRG-OS-000392-GPOS-00172 -->
++
++	<!-- line 84 CCI-000172 SRG-OS-000474-GPOS-00219		The operating system must generate audit records when successful/unsuccessful accesses to objects occur. -->
++	<!-- included by SRG-OS-000064-GPOS-00033 -->
++
++	<!-- line 85 CCI-000172 SRG-OS-000475-GPOS-00220		The operating system must generate audit records for all direct access to the information system. -->
++
++	<!-- line 86 CCI-000172 SRG-OS-000476-GPOS-00221		The operating system must generate audit records for all account creations, modifications, disabling, and termination events. -->
++	<!-- included by SRG-OS-000004-GPOS-00004 -->
++
++	<!-- line 87 CCI-000172 SRG-OS-000477-GPOS-00222		The operating system must generate audit records for all kernel module load, unload, and restart actions, and also for all program initiations. -->
++	<!-- included by SRG-OS-000471-GPOS-00216 -->
++
++	<!-- line 88 CCI-000185 SRG-OS-000066-GPOS-00034		The operating system, for PKI-based authentication, must validate certificates by constructing a certification path (which includes status information) to an accepted trust anchor. -->
++
++	<!-- line 89 CCI-000186 SRG-OS-000067-GPOS-00035		The operating system, for PKI-based authentication, must enforce authorized access to the corresponding private key. -->
++
++	<!-- line 90 CCI-000187 SRG-OS-000068-GPOS-00036		The operating system must map the authenticated identity to the user or group account for PKI-based authentication. -->
++
++	<!-- line 91 CCI-000187 SRG-OS-000068-GPOS-00036		The operating system must map the authenticated identity to the user or group account for PKI-based authentication. -->
++
++	<!-- line 92 CCI-000187 SRG-OS-000068-GPOS-00036		The operating system must map the authenticated identity to the user or group account for PKI-based authentication. -->
++
++	<!-- line 93 CCI-000187 SRG-OS-000068-GPOS-00036		The operating system must map the authenticated identity to the user or group account for PKI-based authentication. -->
++	
++	<!-- line 94 CCI-000192 SRG-OS-000069-GPOS-00037		The operating system must enforce password complexity by requiring that at least one upper-case character be used. -->
++	<overlay owner="disastig" ruleid="cracklib_accounts_password_pam_retry" ownerid="WRL-1019-00451" disa="192" severity="low">
++		<title>Set Password Retry Prompts Permitted Per-Session.</title>
++	</overlay>
++
++	<!-- line 95 CCI-000192 SRG-OS-000069-GPOS-00037		The operating system must enforce password complexity by requiring that at least one upper-case character be used. -->
++	<overlay owner="disastig" ruleid="cracklib_accounts_password_pam_ucredit" ownerid="WRL-1019-00461" disa="192" severity="low">
++		<title>The system must require passwords to contain at least one uppercase alphabetic character.</title>
++	</overlay>
++
++	<!-- line 96 CCI-000193 SRG-OS-000070-GPOS-00038		The operating system must enforce password complexity by requiring that at least one lower-case character be used. -->
++	<overlay owner="disastig" ruleid="cracklib_accounts_password_pam_lcredit" ownerid="WRL-1019-00471" disa="193" severity="low">
++		<title>The system must require passwords to contain at least one lowercase alphabetic character.</title>
++	</overlay>
++
++	<!-- line 97 CCI-000194 SRG-OS-000071-GPOS-00039		The operating system must enforce password complexity by requiring that at least one numeric character be used. -->
++	<overlay owner="disastig" ruleid="cracklib_accounts_password_pam_dcredit" ownerid="WRL-1019-00481" disa="194" severity="low">
++		<title>The system must require passwords to contain at least one numeric character.</title>
++	</overlay>
++
++	<!-- line 98 CCI-000195 SRG-OS-000072-GPOS-00040		The operating system must require the change of at least 50% of the total number of characters when passwords are changed. -->
++	<overlay owner="disastig" ruleid="cracklib_accounts_password_pam_difok" ownerid="WRL-1019-00491" disa="195" severity="low">
++		<title>When passwords are changed a minimum of eight of the total number of characters must be changed.</title>
++	</overlay>
++
++	<!-- line 99 CCI-000195 SRG-OS-000072-GPOS-00040		The operating system must require the change of at least 50% of the total number of characters when passwords are changed. -->
++	<overlay owner="disastig" ruleid="cracklib_accounts_password_pam_minclass" ownerid="WRL-1019-00501" disa="195" severity="low">
++		<title>When passwords are changed a minimum of four character classes must be changed.</title>
++	</overlay>
++
++	<!-- line 100 CCI-000195 SRG-OS-000072-GPOS-00040		The operating system must require the change of at least 50% of the total number of characters when passwords are changed. -->
++	<overlay owner="disastig" ruleid="cracklib_accounts_password_pam_maxrepeat" ownerid="WRL-1019-00511" disa="195" severity="low">
++		<title>When passwords are changed the number of repeating consecutive characters must not be more than four characters.</title>
++	</overlay>
++
++	<!-- line 101 CCI-000195 SRG-OS-000072-GPOS-00040		The operating system must require the change of at least 50% of the total number of characters when passwords are changed. -->
++	<overlay owner="disastig" ruleid="accounts_password_pam_maxclassrepeat" ownerid="WRL-1019-00521" disa="195" severity="low">
++		<title>When passwords are changed the number of repeating characters of the same character class must not be more than four characters.</title>
++	</overlay>
++
++	<!-- line 102 CCI-000196 SRG-OS-000073-GPOS-00041		The operating system must store only encrypted representations of passwords. -->
++	<overlay owner="disastig" ruleid="set_password_hashing_algorithm_systemauth" ownerid="WRL-1019-00531" disa="196" severity="medium">
++		<title>The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (systemauth).</title>
++	</overlay>
++
++	<!-- line 103 CCI-000196 SRG-OS-000073-GPOS-00041		The operating system must store only encrypted representations of passwords. -->
++	<overlay owner="disastig" ruleid="set_password_hashing_algorithm_logindefs" ownerid="WRL-1019-00541" disa="196" severity="medium">
++		<title>The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (login.defs).</title>
++	</overlay>
++
++	<!-- line 104 CCI-000196 SRG-OS-000073-GPOS-00041		The operating system must store only encrypted representations of passwords. -->
++	<overlay owner="disastig" ruleid="set_password_hashing_algorithm_libuserconf" ownerid="WRL-1019-00551" disa="196" severity="medium">
++		<title>The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (libuser.conf).</title>
++	</overlay>
++
++	<!-- line 105 CCI-000197 SRG-OS-000074-GPOS-00042		The operating system must transmit only encrypted representations of passwords. -->
++	<overlay owner="disastig" ruleid="sshd_allow_only_protocol2" ownerid="WRL-1019-00561" disa="197" severity="medium">
++		<title>The SSH daemon must be configured to use only the SSHv2 protocol.</title>
++	</overlay>
++
++	<!-- line 106 CCI-000198 SRG-OS-000075-GPOS-00043		Operating systems must enforce 24 hours/1 day as the minimum password lifetime. -->
++	<overlay owner="disastig" ruleid="accounts_minimum_age_login_defs" ownerid="WRL-1019-00571" disa="198" severity="medium">
++		<title>Passwords for new users must be restricted to a 24 hours/1 day minimum lifetime.</title>
++	</overlay>
++
++	<!-- line 107 CCI-000198 SRG-OS-000075-GPOS-00043		Operating systems must enforce 24 hours/1 day as the minimum password lifetime. -->
++	<overlay owner="disastig" ruleid="accounts_password_set_min_life_existing" ownerid="WRL-1019-00581" disa="198" severity="medium">
++		<title>Passwords must be restricted to a 24 hours/1 day minimum lifetime.</title>
++	</overlay>
++
++	<!-- line 108 CCI-000199 SRG-OS-000076-GPOS-00044		Operating systems must enforce a 60-day maximum password lifetime restriction. -->
++	<overlay owner="disastig" ruleid="accounts_maximum_age_login_defs" ownerid="WRL-1019-00591" disa="199" severity="medium">
++		<title>User passwords must be changed at least every 60 days.</title>
++	</overlay>
++
++	<!-- line 109 CCI-000199 SRG-OS-000076-GPOS-00044		Operating systems must enforce a 60-day maximum password lifetime restriction. -->
++	<overlay owner="disastig" ruleid="accounts_password_set_max_life_existing" ownerid="WRL-1019-00601" disa="199" severity="medium">
++		<title>Existing passwords must be restricted to a 60-day maximum lifetime.</title>
++	</overlay>
++
++
++	<!-- line 110 CCI-000200 SRG-OS-000077-GPOS-00045		The operating system must prohibit password reuse for a minimum of five generations. -->
++	<overlay owner="disastig" ruleid="accounts_password_pam_unix_remember" ownerid="WRL-1019-00611" disa="200" severity="medium">
++		<title>Passwords must be prohibited from reuse for a minimum of five generations.</title>
++	</overlay>
++
++	<!-- line 111 CCI-000205 SRG-OS-000078-GPOS-00046		The operating system must enforce a minimum 15-character password length. -->
++	<overlay owner="disastig" ruleid="accounts_password_pam_minlen" ownerid="WRL-1019-00621" disa="205" severity="medium">
++		<title>The system must require passwords to contain a minimum of 15 characters.</title>
++	</overlay>
++
++	<!-- line 112 CCI-000206 SRG-OS-000079-GPOS-00047		The operating system must obscure feedback of authentication information during the authentication process to protect the information from possible exploitation/use by unauthorized individuals. -->
++
++	<!-- line 113 CCI-000213 SRG-OS-000080-GPOS-00048		The operating system must enforce approved authorizations for logical access to information and system resources in accordance with applicable access control policies. -->
++	<overlay owner="disastig" ruleid="grub2_password" ownerid="WRL-1019-00631" disa="213" severity="medium">
++		<title>The system boot loader must require authentication.</title>
++	</overlay>
++
++	<!-- line 114 CCI-000213 SRG-OS-000080-GPOS-00048		The operating system must enforce approved authorizations for logical access to information and system resources in accordance with applicable access control policies. -->
++	<overlay owner="disastig" ruleid="require_singleuser_auth" ownerid="WRL-1019-00641" disa="213" severity="medium">
++		<title>The system must require authentication upon booting into single-user and maintenance modes.</title>
++	</overlay>
++
++	<!-- line 115 CCI-000213 SRG-OS-000080-GPOS-00048		The operating system must enforce approved authorizations for logical access to information and system resources in accordance with applicable access control policies. -->
++	<overlay owner="disastig" ruleid="grub2_uefi_password" ownerid="WRL-1019-00651" disa="213" severity="medium">
++		<title>Systems using Unified Extensible Firmware Interface (UEFI) must require authentication upon booting into single-user and maintenance modes.</title>
++	</overlay>
++
++	<!-- line 116 CCI-000366 SRG-OS-000480-GPOS-00225		The operating system must prevent the use of dictionary words for passwords. -->
++        <overlay owner="disastig" ruleid="accounts_password_pam_cracklib_dictpath" ownerid="WRL-1019-00661" disa="366" severity="low">
++                <title>The PAM module pam_cracklib must be configured to prevent dictionary-based passwords.</title>
++	</overlay>
++
++	<!-- line 117 CCI-000366 SRG-OS-000480-GPOS-00226		The operating system must enforce a delay of at least 4 seconds between logon prompts following a failed logon attempt. -->
++        <overlay owner="disastig" ruleid="accounts_logon_fail_delay" ownerid="WRL-1019-00671" disa="366" severity="low">
++                <title>The delay between logon prompts following a failed console logon attempt must be at least four seconds.</title>
++	</overlay>
++
++	<!-- line 118 CCI-000663 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++        <overlay owner="disastig" ruleid="rpm_verify_hashes" ownerid="WRL-1019-00681" disa="366" severity="high">
++                <title>The cryptographic hash of system files and commands must match vendor values.</title>
++	</overlay>
++
++	<!-- line 119 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="no_empty_passwords" ownerid="WRL-1019-00691" disa="366" severity="high">
++		<title>The system must not have accounts configured with blank or null passwords.</title>
++	</overlay>
++
++	<!-- line 120 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="accounts_remove_unneeded" ownerid="WRL-1019-00701" disa="366" severity="medium">
++		<title>The system must not have unnecessary accounts.</title>
++	</overlay>
++
++	<!-- line 121 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="disable_ctrlaltdel_reboot" ownerid="WRL-1019-00711" disa="366" severity="high">
++		<title>The x86 Ctrl-Alt-Delete key sequence must be disabled.</title>
++	</overlay>
++
++	<!-- line 122 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="installed_OS_is_vendor_supported" ownerid="WRL-1019-00721" disa="366" severity="high">
++		<title>The operating system must be a vendor supported release.</title>
++	</overlay>
++
++	<!-- line 123 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="accounts_no_uid_except_zero" ownerid="WRL-1019-00731" disa="366" severity="high">
++		<title>The root account must be the only account having unrestricted access to the system.</title>
++	</overlay>
++
++	<!-- line 124 CCI-002165 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="no_files_unowned_by_user" ownerid="WRL-1019-00741" disa="366" severity="medium">
++		<title>All files and directories must have a valid owner.</title>
++	</overlay>
++
++	<!-- line 125 CCI-002165 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="file_permissions_ungroupowned" ownerid="WRL-1019-00751" disa="366" severity="medium">
++		<title>All files and directories must have a valid group owner.</title>
++	</overlay>
++
++	<!-- line 126 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="accounts_user_interactive_home_directory_defined" ownerid="WRL-1019-00761" disa="366" severity="medium">
++		<title>All local interactive users must have a home directory assigned in the /etc/passwd file.</title>
++	</overlay>
++
++	<!-- line 127 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="accounts_have_homedir_login_defs" ownerid="RL-1019-00771" disa="366" severity="medium">
++		<title>All local interactive user accounts, upon creation, must be assigned a home directory.</title>
++	</overlay>
++
++	<!-- line 128 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="accounts_user_interactive_home_directory_exists" ownerid="RL-1019-00781" disa="366" severity="medium">
++		<title>All local interactive user home directories defined in the /etc/passwd file must exist.</title>
++	</overlay>
++
++
++	<!-- line 129 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="file_permissions_home_directories" ownerid="WRL-1019-00791" disa="366" severity="medium">
++		<title>All local interactive user home directories must have mode 0750 or less permissive.</title>
++	</overlay>
++
++	<!-- line 130 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="file_ownership_home_directories" ownerid="WRL-1019-00801" disa="366" severity="medium">
++		<title>All local interactive user home directories must be owned by their respective users.</title>
++	</overlay>
++
++	<!-- line 131 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="file_groupownership_home_directories" ownerid="WRL-1019-00811" disa="366" severity="medium">
++		<title>All local interactive user home directories must be group-owned by the home directory owners primary group.</title>
++	</overlay>
++
++	<!-- line 132 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="accounts_users_home_files_ownership" ownerid="WRL-1019-00821" disa="366" severity="medium">
++		<title>All files and directories contained in local interactive user home directories must be owned by the owner of the home directory.</title>
++	</overlay>
++
++	<!-- line 133 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="accounts_users_home_files_groupownership" ownerid="WRL-1019-00831" disa="366" severity="medium">
++		<title>All files and directories contained in local interactive user home directories must be group-owned by a group of which the home directory owner is a member.</title>
++	</overlay>
++
++	<!-- line 134 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="accounts_users_home_files_permissions" ownerid="WRL-1019-00841" disa="366" severity="medium">
++		<title>All files and directories contained in local interactive user home directories must have mode 0750 or less permissive.</title>
++	</overlay>
++
++	<!-- line 135 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="accounts_user_dot_user_ownership" ownerid="WRL-1019-00851" disa="366" severity="medium">
++		<title>All local initialization files for interactive users must be owned by the home directory user or root.</title>
++	</overlay>
++
++	<!-- line 136 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="accounts_user_dot_group_ownership" ownerid="WRL-1019-00861" disa="366" severity="medium">
++		<title>Local initialization files for local interactive users must be group-owned by the users primary group or root.</title>
++	</overlay>
++
++
++	<!-- line 137 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="file_permission_user_init_files" ownerid="WRL-1019-00871" disa="366" severity="medium">
++		<title>All local initialization files must have mode 0740 or less permissive.</title>
++	</overlay>
++
++	<!-- line 138 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="accounts_user_home_paths_only" ownerid="WRL-1019-00881" disa="366" severity="medium">
++		<title>All local interactive user initialization files executable search paths must contain only paths that resolve to the users home directory.</title>
++	</overlay>
++
++	<!-- line 139 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="accounts_user_dot_no_world_writable_programs" ownerid="WRL-1019-00891" disa="366" severity="medium">
++		<title>Local initialization files must not execute world-writable programs.</title>
++	</overlay>
++
++	<!-- line 140 CCI-000318 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="selinux_all_devicefiles_labeled" ownerid="WRL-1019-00901" disa="366" severity="medium">
++		<title>All system device files must be correctly labeled to prevent unauthorized modification.</title>
++	</overlay>
++
++	<!-- line 141 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="mount_option_home_nosuid" ownerid="WRL-1019-00911" disa="366" severity="medium">
++		<title>File systems that contain user home directories must be mounted to prevent files with the setuid and setgid bit set from being executed.</title>
++	</overlay>
++
++	<!-- line 142 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="mount_option_nosuid_removable_partitions" ownerid="WRL-1019-00921" disa="366" severity="medium">
++		<title>File systems that are used with removable media must be mounted to prevent files with the setuid and setgid bit set from being executed.</title>
++	</overlay>
++
++	<!-- line 143 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="mount_option_nosuid_remote_filesystems" ownerid="WRL-1019-00931" disa="366" severity="medium">
++		<title>File systems that are being imported via Network File System (NFS) must be mounted to prevent files with the setuid and setgid bit set from being executed.</title>
++	</overlay>
++
++	<!-- line 144 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="mount_option_noexec_remote_filesystems" ownerid="WRL-1019-00941" disa="366" severity="medium">
++		<title>All world-writable directories must be group-owned by root, sys, bin, or an application group.</title>
++	</overlay>
++
++
++	<!-- line 145 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="dir_perms_world_writable_system_owned" ownerid="WRL-1019-00951" disa="366" severity="medium">
++		<title>All world-writable directories must be group-owned by root, sys, bin, or an application group.</title>
++	</overlay>
++
++
++	<!-- line 146 CCI-000318 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="accounts_umask_interactive_users" ownerid="WRL-1019-00961" disa="366" severity="medium">
++		<title>The umask must be set to 077 for all local interactive user accounts.</title>
++	</overlay>
++
++	<!-- line 147 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="rsyslog_cron_logging" ownerid="WRL-1019-00971" disa="366" severity="medium">
++		<title>Cron logging must be implemented.</title>
++	</overlay>
++
++	<!-- line 148 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="file_owner_cron_allow" ownerid="WRL-1019-00981" disa="366" severity="medium">
++		<title>If the cron.allow file exists it must be owned by root.</title>
++	</overlay>
++
++
++	<!-- line 149 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="file_groupowner_cron_allow" ownerid="WRL-1019-00991" disa="366" severity="medium">
++		<title>If the cron.allow file exists it must be group-owned by root.</title>
++	</overlay>
++
++
++	<!-- line 150 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="service_kdump_disabled" ownerid="WRL-1019-01001" disa="366" severity="medium">
++		<title>Kernel core dumps must be disabled unless needed.</title>
++	</overlay>
++
++	<!-- line 151 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="partition_for_home" ownerid="WRL-1019-01011" disa="366" severity="low">
++		<title>A separate file system must be used for user home directories (such as /home or an equivalent).</title>
++	</overlay>
++
++	<!-- line 152 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="partition_for_var" ownerid="WRL-1019-01021" disa="366" severity="low">
++		<title>The system must use a separate file system for /var.</title>
++	</overlay>
++
++	<!-- line 153 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="partition_for_var_log_audit" ownerid="WRL-1019-01031" disa="366" severity="low">
++		<title>The system must use a separate file system for the system audit data path.</title>
++	</overlay>
++
++	<!-- line 154 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="partition_for_tmp" ownerid="WRL-1019-01041" disa="366" severity="low">
++		<title>The system must use a separate file system for /tmp (or equivalent).</title>
++	</overlay>
++
++	<!-- line 155 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="package_samhain_installed" ownerid="WRL-1019-01051" disa="366" severity="low">
++		<title>The file integrity tool must be configured to verify Access Control Lists (ACLs).</title>
++	</overlay>
++
++	<!-- line 156 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="package_samhain_installed" ownerid="WRL-1019-01052" disa="366" severity="low">
++		<title>The file integrity tool must be configured to verify extended attributes.</title>
++	</overlay>
++
++	<!-- line 157 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="rsyslog_remote_loghost" ownerid="WRL-1019-01061" disa="366" severity="medium">
++		<title>The system must send rsyslog output to a log aggregation server.</title>
++	</overlay>
++
++	<!-- line 158 CCI-000318 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="rsyslog_nolisten" ownerid="WRL-1019-01071" disa="366" severity="medium">
++		<title>The rsyslog daemon must not accept log messages from other servers unless the server is being used for log aggregation.</title>
++	</overlay>
++
++	<!-- line 159 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="package_iptables_installed" ownerid="WRL-1019-01081" disa="366" severity="medium">
++		<title>The operating system must enable an application firewall, if available.</title>
++	</overlay>
++
++	<!-- line 160 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="display_login_attempts" ownerid="WRL-1019-01091" disa="366" severity="low">
++		<title>The system must display the date and time of the last successful account logon upon logon.</title>
++	</overlay>
++
++	<!-- line 161 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="sshd_print_last_log" ownerid="WRL-1019-01101" disa="366" severity="medium">
++		<title>The system must display the date and time of the last successful account logon upon an SSH logon.</title>
++	</overlay>
++
++	<!-- line 162 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="sshd_disable_root_login" ownerid="WRL-1019-01111" disa="366" severity="medium">
++		<title>The system must not permit direct logons to the root account using remote access via SSH.</title>
++	</overlay>
++
++	<!-- line 163 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="network_configure_name_resolution" ownerid="WRL-1019-01121" disa="366" severity="low">
++		<title>For systems using DNS resolution, at least two name servers must be configured.</title>
++	</overlay>
++
++	<!-- line 164 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="no_user_host_based_files" ownerid="WRL-1019-01131" disa="366" severity="high">
++		<title>There must be no .shosts files on the system.</title>
++	</overlay>
++
++	<!-- line 165 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="no_host_based_files" ownerid="WRL-1019-01141" disa="366" severity="high">
++		<title>There must be no shosts.equiv files on the system.</title>
++	</overlay>
++
++	<!-- line 166 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="sshd_disable_user_known_hosts" ownerid="WRL-1019-01151" disa="366" severity="medium">
++		<title>The SSH daemon must not allow authentication using known hosts authentication.</title>
++	</overlay>
++
++	<!-- line 167 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="sshd_disable_rhosts_rsa" ownerid="WRL-1019-01161" disa="366" severity="medium">
++		<title>The SSH daemon must not allow authentication using RSA rhosts authentication.</title>
++	</overlay>
++
++	<!-- line 168 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="sshd_disable_rhosts" ownerid="WRL-1019-01171" disa="366" severity="medium">
++		<title>The SSH daemon must not allow authentication using rhosts authentication.</title>
++	</overlay>
++
++	<!-- line 169 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="sysctl_net_ipv4_conf_all_accept_source_route" ownerid="WRL-1019-01181" disa="366" severity="medium">
++		<title>The system must not forward Internet Protocol version 4 (IPv4) source-routed packets.</title>
++	</overlay>
++
++	<!-- line 170 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="sysctl_net_ipv4_conf_default_accept_source_route" ownerid="WRL-1019-01191" disa="366" severity="medium">
++		<title>The system must not forward Internet Protocol version 4 (IPv4) source-routed packets by default.</title>
++	</overlay>
++
++	<!-- line 171 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="sysctl_net_ipv4_icmp_echo_ignore_broadcasts" ownerid="WRL-1019-01201" disa="366" severity="medium">
++		<title>The system must not respond to Internet Protocol version 4 (IPv4) Internet Control Message Protocol (ICMP) echoes sent to a broadcast address.</title>
++	</overlay>
++
++	<!-- line 172 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="sysctl_net_ipv4_conf_all_accept_redirects" ownerid="WRL-1019-01211" disa="366" severity="medium">
++		<title>The system must ignore Internet Protocol version 4 (IPv4) Internet Control Message Protocol (ICMP) redirect messages.</title>
++	</overlay>
++
++	<!-- line 173 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="sysctl_net_ipv4_conf_default_send_redirects" ownerid="WRL-1019-01221" disa="366" severity="medium">
++		<title>The system must not allow interfaces to perform Internet Protocol version 4 (IPv4) Internet Control Message Protocol (ICMP) redirects by default.</title>
++	</overlay>
++
++	<!-- line 174 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="sysctl_net_ipv4_conf_all_send_redirects" ownerid="WRL-1019-01231" disa="366" severity="medium">
++		<title>The system must not send Internet Protocol version 4 (IPv4) Internet Control Message Protocol (ICMP) redirects.</title>
++	</overlay>
++
++	<!-- line 175 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="network_sniffer_disabled" ownerid="WRL-1019-01241" disa="366" severity="medium">
++		<title>Network interfaces must not be in promiscuous mode.</title>
++	</overlay>
++
++	<!-- line 176 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="postfix_prevent_unrestricted_relay" ownerid="WRL-1019-01251" disa="366" severity="medium">
++		<title>The system must be configured to prevent unrestricted mail relaying.</title>
++	</overlay>
++
++	<!-- line 177 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="package_vsftpd_removed" ownerid="WRL-1019-01261" disa="366" severity="high">
++		<title>A File Transfer Protocol (FTP) server package must not be installed unless needed.</title>
++	</overlay>
++
++	<!-- line 178 CCI-000318 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="package_tftp-server_removed" ownerid="WRL-1019-01271" disa="366" severity="high">
++		<title>The Trivial File Transfer Protocol (TFTP) server package must not be installed if not required for operational support.</title>
++	</overlay>
++
++	<!-- line 179 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="tftpd_uses_secure_mode" ownerid="WRL-1019-01281" disa="366" severity="medium">
++		<title>If the Trivial File Transfer Protocol (TFTP) server is required, the TFTP daemon must be configured to operate in secure mode.</title>
++	</overlay>
++
++	<!-- line 180 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="sshd_enable_x11_forwarding" ownerid="WRL-1019-01291" disa="366" severity="high">
++		<title>Remote X connections for interactive users must be encrypted.</title>
++	</overlay>
++
++	<!-- line 181 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="snmpd_not_default_password" ownerid="WRL-1019-01301" disa="366" severity="high">
++		<title>SNMP community strings must be changed from the default.</title>
++	</overlay>
++
++	<!-- line 182 CCI-000197 SRG-OS-000074-GPOS-00042		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="sshd_allow_only_protocol2" ownerid="WRL-1019-01311" disa="366" severity="high">
++		<title>The SSH daemon must be configured to only use the SSHv2 protocol.</title>
++	</overlay>
++
++	<!-- line 183 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="file_permissions_sshd_pub_key" ownerid="WRL-1019-01321" disa="366" severity="medium">
++		<title>The SSH public host key files must have mode 0644 or less permissive.</title>
++	</overlay>
++
++	<!-- line 184 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="file_permissions_sshd_private_key" ownerid="WRL-1019-01331" disa="366" severity="medium">
++		<title>The SSH private host key files must have mode 0600 or less permissive.</title>
++	</overlay>
++
++	<!-- line 185 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="sshd_enable_strictmodes" ownerid="WRL-1019-01341" disa="366" severity="medium">
++		<title>The SSH daemon must perform strict mode checking of home directory configuration files.</title>
++	</overlay>
++
++	<!-- line 186 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="sshd_use_priv_separation" ownerid="WRL-1019-01351" disa="366" severity="medium">
++		<title>The SSH daemon must use privilege separation.</title>
++	</overlay>
++
++	<!-- line 187 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="sshd_disable_compression" ownerid="WRL-1019-01361" disa="366" severity="medium">
++		<title>The SSH daemon must not allow compression or must only allow compression after successful authentication.</title>
++	</overlay>
++
++	<!-- line 188 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="sysctl_net_ipv4_ip_forward" ownerid="WRL-1019-01371" disa="366" severity="medium">
++		<title>The system must not be performing packet forwarding unless the system is a router.</title>
++	</overlay>
++
++	<!-- line 189 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="mount_option_krb_sec_remote_filesystems" ownerid="WRL-1019-01381" disa="366" severity="medium">
++		<title>The Network File System (NFS) must be configured to use AUTH_GSS.</title>
++	</overlay>
++
++	<!-- line 190 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="iptables_input_reject_rule" ownerid="WRL-1019-01391" disa="366" severity="medium">
++		<title>The system's local firewall must implement a deny-all, allow-by-exception policy.</title>
++	</overlay>
++
++	<!-- line 191 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="strongswan_approved_tunnels" ownerid="WRL-1019-01401" disa="366" severity="medium">
++		<title>The system must not have unauthorized IP tunnels configured.</title>
++	</overlay>
++
++	<!-- line 192 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. -->
++	<overlay owner="disastig" ruleid="sysctl_net_ipv6_conf_all_accept_source_route" ownerid="WRL-1019-01411" disa="366" severity="medium">
++		<title>The system must not forward IPv6 source-routed packets.</title>
++	</overlay>
++
++	<!-- line 193 CCI-000366 SRG-OS-000480-GPOS-00228		The operating system must define default permissions for all authenticated users in such a way that the user can only read and modify their own files. -->
++	<overlay owner="disastig" ruleid="accounts_umask_etc_login_defs" ownerid="WRL-1019-01421" disa="366" severity="medium">
++		<title>The operating system must define default permissions for all authenticated users in such a way that the user can only read and modify their own files.</title>
++	</overlay>
++
++	<!-- line 194 CCI-000366 SRG-OS-000480-GPOS-00229		The operating system must not allow an unattended or automatic logon to the system. -->
++	<overlay owner="disastig" ruleid="sshd_do_not_permit_user_env" ownerid="WRL-1019-01431" disa="366" severity="medium">
++		<title>The operating system must not allow users to override SSH environment variables.</title>
++	</overlay>
++
++	<!-- line 195 CCI-000366 SRG-OS-000480-GPOS-00229		The operating system must not allow an unattended or automatic logon to the system. -->
++	<overlay owner="disastig" ruleid="disable_host_auth" ownerid="WRL-1019-01441" disa="366" severity="medium">
++		<title>The operating system must not allow a non-certificate trusted host SSH logon to the system.</title>
++	</overlay>
++
++	<!-- line 196 CCI-000366 SRG-OS-000480-GPOS-00230		The operating system must limit the ability of non-privileged users to grant other users direct access to the contents of their home directories/folders. -->
++
++	<!-- line 197 CCI-000366 SRG-OS-000480-GPOS-00232		The operating system must enable an application firewall, if available. -->
++	<!-- included by SRG-OS-000480-GPOS-00227 -->
++
++	<!-- line 198 CCI-000381, CCI-002080 SRG-OS-000480-GPOS-00231		The operating system must employ a deny-all, allow-by-exception firewall policy for allowing connections to other systems. -->
++	<!-- included by SRG-OS-000480-GPOS-00227 -->
++
++	<!-- line 199 CCI-000381 SRG-OS-000095-GPOS-00049		The operating system must be configured to disable non-essential capabilities. -->
++	<overlay owner="disastig" ruleid="package_rsh-server_removed" ownerid="WRL-1019-01451" disa="381" severity="high">
++		<title>The rsh-server package must not be installed.</title>
++	</overlay>
++
++	<!-- line 200 CCI-000381 SRG-OS-000095-GPOS-00049		The operating system must be configured to disable non-essential capabilities. -->
++	<overlay owner="disastig" ruleid="package_ypserv_removed" ownerid="WRL-1019-01461" disa="381" severity="high">
++		<title>The ypserv_removed package must not be installed.</title>
++	</overlay>
++
++	<!-- line 201 CCI-000381 SRG-OS-000095-GPOS-00049		The operating system must be configured to disable non-essential capabilities. -->
++	<overlay owner="disastig" ruleid="package_telnet-server_removed" ownerid="WRL-1019-01471" disa="381" severity="high">
++		<title>The telnet-server package must not be installed.</title>
++	</overlay>
++
++	<!-- line 202 CCI-000382 SRG-OS-000096-GPOS-00050		The operating system must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the PPSM CAL and vulnerability assessments. -->
++	<overlay owner="disastig" ruleid="postfix_network_listening_disabled " ownerid="WRL-1019-01481" disa="382" severity="medium">
++		<title>The host must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management Component Local Service Assessment (PPSM CLSA) and vulnerability assessments.</title>
++	</overlay>
++
++	<!-- line 203 CCI-000764 SRG-OS-000104-GPOS-00051		The operating system must uniquely identify and must authenticate organizational users (or processes acting on behalf of organizational users). -->
++	<overlay owner="disastig" ruleid="gid_passwd_group_same" ownerid="WRL-1019-01491" disa="764" severity="low">
++		<title>All Group Identifiers (GIDs) referenced in the /etc/passwd file must be defined in the /etc/group file.</title>
++	</overlay>
++
++	<!-- line 204 CCI-000765 SRG-OS-000105-GPOS-00052		The operating system must use multifactor authentication for network access to privileged accounts. -->
++
++	<!-- line 205 CCI-000766 SRG-OS-000106-GPOS-00053		The operating system must use multifactor authentication for network access to non-privileged accounts. -->
++	<overlay owner="disastig" ruleid="sshd_disable_empty_passwords" ownerid="WRL-1019-01501" disa="366" severity="high">
++		<title>The SSH daemon must not allow authentication using an empty password.</title>
++	</overlay>
++
++	<!-- line 206 CCI-000767 SRG-OS-000107-GPOS-00054		The operating system must use multifactor authentication for local access to privileged accounts. -->
++
++	<!-- line 207 CCI-000768 SRG-OS-000108-GPOS-00055		The operating system must use multifactor authentication for local access to non-privileged accounts. -->
++
++	<!-- line 208 CCI-000770 SRG-OS-000109-GPOS-00056		The operating system must require individuals to be authenticated with an individual authenticator prior to using a group authenticator. -->
++
++	<!-- line 209 CCI-000778 SRG-OS-000114-GPOS-00059		The operating system must uniquely identify peripherals before establishing a connection. -->
++	<overlay owner="disastig" ruleid="kernel_module_usb-storage_disabled" ownerid="WRL-1019-01511" disa="778" severity="medium">
++		<title>USB mass storage must be disabled.</title>
++	</overlay>
++
++	<!-- line 210 CCI-000778 SRG-OS-000114-GPOS-00059		The operating system must uniquely identify peripherals before establishing a connection. -->
++	<overlay owner="disastig" ruleid="service_autofs_disabled" ownerid="WRL-1019-01521" disa="778" severity="medium">
++		<title>File system automounter must be disabled unless required.</title>
++	</overlay>
++
++	<!-- line 211 CCI-000795 SRG-OS-000118-GPOS-00060		The operating system must disable account identifiers (individuals, groups, roles, and devices) after 35 days of inactivity. -->
++	<overlay owner="disastig" ruleid="account_disable_post_pw_expiration" ownerid="WRL-1019-01531" disa="795" severity="medium">
++		<title>The operating system must disable account identifiers (individuals, groups, roles, and devices) if the password expires.</title>
++	</overlay>
++
++	<!-- line 212 CCI-000803 SRG-OS-000120-GPOS-00061		The operating system must use mechanisms meeting the requirements of applicable federal laws, Executive orders, directives, policies, regulations, standards, and guidance for authentication to a cryptographic module. -->
++
++	<!-- line 213 CCI-000804 SRG-OS-000121-GPOS-00062		The operating system must uniquely identify and must authenticate non-organizational users (or processes acting on behalf of non-organizational users). -->
++
++	<!-- line 214 CCI-000877 SRG-OS-000125-GPOS-00065		The operating system must employ strong authenticators in the establishment of nonlocal maintenance and diagnostic sessions. -->
++	<!-- included by SRG-OS-000033-GPOS-00014 -->
++
++
++	<!-- line 215 CCI-001133 SRG-OS-000163-GPOS-00072		The operating system must terminate all sessions and network connections related to nonlocal maintenance when nonlocal maintenance is completed. -->
++	<overlay owner="disastig" ruleid="sshd_set_keepalive" ownerid="WRL-1019-01541" disa="1133" severity="medium">
++		<title>All network connections associated with SSH traffic must terminate after a period of inactivity.</title>
++	</overlay>
++
++	<!-- line 216 CCI-001082 SRG-OS-000132-GPOS-00067		The operating system must separate user functionality (including user interface services) from operating system management functionality. -->
++
++	<!-- line 217 CCI-001084 SRG-OS-000134-GPOS-00068		The operating system must isolate security functions from nonsecurity functions. -->
++
++	<!-- line 218 CCI-001090 SRG-OS-000138-GPOS-00069		Operating systems must prevent unauthorized and unintended information transfer via shared system resources. -->
++
++	<!-- line 219 CCI-001095 SRG-OS-000142-GPOS-00071		The operating system must manage excess capacity, bandwidth, or other redundancy to limit the effects of information flooding types of Denial of Service (DoS) attacks. -->
++	<overlay owner="disastig" ruleid="sysctl_net_ipv4_tcp_syncookies" ownerid="WRL-1019-01551" disa="1095" severity="medium">
++		<title>The system must be configured to use TCP syncookies when experiencing a TCP SYN flood.</title>
++	</overlay>
++
++	<!-- line 220 CCI-001133 SRG-OS-000163-GPOS-00072		The operating system must terminate all network connections associated with a communications session at the end of the session, or as follows: for in-band management sessions (privileged sessions), the session must be terminated after 10 minutes of inactivity; and for user sessions (non-privileged session), the session must be terminated after 15 minutes of inactivity, except to fulfill documented and validated mission requirements. -->
++	<overlay owner="disastig" ruleid="accounts_tmout" ownerid="WRL-1019-01561" disa="1133" severity="medium">
++		<title>All network connections associated with a communication session must be terminated at the end of the session or after 10 minutes of inactivity from the user at a command prompt, except to fulfill documented and validated mission requirements.</title>
++	</overlay>
++
++
++	<!-- line 221 CCI-001133 SRG-OS-000163-GPOS-00072		The operating system must terminate all network connections associated with a communications session at the end of the session, or as follows: for in-band management sessions (privileged sessions), the session must be terminated after 10 minutes of inactivity; and for user sessions (non-privileged session), the session must be terminated after 15 minutes of inactivity, except to fulfill documented and validated mission requirements. -->
++	<overlay owner="disastig" ruleid="sshd_set_idle_timeout" ownerid="WRL-1019-01571" disa="1133" severity="medium">
++		<title>All network connections associated with SSH traffic must terminate at the end of the session or after 10 minutes of inactivity, except to fulfill documented and validated mission requirements.</title>
++	</overlay>
++
++	<!-- line 222 CCI-001133 SRG-OS-000163-GPOS-00072		The operating system must terminate all network connections associated with a communications session at the end of the session, or as follows: for in-band management sessions (privileged sessions), the session must be terminated after 10 minutes of inactivity; and for user sessions (non-privileged session), the session must be terminated after 15 minutes of inactivity, except to fulfill documented and validated mission requirements. -->
++	<overlay owner="disastig" ruleid="sshd_set_keepalive" ownerid="WRL-1019-01581" disa="1133" severity="medium">
++		<title>All network connections associated with SSH traffic must terminate after a period of inactivity.</title>
++	</overlay>
++
++	<!-- line 223 CCI-001190 SRG-OS-000184-GPOS-00078		The operating system must fail to a secure state if system initialization fails, shutdown fails, or aborts fail. -->
++
++	<!-- line 224 CCI-001199 SRG-OS-000185-GPOS-00079		The operating system must protect the confidentiality and integrity of all information at rest. -->
++	<overlay owner="disastig" ruleid="encrypt_partitions" ownerid="WRL-1019-01591" disa="1199" severity="low">
++		<title>The operating system must protect the confidentiality and integrity of data at rest. </title>
++	</overlay>
++
++	<!-- line 225 CCI-001233 SRG-OS-000191-GPOS-00080		The operating system must employ automated mechanisms to determine the state of system components with regard to flaw remediation using the following frequency: continuously, where HBSS is used; 30 days, for any additional internal network scans not covered by HBSS; and annually, for external scans by Computer Network Defense Service Provider (CNDSP). -->
++
++	<!-- line 226 CCI-001312 SRG-OS-000205-GPOS-00083		The operating system must generate error messages that provide information necessary for corrective actions without revealing information that could be exploited by adversaries. -->
++
++	<!-- line 227 CCI-001314 SRG-OS-000206-GPOS-00084		The operating system must reveal error messages only to authorized users. -->
++
++	<!-- line 228 CCI-001403 SRG-OS-000239-GPOS-00089		The operating system must audit all account modifications. -->
++	<!-- included by SRG-OS-000004-GPOS-00004 -->
++
++	<!-- line 229 CCI-001404 SRG-OS-000240-GPOS-00090		The operating system must audit all account disabling actions. -->
++	<!-- included by SRG-OS-000004-GPOS-00004 -->
++
++	<!-- line 230 CCI-001405 SRG-OS-000241-GPOS-00091		The operating system must audit all account removal actions. -->
++	<!-- included by SRG-OS-000004-GPOS-00004 -->
++
++	<!-- line 231 CCI-001443 SRG-OS-000300-GPOS-00118		The operating system must protect wireless access to the system using authentication of users and/or devices. -->
++
++	<!-- line 232 CCI-001444 SRG-OS-000299-GPOS-00117		The operating system must protect wireless access to and from the system using encryption. -->
++
++	<!-- line 233 CCI-001453 SRG-OS-000250-GPOS-00093		The operating system must implement cryptography to protect the integrity of remote access sessions. -->
++	<overlay owner="disastig" ruleid="sssd_ldap_start_tls" ownerid="WRL-1019-01601" disa="1453" severity="medium">
++		<title>If the system is using LDAP for authentication or account information, the system must use a TLS connection using FIPS 140-2 approved cryptographic algorithms.</title>
++	</overlay>
++
++	<!-- line 234 CCI-001453 SRG-OS-000250-GPOS-00093		The operating system must implement cryptography to protect the integrity of remote access sessions. -->
++	<overlay owner="disastig" ruleid="sssd_ldap_configure_tls_ca_dir" ownerid="WRL-1019-01611" disa="1453" severity="medium">
++		<title>The operating system must implement cryptography to protect the integrity of Lightweight Directory Access Protocol (LDAP) communications.</title>
++	</overlay>
++
++	<!-- line 235 CCI-001453 SRG-OS-000250-GPOS-00093		The operating system must implement cryptography to protect the integrity of remote access sessions. -->
++	<overlay owner="disastig" ruleid="sssd_ldap_configure_tls_ca" ownerid="WRL-1019-01621" disa="1453" severity="medium">
++		<title>The operating system must implement cryptography to protect the integrity of Lightweight Directory Access Protocol (LDAP) communications.</title>
++	</overlay>
++
++	<!-- line 236 CCI-001453 SRG-OS-000250-GPOS-00093		The operating system must implement cryptography to protect the integrity of remote access sessions. -->
++	<overlay owner="disastig" ruleid="sshd_use_approved_macs" ownerid="WRL-1019-01631" disa="1453" severity="medium">
++		<title>The operating system must implement cryptography to protect the integrity of Lightweight Directory Access Protocol (LDAP) communications.</title>
++	</overlay>
++
++	<!-- line 237 CCI-001464 SRG-OS-000254-GPOS-00095		The operating system must initiate session audits at system start-up. -->
++	<!-- included by SRG-OS-000038-GPOS-00016 -->
++
++	<!-- line 238 CCI-001487 SRG-OS-000255-GPOS-00096		The operating system must produce audit records containing information to establish the identity of any individual or process associated with the event. -->
++	<!-- included by SRG-OS-000004-GPOS-00004 -->
++
++	<!-- line 239 CCI-001493 SRG-OS-000256-GPOS-00097		The operating system must protect audit tools from unauthorized access. -->
++	<!-- included by SRG-OS-000257-GPOS-00098 -->
++
++	<!-- line 240 CCI-001494 SRG-OS-000257-GPOS-00098		The operating system must protect audit tools from unauthorized modification. -->
++	<overlay owner="disastig" ruleid="rpm_verify_permissions" ownerid="WRL-1019-01641" disa="366" severity="low">
++		<title>The system package management tool must verify ownership on all files and directories associated with the "audit" package.</title>
++	</overlay>
++
++	<!-- line 241 CCI-001495 SRG-OS-000258-GPOS-00099		The operating system must protect audit tools from unauthorized deletion. -->
++	<!-- included by SRG-OS-000257-GPOS-00098 -->
++
++	<!-- line 242 CCI-001496 SRG-OS-000278-GPOS-00108		The operating system must use cryptographic mechanisms to protect the integrity of audit tools. -->
++	<!-- included by SRG-OS-000257-GPOS-00098 -->
++
++	<!-- line 243 CCI-001499 SRG-OS-000259-GPOS-00100		The operating system must limit privileges to change software resident within software libraries. -->i
++
++	<!-- line 244 CCI-001619 SRG-OS-000266-GPOS-00101		The operating system must enforce password complexity by requiring that at least one special character be used. -->
++	<overlay owner="disastig" ruleid="accounts_password_pam_cracklib_ocredit" ownerid="WRL-1019-01651" disa="1619" severity="low">
++		<title>The system must require passwords to contain at least one special character.</title>
++	</overlay>
++
++	<!-- line 245 CCI-001665 SRG-OS-000269-GPOS-00103		In the event of a system failure, the operating system must preserve any information necessary to determine cause of failure and any information necessary to return to operations with least disruption to mission processes. -->
++
++	<!-- line 246 CCI-001682 SRG-OS-000123-GPOS-00064		The information system must automatically remove or disable emergency accounts after the crisis is resolved or 72 hours. -->
++	<overlay owner="disastig" ruleid="account_temp_expire_date" ownerid="WRL-1019-01661" disa="1682" severity="low">
++		<title>Emergency accounts must be provisioned with an expiration date.</title>
++	</overlay>
++
++	<!-- line 247 CCI-001683 SRG-OS-000274-GPOS-00104		The operating system must notify system administrators and ISSOs when accounts are created. -->
++
++	<!-- line 248 CCI-001684 SRG-OS-000275-GPOS-00105		The operating system must notify system administrators and ISSOs when accounts are modified. -->
++
++	<!-- line 249 CCI-001685 SRG-OS-000276-GPOS-00106		The operating system must notify system administrators and ISSOs when accounts are disabled. -->
++
++	<!-- line 250 CCI-001686 SRG-OS-000277-GPOS-00107		The operating system must notify system administrators and ISSOs when accounts are removed. -->
++
++	<!-- line 251 CCI-001744 SRG-OS-000363-GPOS-00150		The operating system must notify designated personnel if baseline configurations are changed in an unauthorized manner. -->
++	<overlay owner="disastig" ruleid="samhain_periodic_cron_checking" ownerid="WRL-1019-01671" disa="1744" severity="medium">
++		<title>A file integrity tool must be used at least weekly to check for unauthorized file changes, particularly the addition of unauthorized system libraries or binaries, or for unauthorized modification to authorized system libraries or binaries.</title>
++	</overlay>
++
++	<!-- line 252 CCI-001744 SRG-OS-000363-GPOS-00150		The operating system must notify designated personnel if baseline configurations are changed in an unauthorized manner. -->
++	<overlay owner="disastig" ruleid="samhain_scan_notification" ownerid="WRL-1019-01681" disa="1744" severity="medium">
++		<title>Designated personnel must be notified if baseline configurations are changed in an unauthorized manner.</title>
++	</overlay>
++
++	<!-- line 253 CCI-001749 SRG-OS-000366-GPOS-00153		The operating system must prevent the installation of patches, service packs, device drivers, or operating system components without verification they have been digitally signed using a certificate that is recognized and approved by the organization. -->
++	<overlay owner="disastig" ruleid="ensure_gpgcheck_local_packages" ownerid="WRL-1019-01691" disa="1749" severity="high">
++		<title>The operating system must prevent the installation of software, patches, service packs, device drivers, or operating system components of local packages without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization.</title>
++	</overlay>
++
++	<!-- line 254 CCI-001774 SRG-OS-000370-GPOS-00155		The operating system must employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. -->
++	<!-- included by SRG-OS-000445-GPOS-00199 -->
++
++	<!-- line 255 CCI-001812 SRG-OS-000362-GPOS-00149		The operating system must prohibit user installation of system software without explicit privileged status. -->
++
++	<!-- line 256 CCI-001813 SRG-OS-000364-GPOS-00151		The operating system must enforce access restrictions. -->
++        <overlay owner="disastig" ruleid="grub2_no_removeable_media" ownerid="WRL-1019-01701" disa="1813" severity="medium">
++		<title>The system must not allow removable media to be used as the boot loader unless approved.</title>
++	</overlay>
++
++	<!-- line 257 CCI-001813 SRG-OS-000364-GPOS-00151		The operating system must enforce access restrictions. -->
++	<overlay owner="disastig" ruleid="sshd_disable_gssapi_auth" ownerid="WRL-1019-01711" disa="1813" severity="medium">
++		<title>The SSH daemon must not permit Generic Security Service Application Program Interface (GSSAPI) authentication unless needed.</title>
++	</overlay>
++
++	<!-- line 258 CCI-001813 SRG-OS-000364-GPOS-00151		The operating system must enforce access restrictions. -->
++	<overlay owner="disastig" ruleid="sshd_disable_kerb_auth" ownerid="WRL-1019-01781" disa="1813" severity="medium">
++		<title>The SSH daemon must not permit Generic Security Service Application Program Interface (GSSAPI) authentication unless needed.</title>
++	</overlay>
++
++	<!-- line 259 CCI-001814 SRG-OS-000365-GPOS-00152		The operating system must audit the enforcement actions used to restrict access associated with changes to the system. -->
++	<!-- included by SRG-OS-000364-GPOS-00151, SRG-OS-000480-GPOS-00227 -->
++
++	<!-- line 260 CCI-000366 SRG-OS-000480-GPOS-00227		The operating system must allocate audit record storage capacity to store at least one weeks worth of audit records, when audit records are not immediately sent to a central audit record storage facility. -->
++	<overlay owner="disastig" ruleid="partition_for_var_log_audit" ownerid="WRL-1019-01791" disa="1849" severity="low">
++		<title>The system must use a separate file system for the system audit data path.</title>
++	</overlay>
++
++	<!-- line 261 CCI-001851 SRG-OS-000342-GPOS-00133		The operating system must off-load audit records onto a different system or media from the system being audited. -->
++	<overlay owner="disastig" ruleid="auditd_audispd_configure_remote_server" ownerid="WRL-1019-01801" disa="1851" severity="medium">
++		<title>The operating system must off-load audit records onto a different system or media from the system being audited.</title>
++	</overlay>
++
++	<!-- line 262 CCI-001851 SRG-OS-000342-GPOS-00133		The operating system must off-load audit records onto a different system or media from the system being audited. -->
++	<overlay owner="disastig" ruleid="auditd_audispd_encrypt_sent_records" ownerid="WRL-1019-01811" disa="1851" severity="medium">
++		<title>The operating system must encrypt the transfer of audit records off-loaded onto a different system or media from the system being audited.</title>
++	</overlay>
++
++	<!-- line 263 CCI-001851 SRG-OS-000342-GPOS-00133		The operating system must off-load audit records onto a different system or media from the system being audited. -->
++	<overlay owner="disastig" ruleid="auditd_audispd_disk_full_action" ownerid="WRL-1019-01821" disa="1851" severity="medium">
++		<title>The audit system must take appropriate action when the audit storage volume is full.</title>
++	</overlay>
++
++	<!-- line 264 CCI-001851 SRG-OS-000342-GPOS-00133		The operating system must off-load audit records onto a different system or media from the system being audited. -->
++	<overlay owner="disastig" ruleid="auditd_audispd_network_failure_action" ownerid="WRL-1019-01831" disa="1851" severity="medium">
++		<title>The audit system must take appropriate action when there is an error sending audit records to a remote system.</title>
++	</overlay>
++
++	<!-- line 265 CCI-001851 SRG-OS-000479-GPOS-00224		The operating system must, at a minimum, off-load interconnected systems in real time and off-load standalone systems weekly. -->
++	<!-- included by SRG-OS-000342-GPOS-00133 -->
++
++	<!-- line 266 CCI-001855 SRG-OS-000343-GPOS-00134		The operating system must immediately notify the SA and ISSO (at a minimum) when allocated audit record storage volume reaches 75% of the repository maximum audit record storage capacity. -->
++	<overlay owner="disastig" ruleid="auditd_data_retention_space_left" ownerid="WRL-1019-01841" disa="1855" severity="medium">
++		<title>The operating system must immediately notify the SA and ISSO (at a minimum) when allocated audit record storage volume reaches 75% of the repository maximum audit record storage capacity.</title>
++	</overlay>
++
++	<!-- line 267 CCI-001855 SRG-OS-000343-GPOS-00134		The operating system must immediately notify the SA and ISSO (at a minimum) when allocated audit record storage volume reaches 75% of the repository maximum audit record storage capacity. -->
++	<overlay owner="disastig" ruleid="auditd_data_retention_admin_space_left_action" ownerid="WRL-1019-01851" disa="1855" severity="medium">
++		<title>The audit system must alert designated staff members when the audit storage volume approaches capacity.</title>
++	</overlay>
++
++	<!-- line 268 CCI-001855 SRG-OS-000343-GPOS-00134		The operating system must immediately notify the SA and ISSO (at a minimum) when allocated audit record storage volume reaches 75% of the repository maximum audit record storage capacity. -->
++	<overlay owner="disastig" ruleid="auditd_data_retention_action_mail_acct" ownerid="WRL-1019-01861" disa="1855" severity="medium">
++		<title>(SA) and Information System Security Officer (ISSO) (at a minimum) when the threshold for the repository maximum audit record storage capacity is reached.</title>
++	</overlay>
++
++	<!-- line 269 CCI-001858 SRG-OS-000344-GPOS-00135		The operating system must provide an immediate real-time alert to the SA and ISSO, at a minimum, of all audit failure events requiring real-time alerts. -->
++
++	<!-- line 270 CCI-001875 SRG-OS-000348-GPOS-00136		The operating system must provide an audit reduction capability that supports on-demand audit review and analysis. -->
++
++	<!-- line 271 CCI-001876 SRG-OS-000122-GPOS-00063		The operating system must provide an audit reduction capability that supports on-demand reporting requirements. -->
++
++	<!-- line 272 CCI-001877 SRG-OS-000349-GPOS-00137		The operating system must provide an audit reduction capability that supports after-the-fact investigations of security incidents. -->
++
++	<!-- line 273 CCI-001878 SRG-OS-000350-GPOS-00138		The operating system must provide a report generation capability that supports on-demand audit review and analysis. -->
++
++	<!-- line 274 CCI-001879 SRG-OS-000351-GPOS-00139		The operating system must provide a report generation capability that supports on-demand reporting requirements. -->
++
++	<!-- line 275 CCI-001880 SRG-OS-000352-GPOS-00140		The operating system must provide a report generation capability that supports after-the-fact investigations of security incidents. -->
++
++	<!-- line 276 CCI-001881 SRG-OS-000353-GPOS-00141		The operating system must not alter original content or time ordering of audit records when it provides an audit reduction capability. -->
++
++	<!-- line 277 CCI-001882 SRG-OS-000354-GPOS-00142		The operating system must not alter original content or time ordering of audit records when it provides a report generation capability. -->
++
++	<!-- line 278 CCI-001889 SRG-OS-000358-GPOS-00145		The operating system must record time stamps for audit records that meet a minimum granularity of one second for a minimum degree of precision. -->
++
++	<!-- line 279 CCI-001890 SRG-OS-000359-GPOS-00146		The operating system must record time stamps for audit records that can be mapped to Coordinated Universal Time (UTC) or Greenwich Mean Time (GMT). -->
++
++	<!-- line 280 CCI-001891 SRG-OS-000355-GPOS-00143		The operating system must, for networked systems, compare internal information system clocks at least every 24 hours with a server which is synchronized to one of the redundant United States Naval Observatory (USNO) time servers, or a time server designated for the appropriate DoD network (NIPRNet/SIPRNet), and/or the Global Positioning System (GPS). -->
++        <overlay owner="disastig" ruleid="chronyd_or_ntpd_set_maxpoll" ownerid="WRL-1019-01871" disa="1891" severity="medium">
++                <title>The operating system must, for networked systems, synchronize clocks with a server that is synchronized to one of the redundant United States Naval Observatory (USNO) time servers, a time server designated for the appropriate DoD network (NIPRNet/SIPRNet), and/or the Global Positioning System (GPS).</title>
++	</overlay>
++
++	<!-- line 281 CCI-000366 : CCI-001896, SRG-OS-000360-GPOS-00147		The operating system must enforce dual authorization for movement and/or deletion of all audit information, when such movement or deletion is not part of an authorized automatic process. -->
++
++	<!-- line 282 CCI-001914 SRG-OS-000337-GPOS-00129		The operating system must provide the capability for assigned IMOs/ISSOs or designated SAs to change the auditing to be performed on all operating system components, based on all selectable event criteria in near real time. -->
++
++	<!-- line 283 CCI-001919 SRG-OS-000338-GPOS-00130		The operating system must provide the capability for authorized users to select a user session to capture/record or view/hear. -->
++
++	<!-- line 284 CCI-001920 SRG-OS-000339-GPOS-00131		The operating system must provide the capability for authorized users to remotely view/hear, in real time, all content related to an established user session from a component separate from the operating system being monitored. -->
++
++	<!-- line 285 CCI-001941 SRG-OS-000112-GPOS-00057		The operating system must implement replay-resistant authentication mechanisms for network access to privileged accounts. -->
++
++	<!-- line 286 CCI-001942 SRG-OS-000113-GPOS-00058		The operating system must implement replay-resistant authentication mechanisms for network access to non-privileged accounts. -->
++
++	<!-- line 287 CCI-001948 SRG-OS-000375-GPOS-00160		The operating system must implement multifactor authentication for remote access to privileged accounts in such a way that one of the factors is provided by a device separate from the system gaining access. -->
++
++	<!-- line 288 CCI-001953 SRG-OS-000376-GPOS-00161		The operating system must accept Personal Identity Verification (PIV) credentials. -->
++
++	<!-- line 289 CCI-001954 SRG-OS-000377-GPOS-00162		The operating system must electronically verify Personal Identity Verification (PIV) credentials. -->
++
++	<!-- line 290 CCI-001958 SRG-OS-000378-GPOS-00163		The operating system must authenticate peripherals before establishing a connection. -->
++	<overlay owner="disastig" ruleid="kernel_module_dccp_disabled" ownerid="WRL-1019-01881" disa="1958" severity="media">
++		<title>The Datagram Congestion Control Protocol (DCCP) kernel module must be disabled unless required.</title>
++	</overlay>
++
++	<!-- line 291 CCI-001967 SRG-OS-000379-GPOS-00164		The operating system must authenticate all endpoint devices before establishing a local, remote, and/or network connection using bidirectional authentication that is cryptographically based. -->
++
++	<!-- line 292 CCI-001991 SRG-OS-000384-GPOS-00167		The operating system, for PKI-based authentication, must implement a local cache of revocation data to support path discovery and validation in case of the inability to access revocation information via the network. -->
++
++	<!-- line 293 CCI-002007 SRG-OS-000383-GPOS-00166		The operating system must prohibit the use of cached authenticators after one day. -->
++
++	<!-- line 294 CCI-002038 SRG-OS-000373-GPOS-00156		The operating system must require users to re-authenticate for privilege escalation. -->
++        <overlay owner="disastig" ruleid="sudo_remove_nopasswd" ownerid="WRL-1019-01891" disa="2038" severity="media">
++                <title>Users must provide a password for privilege escalation.</title>
++	</overlay>
++
++	<!-- line 295 CCI-002038 SRG-OS-000373-GPOS-00156		The operating system must require users to re-authenticate for privilege escalation. -->
++        <overlay owner="disastig" ruleid="sudo_remove_no_authenticate" ownerid="WRL-1019-01901" disa="2038" severity="media">
++                <title>Users must re-authenticate for privilege escalation..</title>
++	</overlay>
++
++	<!-- line 296 CCI-002038 SRG-OS-000373-GPOS-00157		The operating system must require users to re-authenticate when changing roles. -->
++	<!-- included by SRG-OS-000373-GPOS-00156 -->
++
++	<!-- line 297 CCI-002038 SRG-OS-000373-GPOS-00158		The operating system must require users to re-authenticate when changing authenticators. -->
++	<!-- included by SRG-OS-000373-GPOS-00156 -->
++	
++        <!-- line 298 CCI-002039 SRG-OS-000374-GPOS-00159		The operating system must require devices to re-authenticate when changing authenticators. -->
++
++	<!-- line 299 CCI-002046 SRG-OS-000356-GPOS-00144		The operating system must synchronize internal information system clocks to the authoritative time source when the time difference is greater than one second. -->
++	<!-- included by SRG-OS-000355-GPOS-00143 -->
++
++	<!-- line 300 CCI-000130 SRG-OS-000037-GPOS-00015		The operating system must audit all account enabling actions. -->
++	<!-- included by SRG-OS-000004-GPOS-00004 -->
++	<overlay owner="disastig" ruleid="audit_rules_usergroup_modification" ownerid="WRL-1019-01911" disa="2130" severity="low">
++		<title>The operating system must automatically audit account creation.</title>
++	</overlay>
++
++	<!-- line 301 CCI-002132 SRG-OS-000304-GPOS-00121		The operating system must notify system administrators and ISSOs of account enabling actions. -->
++
++	<!-- line 302 CCI-002165 SRG-OS-000312-GPOS-00122		The operating system must allow operating system admins to pass information to any other operating system admin or user. -->
++
++	<!-- line 303 CCI-002165 SRG-OS-000312-GPOS-00123		The operating system must allow operating system admins to grant their privileges to other operating system admins. -->
++
++	<!-- line 304 CCI-002165 SRG-OS-000312-GPOS-00124		The operating system must allow operating system admins to change security attributes on users, the operating system, or the operating systems components. -->
++
++	<!-- line 305 CCI-002233 SRG-OS-000326-GPOS-00126		The operating system must prevent all software from executing at higher privilege levels than users executing the software. -->
++        <overlay owner="disastig" ruleid="file_permissions_unauthorized_suid" ownerid="WRL-1019-01921" disa="0" severity="low">
++                <title>All setuid and setgid programs must be reviewed and whilelisted.</title>
++	</overlay>
++
++	<!-- line 306 CCI-002234 SRG-OS-000327-GPOS-00127		The operating system must prevent all software from executing at higher privilege levels than users executing the software. -->
++	<overlay owner="disastig" ruleid="audit_rules_privileged_commands" ownerid="WRL-1019-01931" disa="135" severity="low">
++		<title>The audit system must be configured to audit all use of setuid programs.</title>
++	</overlay>
++
++	<!-- line 307 CCI-002235 SRG-OS-000324-GPOS-00125		The operating system must prevent non-privileged users from executing privileged functions to include disabling, circumventing, or altering implemented security safeguards/countermeasures. -->
++        <overlay owner="disastig" ruleid="selinux_user_login_roles" ownerid="WRL-1019-01941" disa="2235" severity="medium">
++		<title>The operating system must prevent non-privileged users from executing privileged functions to include disabling, circumventing, or altering implemented security safeguards/countermeasures.</title>
++	</overlay>
++
++	<!-- line 308 CCI-002238 SRG-OS-000329-GPOS-00128		The operating system must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts in 15 minutes occur. -->
++        <overlay owner="disastig" ruleid="accounts_passwords_pam_tally2_deny" ownerid="WRL-1019-01951" disa="0" severity="medium">
++                <title>The system must disable accounts after three consecutive unsuccessful login attempts.</title>
++	</overlay>
++
++	<!-- line 309 CCI-002238 SRG-OS-000329-GPOS-00128		The operating system must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts in 15 minutes occur. -->
++        <overlay owner="disastig" ruleid="accounts_passwords_pam_tally2_interval" ownerid="WRL-1019-01961" disa="0" severity="medium">
++                <title>Accounts subject to three unsuccessful logon attempts must be locked for the maximum configurable period.</title>
++	</overlay>
++
++	<!-- line 310 CCI-002238 SRG-OS-000329-GPOS-00128		The operating system must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts in 15 minutes occur. -->
++        <overlay owner="disastig" ruleid="accounts_passwords_pam_tally2_interval" ownerid="WRL-1019-01971" disa="0" severity="medium">
++                <title>Accounts subject to three unsuccessful logon attempts must be locked for the maximum configurable period.</title>
++	</overlay>
++
++	<!-- line 311 CCI-002238 SRG-OS-000329-GPOS-00128		The operating system must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts in 15 minutes occur. -->
++        <overlay owner="disastig" ruleid="accounts_passwords_pam_tally2_deny_root" ownerid="WRL-1019-01981" disa="0" severity="medium">
++                <title>If three unsuccessful root logon attempts within 15 minutes occur the associated account must be locked..</title>
++	</overlay>
++
++
++	<!-- line 312 CCI-002314 SRG-OS-000297-GPOS-00115		The operating system must control remote access methods. -->
++	<!-- included by SRG-OS-000096-GPOS-00050 -->
++
++	<!-- line 313 CCI-002322 SRG-OS-000298-GPOS-00116		The operating system must provide the capability to immediately disconnect or disable remote access to the operating system. -->
++
++	<!-- line 314 CCI-002361 SRG-OS-000279-GPOS-00109		The operating system must automatically terminate a user session after inactivity time-outs have expired or at shutdown. -->
++	<!-- included by SRG-OS-000163-GPOS-00072 -->
++
++	<!-- line 315 CCI-002363 SRG-OS-000280-GPOS-00110		The operating system must provide a logoff capability for user-initiated communications sessions when requiring user access authentication. -->
++
++	<!-- line 316 CCI-002364 SRG-OS-000281-GPOS-00111		The operating system must display an explicit logoff message to users indicating the reliable termination of authenticated communications sessions. -->
++
++	<!-- line 317 CCI-002385 SRG-OS-000420-GPOS-00186		The operating system must protect against or limit the effects of Denial of Service (DoS) attacks by ensuring the operating system is implementing rate-limiting measures on impacted network interfaces. -->
++
++	<!-- line 318 CCI-002418 SRG-OS-000423-GPOS-00187		The operating system must protect the confidentiality and integrity of transmitted information. -->
++        <overlay owner="disastig" ruleid="package_openssh-server_installed" ownerid="WRL-1019-01991" disa="2418" severity="medium">
++                <title>All networked systems must have SSH installed.</title>
++	</overlay>
++
++	<!-- line 319 CCI-002418 SRG-OS-000423-GPOS-00187		The operating system must protect the confidentiality and integrity of transmitted information. -->
++	<overlay owner="disastig" ruleid="service_sshd_enabled" ownerid="WRL-1019-02001" disa="2418" severity="medium">
++		<title>All networked systems must use SSH for confidentiality and integrity of transmitted and received information as well as information during preparation for transmission.</title>
++	</overlay>
++
++	<!-- line 320 CCI-002418 SRG-OS-000481-GPOS-000481		The operating system must protect the confidentiality and integrity of communications with wireless peripherals. -->
++	<!-- included by SRG-OS-000423-GPOS-00187 -->
++
++	<!-- line 321 CCI-002420 SRG-OS-000425-GPOS-00189		The operating system must maintain the confidentiality and integrity of information during preparation for transmission. -->
++	<!-- included by SRG-OS-000423-GPOS-00187 -->
++
++	<!-- line 322 CCI-002421 SRG-OS-000424-GPOS-00188		The operating system must implement cryptographic mechanisms to prevent unauthorized disclosure of information and/or detect changes to information during transmission unless otherwise protected by alternative physical safeguards, such as, at a minimum, a Protected Distribution System (PDS). -->
++	<!-- included by SRG-OS-000423-GPOS-00187 -->
++
++	<!-- line 323 CCI-002422 SRG-OS-000426-GPOS-00190		The operating system must maintain the confidentiality and integrity of information during reception. -->
++	<!-- included by SRG-OS-000423-GPOS-00187 -->
++
++	<!-- line 324 CCI-002465 SRG-OS-000399-GPOS-00178		The operating system must request data origin authentication verification on the name/address resolution responses the system receives from authoritative sources. -->
++
++	<!-- line 325 CCI-002466 SRG-OS-000400-GPOS-00179		The operating system must request data integrity verification on the name/address resolution responses the system receives from authoritative sources. -->
++
++	<!-- line 326 CCI-002467 SRG-OS-000401-GPOS-00180		The operating system must perform data integrity verification on the name/address resolution responses the system receives from authoritative sources. -->
++
++	<!-- line 327 CCI-002468 SRG-OS-000402-GPOS-00181		The operating system must perform data origin verification authentication on the name/address resolution responses the system receives from authoritative sources. -->
++
++	<!-- line 328 CCI-002470 SRG-OS-000403-GPOS-00182		The operating system must only allow the use of DoD PKI-established certificate authorities for verification of the establishment of protected sessions. -->
++
++	<!-- line 329 CCI-002475 SRG-OS-000404-GPOS-00183		The operating system must implement cryptographic mechanisms to prevent unauthorized modification of all information at rest on all operating system components. -->
++
++	<!-- line 330 CCI-002476 SRG-OS-000405-GPOS-00184		The operating system must implement cryptographic mechanisms to prevent unauthorized disclosure of all information at rest on all operating system components. -->
++	<overlay owner="disastig" ruleid="encrypt_partitions" ownerid="WRL-1019-02011" disa="2476" severity="low">
++		<title>The operating system must protect the confidentiality and integrity of data at rest. </title>
++	</overlay>
++
++	<!-- line 331 CCI-002617 SRG-OS-000437-GPOS-00194		The operating system must remove all software components after updated versions have been installed. -->
++
++	<!-- line 332 CCI-002696 SRG-OS-000445-GPOS-00199		The operating system must verify correct operation of all security functions. -->
++	<overlay owner="disastig" ruleid="selinux_state" ownerid="WRL-1019-02021" disa="2696" severity="high">
++		<title>The operating system must enable SELinux.</title>
++	</overlay>
++
++	<!-- line 333 CCI-002696 SRG-OS-000445-GPOS-00199		The operating system must verify correct operation of all security functions. -->
++	<overlay owner="disastig" ruleid="selinux_policytype" ownerid="WRL-1019-02031" disa="2696" severity="high">
++		<title>The operating system must enable the SELinux targeted policy.</title>
++	</overlay>
++
++	<!-- line 334 CCI-002699 SRG-OS-000446-GPOS-00200		The operating system must perform verification of the correct operation of security functions: upon system start-up and/or restart; upon command by a user with privileged access; and/or every 30 days. -->
++
++	<!-- line 335 CCI-002702 SRG-OS-000447-GPOS-00201		The operating system must shut down the information system, restart the information system, and/or notify the system administrator when anomalies in the operation of any security functions are discovered. -->
++
++	<!-- line 336 CCI-002754 SRG-OS-000432-GPOS-00191		The operating system must behave in a predictable and documented manner that reflects organizational and system objectives when invalid inputs are received. -->
++
++	<!-- line 337 CCI-002824 SRG-OS-000433-GPOS-00192		The operating system must implement non-executable data to protect its memory from unauthorized code execution. -->
++
++	<!-- line 338 CCI-002824 SRG-OS-000433-GPOS-00193		The operating system must implement address space layout randomization to protect its memory from unauthorized code execution. -->
++
++	<!-- line 339 CCI-002884 SRG-OS-000392-GPOS-00172		The operating system must audit all activities performed during nonlocal maintenance and diagnostic sessions. -->
++	<overlay owner="disastig" ruleid="audit_rules_execution_semanage" ownerid="WRL-1019-02041" disa="2884" severity="medium">
++		<title>All uses of the semanage command must be audited.</title>
++	</overlay>
++
++	<!-- line 340 CCI-002884 SRG-OS-000392-GPOS-00172		The operating system must audit all activities performed during nonlocal maintenance and diagnostic sessions. -->
++	<overlay owner="disastig" ruleid="audit_rules_execution_setsebool" ownerid="WRL-1019-02051" disa="2884" severity="medium">
++		<title>All uses of the setsebool command must be audited.</title>
++	</overlay>
++
++	<!-- line 341 CCI-002884 SRG-OS-000392-GPOS-00172		The operating system must audit all activities performed during nonlocal maintenance and diagnostic sessions. -->
++	<overlay owner="disastig" ruleid="audit_rules_execution_chcon" ownerid="WRL-1019-02061" disa="2884" severity="medium">
++		<title>All uses of the chcon command must be audited.</title>
++	</overlay>
++
++	<!-- line 342 CCI-002884 SRG-OS-000392-GPOS-00172		The operating system must audit all activities performed during nonlocal maintenance and diagnostic sessions. -->
++	<overlay owner="disastig" ruleid="audit_rules_execution_restorecon" ownerid="WRL-1019-02071" disa="2884" severity="medium">
++		<title>All uses of the setfiles command must be audited.</title>
++	</overlay>
++
++	<!-- line 343 CCI-002884 SRG-OS-000392-GPOS-00172		The operating system must audit all activities performed during nonlocal maintenance and diagnostic sessions. -->
++	<overlay owner="disastig" ruleid="audit_rules_login_events_faillock" ownerid="WRL-1019-02081" disa="2884" severity="medium">
++		<title>The operating system must generate audit records for all successful/unsuccessful account access count events.</title>
++	</overlay>
++
++	<!-- line 344 CCI-002884 SRG-OS-000392-GPOS-00172		The operating system must audit all activities performed during nonlocal maintenance and diagnostic sessions. -->
++	<overlay owner="disastig" ruleid="audit_rules_login_events_lastlog" ownerid="WRL-1019-02091" disa="2884" severity="medium">
++		<title>The operating system must generate audit records for all successful account access events.</title>
++	</overlay>
++
++	<!-- line 345 CCI-002890 SRG-OS-000393-GPOS-00173		The operating system must implement cryptographic mechanisms to protect the integrity of nonlocal maintenance and diagnostic communications, when used for nonlocal maintenance sessions. -->
++	<!-- included by SRG-OS-000033-GPOS-00014 -->
++
++	<!-- line 346 CCI-002891 SRG-OS-000395-GPOS-00175		The operating system must verify remote disconnection at the termination of nonlocal maintenance and diagnostic sessions, when used for nonlocal maintenance sessions. -->
++
++	<!-- line 347 CCI-003123 SRG-OS-000394-GPOS-00174		The operating system must implement cryptographic mechanisms to protect the confidentiality of nonlocal maintenance and diagnostic communications, when used for nonlocal maintenance sessions. -->
++	<!-- included by SRG-OS-000033-GPOS-00014 -->
++
++	<!-- line 348 CCI-000131 SRG-OS-000038-GPOS-00016		The operating system must produce audit records containing information to establish when (date and time) the events occurred. -->
++	<overlay owner="disastig" ruleid="service_auditd_enabled" ownerid="WRL-1019-02101" disa="130" severity="medium">
++		<title>The operating system must produce a system-wide (logical or physical) audit trail composed of audit records in a standardized format. </title>
++	</overlay>
++
++</overlays>
++
++
++
++
++
++
++
++
++
++
++
++
++
+-- 
+1.9.1
+
