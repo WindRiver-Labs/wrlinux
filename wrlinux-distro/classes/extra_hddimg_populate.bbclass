@@ -64,3 +64,22 @@ efi_hddimg_populate() {
         install -m 0644 ${DEPLOY_DIR_IMAGE}/boot-menu-hddimg.inc.p7b ${DEST}${EFIDIR}/boot-menu.inc.p7b
     fi
 }
+
+# Override the efi_populate_common() from live-vm-common.bbclass
+# for feature efi-secure-boot.
+# efi_populate_common DEST BOOTLOADER
+efi_populate_common() {
+        # DEST must be the root of the image so that EFIDIR is not
+        # nested under a top level directory.
+        DEST=$1
+
+        install -d ${DEST}${EFIDIR}
+
+        if [ "${EFI_PROVIDER}" = "extra_hddimg_populate" ]; then
+            install -m 0644 ${DEPLOY_DIR_IMAGE}/${EFI_BOOT_IMAGE} ${DEST}${EFIDIR}/${EFI_BOOT_IMAGE}
+        else
+            install -m 0644 ${DEPLOY_DIR_IMAGE}/$2-${EFI_BOOT_IMAGE} ${DEST}${EFIDIR}/${EFI_BOOT_IMAGE}
+        fi
+        EFIPATH=$(echo "${EFIDIR}" | sed 's/\//\\/g')
+        printf 'fs0:%s\%s\n' "$EFIPATH" "${EFI_BOOT_IMAGE}" >${DEST}/startup.nsh
+}
