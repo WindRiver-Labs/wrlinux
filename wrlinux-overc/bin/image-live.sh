@@ -9,7 +9,7 @@ HDINSTALL_ROOTFS="${ARTIFACTS_DIR}/cube-essential-${INSTALL_BSP}.tar.bz2"
 
 HDINSTALL_CONTAINERS="${ARTIFACTS_DIR}/cube-dom0-${INSTALL_BSP}.tar.bz2:console:vty=2 \
   ${ARTIFACTS_DIR}/cube-server-${INSTALL_BSP}.tar.bz2:console:vty=3,active:net=1:cube.admin=1:cube.device.mgr=self:mounts=bind|/lib/modules|/lib/modules;bind|/lib/firmware|/lib/firmware \
-  ${ARTIFACTS_DIR}/cube-vrf-${INSTALL_BSP}.tar.bz2:net=vrf \
+  ${ARTIFACTS_DIR}/cube-vrf-${INSTALL_BSP}.tar.bz2:net=vrf:app=/usr/bin/docker-init,/sbin/vrf-init \
 "
 
 NETWORK_DEVICE="eth+ wl+ en+"
