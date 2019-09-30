@@ -36,7 +36,7 @@ python () {
         d.appendVar('IMAGE_INSTALL', ' run-container')
 
         containers = d.getVar('CONTAINER_NAMES').split()
-        d.appendVarFlag('do_image', 'mcdepends', ' '.join(['multiconfig:wr-host:wr-container:%s:do_image_complete' % c for c in containers]))
+        d.appendVarFlag('do_rootfs', 'mcdepends', ' '.join(['multiconfig:wr-host:wr-container:%s:do_image_complete' % c for c in containers]))
 
         d.appendVar('ROOTFS_POSTPROCESS_COMMAND', ' rootfs_install_container;')
 }
