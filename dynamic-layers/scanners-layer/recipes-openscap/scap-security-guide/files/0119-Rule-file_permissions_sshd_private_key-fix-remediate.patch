@@ -1,0 +1,32 @@
+From 2f1f5f632b05bf1c9762ea75dbe27b30bf6135fc Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Mon, 30 Sep 2019 10:27:47 +0800
+Subject: [PATCH] Rule file_permissions_sshd_private_key fix remediate error
+
+For rule file_permissions_sshd_private_key fix remediate error,
+since the ssh private keys are end with _key, update the
+pattern match to ^.*_key.
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../services/ssh/file_permissions_sshd_private_key/oval/wrlinux1019.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/linux_os/guide/services/ssh/file_permissions_sshd_private_key/oval/wrlinux1019.xml b/linux_os/guide/services/ssh/file_permissions_sshd_private_key/oval/wrlinux1019.xml
+index 39affb4..9b6b45f 100644
+--- a/linux_os/guide/services/ssh/file_permissions_sshd_private_key/oval/wrlinux1019.xml
++++ b/linux_os/guide/services/ssh/file_permissions_sshd_private_key/oval/wrlinux1019.xml
+@@ -20,7 +20,7 @@ set to 0600 (or stronger). By default, these files are located at /etc/ssh.</des
+ 
+   <unix:file_object comment="/etc/ssh" id="object_file_permissions_sshd_private_key" version="1">
+     <unix:path>/etc/ssh/</unix:path>
+-    <unix:filename operation="pattern match">^.*key$</unix:filename>
++    <unix:filename operation="pattern match">^.*_key$</unix:filename>
+   </unix:file_object>
+ 
+   <unix:file_state id="state_file_permissions_sshd_private_key" version="1">
+-- 
+1.9.1
+
