@@ -1,0 +1,83 @@
+From 520942ae6a6fdca0213111731a5b3e9d6fe7664e Mon Sep 17 00:00:00 2001
+From: De Huo <De.Huo@windriver.com>
+Date: Tue, 8 Oct 2019 14:53:23 +0800
+Subject: [PATCH] Rule file_permissions_unauthorized_suid update check code
+
+For rule file_permissions_unauthorized_suid update the check code
+ according to the system updated.
+
+Upstream-Status: Pending
+
+Signed-off-by: De Huo <De.Huo@windriver.com>
+---
+ .../oval/wrlinux1019.xml                           | 42 ++++++++++------------
+ 1 file changed, 19 insertions(+), 23 deletions(-)
+
+diff --git a/linux_os/guide/system/permissions/files/file_permissions_unauthorized_suid/oval/wrlinux1019.xml b/linux_os/guide/system/permissions/files/file_permissions_unauthorized_suid/oval/wrlinux1019.xml
+index c03515e..51a24ca 100644
+--- a/linux_os/guide/system/permissions/files/file_permissions_unauthorized_suid/oval/wrlinux1019.xml
++++ b/linux_os/guide/system/permissions/files/file_permissions_unauthorized_suid/oval/wrlinux1019.xml
+@@ -28,41 +28,37 @@
+     <unix:suid datatype="boolean">true</unix:suid>
+   </unix:file_state>
+ 
+-<!-- List of all setuid files included with base WRL8 system -->
++<!-- List of all setuid files included with base WRL1019 system -->
+ <!-- KEEP THE LIST BELOW SORTED !!! -->
+   <unix:file_state id="state_suid_whitelist" version="1">
+     <unix:filepath var_ref="var_suid_whitelist" var_check="at least one" />
+   </unix:file_state>
+ 
+   <constant_variable id="var_suid_whitelist" version="1" datatype="string" comment="suid whitelist">
+-    <value>/sbin/mount.nfs</value>
+-    <value>/bin/traceroute6</value>
+-    <value>/bin/mount.util-linux</value>
+-    <value>/bin/ping.iputils</value>
+-    <value>/bin/su.shadow</value>
+-    <value>/bin/clockdiff</value>
+-    <value>/bin/umount.util-linux</value>
+-    <value>/bin/su.util-linux</value>
+-    <value>/usr/sbin/seunshare</value>
+-    <value>/usr/sbin/pppd</value>
+-    <value>/usr/sbin/unix_chkpwd</value>
+-    <value>/usr/libexec/dbus-daemon-launch-helper</value>
+-    <value>/usr/libexec/lxc/lxc-user-nic</value>
+-    <value>/usr/bin/gpasswd</value>
+-    <value>/usr/bin/mandb</value>
+-    <value>/usr/bin/chsh.shadow</value>
+-    <value>/usr/bin/expiry</value>
+-    <value>/usr/bin/newgrp.shadow</value>
+     <value>/usr/bin/screen-4.6.2</value>
++    <value>/usr/bin/newgidmap</value>
++    <value>/usr/bin/newgrp.shadow</value>
++    <value>/usr/bin/man</value>
+     <value>/usr/bin/chage</value>
+     <value>/usr/bin/at</value>
+-    <value>/usr/bin/cgexec</value>
+-    <value>/usr/bin/newgidmap</value>
+     <value>/usr/bin/passwd.shadow</value>
+-    <value>/usr/bin/sudo</value>
+-    <value>/usr/bin/man</value>
++    <value>/usr/bin/chsh.shadow</value>
++    <value>/usr/bin/gpasswd</value>
+     <value>/usr/bin/chfn.shadow</value>
++    <value>/usr/bin/expiry</value>
+     <value>/usr/bin/newuidmap</value>
++    <value>/usr/bin/mandb</value>
++    <value>/usr/bin/sudo</value>
++    <value>/usr/sbin/seunshare</value>
++    <value>/usr/sbin/unix_chkpwd</value>
++    <value>/usr/sbin/pppd</value>
++    <value>/usr/libexec/ssh-keysign</value>
++    <value>/usr/libexec/dbus-daemon-launch-helper</value>
++    <value>/bin/su.shadow</value>
++    <value>/bin/umount.util-linux</value>
++    <value>/bin/mount.util-linux</value>
++    <value>/bin/su.util-linux</value>
++    <value>/sbin/mount.nfs</value>
+   </constant_variable>
+ 
+ </def-group>
+-- 
+1.9.1
+
