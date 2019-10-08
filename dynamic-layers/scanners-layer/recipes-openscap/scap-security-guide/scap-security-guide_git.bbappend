@@ -121,6 +121,7 @@ SRC_URI = "git://github.com/OpenSCAP/scap-security-guide.git \
             file://0117-Rule-sysctl_net_ipv4_conf_default_accept_source_route_add_remediation.patch \
             file://0118-supply-stig_overlay-file.patch \
             file://0119-Rule-file_permissions_sshd_private_key-fix-remediate.patch \
+            file://0120-Rule-file_permissions_sshd_private_key-update-remediation.patch \
            "
 PV = "0.1.45+git${SRCPV}"
 
