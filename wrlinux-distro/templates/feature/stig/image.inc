@@ -5,4 +5,6 @@ IMAGE_INSTALL += "openscap \
                   samhain \
                   strongswan \
                   libuser \
+                  openssh-misc \
+                  pam-plugin-timestamp \
                   "
