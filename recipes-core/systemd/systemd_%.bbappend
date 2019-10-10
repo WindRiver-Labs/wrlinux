@@ -13,9 +13,11 @@ SYSTEMD_DISABLED_SERVICES = " \
   proc-sys-fs-binfmt_misc.automount \
 "
 
-pkg_postinst_${PN}_append() {
+pkg_postinst_udev_append() {
+	ln -sf /dev/null $D${sysconfdir}/udev/rules.d/80-net-setup-link.rules
+}
 
-ln -sf /dev/null $D${sysconfdir}/udev/rules.d/80-net-setup-link.rules
+pkg_postinst_${PN}_append() {
 
 container_enable=${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', 'Yes', 'No', d)}
 
