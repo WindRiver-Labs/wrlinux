@@ -21,13 +21,30 @@ each multiconfig in the files.
 
 It requires 3 variables to be configured globally:
 
-* CONTAINER_NAMES
-* CONTAINER_PRIORITIES
-* HOST_IMAGES
+* WR_CONTAINER_NAMES
+* WR_CONTAINER_PRIORITIES
+* WR_HOST_IMAGES
 
-CONTAINER_NAMES and CONTAINER_PRIORITIES are associated. It should set them
+WR_CONTAINER_NAMES and WR_CONTAINER_PRIORITIES are associated. It should set them
 with containers which are involved and their priorities. Images set in
-HOST_IMAGES could be built as host images to include container images.
+WR_HOST_IMAGES could be built as host images to include container images.
+
+It reads configure file /etc/wr-containers/containers.conf and 2 variables are
+supported for now:
+
+* WR_DOCKER_PARAMS: parameters pass to docker for containers
+* WR_DOCKER_START_COMMAND: default value is /bin/bash
+
+it also supports config for single container:
+* WR_DOCKER_PARAMS_${container_name}
+* WR_DOCKER_START_COMMAND_${container_name}
+
+they will override corresponding variable such as WR_DOCKER_PARAMS for specified
+container.
+
+When configure file updated, new containers will be started with new
+configures. Old containers are deprecated but still exists and renamed with
+current date and time in case users still need them.
 
 
 Use Case
@@ -44,9 +61,9 @@ Take existing container recipes wr-app-container and wr-systemd-container as exa
 
 $ source oe-init-build-env
 $ cat >>conf/local.conf <<EOF
-CONTAINER_NAMES = "wr-app-container wr-systemd-container"
-CONTAINER_PRIORITIES = "50 100"
-HOST_IMAGES = "wrlinux-image-std"
+WR_CONTAINER_NAMES = "wr-app-container wr-systemd-container"
+WR_CONTAINER_PRIORITIES = "50 100"
+WR_HOST_IMAGES = "wrlinux-image-std"
 
 # Following are required by example containers
 WR_APP_CONTAINER_APP = "bash"
@@ -54,19 +71,26 @@ WR_SYSTEMD_CONTAINER_APPS = "apache2"
 
 # Set 5G free disk space with these example containers ONLY for qemu images
 IMAGE_ROOTFS_EXTRA_SPACE = "5242880"
+
+# Following configs are for demonstration and optional
+WR_DOCKER_PARAMS = '-v /opt:/mnt'
+WR_DOCKER_START_COMMAND = '/bin/sh'
+
+WR_DOCKER_PARAMS_wr-app-container = ''
+WR_DOCKER_START_COMMAND_wr-systemd-container = "/bin/bash"
 EOF
 
 Note:
 -----
-i. This approach works when building additional container images, as documented in
-"Creating Additional Containers" in the Wind River Linux documentation. In this
-case the CONTAINER_NAMES must reflect the appropriate container names given to
-these containers and WR_APP_CONTAINER_APP or WR_SYSTEMD_CONTAINER_APPS are not
-required.
+i. This approach works when building additional container images, as documented
+in "Creating Additional Containers" in the Wind River Linux documentation. In
+this case the WR_CONTAINER_NAMES must reflect the appropriate container names
+given to these containers and WR_APP_CONTAINER_APP or WR_SYSTEMD_CONTAINER_APPS
+are not required.
 
 ii. For qemu images, it needs to set enough free disk space in the images that
-docker needs a lot of space according to containers set in CONTAINER_NAMES. For
-this example, it suggests to have 5 Gbytes extra free disk space.
+docker needs a lot of space according to containers set in WR_CONTAINER_NAMES.
+For this example, it suggests to have 5 Gbytes extra free disk space.
 
 
 3. Copy multiconfig files resides in this template directory
@@ -74,20 +98,30 @@ this example, it suggests to have 5 Gbytes extra free disk space.
 $ cp -r $THIS_TEMPLATE_PATH/files/multiconfig conf/
 
 
-4. Build host image set in HOST_IMAGES and boot it
+4. Build host image set in WR_HOST_IMAGES and boot it
 
 $ bitbake mc:wr-host:wrlinux-image-std
 $ runqemu qemux86-64 kvm nographic qemuparams='-m 2048' tmp-host-glibc/deploy/images/qemux86-64/wrlinux-image-std-qemux86-64.ext4
 
 
-5 Check docker images created and started according to config of CONTAINER_NAMES and CONTAINER_PRIORITIES
+5 Check docker images created and started according to config of WR_CONTAINER_NAMES and WR_CONTAINER_PRIORITIES
 
 root@qemux86-64:~# docker ps
 CONTAINER ID    IMAGE                  COMMAND        CREATED           STATUS          PORTS    NAMES
 2fbee363bf51    wr-app-container       "/bin/bash"    11 seconds ago    Up 10 seconds            wr-app-container
 4fa1e4122486    wr-systemd-container   "/bin/bash"    40 seconds ago    Up 38 seconds            wr-systemd-container
 
-Then you could attach and work with the containers.
+Then the containers could be attached and work on them. It could check settings
+of WR_DOCKER_PARAMS and WR_DOCKER_START_COMMAND work by following commands:
+
+root@qemux86-64:~# docker attach wr-systemd-container
+bash-5.0# ps
+    PID TTY          TIME CMD
+      1 pts/0    00:00:00 bash
+      6 pts/0    00:00:00 ps
+bash-5.0# ls /mnt/
+containerd  wr-containers
+bash-5.0#
 
 
 Known Issue
