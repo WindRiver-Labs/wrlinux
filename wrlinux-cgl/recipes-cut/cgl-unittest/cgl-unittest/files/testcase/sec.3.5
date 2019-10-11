@@ -67,17 +67,31 @@ fi
 
 chmod 755 /etc/fstab
 cp /bin/arping /bin/arping.bak
-grep Samhain /var/log/syslog | grep fstab |grep $hostname
-if [ $? -ne 0 ] 
-then
-    sleep 120 
-    grep Samhain /var/log/syslog | grep fstab |grep $hostname || cutfail
-fi
 
-grep Samhain /var/log/syslog | grep arping.bak | grep $hostname
-if [ $? -ne 0 ] 
-then
-    sleep 120 
-    grep Samhain /var/log/syslog | grep arping.bak |grep $hostname || cutfail
-fi
+# check log per 10s, maxlimit is 360s
+maxlimit=0
+while true
+do
+    if [ $maxlimit -le 36 ]
+    then
+        grep Samhain /var/log/syslog | grep fstab |grep $hostname
+        fstab_result=$?
+        grep Samhain /var/log/syslog | grep arping.bak | grep $hostname
+        arping_result=$?
+        if [ $fstab_result -ne 0 ] || [ $arping_result -ne 0 ]
+        then
+            sleep 10
+            maxlimit=$[$maxlimit+1]
+        else
+            usedtime=$[$maxlimit * 10]
+            echo "Take $usedtime""s to get result"
+            break
+        fi
+    else
+        grep Samhain /var/log/syslog | grep fstab |grep $hostname || cutfail
+        grep Samhain /var/log/syslog | grep arping.bak |grep $hostname || cutfail
+        break
+    fi
+done
+
 cutpass
