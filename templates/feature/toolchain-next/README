@@ -1,9 +1,0 @@
-Enable alternative in-development toolchain
-
-When the system has multiple toolchains available, generally a stable and
-an indevelopment 'next' version.  Switch to enabling the next version.
-
-#@TYPE: Wrtemplate
-#@NAME: toolchain-next
-#@DESCRIPTION: Enable alternative in-development (future) toolchain
-

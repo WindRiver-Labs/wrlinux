@@ -1,6 +1,0 @@
-Enable the in development linux-yocto kernel.
-
-#@TYPE: Wrtemplate
-#@NAME: linux-yocto-dev
-#@DESCRIPTION: Enable alternative in-development linux-yocto
-
