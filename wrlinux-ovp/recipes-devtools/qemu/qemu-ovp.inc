@@ -6,7 +6,7 @@
 DEPENDS_append = " dtc pixman util-linux"
 EXTRA_OECONF_append += "--disable-sdl --enable-fdt --disable-smartcard --cross-prefix=${TARGET_PREFIX}"
 
-FILESEXTRAPATHS_append := "${THISDIR}/files"
+FILESEXTRAPATHS_append := ":${THISDIR}/files"
 
 CFLAGS_append += "-I${STAGING_INCDIR}/glib-2.0 -I${STAGING_LIBDIR}/glib-2.0/include "
 
