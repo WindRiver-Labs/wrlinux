@@ -1,7 +1,4 @@
-#
-# Copyright (C) 2018 Wind River Systems, Inc.
-#
-
-inherit distro_features_check
-
-CONFLICT_DISTRO_FEATURES_append = " openssl-no-weak-ciphers"
+# This file is generated automatically by wry
+PYTHON_REQUESTS_INC_WRLINUX = ""
+PYTHON_REQUESTS_INC_WRLINUX_osv-wrlinux = "python-requests_wrlinux.inc"
+require ${PYTHON_REQUESTS_INC_WRLINUX}
