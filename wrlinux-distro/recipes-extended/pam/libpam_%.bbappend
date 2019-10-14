@@ -9,7 +9,7 @@ SRC_URI += "${@bb.utils.contains('PACKAGECONFIG', 'tally2', '\
 	file://pam_tally2_faillog.patch', '', d)} \
 "
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/libpam:"
 
 PACKAGECONFIG[tally2] = ",,,"
 

@@ -2,7 +2,7 @@
 # Copyright (C) 2012-2017 Wind River Systems, Inc.
 #
 
-FILESEXTRAPATHS_prepend_wrlinux-ovp := "${THISDIR}/${BPN}:"
+FILESEXTRAPATHS_prepend_wrlinux-ovp := "${THISDIR}/acpid:"
 
 SRC_URI_append_wrlinux-ovp = " \
             file://powerbtn \

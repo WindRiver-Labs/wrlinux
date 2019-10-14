@@ -4,7 +4,7 @@
 # the kernel no longer supports them, but our kernel does support them
 # and we need to use them, so add them back.
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:${THISDIR}/${PN}:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 SRC_URI += "file://nfs-utils-support-mountprog-and-nfsprog-options.patch \
 "

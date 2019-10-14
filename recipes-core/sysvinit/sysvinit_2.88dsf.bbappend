@@ -3,7 +3,7 @@
 #
 # LOCAL REV: add WR specific scripts
 #
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/sysvinit:"
 SRC_URI += "file://sysvinit_2.88dsf-add-service-script.patch"
 
 PR = "r500"

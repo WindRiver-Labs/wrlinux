@@ -3,7 +3,7 @@
 # are part of the distribution, but not the three we add here.
 #
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/libpam:"
 
 # Note how we "name" the checksums.
 #

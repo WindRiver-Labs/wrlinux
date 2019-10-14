@@ -6,7 +6,7 @@
 # make the default runlevel 3
 #
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/sysvinit-inittab:"
 SRC_URI = "file://inittab"
 RDEPENDS_${PN} += "mingetty"
 SYSVINIT_ENABLED_GETTYS = "2 3 4 5 6"
