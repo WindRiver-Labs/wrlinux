@@ -1,7 +1,4 @@
-#
-# Copyright (C) 2017 - 2018 Wind River Systems, Inc.
-#
-
-FILESEXTRAPATHS_prepend := "${THISDIR}/postgresql:"
-
-SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'openssl-no-weak-ciphers', 'file://0001-postgresql-fix-openssl-no-des.patch', '', d)}"
+# This file is generated automatically by wry
+POSTGRESQL_INC_WRLINUX = ""
+POSTGRESQL_INC_WRLINUX_osv-wrlinux = "postgresql_wrlinux.inc"
+require ${POSTGRESQL_INC_WRLINUX}
