@@ -1,7 +1,4 @@
-#
-# Copyright (C) 2017 Wind River Systems, Inc.
-#
-
-inherit distro_features_check
-
-CONFLICT_DISTRO_FEATURES_append = " openssl-no-weak-ciphers"
+# This file is generated automatically by wry
+DOVECOT_INC_WRLINUX = ""
+DOVECOT_INC_WRLINUX_osv-wrlinux = "dovecot_wrlinux.inc"
+require ${DOVECOT_INC_WRLINUX}
