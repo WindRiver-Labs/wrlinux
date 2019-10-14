@@ -1,7 +1,4 @@
-# LOCAL REV: WR specific fixes
-#
-# Replace harmless errors with warnings to meet WR Feature Testing cases.
-
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
-
-SRC_URI += "file://hdparm-fix-HDIO_GET_IDENTITY.patch"
+# This file is generated automatically by wry
+HDPARM_INC_WRLINUX = ""
+HDPARM_INC_WRLINUX_osv-wrlinux = "hdparm_wrlinux.inc"
+require ${HDPARM_INC_WRLINUX}
