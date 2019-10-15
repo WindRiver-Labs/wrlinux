@@ -44,26 +44,19 @@ prepare_fs()
 }
 
 prepare_fs
-# check the file system support journal or not
-debugfs -R features $TMP_DIR1/fs.img|grep has_journal
+# check the file system support journal and if it need recovery
+debugfs -R features $TMP_DIR1/fs.img|grep has_journal | grep needs_recovery
 if [ $? -ne 0 ]
 then
     cutfail
 fi
-# writing a file
-dd if=/dev/zero of=$TMP_DIR/testfile bs=1024 count=400000 &
 
-# Force to unmount
-umount -fl $TMP_DIR
+#only need_recovery file system will recover journal
+#so save one need_recovery file system
+cp $TMP_DIR1/fs.img $TMP_DIR1/fs-unclean.img
 
-# confirm not write
-dd_id=`ps aux | grep dd | grep testfile| awk '{print $2}'`
-if [ ! -z ${dd_id} ]
-then
-    kill -9 $dd_id &> /dev/null
-fi
 # check if support journal when fsck the system
-e2fsck -y $TMP_DIR1/fs.img|grep "recovering journal"
+e2fsck -y $TMP_DIR1/fs-unclean.img|grep "recovering journal"
 if [ $? -eq 0 ]
 then
     cutpass
