@@ -1,0 +1,10 @@
+This template adds kubernetes (Production-Grade Container
+Scheduling and Management) to the filesystem.
+
+To use this template, add the following to your setup line:
+
+    --templates feature/kubernetes
+
+#@TYPE: Wrtemplate
+#@NAME: kubernetes
+#@DESCRIPTION: Add kubernetes to the image
