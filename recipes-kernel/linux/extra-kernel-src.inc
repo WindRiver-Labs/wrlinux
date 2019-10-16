@@ -1,5 +1,5 @@
 EXTRA_KERNEL_FILES ?= ""
 EXTRA_KERNEL_SRC_URI ?= ""
 
-FILESEXTRAPATHS_prepend_osv-wrlinux := "${EXTRA_KERNEL_FILES}:"
-SRC_URI_append_osv-wrlinux = " ${EXTRA_KERNEL_SRC_URI}"
+FILESEXTRAPATHS_prepend := "${EXTRA_KERNEL_FILES}:"
+SRC_URI_append = " ${EXTRA_KERNEL_SRC_URI}"
