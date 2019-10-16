@@ -1,6 +1,4 @@
-#
-# Copyright (C) 2012-2013 Wind River Systems, Inc.
-#
-
-#include util-linux-agetty too
-RRECOMMENDS_${PN} += " util-linux-agetty"
+# This file is generated automatically by wry
+UTIL_LINUX_INC_WRLINUX = ""
+UTIL_LINUX_INC_WRLINUX_osv-wrlinux = "util-linux_wrlinux.inc"
+require ${UTIL_LINUX_INC_WRLINUX}

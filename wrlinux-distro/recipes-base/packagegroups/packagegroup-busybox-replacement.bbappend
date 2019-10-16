@@ -1,10 +1,4 @@
-#
-# Copyright (C) 2016 Wind River Systems Inc.
-#
-
-BUSYBOX_REPLACE_PACKAGES_append_osv-wrlinux = " \
-    fbset \
-    netcat \
-    usleep \
-    vim-tiny \
-    "
+# This file is generated automatically by wry
+PACKAGEGROUP_BUSYBOX_REPLACEMENT_INC_WRLINUX = ""
+PACKAGEGROUP_BUSYBOX_REPLACEMENT_INC_WRLINUX_osv-wrlinux = "packagegroup-busybox-replacement_wrlinux.inc"
+require ${PACKAGEGROUP_BUSYBOX_REPLACEMENT_INC_WRLINUX}

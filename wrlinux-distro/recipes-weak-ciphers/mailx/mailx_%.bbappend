@@ -1,7 +1,4 @@
-#
-# Copyright (C) 2017 Wind River Systems, Inc.
-#
-
-FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
-
-SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'openssl-no-weak-ciphers', 'file://mailx-openssl-no-des.patch', '', d)}"
+# This file is generated automatically by wry
+MAILX_INC_WRLINUX = ""
+MAILX_INC_WRLINUX_osv-wrlinux = "mailx_wrlinux.inc"
+require ${MAILX_INC_WRLINUX}

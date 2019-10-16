@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_append := "${THISDIR}/files:"
+FILESEXTRAPATHS_append := ":${THISDIR}/files"
 
 SRC_URI += " \
 	file://init.luks \

@@ -1,10 +1,4 @@
-#
-# Copyright (C) 2014 Wind River Systems, Inc.
-#
-
-# The graphics packages in packagegroup-self-hosted-graphics
-# are for Build Appliance usage in oe-core which are not
-# needed in our self-hosted feature.
-# So drop the graphics packagegroup.
-PACKAGES_remove_osv-wrlinux = "packagegroup-self-hosted-graphics"
-RDEPENDS_packagegroup-self-hosted_remove_osv-wrlinux = "packagegroup-self-hosted-graphics"
+# This file is generated automatically by wry
+PACKAGEGROUP_SELF_HOST_INC_WRLINUX = ""
+PACKAGEGROUP_SELF_HOST_INC_WRLINUX_osv-wrlinux = "packagegroup-self-host_wrlinux.inc"
+require ${PACKAGEGROUP_SELF_HOST_INC_WRLINUX}

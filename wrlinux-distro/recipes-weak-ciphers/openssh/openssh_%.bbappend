@@ -1,7 +1,4 @@
-#
-# Copyright (C) 2018 Wind River Systems, Inc.
-#
-
-FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
-
-SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'openssl-no-weak-ciphers', 'file://fix-missing-macro-guards-of-ecc.patch', '', d)}"
+# This file is generated automatically by wry
+OPENSSH_INC_WRLINUX = ""
+OPENSSH_INC_WRLINUX_osv-wrlinux = "openssh_wrlinux.inc"
+require ${OPENSSH_INC_WRLINUX}

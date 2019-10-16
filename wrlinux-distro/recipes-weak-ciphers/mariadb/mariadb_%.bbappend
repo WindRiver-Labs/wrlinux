@@ -1,7 +1,4 @@
-#
-# Copyright (C) 2019 Wind River Systems, Inc.
-#
-
-FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
-
-SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'openssl-no-weak-ciphers', 'file://0001-mariadb-fix-openssl-no-des.patch', '', d)}"
+# This file is generated automatically by wry
+MARIADB_INC_WRLINUX = ""
+MARIADB_INC_WRLINUX_osv-wrlinux = "mariadb_wrlinux.inc"
+require ${MARIADB_INC_WRLINUX}

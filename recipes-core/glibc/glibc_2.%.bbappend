@@ -1,6 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
-SRC_URI += " \
-    ${@bb.utils.contains('PACKAGECONFIG', 'POSIX_26', 'file://0001-Add-support-for-posix_devctl.patch', '', d)} \
-"
-
-PACKAGECONFIG[POSIX_26] = ",,,"
+# This file is generated automatically by wry
+GLIBC_INC_WRLINUX = ""
+GLIBC_INC_WRLINUX_osv-wrlinux = "glibc_wrlinux.inc"
+require ${GLIBC_INC_WRLINUX}

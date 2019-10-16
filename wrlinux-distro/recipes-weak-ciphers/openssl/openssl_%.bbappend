@@ -1,7 +1,4 @@
-#
-# Copyright (C) 2017 Wind River Systems, Inc.
-#
-
-WEAKCIPHERS = "${@bb.utils.contains('DISTRO_FEATURES', 'openssl-no-weak-ciphers', 'no-des no-ec no-ecdh no-ecdsa no-md2 no-mdc2', '', d)}"
-EXTRA_OECONF_append_class-target_osv-wrlinux = " ${WEAKCIPHERS}"
-EXTRA_OECONF_append_class-nativesdk_osv-wrlinux = " ${WEAKCIPHERS}"
+# This file is generated automatically by wry
+OPENSSL_INC_WRLINUX = ""
+OPENSSL_INC_WRLINUX_osv-wrlinux = "openssl_wrlinux.inc"
+require ${OPENSSL_INC_WRLINUX}
