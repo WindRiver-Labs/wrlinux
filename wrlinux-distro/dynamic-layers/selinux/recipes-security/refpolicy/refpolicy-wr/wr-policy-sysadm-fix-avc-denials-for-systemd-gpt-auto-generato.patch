@@ -1,0 +1,35 @@
+From 90793e00e098c7029aa54fed2517df341a64b04b Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 17 Oct 2019 16:16:53 +0800
+Subject: [PATCH] sysadm: fix avc denials for systemd-gpt-auto-generator
+
+Fix:
+type=AVC msg=audit(1571296582.175:114): avc:  denied  { read } for
+pid=2564 comm="systemd-gpt-aut" name="sdb" dev="devtmpfs" ino=13861
+scontext=root:sysadm_r:sysadm_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:fixed_disk_device_t:s15:c0.c1023
+tclass=blk_file permissive=1
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/roles/sysadm.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/roles/sysadm.te b/policy/modules/roles/sysadm.te
+index fb3511d..330d9c7 100644
+--- a/policy/modules/roles/sysadm.te
++++ b/policy/modules/roles/sysadm.te
+@@ -59,6 +59,8 @@ userdom_home_filetrans_user_home_dir(sysadm_t)
+ 
+ term_filetrans_all_named_dev(sysadm_t)
+ 
++storage_raw_read_fixed_disk(sysadm_t)
++
+ ifdef(`init_systemd',`
+ 	init_get_all_units_status(sysadm_t)
+ 	init_start_all_units(sysadm_t)
+-- 
+2.7.4
+
