@@ -1,4 +1,4 @@
-FILESPATH_append := ":${@base_set_filespath(['${THISDIR}'], d)}/${BPN}"
+FILESEXTRAPATHS_append := ":${THISDIR}/rpm"
 
 # Add in the macros.krp file to point to the keyring directory
 # to put keys...
