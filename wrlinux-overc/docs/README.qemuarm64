@@ -83,8 +83,8 @@ ENDPATCH
 Running with the Image
 ---
 Run the image using runqemu from your build directory:
-%> ROOTFS=boot.img runqemu slirp qemuparams="-nographic -vnc :1" \
-   bootparams="root=/dev/vda3"
+%> ROOTFS=boot.img runqemu slirp qemuparams="-nographic -vnc :1 -m 2G" \
+   bootparams="root=/dev/vda3 mem=2G"
 
 You can use 'ctrl+w #' to switch between essential (where # = 0), dom0
 (where # = 1) and cube-server (where # = 2) gettys. Since this makes

@@ -33,6 +33,10 @@ my_local_post_func()
 		ln -sf /dev/null ${TMPMNT}/opt/container/cube-gw/rootfs/etc/systemd/system/systemd-resolved.service
 		ln -sf /dev/null ${TMPMNT}/opt/container/cube-gw/rootfs/etc/systemd/system/systemd-networkd.service
 		ln -sf /dev/null ${TMPMNT}/opt/container/cube-gw/rootfs/etc/systemd/system/systemd-networkd.socket
+	    elif [ $c = cube-server ] ; then
+		# Reinstate the autostarting of systemd-resolved that the cubeit-installer disables.
+		# If you remove 'cube.device.mgr=self' from cube-server in HDINSTALL_CONTAINERS then don't do this, ie. comment this line out.
+		ln -sf /lib/systemd/system/systemd-resolved.service ${TMPMNT}/opt/container/cube-server/rootfs/etc/systemd/system/multi-user.target.wants/systemd-resolved.service
 	    fi
 	fi
     done
