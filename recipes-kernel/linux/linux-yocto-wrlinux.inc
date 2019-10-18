@@ -6,6 +6,10 @@ addhandler linux_yocto_rewrite_uri
 linux_yocto_rewrite_uri[eventmask] = "bb.event.RecipePreFinalise"
 
 python linux_yocto_rewrite_uri() {
+    pass
+}
+
+python linux_yocto_rewrite_uri_osv-wrlinux() {
     d = e.data
 
     layer_path="${LAYER_PATH_wrlinux}"
