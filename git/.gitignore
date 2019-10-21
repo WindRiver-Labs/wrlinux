@@ -1,2 +1,6 @@
 *
 !.gitignore
+# symlink oe-core's kernel source repo to wrlinux repo
+!git.yoctoproject.org.linux-yocto-dev.git
+!git.yoctoproject.org.yocto-kernel-cache.git
+!git.yoctoproject.org.linux-yocto.git
