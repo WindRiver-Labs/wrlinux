@@ -13,18 +13,53 @@ container_conf_stamp="/var/etc/wr-containers/containers.conf.stamp"
 
 conf_updated=false
 
+declare -A configs
+
+get_configs() {
+	if [ $# -lt 1 ]; then
+		return
+	fi
+
+	container_name=$1
+
+	# const EMPTY is used to handle empty value of WR_DOCKER_PARAMS_${container}
+	# which overrides WR_DOCKER_PARAMS
+	docker_params=${configs["WR_DOCKER_PARAMS_${container_name}"]}
+	if [ -z "$docker_params" ]; then
+		docker_params=${configs["WR_DOCKER_PARAMS"]}
+	fi
+	if [ "$docker_params" = "EMPTY" ]; then
+		docker_params=
+	fi
+
+	start_command=${configs["WR_DOCKER_START_COMMAND_${container_name}"]}
+	if [ -z "$start_command" ]; then
+		start_command=${configs["WR_DOCKER_START_COMMAND"]}
+	fi
+	if [ -z "$start_command" ]; then
+		start_command=/bin/bash
+	fi
+	if [ "$start_command" = 'EMPTY' ]; then
+		start_command=
+	fi
+}
+
 # check whether config file updated
 if [ -f $container_conf ]; then
 	# parse config file
-	while read -r line; do
-		if [[ "$line" =~ ^$ || "$line" =~ ^# ]]; then
+	while IFS='=' read -r key value; do
+		if [[ "$key" =~ ^$ || "$key" =~ ^# ]]; then
 			continue
 		fi
 
-		# allow hyphen in container names
-		var=`echo $line | cut -d'=' -f 1 | tr '-' '_'`
-		value=`echo $line | cut -d'=' -f 2`
-		eval $var=$value
+		# strip quotes at begin and end
+		value=$(echo $value | sed -E -e 's/^['\''"]+//g' -e 's/['\''"]+$//g')
+
+		if [ -z "$value" ]; then
+			value=EMPTY
+		fi
+
+		configs[$key]="$value"
 	done < $container_conf
 
 	cur_stmp=`stat -c %Y $container_conf`
@@ -38,8 +73,6 @@ if [ -f $container_conf ]; then
 		echo $cur_stmp >$container_conf_stamp
 	fi
 fi
-
-: ${WR_DOCKER_START_COMMAND:=/bin/bash}
 
 
 # get container info
@@ -78,12 +111,14 @@ do
 	fi
 done < $sorted
 
+
 while IFS= read -r line
 do
 	str="$line"
 	arr=($str)
 	container_name=`basename ${arr[0]}`
-	tr_container_name=`basename ${arr[0]} | tr '-' '_'`
+
+	get_configs $container_name
 
 	container_id=`docker ps -a --filter=name=^$container_name$ --format {{.ID}}`
 	if [ -n "$container_id" ]; then
@@ -91,8 +126,7 @@ do
 			echo "Configure updated. Start a new container $container_name with updated configure."
 			curtime=`date +%Y%m%d%H%M`
 			docker rename $container_name ${container_name}_$curtime
-			eval docker_params=\${WR_DOCKER_PARAMS_${tr_container_name}-${WR_DOCKER_PARAMS}}
-			eval start_command=\${WR_DOCKER_START_COMMAND_${tr_container_name}-${WR_DOCKER_START_COMMAND}}
+
 			docker run -it -d --name ${container_name} ${docker_params} ${container_name} ${start_command}
 			errno=$?
 			if [ $errno -ne 0 ]; then
@@ -105,9 +139,6 @@ do
 			docker start $container_id
 		fi
 	else
-		eval docker_params=\${WR_DOCKER_PARAMS_${tr_container_name}-${WR_DOCKER_PARAMS}}
-		eval start_command=\${WR_DOCKER_START_COMMAND_${tr_container_name}-${WR_DOCKER_START_COMMAND}}
-
 		image_id=`docker images $container_name --format {{.ID}}`
 		if [ -z "$image_id" ]; then
 			container_path=`ls -1 ${container_dir}/${container_name}*.tar.bz2 | head -1`
