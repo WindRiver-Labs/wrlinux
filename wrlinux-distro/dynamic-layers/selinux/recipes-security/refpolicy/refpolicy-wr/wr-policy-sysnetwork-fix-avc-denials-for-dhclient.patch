@@ -1,0 +1,57 @@
+From 72920b6ebe18a33dd78a93f7493d1b6ad61173aa Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 22 Oct 2019 17:54:21 +0800
+Subject: [PATCH] sysnetwork: fix avc denials for dhclient
+
+Fix:
+dhclient-systemd-wrapper[316]: chown: changing ownership of '/tmp/resolv.conf.dhclient-new': Operation not permitted
+dhclient-systemd-wrapper[316]: mv: setting attribute 'security.selinux' for 'security.selinux': Permission denied
+dhclient-systemd-wrapper[316]: /etc/dhcp/dhclient.d/ntp.sh: line 31: /etc/ntp.conf: Permission denied
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/ntp.fc      | 1 +
+ policy/modules/system/sysnetwork.te | 6 +++++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/policy/modules/services/ntp.fc b/policy/modules/services/ntp.fc
+index 49ffe6f..8dcd9ac 100644
+--- a/policy/modules/services/ntp.fc
++++ b/policy/modules/services/ntp.fc
+@@ -11,6 +11,7 @@
+ /etc/ntp/step-tickers.*			--	gen_context(system_u:object_r:ntp_conf_t,s0)
+ 
+ /etc/rc\.d/init\.d/ntpd? 		--	gen_context(system_u:object_r:ntpd_initrc_exec_t,s0)
++/etc/dhcp/dhclient\.d/ntp\.sh 		--	gen_context(system_u:object_r:ntpd_exec_t,s0)
+ 
+ /run/ntpd\.pid				--	gen_context(system_u:object_r:ntpd_pid_t,s0)
+ /run/systemd/timesync(/.*)?			gen_context(system_u:object_r:ntpd_pid_t,s0)
+diff --git a/policy/modules/system/sysnetwork.te b/policy/modules/system/sysnetwork.te
+index 13c783e..bfe67cd 100644
+--- a/policy/modules/system/sysnetwork.te
++++ b/policy/modules/system/sysnetwork.te
+@@ -47,7 +47,7 @@ ifdef(`distro_debian',`
+ #
+ # DHCP client local policy
+ #
+-allow dhcpc_t self:capability { dac_override fsetid net_admin net_bind_service net_raw setpcap sys_nice sys_resource sys_tty_config };
++allow dhcpc_t self:capability { dac_override fsetid net_admin net_bind_service net_raw setpcap sys_nice sys_resource sys_tty_config chown sys_admin fowner };
+ dontaudit dhcpc_t self:capability { sys_ptrace sys_tty_config };
+ # for access("/etc/bashrc", X_OK) on Red Hat
+ dontaudit dhcpc_t self:capability { dac_read_search sys_module };
+@@ -83,6 +83,10 @@ sysnet_manage_config(dhcpc_t)
+ files_etc_filetrans(dhcpc_t, net_conf_t, file)
+ files_tmp_filetrans(dhcpc_t, net_conf_t, file, "resolv.conf.dhclient-new")
+ 
++sysnet_relabel_config(dhcpc_t)
++allow dhcpc_t net_conf_t:file manage_file_perms;
++allow dhcpc_t net_conf_t:file relabel_file_perms;
++
+ # create temp files
+ manage_dirs_pattern(dhcpc_t, dhcpc_tmp_t, dhcpc_tmp_t)
+ manage_files_pattern(dhcpc_t, dhcpc_tmp_t, dhcpc_tmp_t)
+-- 
+2.7.4
+
