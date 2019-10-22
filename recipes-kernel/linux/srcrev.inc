@@ -37,9 +37,9 @@ SRCREV_machine_kb-v5.2-standard-mti-malta32 ?= "9cad7bb8bcd3686f580a3363847ee9c9
 LINUX_VERSION_kb-v5.2-standard-mti-malta32 ?= "5.2.20"
 SRCREV_machine_kb-v5.2-standard-mti-malta64 ?= "dc2be1a546e937374590ce3858b717489ded2c21"
 LINUX_VERSION_kb-v5.2-standard-mti-malta64 ?= "5.2.20"
-SRCREV_machine_kb-v5.2-standard-preempt-rt-base ?= "49e2fc02b5a00ab9fc64d01b57609d06aff977a1"
+SRCREV_machine_kb-v5.2-standard-preempt-rt-base ?= "55e3ee387b073d8d609e8899859561340d8b6911"
 LINUX_VERSION_kb-v5.2-standard-preempt-rt-base ?= "5.2.20"
-SRCREV_machine_kb-v5.2-standard-preempt-rt-cn96xx ?= "9a10f5761c01ab1553d6dcbc276d4f41e7c21da6"
+SRCREV_machine_kb-v5.2-standard-preempt-rt-cn96xx ?= "7f866c63b8e12aaf5b4d32183294b50737f36ed2"
 LINUX_VERSION_kb-v5.2-standard-preempt-rt-cn96xx ?= "5.2.20"
 SRCREV_machine_kb-v5.2-standard-preempt-rt-intel-x86 ?= "72e67aa2570880e386d049609aa99997d8c71c55"
 LINUX_VERSION_kb-v5.2-standard-preempt-rt-intel-x86 ?= "5.2.20"
@@ -60,5 +60,5 @@ LINUX_VERSION_kb-v5.2-standard-xlnx-soc ?= "5.2.20"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_5.2 = "yocto-5.2-wr"
-SRCREV_meta_5.2 = "bd0762cd138f1624b5a5f8669cfa3ac2b71cb87b"
+SRCREV_meta_5.2 = "c51fd8b3df624ada2f6699ad1c5f4ae173d76f87"
 LINUX_VERSION_5.2 = "5.2.20"
