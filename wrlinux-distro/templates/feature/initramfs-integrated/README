@@ -5,3 +5,8 @@
 Configure the build to create an initramfs image which will be integrated with
 the kernel image. For additional information, please review the initramfs.txt
 document found in the layers/wrlinux/Documentation directory.
+
+Note, please do not try to configure feature/efi-secure-boot and
+feature/initramfs-integrated simultaneously in a project, since efi-secure-boot
+requires a seperated initramfs for security verification, so these two features
+are not able to work with each other.
