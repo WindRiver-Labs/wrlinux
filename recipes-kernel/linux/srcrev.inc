@@ -60,5 +60,5 @@ LINUX_VERSION_kb-v5.2-standard-xlnx-soc ?= "5.2.20"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_5.2 = "yocto-5.2-wr"
-SRCREV_meta_5.2 = "c51fd8b3df624ada2f6699ad1c5f4ae173d76f87"
-LINUX_VERSION_5.2 = "5.2.20"
+SRCREV_meta_5.2 = "e4b3bf42e616c0deb08345a55022fc3a1f06d84f"
+LINUX_VERSION_5.2 = "5.2.21"
