@@ -159,4 +159,5 @@ SRC_URI += "file://wr-policy-fix-dev-log-label.patch \
             file://wr-policy-postfix-fix-avc-denials-for-postfix_local_t.patch \
             file://wr-policy-targeted-make-unconfined_u-the-default-selinux-user.patch \
             file://wr-policy-sysadm-fix-avc-denials-for-systemd-gpt-auto-generato.patch \
+            file://wr-policy-sysnetwork-fix-avc-denials-for-dhclient.patch \
            "
