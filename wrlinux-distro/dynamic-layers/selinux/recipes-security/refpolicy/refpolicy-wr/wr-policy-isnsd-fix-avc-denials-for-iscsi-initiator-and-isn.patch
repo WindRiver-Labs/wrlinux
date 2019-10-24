@@ -1,0 +1,98 @@
+From 60c1aa264149ec4c3732ddd2e37089eb76c00abb Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 24 Oct 2019 19:53:46 +0800
+Subject: [PATCH] isnsd.te: fix avc denials for iscsi-initiator and isnsd
+
+Fix errors:
+isnsd[6683]: /etc/iscsi/initiatorname.iscsi: Permission denied
+isnsd[6683]: Warning: Unable to listen on socket: Permission denied
+isnsd[6683]: ** FATAL ERROR **
+isnsd[6683]: Error: Unable to create server socket
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/admin/alsa.te     | 1 +
+ policy/modules/admin/logwatch.te | 1 +
+ policy/modules/services/isns.te  | 4 ++++
+ policy/modules/system/init.if    | 5 +++++
+ policy/modules/system/iscsi.te   | 2 ++
+ 5 files changed, 13 insertions(+)
+
+diff --git a/policy/modules/admin/alsa.te b/policy/modules/admin/alsa.te
+index 2512e82..ac815f5 100644
+--- a/policy/modules/admin/alsa.te
++++ b/policy/modules/admin/alsa.te
+@@ -54,6 +54,7 @@ list_dirs_pattern(alsa_t, alsa_etc_t, alsa_etc_t)
+ read_files_pattern(alsa_t, alsa_etc_t, alsa_etc_t)
+ read_lnk_files_pattern(alsa_t, alsa_etc_t, alsa_etc_t)
+ allow alsa_t alsa_etc_t:file map;
++files_map_etc_files(alsa_t)
+ 
+ can_exec(alsa_t, alsa_exec_t)
+ 
+diff --git a/policy/modules/admin/logwatch.te b/policy/modules/admin/logwatch.te
+index 56781f9..97a0fc3 100644
+--- a/policy/modules/admin/logwatch.te
++++ b/policy/modules/admin/logwatch.te
+@@ -190,6 +190,7 @@ dev_read_urand(logwatch_mail_t)
+ dev_read_sysfs(logwatch_mail_t)
+ 
+ files_map_etc_files(logwatch_mail_t)
++cron_rw_pipes(logwatch_mail_t)
+ 
+ logging_read_all_logs(logwatch_mail_t)
+ 
+diff --git a/policy/modules/services/isns.te b/policy/modules/services/isns.te
+index b6780d1..1ba6cb0 100644
+--- a/policy/modules/services/isns.te
++++ b/policy/modules/services/isns.te
+@@ -28,6 +28,7 @@ allow isnsd_t self:process signal;
+ allow isnsd_t self:fifo_file rw_fifo_file_perms;
+ allow isnsd_t self:udp_socket { accept listen };
+ allow isnsd_t self:unix_stream_socket { accept listen };
++allow isnsd_t self:tcp_socket { accept listen };
+ 
+ manage_dirs_pattern(isnsd_t, isnsd_var_lib_t, isnsd_var_lib_t)
+ manage_files_pattern(isnsd_t, isnsd_var_lib_t, isnsd_var_lib_t)
+@@ -52,4 +53,7 @@ logging_send_syslog_msg(isnsd_t)
+ 
+ miscfiles_read_localization(isnsd_t)
+ 
++files_manage_etc_runtime_files(isnsd_t)
++files_etc_filetrans_etc_runtime(isnsd_t, file)
++
+ sysnet_dns_name_resolve(isnsd_t)
+diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
+index c971652..a289fa3 100644
+--- a/policy/modules/system/init.if
++++ b/policy/modules/system/init.if
+@@ -99,6 +99,11 @@ interface(`init_script_domain',`
+ 	role system_r types $1;
+ 
+ 	domtrans_pattern(init_run_all_scripts_domain, $2, $1)
++
++	ifdef(`init_systemd',`
++		allow $1 init_t:unix_stream_socket { getattr read write ioctl };
++		allow init_t $1:process2 { nnp_transition nosuid_transition };
++	')
+ ')
+ 
+ ########################################
+diff --git a/policy/modules/system/iscsi.te b/policy/modules/system/iscsi.te
+index 3026f83..c738206 100644
+--- a/policy/modules/system/iscsi.te
++++ b/policy/modules/system/iscsi.te
+@@ -102,6 +102,8 @@ init_stream_connect_script(iscsid_t)
+ logging_send_syslog_msg(iscsid_t)
+ 
+ miscfiles_read_localization(iscsid_t)
++files_manage_etc_runtime_files(iscsid_t)
++files_etc_filetrans_etc_runtime(iscsid_t, file)
+ 
+ optional_policy(`
+ 	tgtd_manage_semaphores(iscsid_t)
+-- 
+2.7.4
+
