@@ -130,5 +130,5 @@ Known Issue
 ===========
 Because command docker is just a client for interacting with the daemon
 dockerd, it is impossible to create docker images with 'docker import' during
-do_rootfs. Then it may causes a lot of time depends on how many containers are
-configured. Then it may causes oeqa case fails because of timeout.
+do_rootfs. Then it may cost a lot of time depends on how many containers have
+been configured.
