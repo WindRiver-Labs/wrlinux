@@ -1,10 +1,12 @@
+INSTALL_BSP="genericx86-64"
+INSTALL_ROOTFS="${ARTIFACTS_DIR}/cube-essential-${INSTALL_BSP}.tar.bz2"
+
 source config-usb.sh
 
 CONFIG_DIRS=`dirname $BASH_SOURCE`
 
 SCREEN_GETTY_CONSOLE=ttyS0,115200
 
-INSTALL_BSP="genericx86-64"
 HDINSTALL_ROOTFS="${ARTIFACTS_DIR}/cube-essential-${INSTALL_BSP}.tar.bz2"
 
 HDINSTALL_CONTAINERS="${ARTIFACTS_DIR}/cube-dom0-${INSTALL_BSP}.tar.bz2:console:vty=2 \
@@ -14,7 +16,8 @@ HDINSTALL_CONTAINERS="${ARTIFACTS_DIR}/cube-dom0-${INSTALL_BSP}.tar.bz2:console:
 
 NETWORK_DEVICE="eth+ wl+ en+"
 
-INSTALL_ROOTFS="${ARTIFACTS_DIR}/cube-essential-${INSTALL_BSP}.tar.bz2"
+# Add to the list of PREREQ_FILES
+PREREQ_FILES="${PREREQ_FILES} ${HDINSTALL_ROOTFS} `strip_properties ${HDINSTALL_CONTAINERS}`"
 
 export LOCAL_CUSTOM_HDD_POST_FUNCS="my_local_post_func"
 
