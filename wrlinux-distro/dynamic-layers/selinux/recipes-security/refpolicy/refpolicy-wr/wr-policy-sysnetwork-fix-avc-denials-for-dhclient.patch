@@ -1,4 +1,4 @@
-From 72920b6ebe18a33dd78a93f7493d1b6ad61173aa Mon Sep 17 00:00:00 2001
+From 6a8aa4b5b7eec9db410fce94e3259f61b7bda13f Mon Sep 17 00:00:00 2001
 From: Yi Zhao <yi.zhao@windriver.com>
 Date: Tue, 22 Oct 2019 17:54:21 +0800
 Subject: [PATCH] sysnetwork: fix avc denials for dhclient
@@ -12,24 +12,80 @@ Upstream-Status: Pending
 
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 ---
- policy/modules/services/ntp.fc      | 1 +
- policy/modules/system/sysnetwork.te | 6 +++++-
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ policy/modules/services/ntp.if      | 57 +++++++++++++++++++++++++++++++++++++
+ policy/modules/system/sysnetwork.te | 17 ++++++++---
+ 2 files changed, 70 insertions(+), 4 deletions(-)
 
-diff --git a/policy/modules/services/ntp.fc b/policy/modules/services/ntp.fc
-index 49ffe6f..8dcd9ac 100644
---- a/policy/modules/services/ntp.fc
-+++ b/policy/modules/services/ntp.fc
-@@ -11,6 +11,7 @@
- /etc/ntp/step-tickers.*			--	gen_context(system_u:object_r:ntp_conf_t,s0)
+diff --git a/policy/modules/services/ntp.if b/policy/modules/services/ntp.if
+index 7fa20c8..952aab0 100644
+--- a/policy/modules/services/ntp.if
++++ b/policy/modules/services/ntp.if
+@@ -36,6 +36,63 @@ interface(`ntp_read_config',`
  
- /etc/rc\.d/init\.d/ntpd? 		--	gen_context(system_u:object_r:ntpd_initrc_exec_t,s0)
-+/etc/dhcp/dhclient\.d/ntp\.sh 		--	gen_context(system_u:object_r:ntpd_exec_t,s0)
- 
- /run/ntpd\.pid				--	gen_context(system_u:object_r:ntpd_pid_t,s0)
- /run/systemd/timesync(/.*)?			gen_context(system_u:object_r:ntpd_pid_t,s0)
+ ########################################
+ ## <summary>
++##	Write ntp.conf
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`ntp_write_config',`
++	gen_require(`
++		type ntp_conf_t;
++	')
++
++	files_search_etc($1)
++	allow $1 ntp_conf_t:file write_file_perms;
++')
++
++#######################################
++## <summary>
++##  Create ntp.conf
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`ntp_create_config',`
++	gen_require(`
++		type ntp_conf_t;
++	')
++
++	files_search_etc($1)
++	allow $1 ntp_conf_t:file create_file_perms;
++')
++
++#######################################
++## <summary>
++##  Relabel ntp.conf
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`ntp_relabel_config',`
++	gen_require(`
++		type ntp_conf_t;
++	')
++
++	files_search_etc($1)
++	allow $1 ntp_conf_t:file { relabelfrom relabelto };
++')
++
++########################################
++## <summary>
+ ##	Execute ntp server in the ntpd domain.
+ ## </summary>
+ ## <param name="domain">
 diff --git a/policy/modules/system/sysnetwork.te b/policy/modules/system/sysnetwork.te
-index 13c783e..bfe67cd 100644
+index 13c783e..1d92aee 100644
 --- a/policy/modules/system/sysnetwork.te
 +++ b/policy/modules/system/sysnetwork.te
 @@ -47,7 +47,7 @@ ifdef(`distro_debian',`
@@ -52,6 +108,38 @@ index 13c783e..bfe67cd 100644
  # create temp files
  manage_dirs_pattern(dhcpc_t, dhcpc_tmp_t, dhcpc_tmp_t)
  manage_files_pattern(dhcpc_t, dhcpc_tmp_t, dhcpc_tmp_t)
+@@ -159,9 +163,7 @@ sysnet_run_ifconfig(dhcpc_t, dhcpc_roles)
+ userdom_use_user_terminals(dhcpc_t)
+ userdom_dontaudit_search_user_home_dirs(dhcpc_t)
+ 
+-ifdef(`distro_redhat', `
+-	files_exec_etc_files(dhcpc_t)
+-')
++files_exec_etc_files(dhcpc_t)
+ 
+ ifdef(`distro_ubuntu',`
+ 	optional_policy(`
+@@ -178,6 +180,12 @@ ifdef(`init_systemd',`
+ ')
+ 
+ optional_policy(`
++	ntp_create_config(dhcpc_t)
++	ntp_write_config(dhcpc_t)
++	ntp_relabel_config(dhcpc_t)
++')
++
++optional_policy(`
+ 	avahi_domtrans(dhcpc_t)
+ ')
+ 
+@@ -257,6 +265,7 @@ optional_policy(`
+ optional_policy(`
+ 	seutil_sigchld_newrole(dhcpc_t)
+ 	seutil_dontaudit_search_config(dhcpc_t)
++	seutil_domtrans_setfiles(dhcpc_t)
+ ')
+ 
+ optional_policy(`
 -- 
 2.7.4
 
