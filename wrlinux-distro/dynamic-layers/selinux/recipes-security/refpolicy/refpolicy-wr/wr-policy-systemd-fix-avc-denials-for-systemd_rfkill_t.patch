@@ -1,0 +1,35 @@
+From 8a6c56f25c56bc83c56f834871b5d8553a382673 Mon Sep 17 00:00:00 2001
+From: Liwei Song <liwei.song@windriver.com>
+Date: Thu, 24 Oct 2019 11:05:45 +0800
+Subject: [PATCH] systemd: fix avc denials for systemd_rfkill_t
+
+Fix avc denials:
+
+  avc:  denied  { create } for  pid=239 comm="systemd-rfkill"
+  scontext=system_u:system_r:systemd_rfkill_t:s0-s15:c0.c1023
+  tcontext=system_u:system_r:systemd_rfkill_t:s0-s15:c0.c1023
+  tclass=netlink_kobject_uevent_socket permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Liwei Song <liwei.song@windriver.com>
+---
+ policy/modules/system/systemd.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 7611450539b4..0f5162614fc1 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -1003,6 +1003,8 @@ optional_policy(`
+ # Rfkill local policy
+ #
+ 
++allow systemd_rfkill_t self:netlink_kobject_uevent_socket create_socket_perms;
++
+ manage_dirs_pattern(systemd_rfkill_t, systemd_rfkill_var_lib_t, systemd_rfkill_var_lib_t)
+ manage_files_pattern(systemd_rfkill_t, systemd_rfkill_var_lib_t, systemd_rfkill_var_lib_t)
+ init_var_lib_filetrans(systemd_rfkill_t, systemd_rfkill_var_lib_t, dir)
+-- 
+2.17.1
+
