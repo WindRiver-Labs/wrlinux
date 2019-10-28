@@ -1,4 +1,4 @@
-FILESPATH_append := ":${@base_set_filespath(['${THISDIR}'], d)}/${BPN}"
+FILESEXTRAPATHS_append := ":${THISDIR}/dnf"
 
 # Tell dnf to only pull validation keys from the local key directory
 # /etc/rpm/keys/
