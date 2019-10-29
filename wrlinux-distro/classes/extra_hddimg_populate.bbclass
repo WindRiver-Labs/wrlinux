@@ -28,11 +28,18 @@ efi_hddimg_populate() {
 
     if [ -e ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE} ]; then
         install -m 0644 ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE} ${DEST}/${KERNEL_IMAGETYPE}
-        install -m 0644 ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}.p7b ${DEST}/${KERNEL_IMAGETYPE}.p7b
+        if [ -e ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}.p7b ] ; then
+            install -m 0644 ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}.p7b ${DEST}/${KERNEL_IMAGETYPE}.p7b
+            install -m 0644 ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}.p7b ${DEST}/${KERNEL_IMAGETYPE}_bakup.p7b
+        fi
+
+        if [ -e ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}.sig ] ; then
+            install -m 0644 ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}.sig ${DEST}/${KERNEL_IMAGETYPE}.sig
+            install -m 0644 ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}.sig ${DEST}/${KERNEL_IMAGETYPE}_bakup.sig
+        fi
 
         # create a backup kernel for recovery boot
         install -m 0644 ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE} ${DEST}/${KERNEL_IMAGETYPE}_bakup
-        install -m 0644 ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}.p7b ${DEST}/${KERNEL_IMAGETYPE}_bakup.p7b
     else
         bbwarn "${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE} doesn't exist"
     fi
@@ -47,11 +54,17 @@ efi_hddimg_populate() {
         bbnote "Trying to install ${DEPLOY_DIR_IMAGE}/${initramfs} as ${DEST}/initrd"
         if [ -e ${DEPLOY_DIR_IMAGE}/${initramfs} ]; then
             install -m 0644 ${DEPLOY_DIR_IMAGE}/${initramfs} ${DEST}/initrd
-            install -m 0644 ${DEPLOY_DIR_IMAGE}/${initramfs}.p7b ${DEST}/initrd.p7b
+            if [ -e ${DEPLOY_DIR_IMAGE}/${initramfs}.p7b ] ; then
+                install -m 0644 ${DEPLOY_DIR_IMAGE}/${initramfs}.p7b ${DEST}/initrd.p7b
+                install -m 0644 ${DEPLOY_DIR_IMAGE}/${initramfs}.p7b ${DEST}/initrd_bakup.p7b
+            fi
+            if [ -e ${DEPLOY_DIR_IMAGE}/${initramfs}.sig ] ; then
+                install -m 0644 ${DEPLOY_DIR_IMAGE}/${initramfs}.sig ${DEST}/initrd.sig
+                install -m 0644 ${DEPLOY_DIR_IMAGE}/${initramfs}.sig ${DEST}/initrd_bakup.sig
+            fi
 
             # create a backup initrd for recovery boot
             install -m 0644 ${DEPLOY_DIR_IMAGE}/${initramfs} ${DEST}/initrd_bakup
-            install -m 0644 ${DEPLOY_DIR_IMAGE}/${initramfs}.p7b ${DEST}/initrd_bakup.p7b
         else
             bbwarn "${DEPLOY_DIR_IMAGE}/${initramfs} doesn't exist"
         fi
@@ -61,7 +74,12 @@ efi_hddimg_populate() {
     #  - initrd is always needed to mount rootfs from /dev/ram0 (rootfs.img)
     if [ -e ${DEPLOY_DIR_IMAGE}/boot-menu-hddimg.inc ]; then
         install -m 0644 ${DEPLOY_DIR_IMAGE}/boot-menu-hddimg.inc ${DEST}${EFIDIR}/boot-menu.inc
-        install -m 0644 ${DEPLOY_DIR_IMAGE}/boot-menu-hddimg.inc.p7b ${DEST}${EFIDIR}/boot-menu.inc.p7b
+        if [ -e ${DEPLOY_DIR_IMAGE}/boot-menu-hddimg.inc.p7b ] ; then
+            install -m 0644 ${DEPLOY_DIR_IMAGE}/boot-menu-hddimg.inc.p7b ${DEST}${EFIDIR}/boot-menu.inc.p7b
+        fi
+        if [ -e ${DEPLOY_DIR_IMAGE}/boot-menu-hddimg.inc.sig ] ; then
+            install -m 0644 ${DEPLOY_DIR_IMAGE}/boot-menu-hddimg.inc.sig ${DEST}${EFIDIR}/boot-menu.inc.sig
+        fi
     fi
 }
 
