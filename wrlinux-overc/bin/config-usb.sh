@@ -10,7 +10,9 @@ if [ -z "${ARTIFACTS_DIR}" ]; then
 fi
 
 INSTALL_KERNEL="${ARTIFACTS_DIR}/bzImage"
-INSTALL_ROOTFS="${ARTIFACTS_DIR}/cube-essential-${INSTALL_BSP}.tar.bz2"
+if [ -z "$INSTALL_ROOTFS" ]; then
+    INSTALL_ROOTFS="${ARTIFACTS_DIR}/cube-essential-${INSTALL_BSP}.tar.bz2"
+fi
 INSTALL_MODULES=""
 INSTALL_INITRAMFS="${ARTIFACTS_DIR}/cube-builder-initramfs-${INSTALL_BSP}.cpio.gz"
 INSTALL_EFIBOOT="${ARTIFACTS_DIR}/bootx64.efi"
