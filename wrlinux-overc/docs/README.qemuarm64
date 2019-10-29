@@ -50,27 +50,15 @@ host distro:
   a) Add FIRMWARE_INSTALL=""
   b) Update SCREEN_GETTY_CONSOLE to use ttyAMA0
   c) Update INSTALL_BSP to qemuarm64
+  d) Add X86_ARCH=false
 
   You can cut and paste the follow command to accomplish this:
----cut---
-sed 's/[ \t]*$//' <<'ENDPATCH' > >(patch -p1 --ignore-whitespace image-live.sh)
---- a/image-live.sh       2019-09-29 22:02:17.132578149 -0400
-+++ b/image-live.sh       2019-09-30 15:13:08.434786410 -0400
-@@ -2,9 +2,10 @@
 
- CONFIG_DIRS=`dirname $BASH_SOURCE`
-
--SCREEN_GETTY_CONSOLE=ttyS0,115200
-+FIRMWARE_INSTALL=""
-+SCREEN_GETTY_CONSOLE=ttyAMA0,115200
-
--INSTALL_BSP="qemux86-64"
-+INSTALL_BSP="qemuarm64"
- HDINSTALL_ROOTFS="${ARTIFACTS_DIR}/cube-essential-${INSTALL_BSP}.tar.bz2"
-
- HDINSTALL_CONTAINERS="${ARTIFACTS_DIR}/cube-dom0-${INSTALL_BSP}.tar.bz2:console:vty=2 \
-ENDPATCH
----cut---
+  %> sed -i -e 's#ttyS0#ttyAMA0#' \
+            -e 's#^\(INSTALL_BSP=\).*$#\1\"qemuarm64\"#' \
+            -e "/GETTY_CONSOLE=/aFIRMWARE_INSTALL=\"\"" \
+            -e "/GETTY_CONSOLE=/aX86_ARCH=false" \
+            image-live.sh
 
 4) Run the installer:
   %> sudo \
