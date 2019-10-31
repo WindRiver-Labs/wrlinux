@@ -162,4 +162,5 @@ SRC_URI += "file://wr-policy-fix-dev-log-label.patch \
             file://wr-policy-sysnetwork-fix-avc-denials-for-dhclient.patch \
             file://wr-policy-isnsd-fix-avc-denials-for-iscsi-initiator-and-isn.patch \
             file://wr-policy-systemd-fix-avc-denials-for-systemd_rfkill_t.patch \
+            file://wr-policy-systemd-fix-avc-denials-for-systemd-ask-password.patch \
            "
