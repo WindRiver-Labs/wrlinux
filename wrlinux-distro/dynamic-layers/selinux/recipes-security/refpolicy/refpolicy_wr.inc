@@ -164,4 +164,5 @@ SRC_URI += "file://wr-policy-fix-dev-log-label.patch \
             file://wr-policy-systemd-fix-avc-denials-for-systemd_rfkill_t.patch \
             file://wr-policy-systemd-fix-avc-denials-for-systemd-ask-password.patch \
             file://wr-policy-systemd-fix-avc-denials-for-systemd-udevd.patch \
+            file://wr-policy-monit-fix-avc-denials-for-opening-monit-state-file.patch \
            "
