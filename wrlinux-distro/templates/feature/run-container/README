@@ -98,7 +98,9 @@ For this example, it suggests to have 5 Gbytes extra free disk space.
 $ cp -r $THIS_TEMPLATE_PATH/files/multiconfig conf/
 
 
-4. Build host image set in WR_HOST_IMAGES and boot it
+4. Build and boot host image set in WR_HOST_IMAGES
+
+It calls command runqemu to boot qemu images. Because variable 'TMPDIR' is set in reference multiconfig config file wr-host.conf and runqemu can't detect it automatically, image file path must be appended to runqemu parameters.
 
 $ bitbake mc:wr-host:wrlinux-image-std
 $ runqemu qemux86-64 kvm nographic qemuparams='-m 2048' tmp-host-glibc/deploy/images/qemux86-64/wrlinux-image-std-qemux86-64.ext4
