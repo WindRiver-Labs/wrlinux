@@ -20,7 +20,6 @@ PNWHITELIST_CGL_COMMON = " \
     libsocket6-perl \
     libtest-pod-perl \
     libwww-perl \
-    monit \
     ocfs2-tools \
     pacemaker \
     resource-agents \
@@ -92,6 +91,7 @@ PNWHITELIST_META_OE = " \
     pps-tools \
     python-pygobject \
     smartmontools \
+    zabbix \
 "
 
 # For meta-openembedded/meta-perl
