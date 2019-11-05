@@ -55,7 +55,7 @@ SRCREV_machine_kb-v5.2-standard-tiny-common-pc ?= "687ae878843fe5baf9493db58b322
 LINUX_VERSION_kb-v5.2-standard-tiny-common-pc ?= "5.2.21"
 SRCREV_machine_kb-v5.2-standard-tiny-intel-x86 ?= "687ae878843fe5baf9493db58b322f39415c7182"
 LINUX_VERSION_kb-v5.2-standard-tiny-intel-x86 ?= "5.2.21"
-SRCREV_machine_kb-v5.2-standard-xlnx-soc ?= "e9a81ba6a58de13990cf62784110f4f502805cea"
+SRCREV_machine_kb-v5.2-standard-xlnx-soc ?= "97d6db60b09864d99f6f15b541ec39b38a252d24"
 LINUX_VERSION_kb-v5.2-standard-xlnx-soc ?= "5.2.21"
 
 # yocto-kernel-cache entries
