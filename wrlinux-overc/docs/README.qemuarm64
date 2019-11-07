@@ -40,7 +40,7 @@ host distro:
   %> sudo apt-get install btrfs-progs
 
 1) Build native tools required to run the installer:
-  %> bitbake grub-native jq-native parted-native dosfstools-native
+  %> bitbake grub-native jq-native parted-native dosfstools-native btrfs-tools-native qemu-system-native
   %> bitbake build-sysroots
 
 2) Copy the OverC image configurations from the platform project directory:
