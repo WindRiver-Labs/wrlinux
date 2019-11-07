@@ -143,4 +143,5 @@ SRC_URI += "file://policy-minimum-move-xconsole-to-logging-module.patch"
 # Fixes could be pushed to upstream
 SRC_URI += "file://policy-fix-dev_read_framebuffer.patch \
             file://policy-add-crash-module.patch \
+            file://policy-fixes-for-samba-service.patch \
            "

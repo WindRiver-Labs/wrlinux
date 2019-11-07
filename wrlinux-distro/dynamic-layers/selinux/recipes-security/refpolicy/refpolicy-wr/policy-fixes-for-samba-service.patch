@@ -1,0 +1,32 @@
+policy: fixes for samba service
+
+start Samba NMB Daemon to show error info:
+systemd[1]: Starting Samba NMB Daemon...
+nmbd[650]: Failed to create /var/log/samba/cores for user 0 with mode 0700
+nmbd[650]: Unable to setup corepath for nmbd: Permission denied
+nmbd[650]: [2019/10/27 07:32:05.284875, 0] ../lib/util/debug.c:1055(reopen_logs_internal)
+nmbd[650]: Unable to open new log file '/var/log/samba/log.': Permission denied
+nmbd[650]: [2019/10/27 07:32:05.288914, 0] ../lib/util/debug.c:1055(reopen_logs_internal)
+nmbd[650]: Unable to open new log file '/var/log/samba/log.nmbd': Permission denied
+systemd[1]: Started Samba NMB Daemon.
+
+Signed-off-by: Li Wang <li.wang@windriver.com>
+---
+ policy/modules/contrib/samba.te  | 1 +
+ 1 files changed, 1 insertions(+)
+
+diff --git a/policy/modules/contrib/samba.te b/policy/modules/contrib/samba.te
+index b3eba45..6bd6ca3 100644
+--- a/policy/modules/contrib/samba.te
++++ b/policy/modules/contrib/samba.te
+@@ -550,6 +550,7 @@ files_var_filetrans(nmbd_t, samba_var_t, dir, "samba")
+ allow nmbd_t { swat_t smbcontrol_t }:process signal;
+ 
+ allow nmbd_t smbd_var_run_t:dir rw_dir_perms;
++allow nmbd_t tmpfs_t:dir search;
+ 
+ kernel_getattr_core_if(nmbd_t)
+ kernel_getattr_message_if(nmbd_t)
+-- 
+1.9.1
+
