@@ -12,13 +12,18 @@ This layer depends on the following layers:
   meta-oe
   meta-perl
   meta-python
+  meta-filesystems
+  meta-gnome
+  meta-initramfs
   meta-security
   meta-selinux
   meta-webserver
+  meta-xfce
+  meta-realtime
+  meta-virtualization
   openembedded-core
   wrlinux
   wrlinux-distro
-  wr-template
   wr-template
 
 The layer also recommends the following layers:
@@ -46,7 +51,7 @@ DISTRO = "wrlinux-cgl"
 
 License
 -------
-Copyright (C) 2012-2017 Wind River Systems, Inc.
+Copyright (C) 2012-2017, 2019 Wind River Systems, Inc.
 
 The right to copy, distribute or otherwise make use of this software may
 be licensed only pursuant to the terms of an applicable Wind River license
