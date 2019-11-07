@@ -7,6 +7,10 @@ class SignatureGeneratorOverCBasicHash(oe.sstatesig.SignatureGeneratorOEBasicHas
     def init_rundepcheck(self, data):
         oe.sstatesig.SignatureGeneratorOEBasicHash.init_rundepcheck(self, data)
 
+        self.unlockedrecipes = (data.getVar("SIGGEN_UNLOCKED_RECIPES") or
+                                "").split()
+        self.unlockedrecipes = { k: "" for k in self.unlockedrecipes }
+
         self.undefined_msgs = []
 
         self.dev_mode = data.getVar("SIGGEN_OVERC_DEVEL") or "0"
@@ -19,7 +23,7 @@ class SignatureGeneratorOverCBasicHash(oe.sstatesig.SignatureGeneratorOEBasicHas
         if self.dev_mode == "0":
             (mc, _, task, fn) = bb.runqueue.split_tid_mcfn(tid)
             recipename = dataCache.pkg_fn[fn]
-            if recipename not in self.lockedsigs:
+            if recipename not in self.unlockedrecipes and recipename not in self.lockedsigs:
                 self.undefined_msgs.append('The %s:%s task does not have a defined signature.'
                                       % (recipename, task))
 
