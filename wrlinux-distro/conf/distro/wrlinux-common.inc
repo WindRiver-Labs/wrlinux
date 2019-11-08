@@ -62,9 +62,6 @@ DISTRO_EXTRA_RDEPENDS_append_qemuall = " ${WRLINUXQEMUDEPS}"
 #default locale / local language processing settings
 IMAGE_LINGUAS ?= ""
 
-QEMU_TARGETS ?= "arm aarch64 i386 mips mipsel mips64 mips64el ppc ppc64 x86_64"
-# Other QEMU_TARGETS "sh4"
-
 # MIRRORS are used only if we don't have a local copy, and the stated upstream
 # is no longer available.
 MIRRORS =+ "\
