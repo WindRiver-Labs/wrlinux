@@ -321,8 +321,11 @@ def getPciDevicesList():
 
     command = "lspci -mm -vvv -D"
     # execute lspci
-    subprocess.check_call(command , shell=True, stderr=subprocess.STDOUT, universal_newlines=True, stdout=tmpFile)
-  
+    try:
+        subprocess.check_call(command, shell=True, stderr=subprocess.STDOUT, universal_newlines=True, stdout=tmpFile)
+    except Exception as exc:
+        print exc
+
     # close the file to flush the subprocess output into it,
     # and open it for readin
     tmpFile.close()
