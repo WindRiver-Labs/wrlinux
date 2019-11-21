@@ -1,0 +1,11 @@
+#@TYPE: Wrtemplate
+#@NAME: mariadb
+#@DESCRIPTION: install mariadb into image
+
+This template install mariadb into image
+
+To use, add
+
+--templates feature/mariadb
+
+as a configure option.
