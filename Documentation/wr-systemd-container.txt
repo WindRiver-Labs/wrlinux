@@ -17,7 +17,7 @@ which are intended to be defined in local.conf:
 
 * WR_SYSTEMD_CONTAINER_APPS - required - a space separated list of
   application(s) to included in the image. Usually this is one
-  application such as 'apached2'.
+  application such as 'apache2'.
 
 * WR_SYSTEMD_CONTAINER_ENABLE_SERVICES - optional - a space separated
   list of systemd services to enable. This is performed during
