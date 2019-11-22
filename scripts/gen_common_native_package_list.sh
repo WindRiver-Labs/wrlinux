@@ -47,14 +47,33 @@ EOF
 }
 
 # Crude parsing of output from setup.sh --list-machines
+# Expected output:
+#   Index: Wind River Developer Layer Index
+#   display                   description                          layer
+#   ================================================================================
+#   qemuarm                   ARMv7 system on QEMU                 openembedded-core
+#   qemuppc                   a PPC system on QEMU                 openembedded-core
+#   ...
+#   mpc8315e-rdb              Freescale MPC8315E-RDB               meta-yocto-bsp
+#   beaglebone-yocto          Reference machine configuration      meta-yocto-bsp
+#                             for http://beagleboard.org/bone
+#                             and http://beagleboard.org/black
+#                             boards
+#   genericx86                generic x86 (32-bit) PCs. Supports   meta-yocto-bsp
+#                             a moderately wide range of drivers
+#                             that should boot and be usable on
+#                             "typical" hardware.
+#   ....
+#
+# Everything after the 'display' field should be ignored.
 #
 list_machines () {
-    "$wrlinux_dir"/setup.sh --list-machines | while read -r item1 restofline; do
+    "$wrlinux_dir"/setup.sh --list-machines | cut -c -26 | while read -r item1 restofline; do
         case $item1 in
-            ---*) seen=1
+            ===*) separator_seen=1
                   continue
                   ;;
-            *)  if [ "$seen" = "1" ]; then
+            *)  if [ "$separator_seen" = "1" ]; then
                     echo "$item1"
                     :
                 fi
