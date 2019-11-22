@@ -2,8 +2,6 @@ PNWHITELIST_LAYERS_remove = "meta-anaconda"
 
 # Whitelist for meta-openembedded/meta-gnome
 PNWHITELIST_gnome-layer += "\
-    gnome-themes \
-    gtk-engines \
     keybinder \
     libgnomekbd \
     libgnome-keyring \
