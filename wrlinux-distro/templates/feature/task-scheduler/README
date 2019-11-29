@@ -5,3 +5,7 @@ This feature ensures package cronie is included in the image. cronie contains
 the standard UNIX daemon crond that runs specified programs at scheduled times
 and related tools. It is based on the original cron and has security and
 configuration enhancements like the ability to use pam and SELinux.
+
+#@TYPE: Wrtemplate
+#@NAME: task-scheduler
+#@DESCRIPTION: Install package cronie to image
