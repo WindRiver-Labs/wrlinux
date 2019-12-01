@@ -134,8 +134,6 @@ SYSTEMD_AUTO_ENABLE_pn-dnsmasq = "disable"
 
 require conf/distro/include/wrlinux-distro-settings.conf
 
-require conf/distro/include/wrlinux-uninative.inc
-
 # Exclude download layers from eSDK.
 SDK_LAYERS_EXCLUDE_PATTERN ?= ".*-dl$ .*-dl-[0-9.]+$"
 

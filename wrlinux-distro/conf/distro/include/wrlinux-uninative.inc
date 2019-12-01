@@ -14,7 +14,9 @@
 #
 INHERIT += "uninative"
 
-require conf/distro/include/yocto-uninative.inc
+YOCTO_UNINATIVE_INC ?= "conf/distro/include/yocto-uninative.inc"
+YOCTO_UNINATIVE_INC_poky = ""
+require ${YOCTO_UNINATIVE_INC}
 
 # The local fetcher (file://) doesn't verify checksum, which means that there
 # is no error when yocto-uninative.inc is updated, this is not what we need.
