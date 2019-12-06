@@ -29,7 +29,6 @@ RDEPENDS_${PN} = "\
     findutils \
     gawk \
     grep \
-    htop \
     iproute2 \
     kmod \
     logrotate \
@@ -42,7 +41,6 @@ RDEPENDS_${PN} = "\
     ${VIRTUAL-RUNTIME_syslog} \
     tar \
     time \
-    tree \
     udev \
     util-linux \
     util-linux-mount \
