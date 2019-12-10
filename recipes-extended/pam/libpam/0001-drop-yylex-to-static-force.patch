@@ -1,0 +1,51 @@
+From 53f0fd76d6eb0ba5149d316647f83d3c56d1f9aa Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 9 Dec 2019 18:31:06 -0800
+Subject: [PATCH] drop yylex to static force
+
+Since flex was upgraded to 2.6.4, there is a build failure
+...
+In file included from ../../../Linux-PAM-1.3.1/modules/pam_console/configfile.c:56:
+configfile.lex.c:23:15: error: static declaration of '_pc_yylex' follows non-static declaration
+   23 | #define yyleng _pc_yyleng
+      |               ^~~~~~~~~
+configfile.lex.c:1091:28: note: in expansion of macro 'yylex'
+ 1091 |
+      |                            ^
+configfile.lex.c:1111:1: note: in expansion of macro 'YY_DECL'
+ 1111 |  */
+      | ^~~
+configfile.lex.c:23:15: note: previous declaration of '_pc_yylex' was here
+   23 | #define yyleng _pc_yyleng
+      |               ^~~~~~~~~
+configfile.lex.c:1089:12: note: in expansion of macro 'yylex'
+ 1089 |
+      |            ^
+...
+
+Google the world and find a similar fix
+https://lists.pld-linux.org/mailman/pipermail/pld-cvs-commit/Week-of-Mon-20170703/465181.html
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ modules/pam_console/sed-static | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/pam_console/sed-static b/modules/pam_console/sed-static
+index b9a6fa2..c7a850e 100644
+--- a/modules/pam_console/sed-static
++++ b/modules/pam_console/sed-static
+@@ -13,7 +13,7 @@ sed '
+ /^YY_BUFFER_STATE yy_scan_buffer/s/^/STATIC /
+ /^YY_BUFFER_STATE yy_scan_string/s/^/STATIC /
+ /^void yy_switch_to_buffer/s/^/STATIC /
+-/define YY_DECL int yylex/s/YY_DECL /YY_DECL STATIC /
++#/define YY_DECL int yylex/s/YY_DECL /YY_DECL STATIC /
+ /^int yyparse/s/^/STATIC /
+ /^void yyrestart/s/^/STATIC /
+ ' < $1 > sedtmp.$$ && mv sedtmp.$$ $1
+-- 
+2.21.0
+

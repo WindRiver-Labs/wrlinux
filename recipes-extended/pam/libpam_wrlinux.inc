@@ -11,6 +11,7 @@ SRC_URI += "http://pkgs.fedoraproject.org/repo/pkgs/pam/pam-redhat-0.99.11.tar.b
             file://pam-1.0.90-redhat-modules.patch \
             file://pam-1.1.0-console-nochmod.patch \
             file://pam_console_deps.patch \
+            file://0001-drop-yylex-to-static-force.patch \
            "
 
 SRC_URI[redhat.md5sum] = "29eab110f57e8d60471081a6278a5a92"
