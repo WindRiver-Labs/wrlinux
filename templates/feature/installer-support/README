@@ -2,7 +2,7 @@ Limitation
 -----------
 1) Since OE use grub-efi to generate live image, the compatible host
    is i.86|x86_64
-   (Set MACHINE = "qemux86-64|qemux86|intel-x86-64|intel-x86-32" in the build)
+   (Set MACHINE = "qemux86-64|qemux86|intel-x86-64" in the build)
 
 2) The target installer based on fedora 26, so it requires:
    - systemd as init manager
@@ -64,7 +64,7 @@ Building the target installer
              $ cd <wrlinux-project>
              $ git clone --branch master-wr --single-branch \
                  git://pek-git.wrs.com/git/wrlinux-x
-             $ ./wrlinux-x/setup.sh --machines=[qemux86-64|qemux86|intel-x86-64|intel-x86-32] \
+             $ ./wrlinux-x/setup.sh --machines=[qemux86-64|qemux86|intel-x86-64] \
                  --distros=wrlinux --dl-layers \
                  --layers=meta-anaconda \
                  --templates=feature/installer-support
