@@ -5,6 +5,8 @@
 addhandler overc_installer_rewrite_uri
 overc_installer_rewrite_uri[eventmask] = "bb.event.RecipePreFinalise"
 
+SRCREV = "4dfffc0829e839633fa672632ad2befacc327f4b"
+
 python overc_installer_rewrite_uri() {
     d = e.data
 
@@ -18,9 +20,9 @@ python overc_installer_rewrite_uri() {
     # want to expand it.
     src_uri=d.getVar("SRC_URI", False)
 
-    # Replace the kernel URI.
+    # Replace the URI.
     if os.path.exists("%s/git/overc-installer.git" % (d.expand(layer_path))):
-        src_uri = src_uri.replace("git://github.com/OverC/overc-installer.git;branch=master-oci", "git://${LAYER_PATH_wrlinux-overc}/git/overc-installer.git;branch=master-oci;protocol=file")
+        src_uri = src_uri.replace("git://github.com/OverC/overc-installer.git;branch=master", "git://${LAYER_PATH_wrlinux-overc}/git/overc-installer.git;branch=wr-10.20-20191211;protocol=file")
 
     d.setVar("SRC_URI", src_uri)
 }
