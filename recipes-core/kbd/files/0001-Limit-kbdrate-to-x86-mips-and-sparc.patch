@@ -1,6 +1,6 @@
-From 4a679f16a3728a9323d23a8466d22a984a58c7af Mon Sep 17 00:00:00 2001
+From 880b8bb421a6c8108eaa13742956a5ce1891d590 Mon Sep 17 00:00:00 2001
 From: Dennis Hall <dennis.hall@windriver.com>
-Date: Fri, 31 Aug 2012 10:15:13 -0400
+Date: Fri, 13 Dec 2019 00:28:51 -0800
 Subject: [PATCH] Limit kbdrate to x86, mips and sparc.
 
     CQID: WIND00371274
@@ -18,17 +18,21 @@ Subject: [PATCH] Limit kbdrate to x86, mips and sparc.
     MIPS64 is not supported at this time so it was not tested.
 
 Signed-off-by: Dennis Hall <dennis.hall@windriver.com>
+
+Upstream-Status: Inappropriate [wrlinux specific]
+Rebase to 2.2.0
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- src/kbdrate.c |   10 ++++++++++
- 1 files changed, 10 insertions(+), 0 deletions(-)
+ src/kbdrate.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/src/kbdrate.c b/src/kbdrate.c
-index 95ff723..9a79774 100644
+index 4622e43..8771e2d 100644
 --- a/src/kbdrate.c
 +++ b/src/kbdrate.c
-@@ -241,6 +241,16 @@ main( int argc, char **argv ) {
- 	unsigned int i;
- 	extern char *optarg;
+@@ -350,6 +350,16 @@ int main(int argc, char **argv)
+ 		{ NULL, 0, NULL, 0 }
+ 	};
  
 +#if !(  defined(__i386__)   \
 +     || defined(__x86_64__) \
@@ -41,8 +45,8 @@ index 95ff723..9a79774 100644
 +#endif
 + 	set_progname(argv[0]);
  	set_progname(argv[0]);
+ 	setuplocale();
  
- 	setlocale(LC_ALL, "");
 -- 
-1.7.1
+2.21.0
 
