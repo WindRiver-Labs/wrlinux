@@ -101,6 +101,8 @@ SRCREV_machine_kb-v4.18-standard-preempt-rt-wr-axxia-base ?= "a29e144d975147a73f
 LINUX_VERSION_kb-v4.18-standard-preempt-rt-wr-axxia-base ?= "4.18.45"
 SRCREV_machine_kb-v4.18-standard-preempt-rt-wr-base ?= "f7668ea0d7063360d397bcefcb0e6b3eefc7c3dc"
 LINUX_VERSION_kb-v4.18-standard-preempt-rt-wr-base ?= "4.18.45"
+SRCREV_machine_kb-v4.18-standard-preempt-rt-xilinx-sdk2018-03-xilinx-zynq ?= "e36127b9cefd223d334f459387204c6c215682f9"
+LINUX_VERSION_kb-v4.18-standard-preempt-rt-xilinx-sdk2018-03-xilinx-zynq ?= "4.18.45"
 SRCREV_machine_kb-v4.18-standard-preempt-rt-xilinx-sdk2018-03-xilinx-zynqmp ?= "cbb237dc3410553048653e9d5cf34c746e4e083f"
 LINUX_VERSION_kb-v4.18-standard-preempt-rt-xilinx-sdk2018-03-xilinx-zynqmp ?= "4.18.45"
 SRCREV_machine_kb-v4.18-standard-qemuarm64 ?= "21c2aee9c652115e432dc4a67749f34e90447404"
@@ -130,5 +132,5 @@ LINUX_VERSION_kb-v4.18-standard-xilinx-sdk2018-03-xilinx-zynqmp ?= "4.18.45"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_4.18 = "yocto-4.18-wr"
-SRCREV_meta_4.18 = "be54918e2120b3b7b4b448d2e1c83ca8953bd7dc"
+SRCREV_meta_4.18 = "6f24a786bd13a587a4cb6c61da989a8eabe4a804"
 LINUX_VERSION_4.18 = "4.18.45"
