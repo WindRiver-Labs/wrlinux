@@ -23,6 +23,7 @@ SRC_URI += "file://wr-fc-subs_dist-busybox.patch \
             file://wr-fc-usermanage.patch \
             file://wr-fc-udev-udevadm.patch \
             file://wr-fc-devices-memory_bandwidth.patch \
+            file://wr-fc-vlock.patch \
            "
 
 # Other policy fixes
