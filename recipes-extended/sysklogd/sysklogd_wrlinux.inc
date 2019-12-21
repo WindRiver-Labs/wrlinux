@@ -10,7 +10,7 @@
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
-SRC_URI += "file://parse_syslog_conf.patch \
+SRC_URI += " \
 	file://syslog.logrotate"
 
 do_install_append () {
