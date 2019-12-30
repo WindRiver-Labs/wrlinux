@@ -1,0 +1,95 @@
+                           OverC on the xilinx-zynq-zc706 BSP
+			   ----------------------------------
+
+Introduction
+---
+
+The following provides information for building and running OverC on
+the xilinx-zynq-zc706 board. Additional information can be found in the Wind
+River Linux documentation 'Wind River Linux OverC Virtualization
+Features Guide'.
+
+
+Building
+---
+1) Configure your build area using setup.sh:
+  $ ./wrlinux-x/setup.sh --machines=xilinx-zynq \
+  --distros=wrlinux-overc \
+  --dl-layers \
+  --no-recommend
+
+2) Run the environment-setup script from the project directory:
+  $ . ./environment-setup-x86_64-wrlinuxsdk-linux
+
+3) Run the oe-init-build-env script:
+  $ . ./oe-init-build-env
+or with a build directory specified
+  $ . ./oe-init-build-env <newBuildDir>
+
+4) Complete the build:
+  $ bitbake cube-vrf cube-dom0 cube-essential cube-server \
+     cube-builder-initramfs
+
+
+Create a Disk Image
+---
+Starting in your build directory you created above.
+
+Before you start be sure you have 'btrfs-progs' installed for your
+host distro:
+  $ sudo apt-get install btrfs-progs
+
+1) Build native tools required to run the installer:
+  $ bitbake grub-native jq-native parted-native dosfstools-native btrfs-tools-native
+  $ bitbake build-sysroots
+
+2) Copy the OverC image configurations from the platform project directory:
+  $ cp ../layers/wrlinux/wrlinux-overc/bin/* .
+
+3) Edit the configuration for the xilinx-zynq BSP.
+  a) Add FIRMWARE_INSTALL=""
+  b) Update SCREEN_GETTY_CONSOLE to use ttyPS0
+  c) Update INSTALL_BSP to xilinx-zynq
+  d) Add X86_ARCH=false
+  e) Update INSTALL_DTB to ${ARTIFACTS_DIR}/zynq-zc706.dtb
+  f) Update INSTALL_BOOTLOADER to ${ARTIFACTS_DIR}/BOOT.BIN
+
+
+  You can cut and paste the follow command to accomplish this:
+
+  $ sed -i -e 's#ttyS0#ttyPS0#' \
+            -e 's#^\(INSTALL_BSP=\).*$#\1\"xilinx-zynq\"#' \
+            -e "/GETTY_CONSOLE=/aFIRMWARE_INSTALL=\"\"" \
+            -e "/GETTY_CONSOLE=/aX86_ARCH=false" \
+            -e "/GETTY_CONSOLE=/aBOARD_NAME=\"xilinx-zynq\"" \
+            -e "/GETTY_CONSOLE=/aINSTALL_DTB=\"\${ARTIFACTS_DIR}\/zynq-zc706.dtb\"" \
+            -e "/GETTY_CONSOLE=/aINSTALL_BOOTLOADER=\"\${ARTIFACTS_DIR}\/BOOT.BIN\"" \
+            image-live.sh
+
+4) Copy boot firmware image(BOOT.BIN, which can be downloaded with SDK) to artifact directory.
+
+5) Run the installer:
+  $ sudo \
+   PATH=$PWD/tmp/sysroots/x86_64/usr/bin:$PWD/tmp/sysroots/x86_64/usr/sbin:$PATH \
+   ../overc-installer/sbin/cubeit --disk-size 15G --force \
+   --config `pwd`/image-live.sh \
+   --artifacts `pwd`/tmp/deploy/images/xilinx-zynq xilinx-zynq-zc706-boot.img
+
+
+Running with the Image
+---
+dd the boot-zynq-zc706-boot.img to a SD card and boot the target board from SD car with
+following instruction in u-boot:
+
+Zynq> mmcinfo
+Zynq> fatload mmc 0 0x2a00000 dtb
+Zynq> fatload mmc 0 0x3000000 zImage
+Zynq> setenv bootargs console=ttyPS0,115200 earlyprintk root=/dev/mmcblk0p3 ro rootwait initcall_blacklist=init_yaffs_fs
+Zynq> bootz 0x3000000 - 0x2a00000
+
+You can use 'ctrl+w #' to switch between essential (where # = 0), dom0
+(where # = 1) and cube-server (where # = 2) gettys. Since this makes
+use of screen, using 'ctrl+"' will list the available sessions. You
+can also use a VNC viewer like gvncviewer to connect to the VM,
+switching between ptys 0, 1 and 2 will similarly get you to essential,
+dom0 and cube-server.

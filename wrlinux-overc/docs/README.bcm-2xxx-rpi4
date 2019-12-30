@@ -1,0 +1,91 @@
+                           OverC on the Raspberry Pi 4B Board
+			   ----------------------------------
+
+Introduction
+---
+
+The following provides information for building and running OverC on
+Raspberry Pi 4B board. Additional information can be found in the Wind
+River Linux documentation 'Wind River Linux OverC Virtualization
+Features Guide'.
+
+
+Building
+---
+1) Configure your build area using setup.sh:
+  $ ./wrlinux-x/setup.sh --machines=bcm-2xxx-rpi \
+  --distros=wrlinux-overc \
+  --dl-layers \
+  --no-recommend
+
+2) Run the environment-setup script from the project directory:
+  $ . ./environment-setup-x86_64-wrlinuxsdk-linux
+
+3) Run the oe-init-build-env script:
+  $ . ./oe-init-build-env
+or with a build directory specified
+  $ . ./oe-init-build-env <newBuildDir>
+
+4) Complete the build:
+  $ bitbake cube-vrf cube-dom0 cube-essential cube-server \
+     cube-builder-initramfs
+
+
+Create a Disk Image
+---
+Starting in your build directory you created above.
+
+Before you start be sure you have 'btrfs-progs' installed for your
+host distro:
+  $ sudo apt-get install btrfs-progs
+
+1) Build native tools required to run the installer:
+  $ bitbake grub-native jq-native parted-native dosfstools-native btrfs-tools-native
+  $ bitbake build-sysroots
+
+2) Copy the OverC image configurations from the platform project directory:
+  $ cp ../layers/wrlinux/wrlinux-overc/bin/* .
+
+3) Edit the configuration for the bcm-2xxx-rpi BSP.
+  a) Add FIRMWARE_INSTALL=""
+  b) Update INSTALL_BSP to bcm-2xxx-rpi4
+  c) Add X86_ARCH=false
+  d) Update INSTALL_DTB to ${ARTIFACTS_DIR}/bcm2711-rpi-4-b.dtb
+  e) Update INSTALL_BOOTLOADER to ${ARTIFACTS_DIR}/bcm2835-bootfiles
+
+
+  You can cut and paste the follow command to accomplish this:
+
+  $ sed -i -e 's#^\(INSTALL_BSP=\).*$#\1\"bcm-2xxx-rpi4\"#' \
+            -e "/GETTY_CONSOLE=/aFIRMWARE_INSTALL=\"\"" \
+            -e "/GETTY_CONSOLE=/aX86_ARCH=false" \
+            -e "/GETTY_CONSOLE=/aBOARD_NAME=\"bcm-2xxx-rpi4\"" \
+            -e "/GETTY_CONSOLE=/aINSTALL_DTB=\"\${ARTIFACTS_DIR}\/bcm2711-rpi-4-b.dtb\"" \
+            -e "/GETTY_CONSOLE=/aINSTALL_BOOTLOADER=\"\${ARTIFACTS_DIR}\/bcm2835-bootfiles\"" \
+            image-live.sh
+
+4) Run the installer:
+  $ sudo \
+   PATH=$PWD/tmp/sysroots/x86_64/usr/bin:$PWD/tmp/sysroots/x86_64/usr/sbin:$PATH \
+   ../overc-installer/sbin/cubeit --force \
+   --config `pwd`/image-live.sh \
+   --artifacts `pwd`/tmp/deploy/images/bcm-2xxx-rpi4 boot.img
+
+
+Running with the Image
+---
+dd the boot.img to a SD card and boot the target board from SD car with
+following instruction in u-boot:
+
+U-BOOT> fatload mmc 0:1 ${kernel_addr_r} Image
+U-BOOT> fdt addr ${fdt_addr}
+U-BOOT> fdt resize
+U-BOOT> setenv bootargs "dwc_otg.lpm_enable=0 console=ttyS0,115200 root=/dev/mmcblk0p3 rootwait"
+U-BOOT> booti ${kernel_addr_r} - ${fdt_addr}
+
+You can use 'ctrl+w #' to switch between essential (where # = 0), dom0
+(where # = 1) and cube-server (where # = 2) gettys. Since this makes
+use of screen, using 'ctrl+"' will list the available sessions. You
+can also use a VNC viewer like gvncviewer to connect to the VM,
+switching between ptys 0, 1 and 2 will similarly get you to essential,
+dom0 and cube-server.
