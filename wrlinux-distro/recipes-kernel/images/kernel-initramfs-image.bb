@@ -20,6 +20,8 @@ EXCLUDE_FROM_WORLD = "1"
 
 DEPENDS = "virtual/kernel"
 
+DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'ostree', 'initramfs-ostree-image', '', d)}"
+
 PROVIDES = "virtual/kernel-initramfs-image"
 
 inherit kernelsrc kernel-arch
