@@ -15,6 +15,9 @@ TOOLCHAIN_HOST_TASK_append_osv-wrlinux = " \
 # use anspass to save and retrieve credentials
 TOOLCHAIN_HOST_TASK_append_osv-wrlinux = " nativesdk-anspass"
 
+# For wr-ostree
+TOOLCHAIN_HOST_TASK_append_osv-wrlinux = " nativesdk-gnupg"
+
 SDK_POSTPROCESS_COMMAND_prepend_osv-wrlinux = " gen_buildtools_delete_target ;"
 
 gen_buildtools_delete_target() {
