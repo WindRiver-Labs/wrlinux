@@ -73,7 +73,11 @@ PNWHITELIST_meta-python += " \
     python3-django-south \
     python3-pytz \
     nativesdk-python3-beautifulsoup4 \
+    nativesdk-python3-html5lib \
+    nativesdk-python3-lxml \
     nativesdk-python3-pytz \
+    nativesdk-python3-soupsieve \
+    nativesdk-python3-webencodings \
     python-m2crypto \
     python-typing \
     python3-pyyaml \
