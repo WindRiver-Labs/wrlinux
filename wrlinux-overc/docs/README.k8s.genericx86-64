@@ -16,6 +16,7 @@ Building
 1) Configure your build area using setup.sh:
   %> ./wrlinux-setup.sh --machines genericx86-64 \
        --distros wrlinux-overc \
+       --templates feature/kubernetes \
        --dl-layers \
        --no-recommend
 
