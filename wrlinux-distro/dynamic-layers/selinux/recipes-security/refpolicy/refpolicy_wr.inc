@@ -169,4 +169,5 @@ SRC_URI += "file://wr-policy-fix-dev-log-label.patch \
             file://wr-policy-files-add-lable-if-mnt-opt-media-is-symlinks-file.patch \
             file://wr-policy-system-mount.te-allow-mount-on-symlink-file.patch \
             file://wr-policy-system-locallogin.te-allow-login-read-symlink-file.patch \
+            file://wr-policy-allow-mount-to-dirs-under-tmp.patch \
            "

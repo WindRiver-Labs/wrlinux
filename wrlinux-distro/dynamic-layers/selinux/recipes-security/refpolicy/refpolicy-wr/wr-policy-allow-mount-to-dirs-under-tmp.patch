@@ -1,0 +1,36 @@
+From da85641daa22ef2e522102c88981e7a95c5d6587 Mon Sep 17 00:00:00 2001
+From: Liwei Song <liwei.song@windriver.com>
+Date: Fri, 3 Jan 2020 10:19:20 +0800
+Subject: [PATCH] allow mount to dirs under /tmp
+
+fix avc denials:
+
+AVC avc:  denied  { mounton } for  pid=646 comm="mount" path="/tmp/mnt"
+dev="tmpfs" ino=26671 scontext=root:sysadm_r:mount_t:s0-s15:c0.c1023
+tcontext=root:object_r:user_tmp_t:s0 tclass=dir permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Liwei Song <liwei.song@windriver.com>
+---
+ policy/modules/system/mount.te | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/policy/modules/system/mount.te b/policy/modules/system/mount.te
+index 70e66bac5118..a7c4d2314835 100644
+--- a/policy/modules/system/mount.te
++++ b/policy/modules/system/mount.te
+@@ -49,6 +49,10 @@ mount_read_loopback_files(mount_t)
+ allow mount_t mount_tmp_t:file manage_file_perms;
+ allow mount_t mount_tmp_t:dir manage_dir_perms;
+ 
++
++# Allow mount to dirs under /tmp
++userdom_mounton_tmp_dirs(mount_t);
++
+ can_exec(mount_t, mount_exec_t)
+ 
+ files_tmp_filetrans(mount_t, mount_tmp_t, { file dir })
+-- 
+2.17.1
+
