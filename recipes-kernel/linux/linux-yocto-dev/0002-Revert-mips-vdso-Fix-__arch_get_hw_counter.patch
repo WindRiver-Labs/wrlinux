@@ -1,0 +1,39 @@
+From 83d5b0e64aedff6fc42aa0bb6ca6157e2725646c Mon Sep 17 00:00:00 2001
+From: He Zhe <zhe.he@windriver.com>
+Date: Wed, 18 Dec 2019 17:14:02 +0800
+Subject: [PATCH 2/6] Revert "mips: vdso: Fix __arch_get_hw_counter()"
+
+This reverts commit 8a1bef4193e81c8afae4d2f107f1c09c8ce89470.
+
+Upstream-Status: Wind River specific
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+
+---
+ arch/mips/include/asm/vdso/gettimeofday.h | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/arch/mips/include/asm/vdso/gettimeofday.h b/arch/mips/include/asm/vdso/gettimeofday.h
+index b08825531e9f..e78462e8ca2e 100644
+--- a/arch/mips/include/asm/vdso/gettimeofday.h
++++ b/arch/mips/include/asm/vdso/gettimeofday.h
+@@ -24,8 +24,6 @@
+ 
+ #define VDSO_HAS_CLOCK_GETRES		1
+ 
+-#define __VDSO_USE_SYSCALL		ULLONG_MAX
+-
+ #ifdef CONFIG_MIPS_CLOCK_VSYSCALL
+ 
+ static __always_inline long gettimeofday_fallback(
+@@ -207,7 +205,7 @@ static __always_inline u64 __arch_get_hw_counter(s32 clock_mode)
+ 		break;
+ #endif
+ 	default:
+-		cycle_now = __VDSO_USE_SYSCALL;
++		cycle_now = 0;
+ 		break;
+ 	}
+ 
+-- 
+2.24.1
+

@@ -1,0 +1,72 @@
+From b3dc3ba278baa981f33a611cb57d6f1ff48cd57e Mon Sep 17 00:00:00 2001
+From: He Zhe <zhe.he@windriver.com>
+Date: Wed, 18 Dec 2019 17:18:48 +0800
+Subject: [PATCH 3/6] Revert "mips: Add clock_getres entry point"
+
+This reverts commit abed3d826f2fb723c61b1251720348a42357c4e5.
+
+Upstream-Status: Wind River specific
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+
+---
+ arch/mips/include/asm/vdso/gettimeofday.h |  2 --
+ arch/mips/vdso/vdso.lds.S                 |  1 -
+ arch/mips/vdso/vgettimeofday.c            | 12 ------------
+ 3 files changed, 15 deletions(-)
+
+diff --git a/arch/mips/include/asm/vdso/gettimeofday.h b/arch/mips/include/asm/vdso/gettimeofday.h
+index e78462e8ca2e..5c17bed9d333 100644
+--- a/arch/mips/include/asm/vdso/gettimeofday.h
++++ b/arch/mips/include/asm/vdso/gettimeofday.h
+@@ -22,8 +22,6 @@
+ #include <asm/unistd.h>
+ #include <asm/vdso.h>
+ 
+-#define VDSO_HAS_CLOCK_GETRES		1
+-
+ #ifdef CONFIG_MIPS_CLOCK_VSYSCALL
+ 
+ static __always_inline long gettimeofday_fallback(
+diff --git a/arch/mips/vdso/vdso.lds.S b/arch/mips/vdso/vdso.lds.S
+index ad9f2f2c0c97..94d90c440590 100644
+--- a/arch/mips/vdso/vdso.lds.S
++++ b/arch/mips/vdso/vdso.lds.S
+@@ -95,7 +95,6 @@ VERSION
+ 	global:
+ 		__vdso_clock_gettime;
+ 		__vdso_gettimeofday;
+-		__vdso_clock_getres;
+ #endif
+ 	local: *;
+ 	};
+diff --git a/arch/mips/vdso/vgettimeofday.c b/arch/mips/vdso/vgettimeofday.c
+index 48e1ab32204b..1c46dace041e 100644
+--- a/arch/mips/vdso/vgettimeofday.c
++++ b/arch/mips/vdso/vgettimeofday.c
+@@ -23,12 +23,6 @@ int __vdso_gettimeofday(struct __kernel_old_timeval *tv,
+ 	return __cvdso_gettimeofday(tv, tz);
+ }
+ 
+-int __vdso_clock_getres(clockid_t clock_id,
+-			struct old_timespec32 *res)
+-{
+-	return __cvdso_clock_getres_time32(clock_id, res);
+-}
+-
+ #else
+ 
+ int __vdso_clock_gettime(clockid_t clock,
+@@ -43,10 +37,4 @@ int __vdso_gettimeofday(struct __kernel_old_timeval *tv,
+ 	return __cvdso_gettimeofday(tv, tz);
+ }
+ 
+-int __vdso_clock_getres(clockid_t clock_id,
+-			struct __kernel_timespec *res)
+-{
+-	return __cvdso_clock_getres(clock_id, res);
+-}
+-
+ #endif
+-- 
+2.24.1
+
