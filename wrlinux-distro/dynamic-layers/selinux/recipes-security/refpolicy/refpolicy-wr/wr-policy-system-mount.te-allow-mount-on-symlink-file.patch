@@ -1,0 +1,35 @@
+From b80f2a3744ac915dbe7d448ed40c87a747666f9e Mon Sep 17 00:00:00 2001
+From: Liwei Song <liwei.song@windriver.com>
+Date: Thu, 2 Jan 2020 17:38:13 +0800
+Subject: [PATCH 2/3] system/mount.te: allow mount on symlink file
+
+allow mount on symlink file /mnt
+
+AVC avc:  denied  { read } for  pid=644 comm="mount" name="mnt"
+dev="sda3" ino=865 scontext=root:sysadm_r:mount_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:default_t:s0 tclass=lnk_file permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Liwei Song <liwei.song@windriver.com>
+---
+ policy/modules/system/mount.te | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/policy/modules/system/mount.te b/policy/modules/system/mount.te
+index dd965b39f4bd..70e66bac5118 100644
+--- a/policy/modules/system/mount.te
++++ b/policy/modules/system/mount.te
+@@ -115,6 +115,9 @@ fs_rw_tmpfs_chr_files(mount_t)
+ fs_read_tmpfs_symlinks(mount_t)
+ fs_dontaudit_write_tmpfs_dirs(mount_t)
+ 
++files_read_all_symlinks(mount_t)
++files_getattr_all_symlinks(mount_t)
++
+ mls_file_read_all_levels(mount_t)
+ mls_file_write_all_levels(mount_t)
+ 
+-- 
+2.17.1
+
