@@ -166,4 +166,5 @@ SRC_URI += "file://wr-policy-fix-dev-log-label.patch \
             file://wr-policy-systemd-fix-avc-denials-for-systemd-udevd.patch \
             file://wr-policy-monit-fix-avc-denials-for-opening-monit-state-file.patch \
             file://wr-policy-files-add-lable-if-mnt-opt-media-is-symlinks-file.patch \
+            file://wr-policy-system-mount.te-allow-mount-on-symlink-file.patch \
            "
