@@ -1,0 +1,26 @@
+From f7a02638d11995b5b0b199e7227191f775b6dab5 Mon Sep 17 00:00:00 2001
+From: Liwei Song <liwei.song@windriver.com>
+Date: Wed, 8 Jan 2020 05:48:58 +0000
+Subject: [PATCH] file_contexts.subs_dist: fix label for /usr/etc
+
+/usr/etc should has the same label with /etc
+
+Upstream-Status: Pending
+
+Signed-off-by: Liwei Song <liwei.song@windriver.com>
+---
+ config/file_contexts.subs_dist | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/config/file_contexts.subs_dist b/config/file_contexts.subs_dist
+index 34fabdf41c17..e29d7f484662 100644
+--- a/config/file_contexts.subs_dist
++++ b/config/file_contexts.subs_dist
+@@ -52,3 +52,4 @@
+ /run/systemd/generator /usr/lib/systemd/system
+ /etc/systemd/system /usr/lib/systemd/system
+ /root /home/root
++/usr/etc /etc
+-- 
+2.23.0
+
