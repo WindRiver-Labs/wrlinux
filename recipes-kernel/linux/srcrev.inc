@@ -105,7 +105,7 @@ SRCREV_machine_kb-v4.18-standard-preempt-rt-wr-axxia-base ?= "37fac3f1047b3b346d
 LINUX_VERSION_kb-v4.18-standard-preempt-rt-wr-axxia-base ?= "4.18.45"
 SRCREV_machine_kb-v4.18-standard-preempt-rt-wr-base ?= "a013bf608e811533f1953a01dfc1453e6bf548c5"
 LINUX_VERSION_kb-v4.18-standard-preempt-rt-wr-base ?= "4.18.45"
-SRCREV_machine_kb-v4.18-standard-preempt-rt-xilinx-sdk2018-03-xilinx-zynq ?= "fd75a25ed77a0f52564309f81449342a124141d2"
+SRCREV_machine_kb-v4.18-standard-preempt-rt-xilinx-sdk2018-03-xilinx-zynq ?= "50daf075b97402b9b27e6a44c5c1a9b4f815cea4"
 LINUX_VERSION_kb-v4.18-standard-preempt-rt-xilinx-sdk2018-03-xilinx-zynq ?= "4.18.45"
 SRCREV_machine_kb-v4.18-standard-preempt-rt-xilinx-sdk2018-03-xilinx-zynqmp ?= "228194ac7d16a2f95e591515355cc8b34e6232e3"
 LINUX_VERSION_kb-v4.18-standard-preempt-rt-xilinx-sdk2018-03-xilinx-zynqmp ?= "4.18.45"
@@ -129,12 +129,12 @@ SRCREV_machine_kb-v4.18-standard-wr-axxia-base ?= "dbbd76102c88e4b5189dfcc15bdca
 LINUX_VERSION_kb-v4.18-standard-wr-axxia-base ?= "4.18.45"
 SRCREV_machine_kb-v4.18-standard-wr-base ?= "04ceea570a2c7348a7fa11609f3a2c15a68e6534"
 LINUX_VERSION_kb-v4.18-standard-wr-base ?= "4.18.45"
-SRCREV_machine_kb-v4.18-standard-xilinx-sdk2018-03-xilinx-zynq ?= "78883d033b78be067dc90aaa2e8ef8ca36b50d7e"
+SRCREV_machine_kb-v4.18-standard-xilinx-sdk2018-03-xilinx-zynq ?= "a49f32b3cb4c1dc38846eb10ecef205e390625fa"
 LINUX_VERSION_kb-v4.18-standard-xilinx-sdk2018-03-xilinx-zynq ?= "4.18.45"
 SRCREV_machine_kb-v4.18-standard-xilinx-sdk2018-03-xilinx-zynqmp ?= "54722177286e92f94fc16061e7354d82c6157092"
 LINUX_VERSION_kb-v4.18-standard-xilinx-sdk2018-03-xilinx-zynqmp ?= "4.18.45"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_4.18 = "yocto-4.18-wr"
-SRCREV_meta_4.18 = "0a115ad3e8e32d69525c952430eceb4d1740ec95"
+SRCREV_meta_4.18 = "b15670dca90b6bb37ae7132fd45ab34a2a374460"
 LINUX_VERSION_4.18 = "4.18.45"
