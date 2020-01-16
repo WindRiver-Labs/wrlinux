@@ -28,7 +28,7 @@ Recipes
    KERNEL_HEADER_DIR is "/usr".
 
 2. linux-yocto-dev.bbappend is for customizing Yocto kernel source and
-   linux-yocto_4.18.bbappend for Wind River kernel source. If you want to use
+   linux-yocto_%.bbappend for Wind River kernel source. If you want to use
    headers of these kernels, you need to properly set KERNEL_ALT_HEADER_DIR
    ("/usr" is invalid in this case).
 
