@@ -53,9 +53,10 @@ RDEPENDS_${PN}-access = "\
 	${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'audit auditd', '', d)} \
         "
 
-RDEPENDS_${PN}-detection = "\
-	${@bb.utils.contains('BBFILE_COLLECTIONS', 'security', 'samhain', '', d)} \
-        "
+# Remove temporarily as samhain is blacklisted. See LINCD-882
+# RDEPENDS_${PN}-detection = "\
+# 	${@bb.utils.contains('BBFILE_COLLECTIONS', 'security', 'samhain', '', d)} \
+#         "
 
 RDEPENDS_${PN}-crypto = "\
 	${@bb.utils.contains('BBFILE_COLLECTIONS', 'security', 'ecryptfs-utils', '', d)} \
