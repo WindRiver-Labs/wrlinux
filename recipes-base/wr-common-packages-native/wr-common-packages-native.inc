@@ -148,7 +148,6 @@ DEPENDS = "\
     pseudo-native \
     python-futures-native \
     python-jsmin-native \
-    python-m2crypto-native \
     python-native \
     python-pytoml-native \
     python-setuptools-native \
@@ -157,6 +156,7 @@ DEPENDS = "\
     python-which-native \
     python3-iniparse-native \
     python3-mako-native \
+    python3-m2crypto-native \
     python3-native \
     python3-setuptools-native \
     python3-six-native \

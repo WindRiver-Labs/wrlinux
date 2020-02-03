@@ -78,7 +78,7 @@ PNWHITELIST_meta-python += " \
     nativesdk-python3-pytz \
     nativesdk-python3-soupsieve \
     nativesdk-python3-webencodings \
-    python-m2crypto \
+    python3-m2crypto \
     python-typing \
     python3-pyyaml \
     python3-jinja2 \
