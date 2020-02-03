@@ -16,7 +16,7 @@ PR = "r1"
 ALLOW_EMPTY_${PN} = "1"
 
 RDEPENDS_${PN} = " \
-    python \
-    python-misc \
-    python-modules \
+    python3 \
+    python3-misc \
+    python3-modules \
     "
