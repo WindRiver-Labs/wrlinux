@@ -92,5 +92,5 @@ INSANE_SKIP_${PN} += "already-stripped"
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 RDEPENDS_open-posix-testsuite += "eglibc-utils"
-RDEPENDS_${PN} += "open-posix-testsuite expect python python-textutils binutils binutils-symlinks gzip"
+RDEPENDS_${PN} += "open-posix-testsuite expect binutils binutils-symlinks gzip"
 
