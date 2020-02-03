@@ -51,11 +51,8 @@ RDEPENDS_${PN} = "\
 	lvm2 \
 	monit \
 	${NUMACTL} \
-	ocfs2-tools \
 	openhpi \
 	openl2tp \
-	pacemaker \
-	crmsh \
 	passwdqc \
 	postgresql \
 	quagga \
