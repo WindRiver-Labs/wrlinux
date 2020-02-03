@@ -88,7 +88,7 @@ index 0000000..3037077
 +LOGFILE="$LOGPATH/LTP_RUN_ON-$EXECUTION_TIME.log"
 +LTPLOG=$LOGPATH/LTP.log
 +SCENARIO_GROUP_LIST="syscalls,fs,fs_perms_simple,fsx,dio,io,mm,ipc,sched,math,nptl,pty,\
-+containers,fs_bind,filecaps,cap_bounds,connectors,fcntl-locktests,admin_tools,timers,commands,\
++containers,fs_bind,filecaps,cap_bounds,connectors,fcntl-locktests,admin_tools,commands,\
 +hyperthreading,kernel_misc,modules"
 +
 +RUN_RESUME_TEST=0

@@ -129,7 +129,6 @@ By default, the wr-runltp execute the following scenario groups:
 -fcntl-locktests
 -connectors
 -admin_tools
--timers
 -commands
 -hyperthreading
 -kernel_misc
