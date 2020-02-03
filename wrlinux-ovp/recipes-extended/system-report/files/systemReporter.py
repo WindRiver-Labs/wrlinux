@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 ###############################################################################
 #
 # Copyright (C) 2013 Wind River Systems, Inc.
@@ -33,7 +33,7 @@ def printReportHeader(headline, skipNewLine = 1):
     lineToPrint = string.center(headline, 80, "*")
     if skipNewLine != 0 :
         lineToPrint = "\n" + lineToPrint
-    print lineToPrint
+    print(lineToPrint)
     sys.stdout.flush()
 
 
@@ -219,7 +219,7 @@ def processDmiDecodeValues():
     try:
         tmpFile = open(tmpFileName, "w")
     except:
-        print "Cannot create file: " + tmpFileName
+        print("Cannot create file: " + tmpFileName)
         return
 
     command = "dmidecode"
@@ -227,7 +227,7 @@ def processDmiDecodeValues():
     try:
         subprocess.check_call(command , shell=True, stderr=subprocess.STDOUT, universal_newlines=True, stdout=tmpFile)
     except subprocess.CalledProcessError:
-        print "Error calling dmidecode!"
+        print("Error calling dmidecode!")
         return
   
     # close the file to flush the subprocess output into it,
@@ -237,14 +237,14 @@ def processDmiDecodeValues():
     try:
         tmpFile = open(tmpFileName, "r+")
     except:
-        print "Cannot open file " + tmpFileName
+        print("Cannot open file " + tmpFileName)
         return
 
     # process each line....
     # The processing logic is the following:
     # getting from the dmiDecodeValues hash, the keys, and lookup that
     # key in the file.
-    for dmiK1, dmiV1 in dmiDecodeValues.iteritems():
+    for dmiK1, dmiV1 in dmiDecodeValues.items():
         tmpFile.seek(0,0) # rewind to position 0
         line = tmpFile.readline()
         while line:
@@ -255,7 +255,7 @@ def processDmiDecodeValues():
                 # get the current file position to be able to rewind to it
                 masterKeyFilePosition = tmpFile.tell()
                 # now lookup the next key in the following lines...
-                for dmiK2, dmiV2 in dmiV1.iteritems():
+                for dmiK2, dmiV2 in dmiV1.items():
                     # seek for the master key position
                     tmpFile.seek(masterKeyFilePosition, 0)
                     # read ahead and search for the sub-key
@@ -280,10 +280,10 @@ def processDmiDecodeValues():
 # this method prints out a hash of hash-es...
 def printDmiDecodeValues(dmiDecVal, headline, footline, prefix):
     printReportHeader(headline)
-    for dmiK1,dmiV1 in dmiDecVal.iteritems():
-        print  "\n" + prefix + dmiK1
-        for dmiK2,dmiV2 in dmiV1.iteritems():
-            print "  " + prefix + dmiK2 + " " + dmiV2
+    for dmiK1,dmiV1 in dmiDecVal.items():
+        print("\n" + prefix + dmiK1)
+        for dmiK2,dmiV2 in dmiV1.items():
+            print("  " + prefix + dmiK2 + " " + dmiV2)
     printReportHeader(footline, 0)
 
 
@@ -316,7 +316,7 @@ def getPciDevicesList():
     try:
         tmpFile = open(tmpFileName, "w")
     except:
-        print "Cannot create file " + tmpFileName
+        print("Cannot create file " + tmpFileName)
         return retVal
 
     command = "lspci -mm -vvv -D"
@@ -324,7 +324,7 @@ def getPciDevicesList():
     try:
         subprocess.check_call(command, shell=True, stderr=subprocess.STDOUT, universal_newlines=True, stdout=tmpFile)
     except Exception as exc:
-        print exc
+        print(exc)
 
     # close the file to flush the subprocess output into it,
     # and open it for readin
@@ -333,7 +333,7 @@ def getPciDevicesList():
     try:
         tmpFile = open(tmpFileName, "r+")
     except:
-        print "Cannot open file " + tmpFileName
+        print("Cannot open file " + tmpFileName)
         return retVal
 
     line = tmpFile.readline()
@@ -362,10 +362,10 @@ def printPciDevicesList(pciDevices):
     printReportHeader("PCI Devices Information")
 
     for pciDev in pciDevices:
-        print "\nPCI - Slot: " + pciDev["Slot"]
-        print "PCI - Device: " + pciDev["Device"]
-        print "PCI - Class: " + pciDev["Class"]
-        print "PCI - Vendor: " + pciDev["Vendor"]
+        print("\nPCI - Slot: " + pciDev["Slot"])
+        print("PCI - Device: " + pciDev["Device"])
+        print("PCI - Class: " + pciDev["Class"])
+        print("PCI - Vendor: " + pciDev["Vendor"])
 
     printReportHeader("PCI Devices Info - Done", 0)
 
@@ -393,7 +393,7 @@ def kernelConfigGathering():
     configFile = "/proc/config.gz"
     printReportHeader("KERNEL Configuration Information")
     if not os.path.exists(configFile):
-        print "KERNEL Configuration Information - NOT PRESENT!"
+        print("KERNEL Configuration Information - NOT PRESENT!")
     else:
         subprocess.call("zcat "+configFile, shell=True)
 
@@ -406,12 +406,12 @@ def printCpuInfo(cHash):
     if cHash == None: # don't have VDSM, get the info from /proc/cpuinfo
         cHash = getProcCpuInfo()
       
-    print "CPU Model: " + cHash["cpuModel"]
-    print "CPU Speed: " + cHash["cpuSpeed"]
-    print "CPU Sockets: " + cHash["cpuSockets"]
-    print "CPU Cores: " + cHash["cpuCores"]
-    print "CPU Threads: " + cHash["cpuThreads"]
-    print "CPU Flags: " + cHash["cpuFlags"]
+    print("CPU Model: " + cHash["cpuModel"])
+    print("CPU Speed: " + cHash["cpuSpeed"])
+    print("CPU Sockets: " + cHash["cpuSockets"])
+    print("CPU Cores: " + cHash["cpuCores"])
+    print("CPU Threads: " + cHash["cpuThreads"])
+    print("CPU Flags: " + cHash["cpuFlags"])
    
     # create a list of cpu flags
     flagList = cHash["cpuFlags"].split()
@@ -425,8 +425,8 @@ def printCpuInfo(cHash):
     else:
         vtsupport = " not present"
 
-    print "CPU X2APIC Support:" + x2apic
-    print "CPU VT Support:" + vtsupport
+    print("CPU X2APIC Support:" + x2apic)
+    print("CPU VT Support:" + vtsupport)
     # for VT-d support - IOMMU there is no linux flag present, so it cannot
     # be reported
 
@@ -438,16 +438,16 @@ def printCpuInfo(cHash):
 def printHwInfo(cHash):
     printReportHeader("HARDWARE Information")
     if cHash != None: # if we have vdsm, report it from vdsm
-        print "HARDWARE - KVM enabled: " + cHash["kvmEnabled"]
-        print "HARDWARE - MEMORY Size: " + cHash["memSize"]
-        print "HARDWARE - MEMORY Reserved: " + cHash["reservedMem"]
+        print("HARDWARE - KVM enabled: " + cHash["kvmEnabled"])
+        print("HARDWARE - MEMORY Size: " + cHash["memSize"])
+        print("HARDWARE - MEMORY Reserved: " + cHash["reservedMem"])
 
     # display memory related information
     memInfoHash = getProcMemInfo()
-    print "HARDWARE - MEMORY Total: " + memInfoHash["memTotal"]
-    print "HARDWARE - MEMORY Free: " + memInfoHash["memFree"]
-    print "HARDWARE - MEMORY Swap Size: " + memInfoHash["swapTotal"]
-    print "HARDWARE - MEMORY Swap Free: " + memInfoHash["swapFree"]
+    print("HARDWARE - MEMORY Total: " + memInfoHash["memTotal"])
+    print("HARDWARE - MEMORY Free: " + memInfoHash["memFree"])
+    print("HARDWARE - MEMORY Swap Size: " + memInfoHash["swapTotal"])
+    print("HARDWARE - MEMORY Swap Free: " + memInfoHash["swapFree"])
 
     printReportHeader("HARDWARE Info - Done", 0)
 
@@ -457,13 +457,13 @@ def printKernelInfo(cHash):
     printReportHeader("KERNEL Information")
     if cHash != None: # if we have vdsm, report it from vdsm
         kernelInfo = cHash["packages2"]["kernel"]
-        print "KERNEL Version: " + kernelInfo["version"]
-        print "KERNEL Release: " + kernelInfo["release"]
+        print("KERNEL Version: " + kernelInfo["version"])
+        print("KERNEL Release: " + kernelInfo["release"])
     #else:
     kernelInfo = getProcModules()
-    print "KERNEL Version: " + kernelInfo["version"]
-    print "KERNEL Release: " + kernelInfo["release"]
-    print "KERNEL Modules: " + kernelInfo["modules"]
+    print("KERNEL Version: " + kernelInfo["version"])
+    print("KERNEL Release: " + kernelInfo["release"])
+    print("KERNEL Modules: " + kernelInfo["modules"])
     printReportHeader("KERNEL Info - Done", 0)
 
 
@@ -472,18 +472,18 @@ def printKernelInfo(cHash):
 ###############################################################
 def printUsage():
     printReportHeader("Tool Usage")
-    print "\nUsage:"
-    print "\t" + sys.argv[0] + " <options>"
-    print "\nWhere options:\n"
-    print "\t -h | --help = display this help message"
-    print "\t -c | --cpushow = shows CPU information"
-    print "\t -H | --hardware = shows various hardware related information"
-    print "\t -k | --kernel = shows kernel related information"
-    print "\t -L | --localization = shows lstopo (hwloc-info) topology information"
-    print "\t -d | --dmi = shows dmidecode provided information"
-    print "\t -p | --pci = shows pci related information"
-    print "\t -K | --Kconfig = shows kernel configuration information"
-    print "\t -a | --all = shows all the information that can be gathered"
+    print("\nUsage:")
+    print("\t" + sys.argv[0] + " <options>")
+    print("\nWhere options:\n")
+    print("\t -h | --help = display this help message")
+    print("\t -c | --cpushow = shows CPU information")
+    print("\t -H | --hardware = shows various hardware related information")
+    print("\t -k | --kernel = shows kernel related information")
+    print("\t -L | --localization = shows lstopo (hwloc-info) topology information")
+    print("\t -d | --dmi = shows dmidecode provided information")
+    print("\t -p | --pci = shows pci related information")
+    print("\t -K | --Kconfig = shows kernel configuration information")
+    print("\t -a | --all = shows all the information that can be gathered")
     printReportHeader("Bye")
 
 
