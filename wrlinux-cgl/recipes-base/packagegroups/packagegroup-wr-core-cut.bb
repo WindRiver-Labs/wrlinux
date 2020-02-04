@@ -26,5 +26,4 @@ RDEPENDS_${PN} = "\
         cgl-unittest \
         expect \
         perf \
-        saftest \
         "
