@@ -195,11 +195,11 @@ static void init_vdso(void)
 	init = 1;
 }
 
-int gettimeofday(struct timeval *tv, struct timezone *tz)
+int gettimeofday(struct timeval *tv, void *tz)
 {
 	if (unlikely(!init))
 		init_vdso();
-	return vdso_gettimeofday(tv, tz);
+	return vdso_gettimeofday(tv, (struct timezone *)tz);
 }
 
 int clock_gettime(clockid_t clk_id, struct timespec *tp)
