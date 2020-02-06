@@ -22,7 +22,7 @@ babeltrace: an open-source trace converter and processor. The tool can convert
             from one trace format to another, possibly with one or more filters
             in the conversion path, and perform other operations depending on
             the command
-python-core: used with Python bindings of babeltrace library
+python3-core: used with Python bindings of babeltrace library
 
 For more details of lttng please refer to
 https://lttng.org/docs/v2.10/#doc-plumbing
