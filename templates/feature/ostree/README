@@ -1,0 +1,51 @@
+OSTree (libostree)
+==================
+
+Enable ostree which fundamentally changes the way you will update the
+target device file system.
+
+You should always set the OSTREE_REMOTE_URL in your local.conf so that
+it is built into the target image for later updating.  This will be
+the location which you copy the ostree_repo from your deploy
+directory.
+
+The ostree integration modifies the following aspects of your image:
+  * The disk layout will be altered to use an A/B or A only layout
+    depending on the value of ${OSTREE_USE_AB}
+     1) OSTREE_USE_AB = 1  - Use the A/B layout
+         * FAT partition for the bootloader
+	 * primary "A" /boot partition for the kernel and initramfs
+	 * primary "A" / partition for the OS and the local ostree_repo
+	 * secondary "B" /boot partition for the kernel and initramfs
+	 * secondary "B" /  partition for the OS and the local ostree_repo
+	 * /var partition which auto expands to fill the physical disk for data
+     1) OSTREE_USE_AB = 0  - Use the A layout
+         * FAT partition for the bootloader
+	 * primary "A" /boot partition for the kernel and initramfs
+	 * primary "A" / partition for the OS and the local ostree_repo
+	   - In the A layout the rollback deployment data is stored on the same partition
+	 * /var partition which auto expands to fill the physical disk for data
+
+  * The bootloader configuration is altered to support a primary boot
+    and rollback boot deployment.  A boot counter is stored in the FAT volume
+    to automatically boot the rollback image if too many failures have occurred. 
+
+  * The initramfs is replaced with the ostree_initramfs which is capable of creating
+    a new deployment using the network or local storage
+
+  * The file system is built with the usrmerge feature which makes /bin /sbin and /lib
+    links into the /usr directory
+
+  * The /etc and /var directories are the only directories which are writable in an
+    OSTree based file system.  This is where any persistent data should stored
+
+  * Each upgrade will perform 3-way merge on the /etc directory
+
+  * You should use the ostree_upgrade.sh script to upgrade the device
+
+With each build of an image, an ostree repository will be created in
+the tmp*/deploy/images/$MACHINE/ostree_repo directory.  This
+repository will be used to create a local repository inside the image,
+from which a "deployment" will be checked out for use as the OS.
+
+You can read more about OSTree at: https://ostree.readthedocs.io/en/latest/
