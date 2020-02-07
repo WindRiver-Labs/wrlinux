@@ -123,6 +123,8 @@ SRC_URI = "git://github.com/OpenSCAP/scap-security-guide.git \
             file://0119-Rule-file_permissions_sshd_private_key-fix-remediate.patch \
             file://0120-Rule-file_permissions_sshd_private_key-update-remediation.patch \
             file://0121-Rule-file_permissions_unauthorized_suid-update-check.patch \
+            file://0122-Fix-XML-parsing-of-the-remediation-functions-file.patch \
+            file://0123-Fixed-the-broken-fix-when-greedy-regex-ate-the-whole.patch \
            "
 PV = "0.1.45+git${SRCPV}"
 
