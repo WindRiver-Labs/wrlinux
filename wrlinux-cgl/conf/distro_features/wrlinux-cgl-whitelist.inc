@@ -15,10 +15,13 @@ PNWHITELIST_cgl-common += " \
 "
 PNWHITELIST_CGL_COMMON = " \
     cluster-glue \
+    crmsh \
     libmailtools-perl \
     libsocket6-perl \
     libtest-pod-perl \
     libwww-perl \
+    ocfs2-tools \
+    pacemaker \
     resource-agents \
     ucarp \
 "
