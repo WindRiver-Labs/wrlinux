@@ -39,7 +39,7 @@ IMAGE_INSTALL += " \
    packagegroup-ovp-docker \
    spice \
    celt051 \
-   python-pyparsing \
+   python3-pyparsing \
    schedtool-dl \
    dpdk \
    system-report \
