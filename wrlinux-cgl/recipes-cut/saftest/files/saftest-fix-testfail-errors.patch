@@ -1,0 +1,261 @@
+diff -urpN a/HPI-B.01.01/include/SaHpi.h b/HPI-B.01.01/include/SaHpi.h
+--- a/HPI-B.01.01/include/SaHpi.h
++++ b/HPI-B.01.01/include/SaHpi.h
+@@ -146,7 +146,7 @@ typedef SaHpiUint32T SaHpiVersionT;
+ ** the next 8 bits represent the major version number; and 
+ ** the least significant 8 bits represent the minor version number.
+ */
+-#define SAHPI_INTERFACE_VERSION (SaHpiVersionT)0x020101  /* B.01.01 */
++#define SAHPI_INTERFACE_VERSION (SaHpiVersionT)0x020302  /* B.01.01 */
+ 
+ /*
+ ** Return Codes
+diff -urpN a/HPI-B.01.01/src/alarm/saHpiAlarmGet/5.c b/HPI-B.01.01/src/alarm/saHpiAlarmGet/5.c
+--- a/HPI-B.01.01/src/alarm/saHpiAlarmGet/5.c
++++ b/HPI-B.01.01/src/alarm/saHpiAlarmGet/5.c
+@@ -66,7 +66,7 @@ int Test_Domain(SaHpiSessionIdT session_
+ 	} else {
+ 		// When the Alarm is successfully set
+ 
+-		status = saHpiAlarmGet(session_id, SAHPI_FIRST_ENTRY, &Alarm);
++		status = saHpiAlarmGet(session_id, SAHPI_LAST_ENTRY-1, &Alarm);
+ 		if (status != SA_OK) {
+ 			if (status == SA_ERR_HPI_NOT_PRESENT) {
+ 				//It is unclear whether this should work.
+diff -urpN a/HPI-B.01.01/src/alarm/saHpiAlarmGet/6.c b/HPI-B.01.01/src/alarm/saHpiAlarmGet/6.c
+--- a/HPI-B.01.01/src/alarm/saHpiAlarmGet/6.c	2013-03-12 13:55:41.000000000 +0800
++++ b/HPI-B.01.01/src/alarm/saHpiAlarmGet/6.c	2013-03-12 14:12:01.000000000 +0800
+@@ -64,7 +64,7 @@ int Test_Domain(SaHpiSessionIdT session_
+ 	} else {
+ 		// When the Alarm is successfully set
+ 
+-		status = saHpiAlarmGet(session_id, SAHPI_LAST_ENTRY, &Alarm);
++		status = saHpiAlarmGet(session_id, SAHPI_LAST_ENTRY-1, &Alarm);
+ 		if (status != SA_OK) {
+ 			if (status == SA_ERR_HPI_NOT_PRESENT) {
+ 				//It is unclear whether this should work.
+diff -urpN a/HPI-B.01.01/src/annunciator/saHpiAnnunciatorAdd/7.c b/HPI-B.01.01/src/annunciator/saHpiAnnunciatorAdd/7.c
+--- a/HPI-B.01.01/src/annunciator/saHpiAnnunciatorAdd/7.c
++++ b/HPI-B.01.01/src/annunciator/saHpiAnnunciatorAdd/7.c
+@@ -94,7 +94,7 @@ int processAnnunRdr(SaHpiSessionIdT sess
+ 			retval =
+ 			    run_test(sessionId, resourceId, a_num,
+ 				     invalidCondType[i]);
+-			if (retval != SAF_TEST_PASS) {
++			if (retval == SAF_TEST_PASS) {
+ 				break;
+ 			}
+ 		}
+diff -urpN a/HPI-B.01.01/src/control/saHpiControlGet/7.c b/HPI-B.01.01/src/control/saHpiControlGet/7.c
+--- a/HPI-B.01.01/src/control/saHpiControlGet/7.c
++++ b/HPI-B.01.01/src/control/saHpiControlGet/7.c
+@@ -55,6 +55,7 @@ int processCtrlRdr(SaHpiSessionIdT sessi
+ 
+ 		ctrlState.StateUnion.Text.Line =
+ 		    ctrlRec->TypeUnion.Text.MaxLines + 1;
++		ctrlState.Type = SAHPI_CTRL_TYPE_TEXT;
+ 
+ 		status = saHpiControlGet(sessionId, resourceId, ctrlNum,
+ 					 &ctrlMode, &ctrlState);
+diff -urpN a/HPI-B.01.01/src/domain/saHpiDomainTagSet/2.c b/HPI-B.01.01/src/domain/saHpiDomainTagSet/2.c
+--- a/HPI-B.01.01/src/domain/saHpiDomainTagSet/2.c
++++ b/HPI-B.01.01/src/domain/saHpiDomainTagSet/2.c
+@@ -41,9 +41,11 @@ int testUnicodeTag(SaHpiSessionIdT sessi
+ 
+ 	NewTag.DataType = SAHPI_TL_TYPE_UNICODE;
+ 	NewTag.Language = SAHPI_LANG_ENGLISH;
+-	NewTag.DataLength = 2;
++	NewTag.DataLength = 4;
+ 	NewTag.Data[0] = 0x0;
+-	NewTag.Data[1] = 0x41;
++	NewTag.Data[1] = 0xd8;
++	NewTag.Data[2] = 0x0;
++	NewTag.Data[3] = 0xdc;
+ 
+ 	status = saHpiDomainTagSet(sessionId, &NewTag);
+ 
+diff -urpN a/HPI-B.01.01/src/eventlog/saHpiEventLogEntryAdd/16.c b/HPI-B.01.01/src/eventlog/saHpiEventLogEntryAdd/16.c
+--- a/HPI-B.01.01/src/eventlog/saHpiEventLogEntryAdd/16.c
++++ b/HPI-B.01.01/src/eventlog/saHpiEventLogEntryAdd/16.c
+@@ -34,7 +34,6 @@
+ #define TEST_STRING     "Event Test"
+ #define TEST_STRING_LENGTH 10
+ 
+-#define TEST_UNICODE "\xFF\xFE\x61\x00"
+ #define TEST_UNICODE_LEN 4
+ 
+ #define TEST_BCDPLUS "0123456789- :,_."
+@@ -161,8 +160,10 @@ int Test_Resource(SaHpiSessionIdT sessio
+ 	}
+ 
+ 	//Test Unicode
+-	strncpy(EvtEntry.EventDataUnion.UserEvent.UserEventData.Data,
+-		TEST_UNICODE, TEST_UNICODE_LEN);
++	EvtEntry.EventDataUnion.UserEvent.UserEventData.Data[0] = 0x0;
++	EvtEntry.EventDataUnion.UserEvent.UserEventData.Data[1] = 0xD8;
++	EvtEntry.EventDataUnion.UserEvent.UserEventData.Data[2] = 0x0;
++	EvtEntry.EventDataUnion.UserEvent.UserEventData.Data[3] = 0xDC;
+ 	EvtEntry.EventDataUnion.UserEvent.UserEventData.DataLength =
+ 	    TEST_UNICODE_LEN;
+ 	EvtEntry.EventDataUnion.UserEvent.UserEventData.Language =
+diff -urpN a/HPI-B.01.01/src/events/saHpiEventGet/10.c b/HPI-B.01.01/src/events/saHpiEventGet/10.c
+--- a/HPI-B.01.01/src/events/saHpiEventGet/10.c
++++ b/HPI-B.01.01/src/events/saHpiEventGet/10.c
+@@ -63,7 +63,7 @@ int main()
+ 	int ret = SAF_TEST_UNKNOWN;
+ 	int i;
+ 	int test_len =
+-	    try_get_int_val_from_env("SAF_HPI_EVT_QUEUE_LIMIT", 1000) + 1;
++	    try_get_int_val_from_env("SAF_HPI_EVT_QUEUE_LIMIT", 10001) + 1;
+ 
+ 	val = saHpiSessionOpen(SAHPI_UNSPECIFIED_DOMAIN_ID, &session_id, NULL);
+ 	if (val != SA_OK) {
+diff -urpN a/HPI-B.01.01/src/rdr/saHpiRdrGet/1.c b/HPI-B.01.01/src/rdr/saHpiRdrGet/1.c
+--- a/HPI-B.01.01/src/rdr/saHpiRdrGet/1.c
++++ b/HPI-B.01.01/src/rdr/saHpiRdrGet/1.c
+@@ -33,7 +33,7 @@ int check_rdr(SaHpiRdrT * prdr)
+ {
+ 	int ret = 0;
+ 	if (prdr->RdrType < SAHPI_NO_RECORD
+-	    || prdr->RdrType > SAHPI_ANNUNCIATOR_RDR) {
++	    || prdr->RdrType > SAHPI_RDR_TYPE_MAX_VALID) {
+ 		m_print("rdr.RdrType invalid = %d", prdr->RdrType);
+ 		ret = -1;
+ 	}
+diff -urpN a/HPI-B.01.01/src/rdr/saHpiRdrGetByInstrumentId/1.c b/HPI-B.01.01/src/rdr/saHpiRdrGetByInstrumentId/1.c
+--- a/HPI-B.01.01/src/rdr/saHpiRdrGetByInstrumentId/1.c
++++ b/HPI-B.01.01/src/rdr/saHpiRdrGetByInstrumentId/1.c
+@@ -70,7 +70,7 @@ int check_rdr(SaHpiRdrT * pRdr)
+ {
+ 	int ret = 0;
+ 	if (pRdr->RdrType <= SAHPI_NO_RECORD
+-	    || pRdr->RdrType > SAHPI_ANNUNCIATOR_RDR) {
++	    || pRdr->RdrType > SAHPI_RDR_TYPE_MAX_VALID) {
+ 		m_print("rdr.RdrType invalid = %d", pRdr->RdrType);
+ 		ret = -1;
+ 	}
+diff -urpN a/HPI-B.01.01/src/rdr/saHpiRdrGetByInstrumentId/7.c b/HPI-B.01.01/src/rdr/saHpiRdrGetByInstrumentId/7.c
+--- a/HPI-B.01.01/src/rdr/saHpiRdrGetByInstrumentId/7.c
++++ b/HPI-B.01.01/src/rdr/saHpiRdrGetByInstrumentId/7.c
+@@ -87,8 +87,8 @@ int Test_Resource(SaHpiSessionIdT sessio
+ 				status = saHpiRdrGetByInstrumentId(session_id,
+ 								   rpt_entry.
+ 								   ResourceId,
+-								   SAHPI_ANNUNCIATOR_RDR
+-								   + 1, Id,
++								   SAHPI_ANNUNCIATOR_RDR + 3,
++								   Id,
+ 								   &newRdr);
+ 				if (status != SA_ERR_HPI_INVALID_PARAMS) {
+ 					e_print(saHpiRdrGetByInstrumentId,
+diff -urpN a/HPI-B.01.01/src/sensor/saHpiSensorThresholdsGet/3.c b/HPI-B.01.01/src/sensor/saHpiSensorThresholdsGet/3.c
+--- a/HPI-B.01.01/src/sensor/saHpiSensorThresholdsGet/3.c
++++ b/HPI-B.01.01/src/sensor/saHpiSensorThresholdsGet/3.c
+@@ -203,11 +203,6 @@ SaHpiBoolT areThresholdsValid(const SaHp
+ 	}
+ 
+ 	if (!isThresholdValid
+-	    (sensorRec, &thresholds->LowMinor, SAHPI_STM_LOW_MINOR)) {
+-		valid = SAHPI_FALSE;
+-	}
+-
+-	if (!isThresholdValid
+ 	    (sensorRec, &thresholds->UpCritical, SAHPI_STM_UP_CRIT)) {
+ 		valid = SAHPI_FALSE;
+ 	}
+@@ -218,26 +213,11 @@ SaHpiBoolT areThresholdsValid(const SaHp
+ 	}
+ 
+ 	if (!isThresholdValid
+-	    (sensorRec, &thresholds->UpMinor, SAHPI_STM_UP_MINOR)) {
+-		valid = SAHPI_FALSE;
+-	}
+-
+-	if (!isThresholdValid
+ 	    (sensorRec, &thresholds->PosThdHysteresis,
+ 	     SAHPI_STM_UP_HYSTERESIS)) {
+ 		valid = SAHPI_FALSE;
+ 	}
+ 
+-	if (!isThresholdValid
+-	    (sensorRec, &thresholds->NegThdHysteresis,
+-	     SAHPI_STM_LOW_HYSTERESIS)) {
+-		valid = SAHPI_FALSE;
+-	}
+-
+-	if (!isHysteresisValid(&thresholds->PosThdHysteresis)) {
+-		valid = SAHPI_FALSE;
+-	}
+-
+ 	if (!isHysteresisValid(&thresholds->NegThdHysteresis)) {
+ 		valid = SAHPI_FALSE;
+ 	}
+diff -urpN a/HPI-B.01.01/src/sensor/saHpiSensorThresholdsSet/15.c b/HPI-B.01.01/src/sensor/saHpiSensorThresholdsSet/15.c
+--- a/HPI-B.01.01/src/sensor/saHpiSensorThresholdsSet/15.c
++++ b/HPI-B.01.01/src/sensor/saHpiSensorThresholdsSet/15.c
+@@ -313,30 +313,36 @@ SaHpiBoolT sameThreshold(SaHpiSensorRead
+  *
+  ********************************************************************************************/
+ 
+-SaHpiBoolT sameThresholds(SaHpiSensorThresholdsT * t1,
++SaHpiBoolT sameThresholds(SaHpiSensorThdMaskT mask, SaHpiSensorThresholdsT * t1,
+ 			  SaHpiSensorThresholdsT * t2)
+ {
+-	if (!sameThreshold(&(t1->LowMinor), &(t2->LowMinor))) {
++	if ((mask & SAHPI_STM_LOW_MINOR) && 
++		(!sameThreshold(&(t1->LowMinor), &(t2->LowMinor)))) {
+ 		return SAHPI_FALSE;
+ 	}
+ 
+-	if (!sameThreshold(&(t1->LowMajor), &(t2->LowMajor))) {
++	if ((mask & SAHPI_STM_LOW_MAJOR) && 
++		(!sameThreshold(&(t1->LowMajor), &(t2->LowMajor)))) {
+ 		return SAHPI_FALSE;
+ 	}
+ 
+-	if (!sameThreshold(&(t1->LowCritical), &(t2->LowCritical))) {
++	if ((mask & SAHPI_STM_LOW_CRIT) && 
++		(!sameThreshold(&(t1->LowCritical), &(t2->LowCritical)))) {
+ 		return SAHPI_FALSE;
+ 	}
+ 
+-	if (!sameThreshold(&(t1->UpMinor), &(t2->UpMinor))) {
++	if ((mask & SAHPI_STM_UP_MINOR) && 
++		(!sameThreshold(&(t1->UpMinor), &(t2->UpMinor)))) {
+ 		return SAHPI_FALSE;
+ 	}
+ 
+-	if (!sameThreshold(&(t1->UpMajor), &(t2->UpMajor))) {
++	if ((mask & SAHPI_STM_UP_MAJOR) && 
++		(!sameThreshold(&(t1->UpMajor), &(t2->UpMajor)))) {
+ 		return SAHPI_FALSE;
+ 	}
+ 
+-	if (!sameThreshold(&(t1->UpCritical), &(t2->UpCritical))) {
++	if ((mask & SAHPI_STM_UP_CRIT) && 
++		(!sameThreshold(&(t1->UpCritical), &(t2->UpCritical)))) {
+ 		return SAHPI_FALSE;
+ 	}
+ 
+@@ -408,7 +414,8 @@ int Test_Rdr(SaHpiSessionIdT sessionId,
+ 						status);
+ 				} else
+ 				    if (!sameThresholds
+-					(&thresholds, &new_thresholds)) {
++					(sensorRec->ThresholdDefn.WriteThold,
++					&thresholds, &new_thresholds)) {
+ 					retval = SAF_TEST_FAIL;
+ 					m_print
+ 					    ("Threshold values were not changed!");
+diff -urpN a/HPI-B.01.01/src/watchdogtimer/saHpiWatchdogTimerSet/5.c b/HPI-B.01.01/src/watchdogtimer/saHpiWatchdogTimerSet/5.c
+--- a/HPI-B.01.01/src/watchdogtimer/saHpiWatchdogTimerSet/5.c
++++ b/HPI-B.01.01/src/watchdogtimer/saHpiWatchdogTimerSet/5.c
+@@ -53,7 +53,7 @@ int processWatchdogRdr(SaHpiSessionIdT s
+ 	status = saHpiWatchdogTimerSet(sessionId, resourceId,
+ 				       BAD_WATCHDOG_NUM, &Watchdog);
+ 
+-	if (status != SA_ERR_HPI_NOT_PRESENT) {
++	if (status == SA_ERR_HPI_NOT_PRESENT) {
+ 		retval = SAF_TEST_PASS;
+ 	} else {
+ 		retval = SAF_TEST_FAIL;
