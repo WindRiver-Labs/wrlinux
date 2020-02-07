@@ -80,10 +80,11 @@ DEPENDS = "\
     libgpg-error-native \
     libice-native \
     libjpeg-turbo-native \
-    libmodulemd-native \
+    libmodulemd-v1-native \
     libmpc-native \
     libnsl2-native \
     libpcre-native \
+    libpcre2-native \
     libpng-native \
     libpthread-stubs-native \
     librepo-native \
@@ -120,7 +121,6 @@ DEPENDS = "\
     makedepend-native \
     makedevs-native \
     meson-native \
-    mkfontdir-native \
     mkfontscale-native \
     mklibs-native \
     mpfr-native \
@@ -129,8 +129,6 @@ DEPENDS = "\
     nasm-native \
     ncurses-native \
     ninja-native \
-    nspr-native \
-    nss-native \
     openssl-native \
     opkg-native \
     opkg-utils-native \
