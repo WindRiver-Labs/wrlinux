@@ -26,6 +26,9 @@ PNWHITELIST_meta-python += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'cgl', '${PNWHITELIST_META_PYTHON}', '', d)}  \
 "
 PNWHITELIST_META_PYTHON = " \
+    python-lxml \
+    python-paste \
+    python-vcversioner \
 "
 
 # For meta-openembedded/meta-networking
