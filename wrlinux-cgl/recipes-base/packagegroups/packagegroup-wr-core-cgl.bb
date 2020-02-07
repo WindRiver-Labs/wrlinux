@@ -35,6 +35,7 @@ NUMACTL_armeb = ""
 
 RDEPENDS_${PN} = "\
 	boost \
+	cluster-glue \
 	corosync \
 	${CRASH} \
 	device-mapper-multipath \
@@ -63,6 +64,7 @@ RDEPENDS_${PN} = "\
 	quagga-ripd \
 	quagga-ripngd \
 	${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'quagga-watchquagga', '', d)} \
+	resource-agents \
 	rng-tools \
 	rpcbind \
 	smartmontools \

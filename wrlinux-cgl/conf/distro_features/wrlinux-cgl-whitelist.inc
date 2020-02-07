@@ -14,10 +14,12 @@ PNWHITELIST_cgl-common += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'cgl', '${PNWHITELIST_CGL_COMMON}', '', d)}  \
 "
 PNWHITELIST_CGL_COMMON = " \
+    cluster-glue \
     libmailtools-perl \
     libsocket6-perl \
     libtest-pod-perl \
     libwww-perl \
+    resource-agents \
     ucarp \
 "
 
