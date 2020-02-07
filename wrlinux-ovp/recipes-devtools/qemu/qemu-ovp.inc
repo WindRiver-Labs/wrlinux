@@ -42,7 +42,7 @@ PACKAGECONFIG ?= "cap-ng linux-aio xfsctl attr \
 # as spice-native is not provided
 PACKAGECONFIG_append_x86-64_class-target = " spice rbd"
 
-RDEPENDS_${PN}_class-nativesdk += "nativesdk-python-core"
+RDEPENDS_${PN}_class-nativesdk += "nativesdk-python3-core"
 
 # needed for libvirt
 do_install_append () {
