@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier:  GPL-2.0 */
+
 /*
  * memtrace_01.c
  *
@@ -10,6 +12,7 @@
  *  a five-level recursive call stack
  */
 
+/* Copyright 2020 Wind River Systems, Inc. */
 
 #include <stdio.h>
 #include <stdlib.h>

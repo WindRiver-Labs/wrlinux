@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier:  GPL-2.0 */
+
 /* mthread.c - Sample Program for Usermode Multi-threaded debugging */
 
 /* Copyright 2006 Wind River Systems, Inc. */

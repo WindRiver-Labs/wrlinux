@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier:  GPL-2.0 */
+
 /*
  * mips_bttest.c
  *
@@ -11,6 +13,8 @@
  *  without args, prints the test case descriptions
  *  with a numeric arg, runs a profile test
  */
+
+/* Copyright 2020 Wind River Systems, Inc. */
 
 #undef TEST_ALLOCA
 
