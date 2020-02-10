@@ -4,11 +4,11 @@
 SUMMARY = "cyclictest"
 DESCRIPTION = "The cyclictest package contains a Hello World program"
 SECTION = "apps"
-LICENSE = "windriver"
-LIC_FILES_CHKSUM = "file://license;md5=8cc536f28ecdfef562344c9fe2222252"
+LICENSE = "GPLv2"
+LIC_FILES_CHKSUM = "file://COPYING;md5=12f884d2ae1ff87c09e5b7ccc2c4ca7e"
 
 SRC_URI = "\
-	file://files/license \
+	file://files/COPYING \
 	file://files/cyclic-test \
 	file://files/cyclictest.c \
 	file://files/Makefile \
