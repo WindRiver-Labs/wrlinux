@@ -4,8 +4,8 @@
 SUMMARY = "cgl-unittest"
 DESCRIPTION = "cgl-unittest"
 SECTION = "apps"
-LICENSE = "windriver"
-LIC_FILES_CHKSUM = "file://license;md5=8cc536f28ecdfef562344c9fe2222252"
+LICENSE = "GPLv2"
+LIC_FILES_CHKSUM = "file://COPYING;md5=12f884d2ae1ff87c09e5b7ccc2c4ca7e"
 
 RDEPENDS_${PN} = "ntp ntp-utils ntp-tickadj ltp \
                   e2fsprogs e2fsprogs-resize2fs \
@@ -13,7 +13,7 @@ RDEPENDS_${PN} = "ntp ntp-utils ntp-tickadj ltp \
 "
 
 SRC_URI = "\
-	file://files/license \
+	file://files/COPYING \
 	file://files/src/vul.c \
 	file://files/src/get_memory.c \
 	file://files/src/file_test.c \
