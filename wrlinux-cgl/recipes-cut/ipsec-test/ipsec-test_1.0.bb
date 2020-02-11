@@ -4,11 +4,11 @@
 SUMMARY = "ipsec-test"
 DESCRIPTION = "The ipsec-test package contains a ipsec-test World program"
 SECTION = "apps"
-LICENSE = "windriver"
-LIC_FILES_CHKSUM = "file://license;md5=8cc536f28ecdfef562344c9fe2222252"
+LICENSE = "GPLv2"
+LIC_FILES_CHKSUM = "file://COPYING;md5=12f884d2ae1ff87c09e5b7ccc2c4ca7e"
 
 SRC_URI = "\
-	file://files/license \
+	file://files/COPYING \
 	file://files/ipsec.sh \
 	file://files/ipsec_cut_config.sh \
 	file://files/makeTunnel.sh \
@@ -27,7 +27,7 @@ do_install() {
 	mkdir -p ${D}/opt/cut/ipsec-strongswan
 	mkdir -p ${D}/opt/cut/scripts
 	install -m 0755 ${S}/* ${D}/opt/cut/ipsec-strongswan
-	rm ${D}/opt/cut/ipsec-strongswan/license
+	rm ${D}/opt/cut/ipsec-strongswan/COPYING
 	mv ${D}/opt/cut/ipsec-strongswan/ipsec.sh  ${D}/opt/cut/scripts
 }
 
