@@ -100,7 +100,7 @@ for bsp in $bsps; do
     bDir="build-$bsp"
     runbb "$bDir" "$bsp" wrlinux-graphics wrlinux-image-std-sato
     if [ -f "$bDir"/task-depends.dot ]; then
-        cut -d">" -f1 "$bDir"/task-depends.dot | grep native | grep populate_sysroot | cut -d" " -f1 | uniq | cut -c 2- | cut -d"." -f1 > "plists/${bsp}-native-packages.txt"
+        cut -d">" -f1 "$bDir"/task-depends.dot | grep -v '\[label=' | grep native | grep populate_sysroot | cut -d" " -f1 | uniq | cut -c 2- | sed 's/\(.*\).do_populate_sysroot"/\1/' > "plists/${bsp}-native-packages.txt"
     fi
 done
 
