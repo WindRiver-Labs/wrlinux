@@ -12,8 +12,8 @@ Signed-off-by: Vu Tran <vu.tran@windriver.com>
 Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 ---
- rules/99-kvm.rules | 1 +
- rules/meson.build  | 1 +
+ rules.d/99-kvm.rules | 1 +
+ rules.d/meson.build  | 1 +
  2 files changed, 2 insertions(+)
  create mode 100644 rules/99-kvm.rules
 
@@ -21,14 +21,14 @@ diff --git a/rules/99-kvm.rules b/rules/99-kvm.rules
 new file mode 100644
 index 0000000..c2f7317
 --- /dev/null
-+++ b/rules/99-kvm.rules
++++ b/rules.d/99-kvm.rules
 @@ -0,0 +1 @@
 +KERNEL=="kvm", GROUP="kvm", MODE="0660"
 diff --git a/rules/meson.build b/rules/meson.build
 index e253b9f..6c74b73 100644
---- a/rules/meson.build
-+++ b/rules/meson.build
-@@ -36,6 +36,7 @@ rules = files('''
+--- a/rules.d/meson.build
++++ b/rules.d/meson.build
+@@ -23,6 +23,7 @@ rules = files('''
          78-sound-card.rules
          80-drivers.rules
          80-net-setup-link.rules
