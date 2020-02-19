@@ -6,6 +6,7 @@ DEPENDS = "\
     at-spi2-core-native \
     atk-native \
     attr-native \
+    autoconf-2.13-native \
     autoconf-archive-native \
     autoconf-native \
     automake-native \
@@ -31,6 +32,7 @@ DEPENDS = "\
     dbus-glib-native \
     dbus-native \
     debianutils-native \
+    desktop-file-utils-native \
     dnf-native \
     dosfstools-native \
     dtc-native \
@@ -49,7 +51,7 @@ DEPENDS = "\
     gdk-pixbuf-native \
     gettext-minimal-native \
     gettext-native \
-    glib-2 \
+    glib-2.0-native \
     gmp-native \
     gnu-config-native \
     gobject-introspection-native \
@@ -63,6 +65,7 @@ DEPENDS = "\
     harfbuzz-native \
     icu-native \
     intltool-native \
+    itstool-native \
     iucode-tool-native \
     json-c-native \
     kern-tools-native \
@@ -135,6 +138,7 @@ DEPENDS = "\
     orc-native \
     pango-native \
     parted-native \
+    patch-native \
     pbzip2-native \
     perl-native \
     pigz-native \
@@ -144,18 +148,12 @@ DEPENDS = "\
     postfix-native \
     prelink-native \
     pseudo-native \
-    python-futures-native \
-    python-jsmin-native \
-    python-native \
-    python-pytoml-native \
-    python-setuptools-native \
-    python-six-native \
-    python-typing-native \
-    python-which-native \
     python3-iniparse-native \
-    python3-mako-native \
+    python3-jsmin-native \
     python3-m2crypto-native \
+    python3-mako-native \
     python3-native \
+    python3-pytoml-native \
     python3-setuptools-native \
     python3-six-native \
     qemu-helper-native \
@@ -165,6 +163,7 @@ DEPENDS = "\
     re2c-native \
     readline-native \
     rpm-native \
+    rsync-native \
     shadow-native \
     shared-mime-info-native \
     sqlite3-native \
@@ -178,7 +177,7 @@ DEPENDS = "\
     u-boot-tools-native \
     unifdef-native \
     unzip-native \
-    update-rc \
+    update-rc.d-native \
     util-linux-native \
     util-macros-native \
     wayland-native \
