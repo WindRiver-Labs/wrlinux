@@ -1,6 +1,6 @@
-From 89958a2ac4111fa098be735dd18e457b70b7ee16 Mon Sep 17 00:00:00 2001
-From: "Hongzhi.Song" <hongzhi.song@windriver.com>
-Date: Thu, 23 Aug 2018 22:32:43 -0400
+From bd2adfc3010b34131c14e0165cd33c020511e9a5 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Thu, 20 Feb 2020 10:26:54 +0800
 Subject: [PATCH] qemu: inject NMI in i6300esb watchdog timer
 
 Inject the NMI to the guest instance of the current qemu if the WDT is
@@ -15,18 +15,21 @@ Signed-off-by: He Zhe <zhe.he@windriver.com>
 modify header file due to the version is update
 qmp-commands.h -> qapi/qapi-commands-misc.h
 Signed-off-by: Hongzhi.Song <hongzhi.song@windriver.com>
+
+update to new version
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
- hw/watchdog/wdt_i6300esb.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ hw/watchdog/wdt_i6300esb.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/hw/watchdog/wdt_i6300esb.c b/hw/watchdog/wdt_i6300esb.c
-index e596b08..7fa613b 100644
+index 370cf92..fae25bb 100644
 --- a/hw/watchdog/wdt_i6300esb.c
 +++ b/hw/watchdog/wdt_i6300esb.c
 @@ -26,6 +26,7 @@
  #include "sysemu/watchdog.h"
- #include "hw/hw.h"
  #include "hw/pci/pci.h"
+ #include "migration/vmstate.h"
 +#include "qapi/qapi-commands-misc.h"
  
  /*#define I6300ESB_DEBUG 1*/
@@ -39,16 +42,17 @@ index e596b08..7fa613b 100644
  
      i6300esb_debug("stage %d\n", d->stage);
  
-@@ -192,6 +194,9 @@ static void i6300esb_timer_expired(void *vp)
-             fprintf(stderr, "i6300esb_timer_expired: I would send SMI here if I knew how (XXX)\n");
+@@ -193,6 +195,10 @@ static void i6300esb_timer_expired(void *vp)
              break;
          }
+ 
 +        /* Always send NMI at the end of stage 1 */
 +        fprintf(stderr, "i6300esb_timer_expired: inject nmi \n");
 +        qmp_inject_nmi(&errp);
- 
++
          /* Start the second stage. */
          i6300esb_restart_timer(d, 2);
+     } else {
 -- 
-2.8.1
+2.7.4
 
