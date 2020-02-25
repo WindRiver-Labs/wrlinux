@@ -49,3 +49,18 @@ repository will be used to create a local repository inside the image,
 from which a "deployment" will be checked out for use as the OS.
 
 You can read more about OSTree at: https://ostree.readthedocs.io/en/latest/
+
+The wr-ostree layer also provides an initial image deployment tool
+called bootfs.sh.  You can see the help message by running the
+following from your project directory, assuming you created inside the
+directory where you ran setup.sh:
+
+   ../layers/wr-ostree/scripts/bootfs.sh -h
+
+The initial deployment tool will create a ustart.img file which can be
+copied to boot media or media which will be a permanent part of the
+device.  The OSTREE_REMOTE_URL must be defined in the local.conf in
+order to perform a network deployment.  The bootfs.sh tool can
+generate an image which contains the ostree_repo which will be
+deployed on the first boot, or it can use the network as the point to
+retrieve the data in the ostree_repo.
