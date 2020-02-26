@@ -173,4 +173,5 @@ SRC_URI += "file://wr-policy-fix-dev-log-label.patch \
             file://wr-policy-allow-mount-to-dirs-under-tmp.patch \
             file://wr-policy-add-ostree-policy.patch \
             file://wr-policy-Allow-sshd_t-and-staff_t-read-symlinks.patch \
+            file://wr-policy-lable-system-export-as-ostree_exec_t.patch \
            "
