@@ -42,7 +42,7 @@ DEPENDS = "\
     gdk-pixbuf-native \
     gettext-minimal-native \
     gettext-native \
-    glib-2 \
+    glib-2.0-native \
     gmp-native \
     gnu-config-native \
     gobject-introspection-native \
@@ -163,7 +163,7 @@ DEPENDS = "\
     tzcode-native \
     unifdef-native \
     unzip-native \
-    update-rc \
+    update-rc.d-native \
     util-linux-native \
     util-macros-native \
     wayland-native \
