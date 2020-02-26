@@ -1,0 +1,65 @@
+From abb7bef0e362fb29e2e2034ea9f7f84d0e547c40 Mon Sep 17 00:00:00 2001
+From: Liwei Song <liwei.song@windriver.com>
+Date: Mon, 24 Feb 2020 11:10:47 +0800
+Subject: [PATCH] usermanage.fc: fix avc denials when use useradd
+
+fix avc denials:
+
+AVC avc:  denied  { map } for  pid=5169 comm="chfn" path="/etc/passwd"
+dev="sdb2" ino=28449 scontext=root:sysadm_r:chfn_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:etc_t:s0 tclass=file permissive=0
+
+AVC avc:  denied  { map } for  pid=710 comm="passwd" path="/etc/passwd"
+dev="sdb3" ino=29636 scontext=root:sysadm_r:passwd_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:etc_t:s0 tclass=file permissive=0
+
+AVC avc:  denied  { map } for  pid=716 comm="groupadd" path="/etc/group"
+dev="sdb3" ino=786 scontext=root:sysadm_r:groupadd_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:etc_t:s0 tclass=file permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Liwei Song <liwei.song@windriver.com>
+---
+ policy/modules/admin/usermanage.te | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/policy/modules/admin/usermanage.te b/policy/modules/admin/usermanage.te
+index 9cf879d263c4..73f06c7abbcc 100644
+--- a/policy/modules/admin/usermanage.te
++++ b/policy/modules/admin/usermanage.te
+@@ -112,6 +112,7 @@ corecmd_check_exec_shell(chfn_t)
+ domain_use_interactive_fds(chfn_t)
+ 
+ files_manage_etc_files(chfn_t)
++files_map_etc_files(chfn_t)
+ files_read_etc_runtime_files(chfn_t)
+ files_dontaudit_search_var(chfn_t)
+ files_dontaudit_search_home(chfn_t)
+@@ -125,6 +126,7 @@ miscfiles_read_localization(chfn_t)
+ logging_send_syslog_msg(chfn_t)
+ 
+ seutil_read_file_contexts(chfn_t)
++seutil_read_config(chfn_t)
+ 
+ userdom_use_unpriv_users_fds(chfn_t)
+ # user generally runs this from their home directory, so do not audit a search
+@@ -226,6 +228,7 @@ domain_use_interactive_fds(groupadd_t)
+ files_manage_etc_files(groupadd_t)
+ files_relabel_etc_files(groupadd_t)
+ files_read_etc_runtime_files(groupadd_t)
++files_map_etc_files(groupadd_t)
+ files_read_usr_symlinks(groupadd_t)
+ 
+ # Execute /usr/bin/{passwd, chfn, chsh} and /usr/sbin/{useradd, vipw}.
+@@ -340,6 +343,7 @@ domain_use_interactive_fds(passwd_t)
+ 
+ files_read_etc_runtime_files(passwd_t)
+ files_manage_etc_files(passwd_t)
++files_map_etc_files(passwd_t)
+ files_search_var(passwd_t)
+ files_dontaudit_search_pids(passwd_t)
+ files_relabel_etc_files(passwd_t)
+-- 
+2.17.1
+
