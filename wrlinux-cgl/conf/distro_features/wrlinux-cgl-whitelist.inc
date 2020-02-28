@@ -42,7 +42,6 @@ PNWHITELIST_networking-layer += " \
 "
 PNWHITELIST_META_NETWORKING = " \
     bridge-utils \
-    c-ares \
     corosync \
     freediameter \
     geoip \
@@ -81,6 +80,7 @@ PNWHITELIST_openembedded-layer += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'cgl', '${PNWHITELIST_META_OE}', '', d)}  \
 "
 PNWHITELIST_META_OE = " \
+    c-ares \
     crash \
     edac-utils \
     indent \
