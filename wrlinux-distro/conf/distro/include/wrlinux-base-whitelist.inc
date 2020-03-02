@@ -11,8 +11,12 @@ PNWHITELIST_meta-initramfs += ""
 PNWHITELIST_multimedia-layer += ""
 
 PNWHITELIST_networking-layer += " \
+    c-ares \
     freeradius \
+    libldb \
     libtalloc \
+    libtdb \
+    libtevent \
     netcat \
     netcat-openbsd \
     postfix \
@@ -39,6 +43,7 @@ PNWHITELIST_openembedded-layer += " \
     mariadb \
     memstat \
     nmap \
+    openldap \
     passwdqc \
     phoronix-test-suite \
     php \
@@ -95,12 +100,14 @@ PNWHITELIST_webserver += " \
 PNWHITELIST_xfce-layer += ""
 
 PNWHITELIST_security += " \
+    ding-libs \
     ecryptfs-utils \
     libgssglue \
     libmhash \
     samhain-client \
     samhain-server \
     samhain-standalone \
+    sssd \
 "
 
 PNWHITELIST_integrity += " \
