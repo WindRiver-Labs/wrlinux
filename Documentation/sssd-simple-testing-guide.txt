@@ -1,0 +1,307 @@
+SSSD Simple Testing Guide
+=========================
+SSSD is a system daemon. Its primary function is to provide access to local or
+remote identity and authentication resources through a common framework that
+can provide caching and offline support to the system. It provides several
+interfaces, including NSS and PAM modules or a D-Bus interface.
+
+It provides a simple testing guide for SSSD in this file.
+
+Build
+=====
+SSSD is enabled but not included in any image. So it need to add sssd to
+IMAGE_INSTALL in local.conf.
+
+1 setup.sh --distro=wrlinux --machines=qemux86-64 --dl-layers
+2 source oe-init-build-env
+3 echo 'IMAGE_INSTALL_append = " sssd"' >>conf/local.conf
+  # Install packages which are required by testing
+  echo 'IMAGE_INSTALL_append = " openssl-misc glibc-utils openldap-slapd openldap-bin"' >>conf/local.conf
+4 bitbake wrlinux-image-std
+
+Runtime Tests
+=============
+1 Boot two qemu instances as client and server separately. Take 'windriver.com'
+  as a sample domain name. It could be replaced by your own one.
+
+$ runqemu qemux86-64 kvm nographic
+
+Update /etc/hosts for both server and client:
+192.168.7.10 server.windriver.com server
+192.168.7.12 client.windriver.com client
+
+2 Prepare CA certificates on server
+2.1 Create a new CA by command CA.pl from package openssl-misc
+Only need to set password and Common Name and just input 'Enter' for others to
+use default values.
+root@qemux86-64:~# mkdir myca
+root@qemux86-64:~# cd myca
+root@qemux86-64:~/myca# /usr/lib64/ssl-1.1/misc/CA.pl -newca
+set with a password when meet
+Enter PEM pass phrase:
+
+Use default values except:
+Common Name (e.g. server FQDN or YOUR name) []:windriver.com
+
+2.2 Create a new certificate request
+root@qemux86-64:~/myca# openssl req -new -nodes -keyout newreq.pem -out newreq.pem
+Use default values except:
+Common Name (e.g. server FQDN or YOUR name) []:server.windriver.com
+
+2.3 Sign the certificate request
+root@qemux86-64:~/myca# /usr/lib64/ssl-1.1/misc/CA.pl -sign
+
+2.4 Deploy the certificates on the server
+root@qemux86-64:~/myca# mkdir -p /usr/local/etc/openldap/
+root@qemux86-64:~/myca# cp demoCA/cacert.pem /usr/local/etc/openldap/
+root@qemux86-64:~/myca# mv newcert.pem /usr/local/etc/openldap/servercrt.pem
+root@qemux86-64:~/myca# mv newreq.pem /usr/local/etc/openldap/serverkey.pem
+root@qemux86-64:~/myca# ls -l /usr/local/etc/openldap/serverkey.pem
+-rw------- 1 root root 2705 Feb 28 06:10 /usr/local/etc/openldap/serverkey.pem
+root@qemux86-64:~/myca# chmod 600 /usr/local/etc/openldap/serverkey.pem
+
+2.5 Deploy cacert.pem on client
+root@qemux86-64:~/myca# scp demoCA/cacert.pem root@client:/root/
+
+
+3 Configure openldap on server
+3.1 prepare root passwd
+root@qemux86-64:/etc/openldap# slappasswd
+New password:
+Re-enter new password:
+{SSHA}enMJI7caaFw5YstcK4qdUC6e8odVlFn8
+root@qemux86-64:/etc/openldap#
+
+3.2 Update /etc/openldap/slapd.conf with following lines:
+```
+include         /etc/openldap/schema/core.schema
+include         /etc/openldap/schema/cosine.schema
+include         /etc/openldap/schema/inetorgperson.schema
+include         /etc/openldap/schema/nis.schema
+
+
+TLSCACertificateFile /usr/local/etc/openldap/cacert.pem
+TLSCertificateFile /usr/local/etc/openldap/servercrt.pem
+TLSCertificateKeyFile /usr/local/etc/openldap/serverkey.pem
+
+database        mdb
+maxsize         1073741824
+suffix  "dc=windriver,dc=com"
+rootdn  "cn=Manager,dc=windriver,dc=com"
+rootpw  {SSHA}enMJI7caaFw5YstcK4qdUC6e8odVlFn8
+```
+
+Section 'database        mdb' must be updated in the original position
+
+And then start slapd service
+root@qemux86-64:~/ldif# systemctl start slapd
+
+3.3 Add ldap user
+Add user ldapuser according to
+http://lxgit.wrs.com/cgit/wrlinux-testing/testcases.git/tree/wr-testing/userspace/recipes-test-suite/userspace-test/userspace-test/testcases/openldap/conf
+
+3.3.1 add base domain
+root@qemux86-64:~/ldif# cat base.ldif
+dn: dc=windriver,dc=com
+dc: windriver
+objectClass: top
+objectClass: domain
+
+dn: ou=People,dc=windriver,dc=com
+ou: People
+objectClass: top
+objectClass: organizationalUnit
+
+dn: ou=Group,dc=windriver,dc=com
+ou: Group
+objectClass: top
+objectClass: organizationalUnit
+
+root@qemux86-64:~/ldif#
+root@qemux86-64:~/ldif# ldapadd -x -D "cn=Manager,dc=windriver,dc=com" -W -f base.ldif
+Enter LDAP Password:
+adding new entry "dc=windriver,dc=com"
+
+adding new entry "ou=People,dc=windriver,dc=com"
+
+adding new entry "ou=Group,dc=windriver,dc=com"
+
+3.3.2 add group
+root@qemux86-64:~/ldif# cat group.ldif
+dn: cn=ldapuser,ou=Group,dc=windriver,dc=com
+objectClass: posixGroup
+objectClass: top
+cn: ldapuser
+gidNumber: 500
+
+root@qemux86-64:~/ldif#
+root@qemux86-64:~/ldif# ldapadd -x -D "cn=Manager,dc=windriver,dc=com" -W -f group.ldif
+Enter LDAP Password:
+adding new entry "cn=ldapuser,ou=Group,dc=windriver,dc=com"
+
+root@qemux86-64:~/ldif#
+
+3.3.3 add user
+Download user.ldif from the upper URL and update with 'userPassword'
+root@qemux86-64:~/ldif# slappasswd
+New password:
+Re-enter new password:
+{SSHA}ouqu/qp8I0vctehiengGnSQglqPizZXR
+root@qemux86-64:~/ldif#
+root@qemux86-64:~/ldif# cat user.ldif
+dn: cn=ldapuser,ou=People,dc=windriver,dc=com
+uid: ldapuser
+cn: ldapuser
+objectClass: account
+objectClass: posixAccount
+objectClass: top
+objectClass: shadowAccount
+shadowLastChange: 13048
+shadowMax: 99999
+shadowWarning: 7
+loginShell: /bin/bash
+uidNumber: 500
+gidNumber: 500
+homeDirectory: /home/ldapuser
+gecos: ldapuser
+userPassword: {SSHA}ouqu/qp8I0vctehiengGnSQglqPizZXR
+root@qemux86-64:~/ldif#
+root@qemux86-64:~/ldif# ldapadd -x -D "cn=Manager,dc=windriver,dc=com" -W -f user.ldif
+Enter LDAP Password:
+adding new entry "cn=ldapuser,ou=People,dc=windriver,dc=com"
+
+3.3.4 Optional: another way to update user password
+root@qemux86-64:~# cat add-passwd-abc123.ldif
+dn: cn=ldapuser,ou=People,dc=windriver,dc=com
+changetype: modify
+add: userPassword
+userPassword: {SSHA}CVtrsSL8M8SgReVl7AxvT5OvXzoGec5K
+root@qemux86-64:~/ldiifs# ldapmodify -x -D "cn=Manager,dc=windriver,dc=com" -W -f  add-passwd-abc123.ldif
+Enter LDAP Password:
+modifying entry "cn=ldapuser,ou=People,dc=windriver,dc=com"
+
+
+4 Configure client
+4.1 update openldap config file /etc/openldap/ldap.conf
+root@qemux86-64:~# realpath cacert.pem
+/root/cacert.pem
+root@qemux86-64:~# cat /etc/openldap/ldap.conf
+BASE    dc=windriver,dc=com
+URI     ldap://server.windriver.com
+TLS_CACERT /root/cacert.pem
+
+4.2 update pam config files
+root@qemux86-64:/etc/pam.d# git diff
+diff --git a/common-account b/common-account
+index 316b173..03d3f51 100644
+--- a/common-account
++++ b/common-account
+@@ -13,6 +13,8 @@
+ # pam-auth-update(8) for details.
+ #
+
++account     [default=bad success=ok user_unknown=ignore] pam_sss.so
++
+ # here are the per-package modules (the "Primary" block)
+ account        [success=1 new_authtok_reqd=done default=ignore]        pam_unix.so
+ # here's the fallback if no module succeeds
+diff --git a/common-auth b/common-auth
+index 7e66398..738c252 100644
+--- a/common-auth
++++ b/common-auth
+@@ -7,6 +7,8 @@
+ # (e.g., /etc/shadow, LDAP, Kerberos, etc.).  The default is to use the
+ # traditional Unix authentication mechanisms.
+
++auth        sufficient    pam_sss.so forward_pass
++
+ # here are the per-package modules (the "Primary" block)
+ auth   [success=1 default=ignore]      pam_unix.so nullok
+ # here's the fallback if no module succeeds
+diff --git a/common-password b/common-password
+index 3896057..e30897d 100644
+--- a/common-password
++++ b/common-password
+@@ -17,6 +17,9 @@
+
+ # here are the per-package modules (the "Primary" block)
+ password       [success=1 default=ignore]      pam_unix.so obscure sha512
++
++password    sufficient    pam_sss.so use_authtok
++
+ # here's the fallback if no module succeeds
+ password       requisite                       pam_deny.so
+ # prime the stack with a positive return value if there isn't one already;
+diff --git a/common-session b/common-session
+index 8137afe..7b84407 100644
+--- a/common-session
++++ b/common-session
+@@ -17,4 +17,5 @@ session       requisite                       pam_deny.so
+ session        required                        pam_permit.so
+ # and here are more per-package modules (the "Additional" block)
+ session        required        pam_unix.so
++session optional    pam_sss.so
+ session optional pam_systemd.so
+
+4.3 update /etc/nsswitch.conf
+passwd:         compat sss
+group:          compat sss
+shadow:         compat sss
+
+netgroup:       nis sss
+
+4.4 configure sssd.conf
+The domain name 'windriver' is just an example. It could be replaced by any
+name as your wish.
+
+root@qemux86-64:/etc/pam.d# cat /etc/sssd/sssd.conf
+[sssd]
+services = nss, pam
+config_file_version = 2
+domains = windriver
+
+[nss]
+filter_groups = root
+filter_users = root
+reconnection_retries = 3
+entry_cache_timeout = 300
+entry_cache_nowait_percentage = 75
+
+[pam]
+filter_groups = root
+filter_users = root
+
+[domain/windriver]
+id_provider = ldap
+auth_provider = ldap
+chpass_provider = ldap
+cache_credentials = true
+ldap_search_base = dc=windriver,dc=com
+ldap_tls_reqcert = never
+# primary and backup ldap servers below [first server and],[second server]
+ldap_uri = ldap://server.windriver.com,ldaps://server.windriver.com:636
+
+root@qemux86-64:/etc/pam.d# systemctl start sssd
+
+4.4 ssh
+$ ssh ldapuser@192.168.7.12
+ldapuser@192.168.7.12's password:
+Last login: Sun Mar  1 08:14:01 2020
+Could not chdir to home directory /home/ldapuser: No such file or directory
+ldapuser@qemux86-64:/$
+
+4.5 login
+root@qemux86-64:/etc/pam.d# login
+qemux86-64 login: ldapuser
+Password:
+No directory, logging in with HOME=/
+ldapuser@qemux86-64:/$ id
+uid=500(ldapuser) gid=500(ldapuser) groups=500(ldapuser)
+ldapuser@qemux86-64:/$ logout
+root@qemux86-64:/etc/pam.d# ip link set eth0 down
+root@qemux86-64:/etc/pam.d# login
+qemux86-64 login: ldapuser
+Password:
+Last login: Sun Mar  1 08:37:04 UTC 2020 on ttyS0
+No directory, logging in with HOME=/
+ldapuser@qemux86-64:/$
