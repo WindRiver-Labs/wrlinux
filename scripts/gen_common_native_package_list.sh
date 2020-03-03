@@ -49,12 +49,12 @@ EOF
 # Crude parsing of output from setup.sh --list-machines
 #
 list_machines () {
-    "$wrlinux_dir"/setup.sh --list-machines | while read -r item1 restofline; do
+    "$wrlinux_dir"/setup.sh --list-machines | awk '{if (substr($0, 0, 1) != " ") print $1;}' | while read -r item1 restofline; do
         case $item1 in
-            ---*) seen=1
+            ===*) separator_seen=1
                   continue
                   ;;
-            *)  if [ "$seen" = "1" ]; then
+            *)  if [ "$separator_seen" = "1" ]; then
                     echo "$item1"
                     :
                 fi
