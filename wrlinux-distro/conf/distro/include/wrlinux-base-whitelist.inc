@@ -11,7 +11,6 @@ PNWHITELIST_meta-initramfs += ""
 PNWHITELIST_multimedia-layer += ""
 
 PNWHITELIST_networking-layer += " \
-    c-ares \
     freeradius \
     libldb \
     libtalloc \
@@ -28,6 +27,7 @@ PNWHITELIST_networking-layer += " \
 PNWHITELIST_openembedded-layer += " \
     agent-proxy-native \
     bonnie++ \
+    c-ares \
     fbset \
     fbset-modes \
     iotop \
