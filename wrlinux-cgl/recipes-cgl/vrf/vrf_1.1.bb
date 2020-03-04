@@ -27,6 +27,7 @@ SRC_URI    = "file://vrf-1.1.tgz \
               file://vrf-disable-systemd-tmpfiles-to-create-run-nologin.patch \
               file://0001-vrf-start-redirect-the-error-message.patch \
               file://0001-vrf-helper-fix-cmd-for-get-DISTRIB_RELEASE.patch \
+              file://0001-vrf-create-override-systemd-wired-network-config.patch \
 "
 
 S  = "${WORKDIR}/wrlinux-vrf"

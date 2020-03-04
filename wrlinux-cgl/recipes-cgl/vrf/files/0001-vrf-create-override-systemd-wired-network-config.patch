@@ -1,0 +1,49 @@
+From fc87df427e141c38c29a268879f5733d8aa5e0c6 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Wed, 4 Mar 2020 11:48:32 +0000
+Subject: [PATCH] vrf-create: override systemd wired network config
+
+Our WRLinux system has below logic in commit
+[b8afb705 systemd-conf: override systemd wired network config]
+to override systemd wired network config as systemd
+wired network config file is not necessary for WRLinux
+ # ls -l /etc/systemd/network/80-wired.network
+ lrwxrwxrwx 1 root root 9 Mar  4 00:36 /etc/systemd/network/80-wired.network -> /dev/null
+
+So add the logic also to our vrf to avoid below
+error:
+ # systemctl status systemd-networkd
+ [snip]
+ Mar 04 03:28:29 vrf_3 systemd-networkd[61]: eth0: DHCP4 CLIENT: Failed to set hostname from kernel hostname, ignoring: Invalid argument
+ Mar 04 03:28:29 vrf_3 systemd-networkd[61]: eth0: DHCP6 CLIENT: Failed to set hostname from kernel hostname, ignoring: Invalid argument
+
+Upstream-Status: Inappropriate [no upstream]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ src/vrf-create | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/src/vrf-create b/src/vrf-create
+index e03f0c0..c6b0f0a 100755
+--- a/src/vrf-create
++++ b/src/vrf-create
+@@ -246,6 +246,15 @@ do_install1_systemd () {
+ 	dup_file /etc/login.defs
+     fi
+ 
++    #needed by systemd-networkd otherwise it will call dhclient and cause below error:
++    #systemctl status systemd-networkd
++    # [snip]
++    #Mar 04 03:28:29 vrf_3 systemd-networkd[61]: eth0: DHCP4 CLIENT: Failed to set hostname from kernel hostname, ignoring: Invalid argument
++    #Mar 04 03:28:29 vrf_3 systemd-networkd[61]: eth0: DHCP6 CLIENT: Failed to set hostname from kernel hostname, ignoring: Invalid argument
++    if [ -e /etc/systemd/network/80-wired.network ]; then
++	dup_file /etc/systemd/network/80-wired.network
++    fi
++
+     if [ -e /etc/securetty ]; then
+ 	dup_file /etc/securetty
+         #overwrite
+-- 
+2.24.1
+
