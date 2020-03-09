@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=073dc31ccb2ebed70db54f1e8aeb4c33"
 
 DEPENDS = "openssl indent-native bison-native"
 
-SRC_URI = "git://git.umip.org/umip/umip.git \
+SRC_URI = "file://umip-1.0.tar.gz \
            file://0001-add-dependency-to-support-parallel-compilation.patch \
            file://0002-Add-format-string-to-fprintf-call.patch \
            file://0003-replace-SIGCLD-with-SIGCHLD-and-include-sys-types.h.patch \
@@ -19,9 +19,8 @@ SRC_URI = "git://git.umip.org/umip/umip.git \
            file://mip6d \
            file://mip6d.service \
            "
-SRCREV = "cbd441c5db719db554ff2b4fcb02fef88ae2f791"
 
-S = "${WORKDIR}/git"
+S = "${WORKDIR}/umip"
 
 EXTRA_OECONF = "--enable-vt"
 
