@@ -13,7 +13,7 @@ Features Guide'.
 Building
 ---
 1) Configure your build area using setup.sh:
-  $ ./wrlinux-x/setup.sh --machines=bcm-2xxx-rpi \
+  $ ./wrlinux-x/setup.sh --machines=bcm-2xxx-rpi4 \
   --distros=wrlinux-overc \
   --dl-layers \
   --no-recommend

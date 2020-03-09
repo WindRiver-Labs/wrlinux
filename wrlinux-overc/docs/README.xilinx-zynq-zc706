@@ -78,7 +78,7 @@ host distro:
 
 Running with the Image
 ---
-dd the boot-zynq-zc706-boot.img to a SD card and boot the target board from SD car with
+dd the xilinx-zynq-zc706-boot.img to a SD card and boot the target board from SD car with
 following instruction in u-boot:
 
 Zynq> mmcinfo
