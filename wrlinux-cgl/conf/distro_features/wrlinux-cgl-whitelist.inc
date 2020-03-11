@@ -43,6 +43,7 @@ PNWHITELIST_networking-layer += " \
 PNWHITELIST_META_NETWORKING = " \
     bridge-utils \
     corosync \
+    kronosnet \
     freediameter \
     geoip \
     geoip-perl \
@@ -82,6 +83,7 @@ PNWHITELIST_openembedded-layer += " \
 PNWHITELIST_META_OE = " \
     c-ares \
     crash \
+    doxygen \
     edac-utils \
     indent \
     ipmitool \
@@ -92,6 +94,7 @@ PNWHITELIST_META_OE = " \
     python-pygobject \
     smartmontools \
     zabbix \
+    zstd \
 "
 
 # For meta-openembedded/meta-perl
