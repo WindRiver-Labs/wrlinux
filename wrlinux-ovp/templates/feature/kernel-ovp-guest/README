@@ -1,0 +1,5 @@
+This template is used to build guest image for wrlinux-ovp distribution.
+
+#@TYPE: Wrtemplate
+#@NAME: kernel-ovp-guest
+#@DESCRIPTION: Enable guest image for wrlinux-ovp distribution.

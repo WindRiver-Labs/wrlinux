@@ -13,3 +13,7 @@ parameters may vary from system to system to gain an expected result and thus
 they may change as kernel and/or hardware change.
 
 No guarantee of latency and performance can be made by using this template.
+
+#@TYPE: Wrtemplate
+#@NAME: rt-latency-host
+#@DESCRIPTION: Tune kernel options for reducing lantency for real-time kernel of host system

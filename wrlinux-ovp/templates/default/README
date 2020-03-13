@@ -1,0 +1,7 @@
+This template is used to indicate that the default setting will build host image
+for wrlinux-ovp distribution and use feature/kernel-ovp-guest to build guest
+image.
+
+#@TYPE: Wrtemplate
+#@NAME: wrlinux-ovp-default
+#@DESCRIPTION: Add notice for building host or guest systems for distro wrlinux-ovp

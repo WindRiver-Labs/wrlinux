@@ -1,0 +1,6 @@
+This template adds options for the configuration of a balanced real time ovp
+kernel-type for guest system.
+
+#@TYPE: Wrtemplate
+#@NAME: guest-rt-tune
+#@DESCRIPTION: Tune kernel options for real-time kernel for guest system

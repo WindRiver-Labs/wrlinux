@@ -1,0 +1,6 @@
+This template adds options for the configuration of a balanced real time ovp
+kernel-type for host system.
+
+#@TYPE: Wrtemplate
+#@NAME: host-rt-tune
+#@DESCRIPTION: Tune kernel options for real-time kernel for host system
