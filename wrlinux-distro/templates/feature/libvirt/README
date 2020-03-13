@@ -1,0 +1,15 @@
+libvirt
+- is a toolkit to manage virtualization platforms
+- is accessible from C, Python, Perl, Java and more
+- is licensed under open source licenses
+- supports KVM, QEMU, Xen, Virtuozzo, VMWare ESX, LXC, BHyve and more
+- targets Linux and other OSes
+- is used by many applications
+
+This template enables libvirt itself along with other components and utilities
+of file systems and networking, and kernel configuration options that usually
+work together.
+
+#@TYPE: Wrtemplate
+#@NAME: libvirt
+#@DESCRIPTION: Enable libvirt and related components utilities and kernel options
