@@ -89,7 +89,9 @@ cus_corosync()
     fi
    
     # update the bindnetaddr item in /etc/corosync/corosync.conf
-    sed -i "s/bindnetaddr: .*$/bindnetaddr: $NETADDR1/g" /etc/corosync/corosync.conf
+    sed -i -e "s/node1_addr_placeholder.*$/ring0_addr: $TARGET_IP/g" \
+           -e "s/node2_addr_placeholder.*$/ring0_addr: $CLIENT_IP/g" \
+           /etc/corosync/corosync.conf
     
     # update the /etc/hosts and /etc/corosync/corosync.conf on client
     ssh root@$CLIENT_IP -- "cp /etc/hosts /etc/hosts.bak"
