@@ -5,6 +5,7 @@ PNWHITELIST_gnome-layer += "\
     keybinder \
     libgnomekbd \
     libgnome-keyring \
+    libnma \
     libtimezonemap \
     libuser \
     metacity \
