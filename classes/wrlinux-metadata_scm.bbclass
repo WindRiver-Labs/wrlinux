@@ -15,7 +15,7 @@ def base_get_metadata_git_branch(path, d):
             bb.debug(1, "Trying to get branch name from m/master...")
             # Check whether HEAD == m/master
             cmd1 = 'git rev-parse HEAD'.split()
-            cmd2 = 'git rev-parse m/master'.split()
+            cmd2 = 'git rev-parse m/master^0'.split()
             if subprocess.check_output(cmd1, cwd=path) == subprocess.check_output(cmd2, cwd=path):
                 cmd = 'git rev-parse --abbrev-ref m/master'.split()
                 branch = subprocess.check_output(cmd, cwd=path).decode('utf-8')
