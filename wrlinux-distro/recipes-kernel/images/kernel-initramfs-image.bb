@@ -18,7 +18,6 @@ LIC_FILES_CHKSUM_mpc8315e = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7
 
 EXCLUDE_FROM_WORLD = "1"
 
-DEPENDS = "virtual/kernel"
 
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'ostree', 'initramfs-ostree-image', '', d)}"
 
@@ -26,8 +25,7 @@ PROVIDES = "virtual/kernel-initramfs-image"
 
 inherit kernelsrc kernel-arch
 
-do_populate_lic[depends] += "virtual/kernel:do_deploy"
-do_unpack[depends] += "virtual/kernel:do_deploy"
+do_install[depends] += "virtual/kernel:do_deploy"
 
 B = "${WORKDIR}/${BPN}-${PV}"
 
