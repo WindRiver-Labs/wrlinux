@@ -3,4 +3,7 @@ F2FS  is a file system intended for NAND-based flash memory equipped with
 Flash Translation Layer. Unlike JFFS or UBIFS it relies on FTL to handle 
 write distribution. It is supported from kernel 3.8 onwards.
 
+#@TYPE: Wrtemplate
+#@NAME: f2fstools
+#@DESCRIPTION: Enable f2fs kernel options and user-space utility
 
