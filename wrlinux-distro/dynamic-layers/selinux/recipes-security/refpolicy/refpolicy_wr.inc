@@ -24,6 +24,7 @@ SRC_URI += "file://wr-fc-subs_dist-busybox.patch \
             file://wr-fc-udev-udevadm.patch \
             file://wr-fc-devices-memory_bandwidth.patch \
             file://wr-fc-file_contexts-subs_dist-fix-label-for-usr-etc.patch \
+            file://wr-fc-vlock.patch \
            "
 
 # Other policy fixes

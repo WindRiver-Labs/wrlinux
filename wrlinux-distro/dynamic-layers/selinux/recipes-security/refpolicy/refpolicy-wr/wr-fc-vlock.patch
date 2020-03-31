@@ -1,0 +1,25 @@
+From 422dedc8a6e83acf667e09af22bfe07eb2fc0dcf Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Wed, 18 Dec 2019 15:04:41 +0800
+Subject: [PATCH] fix real path for vlock
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/apps/vlock.fc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/apps/vlock.fc b/policy/modules/apps/vlock.fc
+index f668cde..c4bc509 100644
+--- a/policy/modules/apps/vlock.fc
++++ b/policy/modules/apps/vlock.fc
+@@ -1,4 +1,5 @@
+ /usr/bin/vlock		--	gen_context(system_u:object_r:vlock_exec_t,s0)
++/usr/bin/vlock\.kbd		--	gen_context(system_u:object_r:vlock_exec_t,s0)
+ /usr/bin/vlock-main	--	gen_context(system_u:object_r:vlock_exec_t,s0)
+ 
+ /usr/sbin/vlock-main	--	gen_context(system_u:object_r:vlock_exec_t,s0)
+-- 
+2.7.4
+
