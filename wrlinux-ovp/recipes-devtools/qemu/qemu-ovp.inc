@@ -32,14 +32,17 @@ PACKAGECONFIG[snappy] = "--enable-snappy,--disable-snappy,snappy,"
 # disable gl support for kvm
 PACKAGECONFIG[gl] = ",,,"
 
-PACKAGECONFIG ?= "cap-ng linux-aio xfsctl attr \
+PACKAGECONFIG_COMMON = "cap-ng linux-aio xfsctl attr \
                   virtfs fdt glusterfs \
                   vhost pie alsa kvm \
                  " 
+PACKAGECONFIG ?= " ${PACKAGECONFIG_COMMON}"
 
 # This is making sure qemu-native independs on spice-native
 # as spice-native is not provided
-PACKAGECONFIG_append_x86-64_class-target = " spice rbd"
+PACKAGECONFIG_x86-64_class-target ?= " ${PACKAGECONFIG_COMMON} \
+                  spice rbd \
+				 "
 
 RDEPENDS_${PN}_class-nativesdk += "nativesdk-python3-core"
 
