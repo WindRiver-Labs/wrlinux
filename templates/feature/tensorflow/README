@@ -1,0 +1,109 @@
+This template adds tensorflow to the filesystem.
+
+1. Setup and build
+1) Supported BSP: qemux86-64|qemuarm64|intel-x86-64
+    --machines qemux86-64|qemuarm64|intel-x86-64
+
+2) To use this template, you should add layer meta-tensorflow:
+    --layers meta-tensorflow --templates feature/tensorflow
+
+3) Build image
+$ bitbake wrlinux-image-std
+
+
+2. Run and verify
+1) Start qemu with kvm + 5GB memory
+$ runqemu qemux86-64 wrlinux-image-std kvm qemuparams="-m 5120"
+
+2) Verify the install [1]
+root@qemux86-64:~# python3 -c "import tensorflow as tf; print(tf.reduce_sum(tf.random.normal([1000, 1000])))"
+Tensor("Sum:0", shape=(), dtype=float32)
+
+3) Run tutorial case for beginners [2]
+This short introduction uses Keras to:
+  - Build a neural network that classifies images.
+  - Train this neural network.
+  - And, finally, evaluate the accuracy of the model.
+
+root@qemux86-64:~# cat >code.py <<ENDOF
+import tensorflow as tf
+mnist = tf.keras.datasets.mnist
+
+(x_train, y_train),(x_test, y_test) = mnist.load_data()
+x_train, x_test = x_train / 255.0, x_test / 255.0
+
+model = tf.keras.models.Sequential([
+  tf.keras.layers.Flatten(input_shape=(28, 28)),
+  tf.keras.layers.Dense(512, activation=tf.nn.relu),
+  tf.keras.layers.Dropout(0.2),
+  tf.keras.layers.Dense(10, activation=tf.nn.softmax)
+])
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+model.fit(x_train, y_train, epochs=5)
+model.evaluate(x_test, y_test)
+ENDOF
+
+root@qemux86-64:~# python3 ./code.py
+Downloading data from https://storage.googleapis.com/tensorflow/tf-keras-datasets/mnist.npz
+11493376/11490434 [==============================] - 13s 1us/step
+Instructions for updating:
+Colocations handled automatically by placer.
+Instructions for updating:
+Please use `rate` instead of `keep_prob`. Rate should be set to `rate = 1 - keep_prob`.
+Epoch 1/5
+60000/60000 [==============================] - 11s 182us/sample - loss: 0.2194 - acc: 0.9347
+Epoch 2/5
+60000/60000 [==============================] - 11s 180us/sample - loss: 0.0955 - acc: 0.9704
+Epoch 3/5
+60000/60000 [==============================] - 11s 180us/sample - loss: 0.0679 - acc: 0.9786
+Epoch 4/5
+60000/60000 [==============================] - 11s 180us/sample - loss: 0.0537 - acc: 0.9831
+Epoch 5/5
+60000/60000 [==============================] - 11s 180us/sample - loss: 0.0439 - acc: 0.9858
+10000/10000 [==============================] - 1s 60us/sample - loss: 0.0733 - acc: 0.9785
+
+4) Run TensorFlow C++ Image Recognition Demo [3]
+In this case, we're using the default image of Admiral Grace Hopper,
+and you can see the network correctly spots she's wearing a military
+uniform, with a high score of 0.8.
+
+root@qemux86-64:~# label_image
+2020-04-01 08:47:45.545109: I tensorflow/examples/label_image/main.cc:251] military uniform (653): 0.834306
+2020-04-01 08:47:45.546126: I tensorflow/examples/label_image/main.cc:251] mortarboard (668): 0.0218695
+2020-04-01 08:47:45.547013: I tensorflow/examples/label_image/main.cc:251] academic gown (401): 0.010358
+2020-04-01 08:47:45.547918: I tensorflow/examples/label_image/main.cc:251] pickelhaube (716): 0.00800814
+2020-04-01 08:47:45.548801: I tensorflow/examples/label_image/main.cc:251] bulletproof vest (466): 0.00535084
+
+5) Run TensorFlow Lite C++ Image Recognition Demo [4]
+This example shows how you can load a pre-trained and converted
+TensorFlow Lite model and use it to recognize objects in images.
+In this case, we're using the default image of Admiral Grace Hopper,
+and you can see the network correctly spots she's wearing a military
+uniform, with a high score of 0.7.
+
+root@qemux86-64:~# label_image.lite
+Loaded model /usr/share/label_image/mobilenet_v1_1.0_224_quant.tflite
+resolved reporter
+invoked
+average time: 869.476 ms
+0.780392: 653 military uniform
+0.105882: 907 Windsor tie
+0.0156863: 458 bow tie
+0.0117647: 466 bulletproof vest
+0.00784314: 835 suit
+
+[1] https://www.tensorflow.org/install/pip
+[2] https://www.tensorflow.org/overview
+[3] https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/label_image
+[4] https://github.com/tensorflow/tensorflow/tree/master/tensorflow/lite/examples/label_image
+
+Known issue:
+- Since Tensorflow 1.13 is not the latest version, there are some `FutureWarning'
+  and `UserWarning', please ignore them
+
+#@TYPE: Wrtemplate
+#@NAME: tensorflow
+#@DESCRIPTION: Add tensorflow to the image
