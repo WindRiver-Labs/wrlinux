@@ -21,10 +21,10 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  1 file changed, 56 insertions(+), 4 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 3785dff63..99b958947 100644
+index 50d1496..43190ca 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -204,15 +204,68 @@ AC_CONFIG_SUBDIRS([utils/ffsb-6.0-rc2])
+@@ -205,15 +205,68 @@ fi
  
  AC_CONFIG_COMMANDS([syscalls.h], [cd ${ac_top_srcdir}/include/lapi/syscalls; ./regen.sh])
  
@@ -93,10 +93,10 @@ index 3785dff63..99b958947 100644
  LTP_CHECK_CC_WARN_OLDSTYLE
  LTP_CHECK_CLONE_SUPPORTS_7_ARGS
 -LTP_CHECK_CRYPTO
+ LTP_CHECK_FANOTIFY
  LTP_CHECK_FIDEDUPE
  LTP_CHECK_FORTIFY_SOURCE
- LTP_CHECK_FTS_H
-@@ -231,7 +284,6 @@ LTP_CHECK_NOMMU_LINUX
+@@ -233,7 +286,6 @@ LTP_CHECK_NOMMU_LINUX
  LTP_CHECK_PERF_EVENT
  LTP_CHECK_PRCTL_SUPPORT
  LTP_CHECK_RLIMIT64
@@ -104,6 +104,3 @@ index 3785dff63..99b958947 100644
  LTP_CHECK_SIGNAL
  LTP_CHECK_STATX
  LTP_CHECK_SYNC_ADD_AND_FETCH
--- 
-2.21.0
-
