@@ -31,7 +31,7 @@ do_compile(){
 }
 
 do_install(){
-	install -d ${D}/opt/ltp
+	install -d ${D}/opt/${PN}
 	oe_runmake DESTDIR=${D} SKIP_IDCHECK=1 install
 
 	# fixup not deploy STPfailure_report.pl to avoid confusing about it fails to run
@@ -40,7 +40,7 @@ do_install(){
 	# runs on the OSDL's Scaleable Test Platform (STP) and it mainly accesses
 	# http://khack.osdl.org to retrieve ltp test results run on
 	# OSDL's Scaleable Test Platform, but now http://khack.osdl.org unaccessible
-	rm -rf ${D}/opt/ltp/bin/STPfailure_report.pl
+	rm -rf ${D}/opt/${PN}/bin/STPfailure_report.pl
 
 	# Install Posix Test Suite
 	install -d ${D}/opt/open_posix_testsuite
@@ -58,8 +58,8 @@ do_install(){
 
     # Install wrLinux_ltp
 	cp ${WORKDIR}/README ${S}/wrLinux_ltp/
-	cp -r ${S}/wrLinux_ltp ${D}/opt/ltp/
-	install -m 755 ${S}/wrLinux_ltp/wr-runltp ${D}/opt/ltp/wrLinux_ltp/
+	cp -r ${S}/wrLinux_ltp ${D}/opt/${PN}/
+	install -m 755 ${S}/wrLinux_ltp/wr-runltp ${D}/opt/${PN}/wrLinux_ltp/
 }
 
 PACKAGECONFIG ??= ""
@@ -81,9 +81,9 @@ FILES_open-posix-testsuite-dbg += "\
 ### These may be in .bb file after package is upgraded
 ###
 FILES_${PN}-dbg += "\
-    /opt/ltp/testcases/*/.debug \
-    /opt/ltp/testcases/*/*/.debug \
-    /opt/ltp/testcases/*/*/*/.debug \
+    /opt/${PN}/testcases/*/.debug \
+    /opt/${PN}/testcases/*/*/.debug \
+    /opt/${PN}/testcases/*/*/*/.debug \
     "
 INSANE_SKIP_${PN} += "already-stripped"
 ###
@@ -93,6 +93,6 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 RDEPENDS_open-posix-testsuite += "eglibc-utils"
 RDEPENDS_${PN} += "open-posix-testsuite expect binutils binutils-symlinks gzip"
 
-FILES_${PN} += "/opt/ltp/* /opt/ltp/runtest/* /opt/ltp/scenario_groups/* /opt/ltp/testcases/bin/* /opt/ltp/testcases/bin/*/bin/* /opt/ltp/testscripts/* /opt/ltp/testcases/open_posix_testsuite/* /opt/ltp/testcases/open_posix_testsuite/conformance/* /opt/ltp/testcases/open_posix_testsuite/Documentation/* /opt/lpp/testcases/open_posix_testsuite/functional/* /opt/ltp/testcases/open_posix_testsuite/include/* /opt/ltp/testcases/open_posix_testsuite/scripts/* /opt/ltp/testcases/open_posix_testsuite/stress/* /opt/ltp/testcases/open_posix_testsuite/tools/* /opt/ltp/testcases/data/nm01/lib.a /opt/ltp/lib/libmem.a"
+FILES_${PN} += "/opt/${PN}/* /opt/${PN}/runtest/* /opt/${PN}/scenario_groups/* /opt/${PN}/testcases/bin/* /opt/${PN}/testcases/bin/*/bin/* /opt/${PN}/testscripts/* /opt/${PN}/testcases/open_posix_testsuite/* /opt/${PN}/testcases/open_posix_testsuite/conformance/* /opt/${PN}/testcases/open_posix_testsuite/Documentation/* /opt/lpp/testcases/open_posix_testsuite/functional/* /opt/${PN}/testcases/open_posix_testsuite/include/* /opt/${PN}/testcases/open_posix_testsuite/scripts/* /opt/${PN}/testcases/open_posix_testsuite/stress/* /opt/${PN}/testcases/open_posix_testsuite/tools/* /opt/${PN}/testcases/data/nm01/lib.a /opt/${PN}/lib/libmem.a"
 
-INHIBIT_PACKAGE_STRIP_FILES = "/opt/ltp/testcases/bin/nm01 /opt/ltp/testcases/bin/ldd01"
+INHIBIT_PACKAGE_STRIP_FILES = "/opt/${PN}/testcases/bin/nm01 /opt/${PN}/testcases/bin/ldd01"
