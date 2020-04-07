@@ -7,7 +7,9 @@ This template adds tensorflow to the filesystem.
 2) To use this template, you should add layer meta-tensorflow:
     --layers meta-tensorflow --templates feature/tensorflow
 
-3) Build image
+3) Add download layers --dl-layers to include predownloaded items
+
+4) Build image
 $ bitbake wrlinux-image-std
 
 
