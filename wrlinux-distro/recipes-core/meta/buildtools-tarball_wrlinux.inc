@@ -1,5 +1,5 @@
 # Force the name, we don't want ?= or our SDK naming will be used.
-TOOLCHAIN_OUTPUTNAME_osv-wrlinux = "${SDK_ARCH}-buildtools-nativesdk-standalone-${DISTRO_VERSION}"
+TOOLCHAIN_OUTPUTNAME_osv-wrlinux = "${SDK_ARCH}-${BUILDTOOLS}-nativesdk-standalone-${DISTRO_VERSION}"
 
 # for toaster
 #
