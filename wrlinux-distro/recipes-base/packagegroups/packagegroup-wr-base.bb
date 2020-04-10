@@ -47,6 +47,7 @@ RDEPENDS_${PN} = "\
     util-linux-umount \
     util-linux-fstrim \
     util-linux-hwclock \
+    util-linux-logger \
     vim \
     which \
     "
