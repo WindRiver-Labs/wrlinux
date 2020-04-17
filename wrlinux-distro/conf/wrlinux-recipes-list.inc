@@ -2971,6 +2971,7 @@ WRLINUX_ALL_RECIPES = " \
     nasm \
     nautilus \
     nbd \
+    nbdkit \
     nbench-byte \
     ncftp \
     ncmpc \
