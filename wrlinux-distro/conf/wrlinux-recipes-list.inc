@@ -1997,6 +1997,7 @@ WRLINUX_ALL_RECIPES = " \
     gettext \
     gexiv2 \
     gflags \
+    ghex \
     ghostscript \
     giflib \
     gigolo \
@@ -2684,7 +2685,9 @@ WRLINUX_ALL_RECIPES = " \
     libutempter \
     libuv \
     libva \
+    libva-intel \
     libva-utils \
+    libva-utils-intel \
     libvdpau \
     libvirt \
     libvmi \
@@ -2808,6 +2811,7 @@ WRLINUX_ALL_RECIPES = " \
     lttng-ust \
     lua \
     luajit \
+    luaposix \
     lvm2 \
     lxc \
     lxcfs \
@@ -3259,6 +3263,7 @@ WRLINUX_ALL_RECIPES = " \
     pango \
     pangomm \
     parole \
+    parson \
     parted \
     passwdqc \
     patch \
@@ -3426,6 +3431,8 @@ WRLINUX_ALL_RECIPES = " \
     python-django-south \
     python-djangorestframework \
     python-dnspython \
+    python-docker \
+    python-docker-pycreds \
     python-docutils \
     python-dominate \
     python-editor \
@@ -3763,6 +3770,7 @@ WRLINUX_ALL_RECIPES = " \
     python-webcolors \
     python-webdav \
     python-webencodings \
+    python-websocket-client \
     python-websockify \
     python-werkzeug \
     python-which \
@@ -3837,6 +3845,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-avahi \
     python3-aws-iot-device-sdk-python \
     python3-awscli \
+    python3-azure-iot-device \
     python3-babel \
     python3-backports-functools-lru-cache \
     python3-bandit \
@@ -3894,6 +3903,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-deprecation \
     python3-dicttoxml \
     python3-dill \
+    python3-distro \
     python3-distutils-extra \
     python3-django \
     python3-django-appconf \
@@ -3997,6 +4007,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-isodate \
     python3-isort \
     python3-itsdangerous \
+    python3-janus \
     python3-jaraco-functools \
     python3-javaobj-py3 \
     python3-jdcal \
@@ -4154,6 +4165,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-pyjks \
     python3-pyjwt \
     python3-pykickstart \
+    python3-pykwalify \
     python3-pylint \
     python3-pylyrics \
     python3-pymisp \
@@ -4207,6 +4219,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-requests-futures \
     python3-requests-oauthlib \
     python3-requests-toolbelt \
+    python3-requests-unixsocket \
     python3-requestsexceptions \
     python3-retrying \
     python3-rfc3339-validator \
@@ -4284,6 +4297,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-tornado \
     python3-tox \
     python3-tqdm \
+    python3-transitions \
     python3-twine \
     python3-twisted \
     python3-twitter \
