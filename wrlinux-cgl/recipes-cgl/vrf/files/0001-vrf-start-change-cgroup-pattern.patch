@@ -1,0 +1,46 @@
+From 04af8a6b904eb765499ac9b6adde65faa0b2899d Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Tue, 21 Apr 2020 07:53:28 +0000
+Subject: [PATCH] vrf-start: change cgroup search pattern
+
+After lxc upgraded to 4.x, the cgroup pattern
+changes from lxc.payload/%n to lxc.payload.%n
+and lxc.monitor/%n to lxc.monitor.%n-%n because
+below commits introduced:
+d6bdd18 cgroups: honor lxc.cgroup.pattern if set explicitly II
+4ba0393 cgroups: fix default cgroup pattern
+
+Take /sys/fs/cgroup/cpu,cpuacct/ for example,
+Before 4.x,
+/sys/fs/cgroup/cpu,cpuacct/lxc.payload/vrf_1/tasks
+/sys/fs/cgroup/cpu,cpuacct/lxc.monitor/vrf_1/tasks
+
+After 4.x:
+/sys/fs/cgroup/cpu,cpuacct/lxc.payload.vrf_1/tasks
+/sys/fs/cgroup/cpu,cpuacct/lxc.monitor.vrf_1-1/tasks
+
+So change the search pattern accordingly.
+
+Upstream-Status: Inappropriate [no upstream]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ src/vrf-start | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/vrf-start b/src/vrf-start
+index 4dfd2da..54149ac 100755
+--- a/src/vrf-start
++++ b/src/vrf-start
+@@ -65,7 +65,7 @@ fi
+ sleep 1
+ debug_log -e "cgroup mounted at \"$CGROUP_MNT\""
+ 
+-VRF_PATH=$(find $CGROUP_MNT -name $VRF_NAME)
++VRF_PATH=$(find $CGROUP_MNT -name *${VRF_NAME}*)
+ if [ -n "$VRF_PATH" ] && [ "$(find $VRF_PATH -name tasks |xargs -d'\n' cat 2> /dev/null|wc -l)" -gt 0 ] ; then
+     echo "$VRF_NAME successfully started"
+     exit $VRF_SUCCESS
+-- 
+2.24.1
+
