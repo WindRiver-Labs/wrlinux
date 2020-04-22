@@ -2916,7 +2916,6 @@ WRLINUX_ALL_RECIPES = " \
     mixlib-log \
     mixlib-shellout \
     mkfontscale \
-    mkl-dnn \
     mksh \
     mm-common \
     mmap-smack-test \
@@ -4855,6 +4854,7 @@ WRLINUX_ALL_RECIPES = " \
     xbitmaps \
     xcb-proto \
     xcb-util \
+    xcb-util-cursor \
     xcb-util-image \
     xcb-util-keysyms \
     xcb-util-renderutil \
