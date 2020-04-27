@@ -4465,6 +4465,7 @@ WRLINUX_ALL_RECIPES = " \
     scsirastools \
     sdbus-c++ \
     sdbus-c++-libsystemd \
+    sdbus-c++-tools \
     sdparm \
     seabios \
     secilc \
