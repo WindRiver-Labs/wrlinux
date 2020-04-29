@@ -33,8 +33,6 @@ PNWHITELIST_meta-python += " \
 PNWHITELIST_META_PYTHON = " \
     python3-lxml \
     python3-parallax \
-    python-paste \
-    python-vcversioner \
 "
 
 # For meta-openembedded/meta-networking
@@ -92,7 +90,6 @@ PNWHITELIST_META_OE = " \
     libqb \
     postgresql \
     pps-tools \
-    python-pygobject \
     smartmontools \
     zabbix \
     zstd \

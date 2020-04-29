@@ -4,7 +4,6 @@ PNWHITELIST_LAYERS_remove = "meta-anaconda"
 PNWHITELIST_gnome-layer += "\
     keybinder \
     libgnomekbd \
-    libgnome-keyring \
     libnma \
     libtimezonemap \
     libuser \
@@ -39,7 +38,6 @@ PNWHITELIST_meta-python += "\
 
 # Whitelist for meta-openembedded/meta-filesystems
 PNWHITELIST_filesystems-layer += "\
-    fuse \
     ntfs-3g-ntfsprogs \
     xfsprogs \
 "

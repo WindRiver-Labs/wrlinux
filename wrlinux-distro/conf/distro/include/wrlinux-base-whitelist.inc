@@ -72,8 +72,6 @@ PNWHITELIST_perl-layer += " \
 "
 
 PNWHITELIST_meta-python += " \
-    python-dbus \
-    python-pyrex-native \
     python3-django \
     python3-django-south \
     python3-pytz \
@@ -84,12 +82,10 @@ PNWHITELIST_meta-python += " \
     nativesdk-python3-soupsieve \
     nativesdk-python3-webencodings \
     python3-m2crypto \
-    python-typing \
     python3-pyyaml \
     python3-jinja2 \
     python3-markupsafe \
     python3-cython \
-    python3-sqlparse \
 "
 
 PNWHITELIST_webserver += " \
