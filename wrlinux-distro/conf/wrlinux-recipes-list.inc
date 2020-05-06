@@ -47,6 +47,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     base-passwd \
     bash \
     bash-completion \
+    bazel \
     bc \
     bcm2835-bootfiles \
     bdwgc \
@@ -522,7 +523,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     libmms \
     libmnl \
     libmodule-build-perl \
-    libmodulemd-v1 \
+    libmodulemd \
     libmpc \
     libndp \
     libnet \
@@ -1002,6 +1003,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     python3-cryptography-vectors \
     python3-cython \
     python3-dbus \
+    python3-dbusmock \
     python3-decorator \
     python3-distutils-extra \
     python3-django \
@@ -1136,6 +1138,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     rdist \
     re2c \
     readline \
+    redis \
     refpolicy-mls \
     resolvconf \
     resource-agents \
@@ -1558,6 +1561,7 @@ WRLINUX_ALL_RECIPES = " \
     azure-iot-sdk-c \
     azure-macro-utils-c \
     azure-uamqp-c \
+    azure-uhttp-c \
     azure-umqtt-c \
     babeld \
     babeltrace \
@@ -1570,6 +1574,7 @@ WRLINUX_ALL_RECIPES = " \
     bash-completion \
     bastille \
     bats \
+    bazel \
     bc \
     bcm2835-bootfiles \
     bdftopcf \
@@ -2517,7 +2522,7 @@ WRLINUX_ALL_RECIPES = " \
     libmodule-build-tiny-perl \
     libmodule-pluggable-perl \
     libmodule-runtime-perl \
-    libmodulemd-v1 \
+    libmodulemd \
     libmoo-perl \
     libmpc \
     libmpd \
@@ -3895,6 +3900,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-dateutil \
     python3-dbus \
     python3-dbus-next \
+    python3-dbusmock \
     python3-dbussy \
     python3-debtcollector \
     python3-decorator \
@@ -3938,6 +3944,8 @@ WRLINUX_ALL_RECIPES = " \
     python3-flask-babel \
     python3-flask-bootstrap \
     python3-flask-cors \
+    python3-flask-jsonpify \
+    python3-flask-jwt \
     python3-flask-login \
     python3-flask-mail \
     python3-flask-migrate \
@@ -3975,6 +3983,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-grpcio \
     python3-grpcio-tools \
     python3-gsocketpool \
+    python3-gunicorn \
     python3-h2 \
     python3-h5py \
     python3-happybase \
@@ -4069,6 +4078,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-networkmanager \
     python3-networkx \
     python3-newrelic \
+    python3-nmap \
     python3-nose \
     python3-ntplib \
     python3-numpy \
@@ -4264,6 +4274,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-socketio \
     python3-soupsieve \
     python3-speaklater \
+    python3-speedtest-cli \
     python3-sphinx \
     python3-spidev \
     python3-sqlalchemy \
