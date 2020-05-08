@@ -59,7 +59,7 @@ SRCREV_machine_kb-v5.2-standard-qemuarm64 ?= "ae9c739b730663a25628b34852c7a7aaac
 LINUX_VERSION_kb-v5.2-standard-qemuarm64 ?= "5.2.39"
 SRCREV_machine_kb-v5.2-standard-qemuppc ?= "2ae6497c8190d282c8475ab88a1a6d6cc56d6881"
 LINUX_VERSION_kb-v5.2-standard-qemuppc ?= "5.2.39"
-SRCREV_machine_kb-v5.2-standard-ti-am335x ?= "7c42e921ab778d112d376a122d67fb43d46128b1"
+SRCREV_machine_kb-v5.2-standard-ti-am335x ?= "4aac4b73d5c334f95a7850874847df463c1f5874"
 LINUX_VERSION_kb-v5.2-standard-ti-am335x ?= "5.2.39"
 SRCREV_machine_kb-v5.2-standard-tiny-arm-versatile-926ejs ?= "abb64fad449c51db4bf2de6e939cb9754a87358e"
 LINUX_VERSION_kb-v5.2-standard-tiny-arm-versatile-926ejs ?= "5.2.39"
@@ -76,5 +76,5 @@ LINUX_VERSION_kb-v5.2-standard-xlnx-soc ?= "5.2.39"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_5.2 = "yocto-5.2-wr"
-SRCREV_meta_5.2 = "4c3fba9510ce8924ec4e0d2896876dd1904dce3d"
+SRCREV_meta_5.2 = "a7cc9faacb4ff42144371fd72a07e58482793d80"
 LINUX_VERSION_5.2 = "5.2.39"
