@@ -84,7 +84,7 @@ DEPENDS = "\
     libgpg-error-native \
     libice-native \
     libjpeg-turbo-native \
-    libmodulemd-v1-native \
+    libmodulemd-native \
     libmpc-native \
     libnsl2-native \
     libpcre-native \
