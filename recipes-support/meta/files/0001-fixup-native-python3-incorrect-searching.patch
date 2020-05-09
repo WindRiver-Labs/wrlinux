@@ -1,0 +1,30 @@
+From 1d53917c808199b016e5c021617d28ca8eb69e94 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 11 May 2020 14:49:52 +0800
+Subject: [PATCH] fixup native python3 incorrect searching
+
+No native sysroot in sdk
+
+Upstream-Status: Inappropriate [wrlinux specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ scripts/lib/wic/plugins/imager/direct.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/lib/wic/plugins/imager/direct.py b/scripts/lib/wic/plugins/imager/direct.py
+index 2d06c242b6..5ffeafcf8b 100644
+--- a/scripts/lib/wic/plugins/imager/direct.py
++++ b/scripts/lib/wic/plugins/imager/direct.py
+@@ -205,7 +205,7 @@ class DirectPlugin(ImagerPlugin):
+         # Generate .bmap
+         if self.bmap:
+             logger.debug("Generating bmap file for %s", disk_name)
+-            python = os.path.join(self.native_sysroot, 'usr/bin/python3-native/python3')
++            python = os.path.join(self.native_sysroot, 'usr/bin/python3')
+             bmaptool = os.path.join(self.native_sysroot, 'usr/bin/bmaptool')
+             exec_native_cmd("%s %s create %s -o %s.bmap" % \
+                             (python, bmaptool, full_path, full_path), self.native_sysroot)
+-- 
+2.18.2
+

@@ -1,0 +1,42 @@
+From 05784373caa153d8be4425bc8d753ae3eab2de57 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 14 May 2020 17:01:22 +0800
+Subject: [PATCH] get vars from environment
+
+Since wic in sdk does not support bitbake, get IMAGE_ROOTFS/
+DEPLOY_DIR_IMAGE/STAGING_DATADIR/RECIPE_SYSROOT_NATIVE from
+environment rather than bitbake
+
+Upstream-Status: Inappropriate [wrlinux specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ scripts/wic | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/scripts/wic b/scripts/wic
+index 24700f380f..5857ec18ee 100755
+--- a/scripts/wic
++++ b/scripts/wic
+@@ -146,13 +146,14 @@ def wic_create_subcommand(options, usage_str):
+             logger.info("Building rootfs...\n")
+             subprocess.check_call(argv)
+ 
+-        rootfs_dir = get_bitbake_var("IMAGE_ROOTFS", options.image_name)
+-        kernel_dir = get_bitbake_var("DEPLOY_DIR_IMAGE", options.image_name)
+-        bootimg_dir = get_bitbake_var("STAGING_DATADIR", options.image_name)
++        rootfs_dir = os.environ.get("IMAGE_ROOTFS")
++        kernel_dir = os.environ.get("DEPLOY_DIR_IMAGE")
++        bootimg_dir = os.environ.get("STAGING_DATADIR")
+ 
+         native_sysroot = options.native_sysroot
+         if options.vars_dir and not native_sysroot:
+-            native_sysroot = get_bitbake_var("RECIPE_SYSROOT_NATIVE", options.image_name)
++            native_sysroot = os.environ.get("RECIPE_SYSROOT_NATIVE")
++
+     else:
+         if options.build_rootfs:
+             raise WicError("Image name is not specified, exiting. "
+-- 
+2.18.2
+

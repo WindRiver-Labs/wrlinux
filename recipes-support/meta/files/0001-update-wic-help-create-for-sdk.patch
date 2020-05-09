@@ -1,0 +1,83 @@
+From 5b75a97f97769d47da941fb361e5f87f6c6c1474 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 11 May 2020 15:09:43 +0800
+Subject: [PATCH] update wic help create for sdk
+
+Since no yocto build in sdk, Remove -e (build image
+environment), -n(specify the path to the native sysroot),
+-f (used to build rootfs by running "bitbake <image>"),
+-s (used to skip the build check)
+
+Upstream-Status: Inappropriate [wrlinux specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ scripts/lib/wic/help.py | 36 +-----------------------------------
+ 1 file changed, 1 insertion(+), 35 deletions(-)
+
+diff --git a/scripts/lib/wic/help.py b/scripts/lib/wic/help.py
+index 1e3d06a87b..627682036d 100644
+--- a/scripts/lib/wic/help.py
++++ b/scripts/lib/wic/help.py
+@@ -150,18 +150,10 @@ DESCRIPTION
+     various build artifacts required to build the image.
+ 
+     Users can explicitly specify the build artifact locations using
+-    the -r, -b, -k, and -n options.  See below for details on where
++    the -r, -b, and -k options.  See below for details on where
+     the corresponding artifacts are typically found in a normal
+     OpenEmbedded build.
+ 
+-    Alternatively, users can use the -e option to have 'wic' determine
+-    those locations for a given image.  If the -e option is used, the
+-    user needs to have set the appropriate MACHINE variable in
+-    local.conf, and have sourced the build environment.
+-
+-    The -e option is used to specify the name of the image to use the
+-    artifacts from e.g. core-image-sato.
+-
+     The -r option is used to specify the path to the /rootfs dir to
+     use as the .wks rootfs source.
+ 
+@@ -172,38 +164,12 @@ DESCRIPTION
+     The -k option is used to specify the path to the dir containing
+     the kernel to use in the .wks bootimg.
+ 
+-    The -n option is used to specify the path to the native sysroot
+-    containing the tools to use to build the image.
+-
+-    The -f option is used to build rootfs by running "bitbake <image>"
+-
+-    The -s option is used to skip the build check.  The build check is
+-    a simple sanity check used to determine whether the user has
+-    sourced the build environment so that the -e option can operate
+-    correctly.  If the user has specified the build artifact locations
+-    explicitly, 'wic' assumes the user knows what he or she is doing
+-    and skips the build check.
+-
+     The -D option is used to display debug information detailing
+     exactly what happens behind the scenes when a create request is
+     fulfilled (or not, as the case may be).  It enumerates and
+     displays the command sequence used, and should be included in any
+     bug report describing unexpected results.
+ 
+-    When 'wic -e' is used, the locations for the build artifacts
+-    values are determined by 'wic -e' from the output of the 'bitbake
+-    -e' command given an image name e.g. 'core-image-minimal' and a
+-    given machine set in local.conf.  In that case, the image is
+-    created as if the following 'bitbake -e' variables were used:
+-
+-    -r:        IMAGE_ROOTFS
+-    -k:        STAGING_KERNEL_DIR
+-    -n:        STAGING_DIR_NATIVE
+-    -b:        empty (plugin-specific handlers must determine this)
+-
+-    If 'wic -e' is not used, the user needs to select the appropriate
+-    value for -b (as well as -r, -k, and -n).
+-
+     The -o option can be used to place the image in a directory with a
+     different name and location.
+ 
+-- 
+2.18.2
+

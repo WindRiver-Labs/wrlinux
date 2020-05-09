@@ -1,0 +1,28 @@
+From e241748906efba8c09bdf9d9f3d20d0b16ed4351 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 11 May 2020 18:40:28 +0800
+Subject: [PATCH] get FAKEROOTCMD from environment
+
+Upstream-Status: Inappropriate [wrlinux specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ scripts/lib/wic/partition.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/lib/wic/partition.py b/scripts/lib/wic/partition.py
+index 2d95f78439..a3b8aa06fe 100644
+--- a/scripts/lib/wic/partition.py
++++ b/scripts/lib/wic/partition.py
+@@ -206,7 +206,7 @@ class Partition():
+         pseudo += "export PSEUDO_LOCALSTATEDIR=%s;" % p_localstatedir
+         pseudo += "export PSEUDO_PASSWD=%s;" % p_passwd
+         pseudo += "export PSEUDO_NOSYMLINKEXP=%s;" % p_nosymlinkexp
+-        pseudo += "%s " % get_bitbake_var("FAKEROOTCMD")
++        pseudo += "%s " % os.environ.get("FAKEROOTCMD")
+ 
+         rootfs = "%s/rootfs_%s.%s.%s" % (cr_workdir, self.label,
+                                          self.lineno, self.fstype)
+-- 
+2.18.2
+
