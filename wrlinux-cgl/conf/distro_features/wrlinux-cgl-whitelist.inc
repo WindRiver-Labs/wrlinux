@@ -60,7 +60,6 @@ PNWHITELIST_META_NETWORKING = " \
     ntop \
     ntp \
     openhpi \
-    openipmi \
     open-isns \
     openl2tp \
     quagga \
@@ -84,7 +83,6 @@ PNWHITELIST_META_OE = " \
     crash \
     edac-utils \
     indent \
-    ipmitool \
     libnet \
     libqb \
     postgresql \
