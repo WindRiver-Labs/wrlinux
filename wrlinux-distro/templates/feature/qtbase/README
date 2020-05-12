@@ -1,0 +1,11 @@
+This template adds qtbase to the filesystem.
+
+Supported BSP: qemux86-64|bcm-2xxx-rpi4|intel-x86-64
+  --machines qemux86-64|bcm-2xxx-rpi4|intel-x86-64
+
+This template is often used with a desktop environment. Please add feature/xfce and layer meta-qt5:
+    --layers meta-qt5 --templates feature/xfce feature/qtbase
+
+#@TYPE: Wrtemplate
+#@NAME: qtbase
+#@DESCRIPTION: Add qtbase to the image

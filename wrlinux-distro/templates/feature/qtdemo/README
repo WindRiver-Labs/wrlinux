@@ -1,0 +1,19 @@
+This template adds qtdemo to the filesystem.
+
+Supported BSP: qemux86-64|bcm-2xxx-rpi4|intel-x86-64
+  --machines qemux86-64|bcm-2xxx-rpi4|intel-x86-64
+
+This template is often used with a desktop environment. Please add feature/xfce and layer meta-qt5:
+  --layers meta-qt5 --templates feature/xfce feature/qtdemo
+
+Once booted into the image, open a terminal and enter
+$ /usr/share/qt5everywheredemo-1.0/QtDemo
+
+A GUI application will be opened consisting a number of mini demo programs.
+
+Known issue:
+- Occationally freeze the entire system when building on bcm-2xxx-rpi4 - LINCD-1941
+
+#@TYPE: Wrtemplate
+#@NAME: qtdemo
+#@DESCRIPTION: Add qtdemo to the image

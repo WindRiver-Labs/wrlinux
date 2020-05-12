@@ -1,0 +1,17 @@
+This template adds qtcreator to the filesystem.
+
+Supported BSP: qemux86-64|bcm-2xxx-rpi4|intel-x86-64
+  --machines qemux86-64|bcm-2xxx-rpi4|intel-x86-64
+
+This template is often used with a desktop environment. Please add feature/xfce and layer meta-qt5:
+  --layers meta-qt5 --templates feature/xfce feature/qtcreator
+
+Once booted into the image, open a terminal and type
+$ /usr/bin/qtcreator
+
+The Qt Creator IDE will be opened. Further instructions on how to use Qt Creator can be found at:
+https://doc.qt.io/qtcreator/index.html
+
+#@TYPE: Wrtemplate
+#@NAME: qtcreator
+#@DESCRIPTION: Add qtcreator to the image
