@@ -1236,7 +1236,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     syslinux \
     syslog-ng \
     sysstat \
-    system-report \
     systemd \
     systemd-boot \
     systemd-bootchart \
@@ -4693,7 +4692,6 @@ WRLINUX_ALL_RECIPES = " \
     sysprof \
     sysstat \
     system-config-keyboard \
-    system-report \
     systemd \
     systemd-boot \
     systemd-bootchart \

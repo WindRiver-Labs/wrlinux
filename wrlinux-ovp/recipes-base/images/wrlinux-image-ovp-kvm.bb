@@ -42,7 +42,6 @@ IMAGE_INSTALL += " \
    python3-pyparsing \
    schedtool-dl \
    dpdk \
-   system-report \
    ceph \
 "
 

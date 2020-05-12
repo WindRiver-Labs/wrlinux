@@ -14,7 +14,6 @@ require recipes-base/images/wrlinux-image-ovp-kvm-minimal.bb
 IMAGE_INSTALL += " \
     packagegroup-ovp-trace-tools \
     hwloc \
-    system-report \
     acpid-default-scripts \
 "
 
