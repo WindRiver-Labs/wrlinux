@@ -40,7 +40,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     autofs \
     automake \
     avahi \
-    avahi-ui \
     babeltrace \
     babeltrace2 \
     base-files \
@@ -49,6 +48,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     bash-completion \
     bazel \
     bc \
+    bcc \
     bcm2835-bootfiles \
     bdwgc \
     bind \
@@ -90,6 +90,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     cgroup-lite \
     checkpolicy \
     chrpath \
+    clang \
     cluster-glue \
     clutter-1.0 \
     clutter-gst-3.0 \
@@ -98,6 +99,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     cmake \
     cni \
     cogl-1.0 \
+    compiler-rt \
     compose-file \
     conmon \
     connman \
@@ -457,6 +459,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     libconfig-general-perl \
     libconvert-asn1-perl \
     libcroco \
+    libcxx \
     libdaemon \
     libdazzle \
     libdbd-mysql-perl \
@@ -497,6 +500,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     libgssglue \
     libgtop \
     libgudev \
+    libhandy \
     libhtml-parser-perl \
     libhtml-tagset-perl \
     libhugetlbfs \
@@ -607,6 +611,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     libusb1 \
     libuser \
     libva \
+    libva-initial \
     libva-utils \
     libvirt \
     libvmi \
@@ -675,6 +680,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     linux-yocto-dev \
     lksctp-tools \
     llvm \
+    llvm-project-source-10.0.0 \
     lmbench \
     lmsensors \
     lmsensors-config \
@@ -690,6 +696,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     lttng-tools \
     lttng-ust \
     lua \
+    luajit \
     lvm2 \
     lxc \
     lxdm \
@@ -1554,7 +1561,6 @@ WRLINUX_ALL_RECIPES = " \
     autofs \
     automake \
     avahi \
-    avahi-ui \
     avro-c \
     aws-iot-device-sdk-cpp \
     azure-c-shared-utility \
@@ -1576,6 +1582,7 @@ WRLINUX_ALL_RECIPES = " \
     bats \
     bazel \
     bc \
+    bcc \
     bcm2835-bootfiles \
     bdftopcf \
     bdwgc \
@@ -1599,6 +1606,7 @@ WRLINUX_ALL_RECIPES = " \
     bootchart2 \
     botan \
     bpftool \
+    bpftrace \
     breakpad \
     bridge-utils \
     broadcom-bt-firmware \
@@ -1658,11 +1666,13 @@ WRLINUX_ALL_RECIPES = " \
     cim-schema-docs \
     cim-schema-exper \
     cim-schema-final \
+    cinematicexperience \
     cirros \
     civetweb \
     cjson \
     ckermit \
     clamav \
+    clang \
     cli11 \
     clinfo \
     cloc \
@@ -1680,12 +1690,15 @@ WRLINUX_ALL_RECIPES = " \
     cmark \
     cmpi-bindings \
     cni \
+    cockpit \
     coderay \
     cogl-1.0 \
     collectd \
     colord \
     colord-gtk \
+    compiler-rt \
     compose-file \
+    con2fbmap \
     concurrencykit \
     concurrent-ruby \
     conmon \
@@ -2200,6 +2213,7 @@ WRLINUX_ALL_RECIPES = " \
     ima-inspect \
     ima-policy \
     imagemagick \
+    imapfilter \
     imsettings \
     indent \
     inetutils \
@@ -2229,6 +2243,8 @@ WRLINUX_ALL_RECIPES = " \
     initrdscripts-secure-core \
     initscripts \
     inotify-tools \
+    intel-compute-runtime \
+    intel-graphics-compiler \
     intel-media-driver \
     intel-mediasdk \
     intel-microcode \
@@ -2370,12 +2386,14 @@ WRLINUX_ALL_RECIPES = " \
     libconfig \
     libconfig-autoconf-perl \
     libconfig-general-perl \
+    libconnman-qt5 \
     libconvert-asn1-perl \
     libcroco \
     libcrypt-openssl-guess-perl \
     libcrypt-openssl-random-perl \
     libcrypt-openssl-rsa-perl \
     libcurses-perl \
+    libcxx \
     libcyusbserial \
     libdaemon \
     libdata-hexdump-perl \
@@ -2586,6 +2604,7 @@ WRLINUX_ALL_RECIPES = " \
     libpwquality \
     libqb \
     libqmi \
+    libqofono \
     libraw1394 \
     librdmacm \
     librealsense \
@@ -2690,9 +2709,11 @@ WRLINUX_ALL_RECIPES = " \
     libutempter \
     libuv \
     libva \
+    libva-initial \
     libva-intel \
     libva-utils \
     libva-utils-intel \
+    libvcard \
     libvdpau \
     libvirt \
     libvmi \
@@ -2787,6 +2808,8 @@ WRLINUX_ALL_RECIPES = " \
     lksctp-tools \
     lldpd \
     llvm \
+    llvm-common \
+    llvm-project-source-10.0.0 \
     lmbench \
     lms \
     lmsensors \
@@ -2835,6 +2858,8 @@ WRLINUX_ALL_RECIPES = " \
     makedepend \
     makedevs \
     makedumpfile \
+    maliit-framework-qt5 \
+    maliit-plugins-qt5 \
     man-db \
     man-pages \
     mariadb \
@@ -2895,6 +2920,7 @@ WRLINUX_ALL_RECIPES = " \
     meta-python2-image-base \
     meta-python2-ptest-image \
     meta-toolchain \
+    meta-toolchain-qt5 \
     meta-webserver-image \
     meta-webserver-image-base \
     meta-world-pkgdata \
@@ -3068,9 +3094,11 @@ WRLINUX_ALL_RECIPES = " \
     octave \
     oe-scap \
     ofono \
+    ogl-runtime \
     ohai \
     oisp-cli \
     onboard \
+    onednn \
     onig \
     open-iscsi-kernel \
     open-iscsi-user \
@@ -3078,6 +3106,7 @@ WRLINUX_ALL_RECIPES = " \
     open-vm-tools \
     openal-soft \
     openbox \
+    opencl-clang \
     opencl-headers \
     opencl-icd-loader \
     openconnect \
@@ -3094,6 +3123,7 @@ WRLINUX_ALL_RECIPES = " \
     openldap \
     openlldp \
     openlmi-tools \
+    openmp \
     openobex \
     openocd \
     opensaf \
@@ -3226,6 +3256,8 @@ WRLINUX_ALL_RECIPES = " \
     packagegroup-ovp-lttng-toolchain \
     packagegroup-ovp-trace-tools \
     packagegroup-ovp-vm \
+    packagegroup-qt5-qtcreator-debug \
+    packagegroup-qt5-toolchain-target \
     packagegroup-sdk-target \
     packagegroup-self-hosted \
     packagegroup-selinux-minimal \
@@ -4186,6 +4218,8 @@ WRLINUX_ALL_RECIPES = " \
     python3-pyparted \
     python3-pyperclip \
     python3-pyperf \
+    python3-pyqt5 \
+    python3-pyqtchart \
     python3-pyro4 \
     python3-pyroute2 \
     python3-pyrsistent \
@@ -4376,13 +4410,71 @@ WRLINUX_ALL_RECIPES = " \
     qat17 \
     qemu \
     qemuwrapper-cross \
+    qmllive \
     qpdf \
     qpid \
     qpid-python \
     qrencode \
+    qsiv \
+    qt-kiosk-browser \
+    qt3d \
+    qt5-creator \
+    qt5-demo-extrafiles \
+    qt5-opengles2-test \
+    qt5-plugin-generic-vboxtouch \
+    qt5everywheredemo \
+    qt5ledscreen \
+    qt5nmapcarousedemo \
+    qt5nmapper \
+    qtbase \
+    qtcharts \
+    qtchooser \
+    qtcoap \
+    qtconnectivity \
+    qtdatavis3d \
+    qtdeclarative \
+    qtgamepad \
+    qtgraphicaleffects \
+    qtimageformats \
+    qtknx \
+    qtlocation \
+    qtlottie \
+    qtmqtt \
+    qtmultimedia \
+    qtnetworkauth \
+    qtopcua \
+    qtpurchasing \
+    qtquick3d \
+    qtquickcontrols \
+    qtquickcontrols2 \
+    qtremoteobjects \
+    qtscript \
+    qtscxml \
+    qtsensors \
+    qtserialbus \
+    qtserialport \
+    qtsmarthome \
+    qtsvg \
+    qtsystems \
+    qttools \
+    qttranslations \
+    qtvirtualkeyboard \
+    qtwayland \
+    qtwebchannel \
+    qtwebengine \
+    qtwebglplugin \
+    qtwebkit \
+    qtwebsockets \
+    qtwebview \
+    qtx11extras \
+    qtxmlpatterns \
     quagga \
+    quazip \
     quilt \
+    quitbattery \
+    quitindicators \
     quota \
+    qwt-qt5 \
     rabbitmq-c \
     rabbitmq-server \
     rack \
@@ -4711,6 +4803,7 @@ WRLINUX_ALL_RECIPES = " \
     ttf-ubuntu-font-family \
     ttf-vlgothic \
     ttf-wqy-zenhei \
+    tufao \
     tumbler \
     tunctl \
     turbostat \
@@ -4814,6 +4907,7 @@ WRLINUX_ALL_RECIPES = " \
     webmin \
     webrtc-audio-processing \
     websocketpp \
+    weechat \
     weston \
     weston-init \
     wget \
