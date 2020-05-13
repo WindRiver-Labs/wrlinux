@@ -156,16 +156,16 @@ KERNEL_VERSION_SANITY_SKIP = "1"
 
 # SANITY_TESTED_DISTROS used to defined the distribution list which we used to build wrlinux
 SANITY_TESTED_DISTROS ?= " \
-            ubuntu-16.04 \n \
             ubuntu-18.04 \n \
             ubuntu-19.04 \n \
+            ubuntu-20.04 \n \
             fedora-29 \n \
             fedora-30 \n \
-            centos-7 \n \
             opensuse-151 \n \
             opensuseleap-15.0 \n \
             rhel-7.6 \n \
             rhel-7.7 \n \
             rhel-8.0 \n \
+            rhel-8.2 \n \
             sled-15 \n \
             "
