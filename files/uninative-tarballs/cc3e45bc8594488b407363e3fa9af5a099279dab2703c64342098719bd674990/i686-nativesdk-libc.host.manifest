@@ -1,0 +1,17 @@
+nativesdk-glibc-gconv i686_nativesdk 2.31
+nativesdk-glibc-gconv-cp1252 i686_nativesdk 2.31
+nativesdk-glibc-gconv-euc-jp i686_nativesdk 2.31
+nativesdk-glibc-gconv-ibm850 i686_nativesdk 2.31
+nativesdk-glibc-gconv-iso8859-1 i686_nativesdk 2.31
+nativesdk-glibc-gconv-libjis i686_nativesdk 2.31
+nativesdk-glibc-gconv-utf-16 i686_nativesdk 2.31
+nativesdk-ldconfig i686_nativesdk 2.31
+nativesdk-libc6 i686_nativesdk 2.31
+nativesdk-libcrypt2 i686_nativesdk 4.4.14
+nativesdk-libgcc1 i686_nativesdk 9.2.0
+nativesdk-libnsl2 i686_nativesdk 1.2.0+git0+4a062cf418
+nativesdk-libnss-nis2 i686_nativesdk 3.1+git0+062f31999b
+nativesdk-libstdc++6 i686_nativesdk 9.2.0
+nativesdk-libtirpc3 i686_nativesdk 1.2.5
+nativesdk-libxcrypt-compat i686_nativesdk 4.4.14
+nativesdk-patchelf i686_nativesdk 0.10
