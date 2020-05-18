@@ -256,7 +256,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     gcc \
     gcc-runtime \
     gcc-sanitizers \
-    gcc-source-9.3.0 \
+    gcc-source-10.1.0 \
     gconf \
     gcr \
     gd \
@@ -291,7 +291,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     gnome-doc-utils-stub \
     gnome-keyring \
     gnome-menus3 \
-    gnome-themes-standard \
+    gnome-themes-extra \
     gnu-config \
     gnu-efi \
     gnulib \
@@ -527,7 +527,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     libmms \
     libmnl \
     libmodule-build-perl \
-    libmodulemd \
+    libmodulemd-v1 \
     libmpc \
     libndp \
     libnet \
@@ -1136,6 +1136,15 @@ WRLINUX_SUPPORTED_RECIPES = " \
     qat17 \
     qemu \
     qemuwrapper-cross \
+    qt5everywheredemo \
+    qtbase \
+    qtdeclarative \
+    qtgraphicaleffects \
+    qtmultimedia \
+    qtsvg \
+    qttools \
+    qtx11extras \
+    qtxmlpatterns \
     quagga \
     quilt \
     quota \
@@ -1848,6 +1857,7 @@ WRLINUX_ALL_RECIPES = " \
     dleyna-server \
     dlm \
     dlt-daemon \
+    dm-verity-image-initramfs \
     dmalloc \
     dmidecode \
     dnf \
@@ -1988,7 +1998,7 @@ WRLINUX_ALL_RECIPES = " \
     gcc \
     gcc-runtime \
     gcc-sanitizers \
-    gcc-source-9.3.0 \
+    gcc-source-10.1.0 \
     gconf \
     gcr \
     gd \
@@ -2062,7 +2072,7 @@ WRLINUX_ALL_RECIPES = " \
     gnome-shell-extensions \
     gnome-system-monitor \
     gnome-terminal \
-    gnome-themes-standard \
+    gnome-themes-extra \
     gnome-tweaks \
     gnu-config \
     gnu-efi \
@@ -2223,6 +2233,7 @@ WRLINUX_ALL_RECIPES = " \
     initramfs-cube-builder \
     initramfs-debug \
     initramfs-debug-image \
+    initramfs-dm-verity \
     initramfs-framework \
     initramfs-kexecboot-image \
     initramfs-kexecboot-klibc-image \
@@ -2539,7 +2550,7 @@ WRLINUX_ALL_RECIPES = " \
     libmodule-build-tiny-perl \
     libmodule-pluggable-perl \
     libmodule-runtime-perl \
-    libmodulemd \
+    libmodulemd-v1 \
     libmoo-perl \
     libmpc \
     libmpd \
@@ -2968,7 +2979,6 @@ WRLINUX_ALL_RECIPES = " \
     mpfr \
     mpg123 \
     mpich \
-    mplayer-common \
     mpv \
     mraa \
     mscgen \
@@ -4483,6 +4493,7 @@ WRLINUX_ALL_RECIPES = " \
     rapidjson \
     raptor2 \
     rarpd \
+    rasdaemon \
     rclone \
     rdate \
     rdfind \
@@ -4772,6 +4783,7 @@ WRLINUX_ALL_RECIPES = " \
     traceroute \
     tracker \
     tracker-miners \
+    transmission \
     tree \
     tremor \
     triggerhappy \
