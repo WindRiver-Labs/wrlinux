@@ -1,0 +1,13 @@
+This template adds additional Qt libraries to the filesystem.
+
+The Qt libraries are: qtcharts, qtconnectivity, qtdeclarative, qtimageformats, qtlocation, qtmqtt, qtmultimedia, qtquickcontrols, qtquickcontrols2, qtscript, qtsensors, qtserialbus, qtserialport, qtsvg, qtsystems, qttools, qttranslations, qtwebchannel, qtwebsockets, qtxmlpatterns, qt3d, qtgraphicaleffects, qtwayland.
+
+Supported BSP: qemux86-64|bcm-2xxx-rpi4|intel-x86-64
+  --machines qemux86-64|bcm-2xxx-rpi4|intel-x86-64
+
+This template is often used with a desktop environment. Please add feature/xfce and layer meta-qt5:
+  --layers meta-qt5 --templates feature/xfce feature/qtcreator
+
+#@TYPE: Wrtemplate
+#@NAME: qtlibs
+#@DESCRIPTION: Add additional Qt libraries to the image
