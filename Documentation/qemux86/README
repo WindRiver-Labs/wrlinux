@@ -121,8 +121,8 @@ http://www.yoctoproject.org/docs/2.2/mega-manual/mega-manual.html#creating-parti
 After build the project, user will get a WIC image under the directory
 tmp-glibc/deploy/images/<bsp name>/ ,such as:
 
-tmp-glibc/deploy/images/qemux86/wrlinux-image-glibc-small-qemux86.wic
+tmp-glibc/deploy/images/qemux86/wrlinux-image-small-qemux86.wic
 
 Then user can use the below command to boot this image:
 
-$ runqemu qemux86 tmp-glibc/deploy/images/qemux86/wrlinux-image-glibc-small-qemux86.wic
+$ runqemu qemux86 tmp-glibc/deploy/images/qemux86/wrlinux-image-small-qemux86.wic

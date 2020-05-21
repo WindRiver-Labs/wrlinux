@@ -89,7 +89,7 @@ KVM HOST preparation
 
    4. Build the KVM HOST bsp:
 
-      $ bitbake wrlinux-image-glibc-std
+      $ bitbake wrlinux-image-std
 
    5. Deploy the kernel and rootfs to your target.
 
@@ -130,9 +130,9 @@ KVM GUEST preparation
 
    4. Build the KVM GUEST bsp:
 
-      $ bitbake wrlinux-image-glibc-std
+      $ bitbake wrlinux-image-std
 
-   5. Copy bzImage and wrlinux-image-glibc-std-x86-64-kvm-guest.ext4
+   5. Copy bzImage and wrlinux-image-std-x86-64-kvm-guest.ext4
       to /root directory on the KVM HOST.
 
 Demonstration
@@ -172,7 +172,7 @@ Demonstration
       -net user,hostname="kvm-guest" \
       -net nic,macaddr=1a:46:0b:ca:bc:7b,model=virtio \
       -net tap,fd=3 3<>/dev/tap7 \
-      -drive file=wrlinux-image-glibc-std-x86-64-kvm-guest.ext4,if=virtio,format=raw \
+      -drive file=wrlinux-image-std-x86-64-kvm-guest.ext4,if=virtio,format=raw \
       -kernel bzImage \
       -append "root=/dev/vda rw console=ttyS0,115200"
 

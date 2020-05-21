@@ -63,7 +63,7 @@ kernel (git whatchanged <kernel_type>..<bsp_name>). For example:
 Since this BSP is targeted to a QEMU simulated board, run the command
 below in the project directory to run the BSP on top of QEMU:
 
-$ bitbake wrlinux-image-glibc-std
+$ bitbake wrlinux-image-std
 
 
 3.1 Ext4 Root File System
