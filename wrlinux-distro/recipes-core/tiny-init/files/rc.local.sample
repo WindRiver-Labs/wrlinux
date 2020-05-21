@@ -10,7 +10,7 @@ echo "Running /etc/rc.local..."
 #setsid /sbin/getty 115200 ttyS2
 
 # Print a banner
-#echo "You are running a glibc-tiny image"
+#echo "You are running a tiny image"
 
 # Setup a debugging environment
 #mkdir /debugfs

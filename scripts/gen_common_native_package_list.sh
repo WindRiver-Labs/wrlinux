@@ -92,8 +92,8 @@ mkdir -p plists
 
 # For each active bsp extract the native packages it requires from the
 # package-depends graph file that runbb creates.
-# This assumes the glibc-std-sato is a superset of the native packages
-# required for each bsp and other rootfs like glibc-std.
+# This assumes the std-sato is a superset of the native packages
+# required for each bsp and other rootfs like std.
 #
 for bsp in $bsps; do
     echo "Processing $bsp"

@@ -5,11 +5,11 @@ DESCRIPTION = "An image with Sato support."
 
 LICENSE = "MIT"
 
-# we just extend glibc-std
+# we just extend std image
 #
 require recipes-base/images/wrlinux-image-std.bb
 
-# override PR in glibc-std
+# override PR in std image
 #
 PR = "r1"
 

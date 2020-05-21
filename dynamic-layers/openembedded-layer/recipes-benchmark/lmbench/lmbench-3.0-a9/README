@@ -6,7 +6,7 @@ Test steps:
 1) $ setup.sh \
 --machines=qemux86-64 --kernel=standard --templates=feature/test --distro=wrlinux
 
-$ bitbake wrlinux-image-glibc-std
+$ bitbake wrlinux-image-std
 
 2) boot target
 Roofs on local storage (such as harddisk) is strongly recommended for benchmark test.

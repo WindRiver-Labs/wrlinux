@@ -19,7 +19,6 @@ IMAGE_INSTALL += " \
 
 IMAGE_INSTALL_append_qemux86-64 = " dpdk"
 
-# Taken from wr-base/recipes-base/images/wrlinux-image-glibc-std.bb
 IMAGE_INSTALL += " \
     kernel-modules \
     packagegroup-base-extended \
@@ -29,7 +28,6 @@ IMAGE_INSTALL += " \
     packagegroup-wr-boot \
     "
 
-# Taken from wr-base/recipes-base/images/wrlinux-image-glibc-std.bb
 IMAGE_FEATURES += " \
     nfs-server \
     package-management \

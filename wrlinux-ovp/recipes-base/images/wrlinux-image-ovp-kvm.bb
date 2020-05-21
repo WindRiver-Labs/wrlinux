@@ -45,7 +45,6 @@ IMAGE_INSTALL += " \
    ceph \
 "
 
-# Taken from wr-base/recipes-base/images/wrlinux-image-glibc-std.bb
 IMAGE_FEATURES += " \
     nfs-server \
     package-management \

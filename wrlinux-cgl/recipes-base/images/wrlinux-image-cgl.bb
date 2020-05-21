@@ -1,11 +1,11 @@
 #
 # Copyright (C) 2012 Wind River Systems, Inc.
 #
-DESCRIPTION = "An image which approximates WRLinux 4.3 glibc-cgl."
+DESCRIPTION = "An image which approximates WRLinux 4.3 cgl."
 
 LICENSE = "MIT"
 
-# we extend glibc-std
+# we extend std image
 require recipes-base/images/wrlinux-image-std.bb
 
 
