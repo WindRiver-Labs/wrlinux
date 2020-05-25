@@ -1086,7 +1086,10 @@ WRLINUX_SUPPORTED_RECIPES = " \
     python3-pyasn1-modules \
     python3-pycairo \
     python3-pycparser \
+    python3-pycryptodome \
+    python3-pycryptodomex \
     python3-pydbus \
+    python3-pyelftools \
     python3-pygments \
     python3-pygobject \
     python3-pyhamcrest \
@@ -1121,6 +1124,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     python3-termcolor \
     python3-testtools \
     python3-texttable \
+    python3-toml \
     python3-twisted \
     python3-urllib3 \
     python3-vcversioner \
@@ -2720,9 +2724,7 @@ WRLINUX_ALL_RECIPES = " \
     libuv \
     libva \
     libva-initial \
-    libva-intel \
     libva-utils \
-    libva-utils-intel \
     libvcard \
     libvdpau \
     libvirt \
@@ -3866,16 +3868,19 @@ WRLINUX_ALL_RECIPES = " \
     python3-aenum \
     python3-aiofiles \
     python3-aiohttp \
+    python3-aiohttp-jinja2 \
     python3-alembic \
     python3-amqp \
     python3-amqplib \
     python3-anaconda \
     python3-ansi2html \
     python3-ansible \
+    python3-ansicolors \
     python3-anyjson \
     python3-appdirs \
     python3-apply-defaults \
     python3-argcomplete \
+    python3-argh \
     python3-arpeggio \
     python3-arrow \
     python3-asn1crypto \
@@ -3886,6 +3891,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-atomicwrites \
     python3-attr \
     python3-attrs \
+    python3-autobahn \
     python3-automat \
     python3-avahi \
     python3-aws-iot-device-sdk-python \
@@ -3911,6 +3917,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-can \
     python3-cassandra-driver \
     python3-cbor \
+    python3-cbor2 \
     python3-cephclient \
     python3-certifi \
     python3-cffi \
@@ -4019,6 +4026,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-google-cloud-storage \
     python3-google-resumable-media \
     python3-googleapis-common-protos \
+    python3-graphviz \
     python3-greenlet \
     python3-grpc-google-iam-v1 \
     python3-grpcio \
@@ -4091,6 +4099,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-luma-core \
     python3-luma-oled \
     python3-lxml \
+    python3-lz4 \
     python3-m2crypto \
     python3-magic \
     python3-mako \
@@ -4151,6 +4160,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-pastedeploy \
     python3-pathlib \
     python3-pathlib2 \
+    python3-pathtools3 \
     python3-pbr \
     python3-pecan \
     python3-pep8 \
@@ -4184,6 +4194,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-ptyprocess \
     python3-pulsectl \
     python3-py \
+    python3-py-ubjson \
     python3-pyalsaaudio \
     python3-pyasn1 \
     python3-pyasn1-modules \
@@ -4314,6 +4325,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-smbus \
     python3-smbus2 \
     python3-smmap \
+    python3-snappy \
     python3-socketio \
     python3-soupsieve \
     python3-speaklater \
@@ -4350,15 +4362,19 @@ WRLINUX_ALL_RECIPES = " \
     python3-tornado \
     python3-tox \
     python3-tqdm \
+    python3-trafaret \
+    python3-trafaret-config \
     python3-transitions \
     python3-twine \
     python3-twisted \
     python3-twitter \
     python3-twofish \
+    python3-txaio \
     python3-txws \
     python3-typeguard \
     python3-typing-extensions \
     python3-tzlocal \
+    python3-u-msgpack-python \
     python3-ujson \
     python3-unidiff \
     python3-uritemplate \
@@ -4372,6 +4388,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-vsts-cd-manager \
     python3-waitress \
     python3-warlock \
+    python3-watchdog \
     python3-wcwidth \
     python3-weakrefmethod \
     python3-webcolors \
@@ -4391,6 +4408,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-xlrd \
     python3-xmlrunner \
     python3-xmltodict \
+    python3-xmodem \
     python3-xstatic \
     python3-xstatic-angular-bootstrap \
     python3-xstatic-angular-cookies \
@@ -4456,6 +4474,7 @@ WRLINUX_ALL_RECIPES = " \
     qtquick3d \
     qtquickcontrols \
     qtquickcontrols2 \
+    qtquicktimeline \
     qtremoteobjects \
     qtscript \
     qtscxml \
