@@ -1,0 +1,125 @@
+#!/bin/sh
+# Copyright (C) 2011 O.S. Systems Software LTDA.
+# Licensed on MIT
+
+resizefs_enabled() {
+	if [ -z "$bootparam_root" ]; then
+		fatal "root=XXX not found in boot params"
+		return 1
+	fi
+	if [ "`echo ${bootparam_root} | cut -c1-9`" != "PARTUUID=" ]; then
+		fatal "root=PARTUUID=XXX not found in boot params"
+		return 1
+	fi
+
+	root_partuuid=`echo $bootparam_root | cut -c10-`
+	part=`blkid | grep $root_partuuid | cut -f 1 -d ':'`
+	export disk=`get_disk_name $part`
+	parted -s $disk print 2>&1 | grep "Warning: Not all of the space available.*" -q
+	if [ $? -eq 0 ]; then
+		msg "Start resize rootfs..."
+		return 0
+	fi
+
+	return 1
+}
+
+# Update UUID of /boot partition in grub.cfg
+update_grubcfg() {
+	old_root_uuid=$1
+	new_root_uuid=$2
+	boot_uuid=$3
+
+	boot_dev="/dev/disk/by-uuid/$boot_uuid"
+	mkdir -p /boot
+	mount $boot_dev /boot
+	sed -i "s:$old_root_uuid:$new_root_uuid:g" /boot/EFI/BOOT/grub.cfg
+	umount /boot
+}
+
+# Reisze last partition to increase filesystem size
+resize_rootfs() {
+	part="$1"
+
+	# Such as /dev/sda1 -> /dev/sda
+	disk=`get_disk_name $part`
+
+	sgdisk -e $disk
+	last_part_index=`sgdisk -p $disk | sed -n '/Number  Start/,+10p;' | wc -l`
+	last_part_index=$(expr $last_part_index - 1)
+	sgdisk -d $last_part_index $disk
+	sgdisk -N $last_part_index $disk
+	partprobe $disk
+	e2fsck -f $part
+	resize2fs -f $part
+}
+
+# /dev/sda1 -> /dev/sda
+get_disk_name() {
+	part=$1
+	part=${part#/dev/}
+	disk=$(readlink /sys/class/block/$part)
+	disk=${disk%/*}
+	disk=/dev/${disk##*/}
+	echo $disk
+}
+
+resizefs_run() {
+	if [ -z "$ROOTFS_DIR" ]; then
+		return
+	fi
+
+	# Umount other media which is mounted by udev
+	killall `basename $_UDEV_DAEMON` 2>/dev/null
+	for dir in `awk '/\/dev.* \/run\/media/{print $2}' /proc/mounts`; do
+		umount $dir
+	done
+
+	C=0
+	delay=${bootparam_rootdelay:-1}
+	timeout=${bootparam_roottimeout:-5}
+	while [ ! -d $ROOTFS_DIR/dev ]; do
+		if [ $(( $C * $delay )) -gt $timeout ]; then
+			fatal "root '$bootparam_root' doesn't exist or does not contain a /dev."
+		fi
+
+		if [ -n "$bootparam_root" ]; then
+			debug "No e2fs compatible filesystem has been mounted, Reiszing fs $bootparam_root..."
+
+			if [ "`echo ${bootparam_root} | cut -c1-9`" = "PARTUUID=" ]; then
+				root_partuuid=`echo $bootparam_root | cut -c10-`
+				bootparam_root="/dev/disk/by-partuuid/$root_partuuid"
+			fi
+
+			if [ -e "$bootparam_root" ]; then
+				flags=""
+				if [ -n "$bootparam_rootfstype" ]; then
+					flags="$flags -t$bootparam_rootfstype"
+				fi
+
+				# Get /boot's UUID from /rootfs/etc.fstab
+				mount $flags $bootparam_root $ROOTFS_DIR
+				boot_uuid=`grep "^UUID=.*/boot" $ROOTFS_DIR/etc/fstab | cut -f 1 | cut -d '=' -f 2`
+				umount $ROOTFS_DIR
+
+				# Resize rootfs
+				part=`blkid | grep $root_partuuid | cut -f 1 -d ':'`
+				resize_rootfs $part
+
+				# Update new rootfs PARTUUID to grub.cfg
+				new_root_partuuid=`blkid  $part -o export | grep PARTUUID | cut -f 2 -d '='`
+				update_grubcfg $root_partuuid $new_root_partuuid $boot_uuid
+
+				msg "Resize rootfs done! Wait 5s and Rebooting..."
+				sleep 5
+				reboot -f
+			fi
+		fi
+		debug "Sleeping for $delay second(s) to wait root to settle..."
+		sleep $delay
+		C=$(( $C + 1 ))
+		if [ $C -eq 3  ]; then
+			sh
+		fi
+	done
+}
