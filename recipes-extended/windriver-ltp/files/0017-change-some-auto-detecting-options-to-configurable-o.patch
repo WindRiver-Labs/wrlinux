@@ -1,6 +1,6 @@
-From 29258f4201214057bbdd3ae697ea8da596521b29 Mon Sep 17 00:00:00 2001
-From: Chen Qi <Qi.Chen@windriver.com>
-Date: Sat, 18 Jan 2020 17:23:45 -0800
+From 6d6a44adb44a55a52136f2b5a57ca884675abe65 Mon Sep 17 00:00:00 2001
+From: Jin Li <jin.li@windriver.com>
+Date: Mon, 25 May 2020 18:59:02 -0700
 Subject: [PATCH] change some auto-detecting options to configurable ones
 
 Upstream-Status: Inappropriate [WR Linux specific change]
@@ -16,15 +16,18 @@ Signed-off-by: He Zhe <zhe.he@windriver.com>
 Rebase on 20200119
 
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+
+Rebase on 20200515
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  configure.ac | 60 ++++++++++++++++++++++++++++++++++++++++++++++++----
  1 file changed, 56 insertions(+), 4 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 50d1496..43190ca 100644
+index 1d3ea58d0..8a09b237e 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -205,15 +205,68 @@ fi
+@@ -289,15 +289,68 @@ fi
  
  AC_CONFIG_COMMANDS([syscalls.h], [cd ${ac_top_srcdir}/include/lapi/syscalls; ./regen.sh])
  
@@ -85,7 +88,7 @@ index 50d1496..43190ca 100644
 +# END options knobs
 +
  # custom functions
- LTP_CHECK_ACCT
+ # NOTE: don't create custom functions for simple checks, put them into this file
 -LTP_CHECK_ACL_SUPPORT
  LTP_CHECK_ATOMIC_MEMORY_MODEL
  LTP_CHECK_BUILTIN_CLEAR_CACHE
@@ -93,14 +96,17 @@ index 50d1496..43190ca 100644
  LTP_CHECK_CC_WARN_OLDSTYLE
  LTP_CHECK_CLONE_SUPPORTS_7_ARGS
 -LTP_CHECK_CRYPTO
- LTP_CHECK_FANOTIFY
- LTP_CHECK_FIDEDUPE
  LTP_CHECK_FORTIFY_SOURCE
-@@ -233,7 +286,6 @@ LTP_CHECK_NOMMU_LINUX
- LTP_CHECK_PERF_EVENT
- LTP_CHECK_PRCTL_SUPPORT
- LTP_CHECK_RLIMIT64
+ LTP_CHECK_KERNEL_DEVEL
+ LTP_CHECK_KEYUTILS_SUPPORT
+@@ -306,7 +359,6 @@ LTP_CHECK_LINUX_PTRACE
+ LTP_CHECK_LINUXRANDOM
+ LTP_CHECK_MREMAP_FIXED
+ LTP_CHECK_NOMMU_LINUX
 -LTP_CHECK_SELINUX
- LTP_CHECK_SIGNAL
- LTP_CHECK_STATX
  LTP_CHECK_SYNC_ADD_AND_FETCH
+ LTP_CHECK_SYSCALL_EVENTFD
+ LTP_CHECK_SYSCALL_FCNTL
+-- 
+2.21.0
+
