@@ -12,16 +12,13 @@ resizefs_enabled() {
 		return 1
 	fi
 
-	root_partuuid=`echo $bootparam_root | cut -c10-`
-	part=`blkid | grep $root_partuuid | cut -f 1 -d ':'`
-	export disk=`get_disk_name $part`
-	parted -s $disk print 2>&1 | grep "Warning: Not all of the space available.*" -q
-	if [ $? -eq 0 ]; then
-		msg "Start resize rootfs..."
-		return 0
-	fi
+	return 0
+}
 
-	return 1
+is_need_resizefs() {
+	part=`blkid | grep $root_partuuid | cut -f 1 -d ':'`
+	disk=`get_disk_name $part`
+	parted -s $disk print 2>&1 | grep "Warning: Not all of the space available.*" -q
 }
 
 # Update UUID of /boot partition in grub.cfg
@@ -64,16 +61,18 @@ get_disk_name() {
 	echo $disk
 }
 
-resizefs_run() {
-	if [ -z "$ROOTFS_DIR" ]; then
-		return
-	fi
-
+cleanup_mount() {
 	# Umount other media which is mounted by udev
 	killall `basename $_UDEV_DAEMON` 2>/dev/null
 	for dir in `awk '/\/dev.* \/run\/media/{print $2}' /proc/mounts`; do
 		umount $dir
 	done
+}
+
+resizefs_run() {
+	if [ -z "$ROOTFS_DIR" ]; then
+		return
+	fi
 
 	C=0
 	delay=${bootparam_rootdelay:-1}
@@ -96,6 +95,13 @@ resizefs_run() {
 				if [ -n "$bootparam_rootfstype" ]; then
 					flags="$flags -t$bootparam_rootfstype"
 				fi
+
+				cleanup_mount
+				is_need_resizefs
+				if [ $? -ne 0 ]; then
+					return
+				fi
+				msg "Start resize rootfs..."
 
 				# Get /boot's UUID from /rootfs/etc.fstab
 				mount $flags $bootparam_root $ROOTFS_DIR
