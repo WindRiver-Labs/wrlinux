@@ -383,6 +383,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     initramfs-live-install-testfs \
     initramfs-module-install \
     initramfs-module-install-efi \
+    initramfs-module-resizefs \
     initramfs-module-setup-live \
     initramfs-ostree \
     initramfs-ostree-image \
@@ -680,7 +681,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     linux-yocto-dev \
     lksctp-tools \
     llvm \
-    llvm-project-source-10.0.0 \
+    llvm-project-source-10.0.1 \
     lmbench \
     lmsensors \
     lmsensors-config \
@@ -1373,11 +1374,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     wr-themes \
     wrlinux-image-cgl \
     wrlinux-image-core \
-    wrlinux-image-glibc-cgl \
-    wrlinux-image-glibc-core \
-    wrlinux-image-glibc-small \
-    wrlinux-image-glibc-std \
-    wrlinux-image-glibc-std-sato \
     wrlinux-image-initramfs \
     wrlinux-image-installer \
     wrlinux-image-installer-initramfs \
@@ -2249,6 +2245,7 @@ WRLINUX_ALL_RECIPES = " \
     initramfs-live-install-testfs \
     initramfs-module-install \
     initramfs-module-install-efi \
+    initramfs-module-resizefs \
     initramfs-module-setup-live \
     initramfs-ostree \
     initramfs-ostree-image \
@@ -2821,7 +2818,7 @@ WRLINUX_ALL_RECIPES = " \
     lldpd \
     llvm \
     llvm-common \
-    llvm-project-source-10.0.0 \
+    llvm-project-source-10.0.1 \
     lmbench \
     lms \
     lmsensors \
@@ -4961,11 +4958,6 @@ WRLINUX_ALL_RECIPES = " \
     wr-themes \
     wrlinux-image-cgl \
     wrlinux-image-core \
-    wrlinux-image-glibc-cgl \
-    wrlinux-image-glibc-core \
-    wrlinux-image-glibc-small \
-    wrlinux-image-glibc-std \
-    wrlinux-image-glibc-std-sato \
     wrlinux-image-initramfs \
     wrlinux-image-installer \
     wrlinux-image-installer-initramfs \
