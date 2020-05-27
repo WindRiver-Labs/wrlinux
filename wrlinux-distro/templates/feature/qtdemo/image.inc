@@ -1,1 +1,1 @@
-IMAGE_INSTALL_append += " qt5everywheredemo"
+IMAGE_INSTALL_append = " qt5everywheredemo"

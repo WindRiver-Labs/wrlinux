@@ -1,1 +1,1 @@
-IMAGE_INSTALL_append += " qtbase"
+IMAGE_INSTALL_append = " qtbase"
