@@ -18,7 +18,7 @@ resizefs_enabled() {
 is_need_resizefs() {
 	part=`blkid | grep $root_partuuid | cut -f 1 -d ':'`
 	disk=`get_disk_name $part`
-	parted -s $disk print 2>&1 | grep "Warning: Not all of the space available.*" -q
+	sgdisk -v $disk | grep "Problem: The secondary header's self-pointer indicates" -q
 }
 
 # Update UUID of /boot partition in grub.cfg

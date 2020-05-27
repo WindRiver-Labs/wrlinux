@@ -5,7 +5,6 @@ RDEPENDS_${PN} = " \
     initramfs-framework-base \
     e2fsprogs-resize2fs \
     e2fsprogs-e2fsck \
-    parted \
     gptfdisk \
 "
 
