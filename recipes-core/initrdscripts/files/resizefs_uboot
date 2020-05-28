@@ -1,0 +1,99 @@
+#!/bin/sh
+# Copyright (C) 2011 O.S. Systems Software LTDA.
+# Licensed on MIT
+
+resizefs_enabled() {
+	return 0
+}
+
+is_need_resizefs() {
+	part=$1
+	disk=`get_disk_name $part`
+
+	disk_sect=`fdisk -l $disk | head -n 1 |awk '{print $7}'`
+	part_end=`fdisk -l $disk | grep ^${part} | awk '{print $3}'`
+	disk_end=$(expr $disk_sect - 1026)
+	if [ $part_end -ge $disk_end ]; then
+		echo "No need to resizefs."
+		return 1
+	fi
+	return 0
+}
+
+# Reisze partition to increase filesystem size
+resize_rootfs() {
+	part=$1
+	disk=`get_disk_name $part`
+	partdevnum=$(echo ${part} | sed 's/\(.*\)\(.\)$/\2/')
+
+	echo ", +" | sfdisk -N $partdevnum $disk
+	cnt=50
+	while [ $cnt ] ; do
+		blockdev --rereadpt $disk 2> /dev/null > /dev/null && break
+		sleep 0.1
+		cnt=$(($cnt - 1))
+	done
+	sync
+
+	resize2fs -f ${part}
+}
+
+# /dev/sda1 -> /dev/sda
+get_disk_name() {
+	part=$1
+	part=${part#/dev/}
+	disk=$(readlink /sys/class/block/$part)
+	disk=${disk%/*}
+	disk=/dev/${disk##*/}
+	echo $disk
+}
+
+cleanup_mount() {
+	# Umount other media which is mounted by udev
+	killall `basename $_UDEV_DAEMON` 2>/dev/null
+	for dir in `awk '/\/dev.* \/run\/media/{print $2}' /proc/mounts`; do
+		umount $dir
+	done
+}
+
+resizefs_run() {
+	if [ -z "$ROOTFS_DIR" ]; then
+		return
+	fi
+
+	C=0
+	delay=${bootparam_rootdelay:-1}
+	timeout=${bootparam_roottimeout:-5}
+	while [ ! -d $ROOTFS_DIR/dev ]; do
+		if [ $(( $C * $delay )) -gt $timeout ]; then
+			fatal "root '$bootparam_root' doesn't exist or does not contain a /dev."
+		fi
+
+		if [ -n "$bootparam_root" ]; then
+			debug "No e2fs compatible filesystem has been mounted, Reiszing fs $bootparam_root..."
+
+			if [ -e "$bootparam_root" ]; then
+				cleanup_mount
+
+				is_need_resizefs $bootparam_root
+				if [ $? -ne 0 ]; then
+					return
+				fi
+				msg "Start resize rootfs..."
+
+				# Resize rootfs
+				resize_rootfs $bootparam_root
+
+				msg "Resize rootfs done! Wait 5s and Rebooting..."
+				sleep 5
+				reboot -f
+			fi
+		fi
+		debug "Sleeping for $delay second(s) to wait root to settle..."
+		sleep $delay
+		C=$(( $C + 1 ))
+		if [ $C -eq 3  ]; then
+			sh
+		fi
+	done
+}
