@@ -895,6 +895,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     packagegroup-ovp-lttng-toolchain \
     packagegroup-ovp-trace-tools \
     packagegroup-ovp-vm \
+    packagegroup-qt5-toolchain-target \
     packagegroup-self-hosted \
     packagegroup-selinux-policycoreutils \
     packagegroup-service-discovery \
@@ -1141,13 +1142,31 @@ WRLINUX_SUPPORTED_RECIPES = " \
     qat17 \
     qemu \
     qemuwrapper-cross \
+    qt3d \
+    qt5-creator \
     qt5everywheredemo \
     qtbase \
+    qtcharts \
+    qtconnectivity \
     qtdeclarative \
     qtgraphicaleffects \
+    qtimageformats \
+    qtlocation \
+    qtmqtt \
     qtmultimedia \
+    qtquickcontrols \
+    qtquickcontrols2 \
+    qtscript \
+    qtsensors \
+    qtserialbus \
+    qtserialport \
     qtsvg \
+    qtsystems \
     qttools \
+    qttranslations \
+    qtwayland \
+    qtwebchannel \
+    qtwebsockets \
     qtx11extras \
     qtxmlpatterns \
     quagga \
