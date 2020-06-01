@@ -58,7 +58,7 @@ echo 0 > tracing_on
 echo > trace
 
 # set the tracing function
-# do_sys_open to track file open
+# do_sys_open or do_sys_openat2 to track file open
 # ksys_read to track file read
 # ksys_write to track file write
 # __close_fd to track file close
@@ -70,6 +70,13 @@ echo > set_ftrace_filter
 # and both SyS_open and compat_SyS_open will 
 # continue to call do_sys_open
 echo do_sys_open > set_ftrace_filter
+# From v5.7 kernel, it introduce openat2 syscall and
+# do_sys_open is implemented by do_sys_openat2. In 
+# addition, we can't trace do_sys_open from v5.7
+# for the kernel optimization. So use do_sys_openat2
+# instead.
+echo do_sys_openat2 >> set_ftrace_filter
+
 echo ksys_read >>  set_ftrace_filter
 echo ksys_write >>  set_ftrace_filter
 echo __close_fd >>  set_ftrace_filter
@@ -90,6 +97,7 @@ then
     cutfail
 fi
 # add to check do_sys_open
+# It might be do_sys_open or do_sys_openat2, both are right.
 cat trace|grep file_test-${pid_f}|grep do_sys_open || cutfail
 cat trace|grep file_test-${pid_f}|grep ksys_read || cutfail
 cat trace|grep file_test-${pid_f}|grep ksys_write || cutfail
