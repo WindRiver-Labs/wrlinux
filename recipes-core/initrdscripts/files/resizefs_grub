@@ -16,9 +16,17 @@ resizefs_enabled() {
 }
 
 is_need_resizefs() {
-	part=`blkid | grep $root_partuuid | cut -f 1 -d ':'`
+	part=$1
 	disk=`get_disk_name $part`
-	sgdisk -v $disk | grep "Problem: The secondary header's self-pointer indicates" -q
+
+	disk_sect=`fdisk -l $disk | head -n 1 |awk '{print $7}'`
+	part_end=`fdisk -l $disk | grep ^${part} | awk '{print $3}'`
+	disk_end=$(expr $disk_sect - 1026)
+	if [ $part_end -ge $disk_end ]; then
+		echo "No need to resizefs."
+		return 1
+	fi
+	return 0
 }
 
 # Update UUID of /boot partition in grub.cfg
@@ -34,21 +42,21 @@ update_grubcfg() {
 	umount /boot
 }
 
-# Reisze last partition to increase filesystem size
+# Reisze partition to increase filesystem size
 resize_rootfs() {
-	part="$1"
-
-	# Such as /dev/sda1 -> /dev/sda
+	part=$1
 	disk=`get_disk_name $part`
+	partdevnum=$(echo ${part} | sed 's/\(.*\)\(.\)$/\2/')
 
-	sgdisk -e $disk
-	last_part_index=`sgdisk -p $disk | sed -n '/Number  Start/,+10p;' | wc -l`
-	last_part_index=$(expr $last_part_index - 1)
-	sgdisk -d $last_part_index $disk
-	sgdisk -N $last_part_index $disk
-	partprobe $disk
-	e2fsck -f $part
-	resize2fs -f $part
+	echo ", +" | sfdisk -N $partdevnum $disk 2> /dev/null > /dev/null
+	cnt=50
+	while [ $cnt ] ; do
+		blockdev --rereadpt $disk 2> /dev/null > /dev/null && break
+		sleep 0.1
+		cnt=$(($cnt - 1))
+	done
+	sync
+	resize2fs -f ${part}
 }
 
 # /dev/sda1 -> /dev/sda
@@ -97,7 +105,8 @@ resizefs_run() {
 				fi
 
 				cleanup_mount
-				is_need_resizefs
+				part=`blkid | grep $root_partuuid | cut -f 1 -d ':'`
+				is_need_resizefs $part
 				if [ $? -ne 0 ]; then
 					return
 				fi
@@ -109,7 +118,6 @@ resizefs_run() {
 				umount $ROOTFS_DIR
 
 				# Resize rootfs
-				part=`blkid | grep $root_partuuid | cut -f 1 -d ':'`
 				resize_rootfs $part
 
 				# Update new rootfs PARTUUID to grub.cfg
