@@ -1,1 +1,1 @@
-IMAGE_INATLL_append += " ecryptfs-utils"
+IMAGE_INSTALL += " ecryptfs-utils"
