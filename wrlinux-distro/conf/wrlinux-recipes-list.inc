@@ -190,6 +190,8 @@ WRLINUX_SUPPORTED_RECIPES = " \
     diod \
     distcc \
     distcc-config \
+    dldt-inference-engine \
+    dldt-model-optimizer \
     dmidecode \
     dnf \
     dnsmasq \
@@ -474,6 +476,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     libdnf \
     libdrm \
     libedit \
+    libeigen \
     libepoxy \
     liberation-fonts \
     liberror-perl \
@@ -795,6 +798,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     nfs-export-root \
     nfs-utils \
     nginx \
+    ngraph \
     ninja \
     nmap \
     notary \
@@ -816,7 +820,9 @@ WRLINUX_SUPPORTED_RECIPES = " \
     ofono \
     onig \
     open-isns \
+    open-model-zoo \
     open-vm-tools \
+    opencv \
     openhpi \
     openipmi \
     openjpeg \
@@ -974,6 +980,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     psplash \
     ptest-runner \
     ptpd \
+    pugixml \
     pulseaudio \
     pulseaudio-client-conf-sato \
     puzzles \
@@ -1014,6 +1021,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     python3-dbus \
     python3-dbusmock \
     python3-decorator \
+    python3-defusedxml \
     python3-distutils-extra \
     python3-django \
     python3-django-south \
@@ -1124,6 +1132,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     python3-subunit \
     python3-systemd \
     python3-termcolor \
+    python3-test-generator \
     python3-testtools \
     python3-texttable \
     python3-toml \
@@ -3130,6 +3139,7 @@ WRLINUX_ALL_RECIPES = " \
     open-iscsi-kernel \
     open-iscsi-user \
     open-isns \
+    open-model-zoo \
     open-vm-tools \
     openal-soft \
     openbox \
@@ -3920,6 +3930,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-beautifulsoup4 \
     python3-behave \
     python3-bitarray \
+    python3-bitstring \
     python3-blinker \
     python3-blivet \
     python3-blivetgui \
