@@ -119,7 +119,8 @@ DISTRO_FEATURES_BACKFILL_CONSIDERED += "x11"
 
 # Multilib configuration
 MULTILIBS ?= ""
-require conf/multilib.conf
+MULTILIB_CONF = "${@'conf/multilib.conf' if d.getVar('MULTILIBS') else ''}"
+require ${MULTILIB_CONF}
 
 # we usually use gnutls as the default PACKAGECONFIG of wpa-supplicant, but its sub-packege gnutls-openssl
 # is GPLv3, so need this check to switch to openssl if GLPv3 is blacklisted.
