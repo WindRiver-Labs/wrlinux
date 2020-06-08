@@ -374,6 +374,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     indent \
     inetutils \
     init-ifupdown \
+    init-system-helpers \
     initramfs-boot \
     initramfs-cube-builder \
     initramfs-framework \
@@ -531,7 +532,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     libmms \
     libmnl \
     libmodule-build-perl \
-    libmodulemd-v1 \
+    libmodulemd \
     libmpc \
     libndp \
     libnet \
@@ -2256,6 +2257,7 @@ WRLINUX_ALL_RECIPES = " \
     inetutils \
     iniparser \
     init-ifupdown \
+    init-system-helpers \
     initramfs-boot \
     initramfs-cgl-boot \
     initramfs-cube-builder \
@@ -2579,7 +2581,7 @@ WRLINUX_ALL_RECIPES = " \
     libmodule-build-tiny-perl \
     libmodule-pluggable-perl \
     libmodule-runtime-perl \
-    libmodulemd-v1 \
+    libmodulemd \
     libmoo-perl \
     libmpc \
     libmpd \
