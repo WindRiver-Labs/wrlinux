@@ -1,0 +1,22 @@
+CBAS
+==================
+
+Phase 1 - Create Full Image Generator
+
+The current full image generation for the OSTree uses two bbclasses
+and an the result of the typical image recipe generation from the
+OE-Core.
+
+We need to be able to assemble full images using only the RPM packages,
+and pass the resulting file system(s) to the WIC tool like is done in
+the bootfs.sh tool which can generate the ustart.img images. Any new
+image that is generated should be able to be checked into an OSTree
+branch, much like what happens when you build core-image-minimal for
+example from a build with the feature/ostree.
+
+The important part here is that you do not have to use bitbake to
+create an image.
+
+The package list for the new images can be specified in a yaml file
+along with any other scripts that may need to be executed to finalize
+an image.
