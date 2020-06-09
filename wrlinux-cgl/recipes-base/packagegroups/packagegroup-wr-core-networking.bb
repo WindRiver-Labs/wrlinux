@@ -39,7 +39,6 @@ RDEPENDS_${PN} = "\
 	netkit-rsh-client \
 	netkit-telnet \
 	ppp \
-	python-paste \
 	radvd \
 	rdate \
 	rdist \

@@ -988,7 +988,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     pv \
     python \
     python-lxml \
-    python-paste \
     python-pip \
     python-py \
     python-pytest-runner \
