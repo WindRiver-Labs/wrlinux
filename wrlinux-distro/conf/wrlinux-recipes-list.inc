@@ -1558,6 +1558,7 @@ WRLINUX_ALL_RECIPES = " \
     alsa-ucm-conf \
     alsa-utils \
     alsa-utils-scripts \
+    amtk \
     anaconda-init \
     android-tools \
     android-tools-conf \
@@ -2051,6 +2052,7 @@ WRLINUX_ALL_RECIPES = " \
     gerbera \
     gettext \
     gexiv2 \
+    gfbgraph \
     gflags \
     ghex \
     ghostscript \
@@ -2094,6 +2096,7 @@ WRLINUX_ALL_RECIPES = " \
     gnome-menus3 \
     gnome-online-accounts \
     gnome-panel \
+    gnome-photos \
     gnome-session \
     gnome-settings-daemon \
     gnome-shell \
@@ -2145,6 +2148,7 @@ WRLINUX_ALL_RECIPES = " \
     gptfdisk \
     gradm \
     grail \
+    graphene \
     graphviz \
     grep \
     grilo \
@@ -2386,6 +2390,7 @@ WRLINUX_ALL_RECIPES = " \
     lemon \
     leptonica \
     less \
+    level-zero \
     leveldb \
     lftp \
     lib-perl \
@@ -3128,6 +3133,7 @@ WRLINUX_ALL_RECIPES = " \
     oci-runtime-spec \
     oci-runtime-tools \
     oci-systemd-hook \
+    ocl-icd \
     octave \
     oe-scap \
     ofono \
@@ -4787,6 +4793,7 @@ WRLINUX_ALL_RECIPES = " \
     tensorflow \
     tensorflow-estimator \
     tensorflow-for-poets \
+    tepl \
     terminus-font \
     tesseract \
     tesseract-lang \
@@ -4822,6 +4829,7 @@ WRLINUX_ALL_RECIPES = " \
     tomoyo-tools \
     toscoterm \
     toybox \
+    toybox-inittab \
     tpm-quote-tools \
     tpm-tools \
     tpm2-abrmd \
@@ -4875,6 +4883,7 @@ WRLINUX_ALL_RECIPES = " \
     u-boot-uenv \
     ubi-utils-klibc \
     ucarp \
+    uchardet \
     udev-extraconf \
     udevil \
     udisks2 \
