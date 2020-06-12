@@ -77,7 +77,7 @@ run with -h will show you the available target devices can be specified by -d
 
 OpenVNIO model optimizer support convert Pre-trained models to IR files which can
 be used by Inference Engine directly, but it does not support training modes.
-for WRLinux, it supports convert Tensorflow Pre-trained models to IR files.
+for WRLinux, it supports convert Tensorflow and Caffee Pre-trained models to IR files.
 Build with template feature/tensorflow to enable tensorflow in WRLinux.
 
 A sample to convert TF models to IR files:
@@ -88,6 +88,18 @@ A sample to convert TF models to IR files:
    [ SUCCESS ] BIN file: /root/./tf_model.bin
    [ SUCCESS ] Total execution time: 62.22 seconds.
    [ SUCCESS ] Memory consumed: 813 MB.
+
+Another way to convert models is using converter.py in
+/usr/share/openvino/open-model-zoo/tools/downloader/
+it support convert TF and Caffe model.
+
+   # TF Model
+   $ /usr/share/openvino/open-model-zoo/tools/downloader/downloader.py --name googlenet-v3
+   $ /usr/share/openvino/open-model-zoo/tools/downloader/converter.py --name googlenet-v3 --mo /usr/share/openvino/model-optimizer/mo.py
+
+   # Caffee Model
+   $ /usr/share/openvino/open-model-zoo/tools/downloader/downloader.py --name caffenet
+   $ /usr/share/openvino/open-model-zoo/tools/downloader/converter.py --name caffenet --mo /usr/share/openvino/model-optimizer/mo.py
 
 
 5. Additional documentation
@@ -104,11 +116,15 @@ requests.exceptions.SSLError: HTTPSConnectionPool(host='download.01.org', port=4
 
 This is due to a slow network rate, or we may need a network proxy to download it.
 
-2) converter.py is not supported since the dependency tools torch, torchvision and scipy was not available in yocto
+2) converter.py is not supported to convert mxnet/onnx/caffe2/pytorch model since
+   the model itself and dependency tools torch, torchvision and scipy are not
+   available in yocto
 
 3) run demos with .mp4 file may failed since gstreamer1.0-libav was not installed,
    add the following line to conf/local.conf to install it:
 
+   BB_NO_NETWORK ?= '0'
+   # WARNING, these settings will install commercial packages on target images.
    LICENSE_FLAGS_WHITELIST_append = " commercial"
    IMAGE_INSTALL_append = " gstreamer1.0-libav"
 
