@@ -35,6 +35,8 @@ DEPENDS = "\
     debianutils-native \
     desktop-file-utils-native \
     dnf-native \
+    docbook-xml-dtd4-native \
+    docbook-xsl-stylesheets-native \
     dosfstools-native \
     dtc-native \
     dwarfsrcfiles-native \
@@ -79,6 +81,8 @@ DEPENDS = "\
     libcomps-native \
     libcroco-native \
     libdnf-native \
+    libdrm-native \
+    libepoxy-native \
     libffi-native \
     libfontenc-native \
     libgpg-error-native \
@@ -87,6 +91,7 @@ DEPENDS = "\
     libmodulemd-native \
     libmpc-native \
     libnsl2-native \
+    libpciaccess-native \
     libpcre-native \
     libpcre2-native \
     libpng-native \
@@ -115,6 +120,7 @@ DEPENDS = "\
     libxrender-native \
     libxslt-native \
     libxtst-native \
+    libxxf86vm-native \
     libyaml-native \
     lz4-native \
     lzip-native \
@@ -124,6 +130,7 @@ DEPENDS = "\
     make-native \
     makedepend-native \
     makedevs-native \
+    mesa-native \
     meson-native \
     mkfontscale-native \
     mklibs-native \
@@ -182,9 +189,12 @@ DEPENDS = "\
     update-rc.d-native \
     util-linux-native \
     util-macros-native \
+    virglrenderer-native \
     wayland-native \
     xcb-proto-native \
+    xmlto-native \
     xorgproto-native \
+    xrandr-native \
     xtrans-native \
     xz-native \
     zlib-native \
