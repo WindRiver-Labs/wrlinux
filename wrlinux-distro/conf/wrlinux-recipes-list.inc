@@ -190,7 +190,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     diod \
     distcc \
     distcc-config \
-    dldt-inference-engine \
     dldt-model-optimizer \
     dmidecode \
     dnf \
@@ -396,6 +395,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     initscripts \
     intel-microcode \
     intel-pcm \
+    intel-speed-select \
     intltool \
     iotop \
     iozone3 \
@@ -1263,6 +1263,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     spf13-pflag \
     spice \
     spice-protocol \
+    sqlite \
     sqlite3 \
     squashfs-tools \
     sssd \
@@ -1663,6 +1664,7 @@ WRLINUX_ALL_RECIPES = " \
     byacc \
     bzip2 \
     c-ares \
+    c-periphery \
     c3-app-container \
     c3-systemd-container \
     ca-certificates \
@@ -1878,7 +1880,6 @@ WRLINUX_ALL_RECIPES = " \
     distcc \
     distcc-config \
     distro-feed-configs \
-    dldt-inference-engine \
     dldt-model-optimizer \
     dleyna-connector-dbus \
     dleyna-core \
@@ -2024,6 +2025,7 @@ WRLINUX_ALL_RECIPES = " \
     gateone \
     gattlib \
     gawk \
+    gcab \
     gcc \
     gcc-runtime \
     gcc-sanitizers \
@@ -2225,6 +2227,7 @@ WRLINUX_ALL_RECIPES = " \
     htpdate \
     http-parser \
     http-parser.rb \
+    httpfs2 \
     hunspell \
     hunspell-dictionaries \
     hwdata \
@@ -2293,6 +2296,7 @@ WRLINUX_ALL_RECIPES = " \
     intel-mediasdk \
     intel-microcode \
     intel-pcm \
+    intel-speed-select \
     intel-vaapi-driver \
     intltool \
     iotop \
@@ -2545,6 +2549,7 @@ WRLINUX_ALL_RECIPES = " \
     libio-stringy-perl \
     libipc-signal-perl \
     libipt \
+    libjcat \
     libjitterentropy \
     libjpeg-turbo \
     libjs-jquery \
@@ -2809,6 +2814,7 @@ WRLINUX_ALL_RECIPES = " \
     libxml-sax-writer-perl \
     libxml-simple-perl \
     libxml2 \
+    libxmlb \
     libxmu \
     libxpm \
     libxpresent \
@@ -3184,6 +3190,7 @@ WRLINUX_ALL_RECIPES = " \
     openstack-image-compute \
     openstack-image-controller \
     openstack-image-network \
+    openvino-inference-engine \
     openvpn \
     openvswitch \
     openwsman \
