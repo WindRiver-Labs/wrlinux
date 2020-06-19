@@ -190,6 +190,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     diod \
     distcc \
     distcc-config \
+    dldt-inference-engine \
     dldt-model-optimizer \
     dmidecode \
     dnf \
@@ -1880,6 +1881,7 @@ WRLINUX_ALL_RECIPES = " \
     distcc \
     distcc-config \
     distro-feed-configs \
+    dldt-inference-engine \
     dldt-model-optimizer \
     dleyna-connector-dbus \
     dleyna-core \
@@ -3190,7 +3192,6 @@ WRLINUX_ALL_RECIPES = " \
     openstack-image-compute \
     openstack-image-controller \
     openstack-image-network \
-    openvino-inference-engine \
     openvpn \
     openvswitch \
     openwsman \
