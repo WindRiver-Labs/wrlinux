@@ -191,7 +191,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     distcc \
     distcc-config \
     dldt-inference-engine \
-    dldt-model-optimizer \
     dmidecode \
     dnf \
     dnsmasq \
@@ -1882,7 +1881,6 @@ WRLINUX_ALL_RECIPES = " \
     distcc-config \
     distro-feed-configs \
     dldt-inference-engine \
-    dldt-model-optimizer \
     dleyna-connector-dbus \
     dleyna-core \
     dleyna-renderer \
@@ -3159,6 +3157,7 @@ WRLINUX_ALL_RECIPES = " \
     openal-soft \
     openbox \
     opencl-clang \
+    opencl-clhpp \
     opencl-headers \
     opencl-icd-loader \
     openconnect \
@@ -3192,6 +3191,7 @@ WRLINUX_ALL_RECIPES = " \
     openstack-image-compute \
     openstack-image-controller \
     openstack-image-network \
+    openvino-model-optimizer \
     openvpn \
     openvswitch \
     openwsman \
@@ -3533,7 +3533,6 @@ WRLINUX_ALL_RECIPES = " \
     python-falcon \
     python-feedformatter \
     python-feedparser \
-    python-fixtures \
     python-flake8 \
     python-flask \
     python-flask-babel \
@@ -3558,7 +3557,6 @@ WRLINUX_ALL_RECIPES = " \
     python-functools32 \
     python-future \
     python-futures \
-    python-futurist \
     python-gdata \
     python-gevent \
     python-gevent-websocket \
@@ -3600,7 +3598,6 @@ WRLINUX_ALL_RECIPES = " \
     python-javaobj-py3 \
     python-jinja2 \
     python-jsmin \
-    python-jsonext \
     python-jsonpatch \
     python-jsonpath-rw \
     python-jsonpath-rw-ext \
@@ -3633,7 +3630,6 @@ WRLINUX_ALL_RECIPES = " \
     python-monotonic \
     python-more-itertools \
     python-mox \
-    python-mox3 \
     python-mprpc \
     python-msgpack \
     python-ndg-httpsclient \
@@ -3644,7 +3640,6 @@ WRLINUX_ALL_RECIPES = " \
     python-neutron \
     python-neutron-lib \
     python-neutronclient \
-    python-nose-exclude \
     python-nova \
     python-novaclient \
     python-novnc \
@@ -3660,7 +3655,6 @@ WRLINUX_ALL_RECIPES = " \
     python-os-vif \
     python-os-win \
     python-os-xenapi \
-    python-osc-lib \
     python-oslo.cache \
     python-oslo.concurrency \
     python-oslo.config \
@@ -3826,10 +3820,8 @@ WRLINUX_ALL_RECIPES = " \
     python-systemd \
     python-sysv-ipc \
     python-taskflow \
-    python-tenacity \
     python-termcolor \
     python-thrift \
-    python-tinyrpc \
     python-toml \
     python-tooz \
     python-tornado \
@@ -3895,7 +3887,6 @@ WRLINUX_ALL_RECIPES = " \
     python-xstatic-qunit \
     python-xstatic-rickshaw \
     python-xstatic-roboto-fontface \
-    python-xstatic-smart-table \
     python-xstatic-spin \
     python-xstatic-term.js \
     python-xstatic-tv4 \
@@ -3921,6 +3912,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-appdirs \
     python3-apply-defaults \
     python3-argcomplete \
+    python3-argexec \
     python3-argh \
     python3-arpeggio \
     python3-arrow \
@@ -3974,6 +3966,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-coloredlogs \
     python3-colorlog \
     python3-configargparse \
+    python3-configobj \
     python3-configparser \
     python3-configshell-fb \
     python3-constantly \
@@ -4015,6 +4008,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-dogpile.core \
     python3-dominate \
     python3-dt-schema \
+    python3-dynamic-dispatch \
     python3-ecdsa \
     python3-editor \
     python3-engineio \
@@ -4030,6 +4024,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-fastentrypoints \
     python3-feedformatter \
     python3-fire \
+    python3-fixtures \
     python3-flask \
     python3-flask-babel \
     python3-flask-bootstrap \
@@ -4048,10 +4043,12 @@ WRLINUX_ALL_RECIPES = " \
     python3-flask-sqlalchemy \
     python3-flask-uploads \
     python3-flask-user \
+    python3-flask-versioned \
     python3-flask-wtf \
     python3-flask-xstatic \
     python3-funcsigs \
     python3-future \
+    python3-futurist \
     python3-gast \
     python3-geojson \
     python3-gevent \
@@ -4085,6 +4082,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-html5lib \
     python3-httplib2 \
     python3-httpretty \
+    python3-huey \
     python3-humanfriendly \
     python3-humanize \
     python3-hyperframe \
@@ -4114,6 +4112,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-jinja2 \
     python3-jmespath \
     python3-jsmin \
+    python3-jsonext \
     python3-jsonpatch \
     python3-jsonpath-rw \
     python3-jsonpointer \
@@ -4157,6 +4156,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-mock \
     python3-monotonic \
     python3-more-itertools \
+    python3-mox3 \
     python3-mpmath \
     python3-mprpc \
     python3-msgpack \
@@ -4172,6 +4172,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-newrelic \
     python3-nmap \
     python3-nose \
+    python3-nose-exclude \
     python3-ntplib \
     python3-numpy \
     python3-oauth2client \
@@ -4282,6 +4283,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-pyperf \
     python3-pyqt5 \
     python3-pyqtchart \
+    python3-pyrad \
     python3-pyro4 \
     python3-pyroute2 \
     python3-pyrsistent \
@@ -4367,6 +4369,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-smbus \
     python3-smbus2 \
     python3-smmap \
+    python3-smpplib \
     python3-snappy \
     python3-socketio \
     python3-soupsieve \
@@ -4376,6 +4379,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-spidev \
     python3-sqlalchemy \
     python3-sqlparse \
+    python3-sqlsoup \
     python3-sshtunnel \
     python3-statsd \
     python3-stevedore \
@@ -4390,6 +4394,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-tabulate \
     python3-tempita \
     python3-tempora \
+    python3-tenacity \
     python3-term \
     python3-termcolor \
     python3-test-generator \
@@ -4400,6 +4405,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-texttable \
     python3-thrift \
     python3-tinyrecord \
+    python3-tinyrpc \
     python3-toml \
     python3-tornado \
     python3-tox \
@@ -4468,6 +4474,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-xstatic-jquery \
     python3-xstatic-jquery-migrate \
     python3-xstatic-roboto-fontface \
+    python3-xstatic-smart-table \
     python3-xxhash \
     python3-yappi \
     python3-yarl \
