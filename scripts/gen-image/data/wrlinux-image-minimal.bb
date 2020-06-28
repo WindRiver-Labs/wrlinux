@@ -11,11 +11,18 @@ CONTAINER_CORE_BOOT ?= " \
     ${VIRTUAL-RUNTIME_update-alternatives} \
 "
 
+TARGET_CORE_BOOT ?= " \
+    packagegroup-core-boot \
+    dhcp-client \
+    kernel-module-fuse \
+    kernel-module-sch-fq-codel \
+"
+
 # Control the installed packages strictly
 WRTEMPLATE_IMAGE = "0"
 
 IMAGE_INSTALL = "\
-    ${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', '${CONTAINER_CORE_BOOT}', 'packagegroup-core-boot dhcp-client kernel-module-fuse', d)} \
+    ${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', '${CONTAINER_CORE_BOOT}', '${TARGET_CORE_BOOT}', d)} \
     busybox \
     busybox-syslog \
     openssh \
