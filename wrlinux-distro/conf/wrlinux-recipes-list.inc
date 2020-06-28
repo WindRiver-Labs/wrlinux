@@ -190,7 +190,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     diod \
     distcc \
     distcc-config \
-    dldt-inference-engine \
     dmidecode \
     dnf \
     dnsmasq \
@@ -367,6 +366,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     icu \
     ifenslave \
     ifupdown \
+    igt-gpu-tools \
     ima-evm-utils \
     ima-inspect \
     ima-policy \
@@ -615,6 +615,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     libusb-compat \
     libusb1 \
     libuser \
+    libuv \
     libva \
     libva-initial \
     libva-utils \
@@ -771,6 +772,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     mtdev \
     mtools \
     mtree \
+    mttyexec \
     multipath-tools \
     mutt \
     mx-1.0 \
@@ -834,6 +836,8 @@ WRLINUX_SUPPORTED_RECIPES = " \
     openssh \
     openssl \
     openssl-tpm-engine \
+    openvino-inference-engine \
+    openvino-model-optimizer \
     openvswitch \
     opkg \
     opkg-arch-config \
@@ -1880,7 +1884,6 @@ WRLINUX_ALL_RECIPES = " \
     distcc \
     distcc-config \
     distro-feed-configs \
-    dldt-inference-engine \
     dleyna-connector-dbus \
     dleyna-core \
     dleyna-renderer \
@@ -3030,6 +3033,7 @@ WRLINUX_ALL_RECIPES = " \
     mtools \
     mtr \
     mtree \
+    mttyexec \
     multimedia-libcamera-image \
     multipath-tools \
     musl \
@@ -3191,6 +3195,7 @@ WRLINUX_ALL_RECIPES = " \
     openstack-image-compute \
     openstack-image-controller \
     openstack-image-network \
+    openvino-inference-engine \
     openvino-model-optimizer \
     openvpn \
     openvswitch \
