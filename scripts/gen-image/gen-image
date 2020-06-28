@@ -148,6 +148,11 @@ class GenImage(object):
 
         logger.setLevel(self.args.loglevel)
 
+        bitbake_path = shutil.which('bitbake')
+        self.builddir = os.getenv('BUILDDIR')
+        if not (bitbake_path and self.builddir):
+            raise Exception('bitbake command is not found, this tools should be run after source oe-init-build-env')
+
         self.today = get_today()
 
         self.project = get_project()
@@ -174,11 +179,6 @@ class GenImage(object):
         logger.info('You can remove them manually if not needed any more')
         for i in (recipe_src_minimal, recipe_src_full):
             shutil.copy(i, recipes_dst_dir)
-
-        bitbake_path = shutil.which('bitbake')
-        self.builddir = os.getenv('BUILDDIR')
-        if not (bitbake_path and self.builddir):
-            raise Exception('bitbake command is not found, this tools should be run after source oe-init-build-env')
 
         self.local_conf = os.path.join(self.builddir, 'conf/local.conf')
         self.local_conf_orig = '%s.orig' % self.local_conf
