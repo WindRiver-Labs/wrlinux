@@ -42,10 +42,11 @@ specified branch configured in /sysroot/ostree/repo/config.
 
 ## How to install/boot binary image
 ### On Board
-Under Linux, insert a USB flash drive.  Assuming the USB flash drive
-takes device /dev/sdf, use dd to copy the image to it.  Before the image
-can be burned onto a USB drive, it should be un-mounted. Some Linux distros
-may automatically mount a USB drive when it is plugged in. Using USB device
+Under Linux, insert a micro SD card to a USB SD Card Reader.
+Assuming the USB SD Card Reader takes device /dev/sdf, use dd
+to copy the image to it. Before the image can be burned onto
+a micro SD card, it should be un-mounted. Some Linux distros
+may automatically mount when it is plugged in. Using device
 /dev/sdf as an example, find all mounted partitions:
 
     $ mount | grep sdf
@@ -55,7 +56,7 @@ and un-mount those that are mounted, for example:
     $ umount /dev/sdf1
     $ umount /dev/sdf2
 
-Now burn the image onto the USB drive:
+Now burn the image onto the micro SD card:
     For full image
     $ sudo dd if=wrlinux-image-full-bcm-2xxx-rpi4.ustart.img of=/dev/sdf conv=notrunc
 
@@ -65,9 +66,10 @@ Now burn the image onto the USB drive:
     $ sync
     $ eject /dev/sdf
 
-This should give you a bootable USB flash device.  Insert the device
-into a bootable USB socket on the target, and power on.  This should
-result in a system booted to the Grub boot menuo.
+This should give you a bootable micro SD card device. Insert the
+SD card into SD slot on Raspberrypi 4b board, and then power on.
+This should result in a system booted to the u-boot menu.
+
 
 ### On Qemu
 Create a 14G disk image
