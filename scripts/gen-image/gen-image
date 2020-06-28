@@ -1,0 +1,560 @@
+#!/usr/bin/env python3
+#
+# Copyright (C) 2020 Wind River Systems, Inc.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+import os
+import sys
+import subprocess
+import argparse
+import logging
+import shutil
+import glob
+import time
+import hashlib
+
+logger = logging.getLogger('gen-image')
+
+def get_project():
+    runqemu_dir = os.path.realpath(shutil.which("runqemu"))
+    return os.path.realpath("%s/../../../../" % runqemu_dir)
+
+def run_cmd(cmd, logger):
+    logger.debug('Running %s' % cmd)
+    output = subprocess.check_output(cmd, shell=True)
+    output = output.decode('utf-8')
+    logger.debug('output: %s' % output)
+    return output
+
+def run_bitbake_cmd(target, logger):
+    cmd = 'bitbake %s' % target
+    logger.info('Running %s' % cmd)
+    output = run_cmd(cmd, logger)
+    return output
+
+def set_logger(logger):
+    logger.setLevel(logging.DEBUG)
+
+    class ColorFormatter(logging.Formatter):
+        FORMAT = ("$BOLD%(name)-s$RESET - %(levelname)s: %(message)s")
+
+        BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = list(range(8))
+
+        RESET_SEQ = "\033[0m"
+        COLOR_SEQ = "\033[1;%dm"
+        BOLD_SEQ = "\033[1m"
+
+        COLORS = {
+            'WARNING': YELLOW,
+            'INFO': GREEN,
+            'DEBUG': BLUE,
+            'ERROR': RED
+        }
+
+        def formatter_msg(self, msg, use_color = True):
+            if use_color:
+                msg = msg.replace("$RESET", self.RESET_SEQ).replace("$BOLD", self.BOLD_SEQ)
+            else:
+                msg = msg.replace("$RESET", "").replace("$BOLD", "")
+            return msg
+
+        def __init__(self, use_color=True):
+            msg = self.formatter_msg(self.FORMAT, use_color)
+            logging.Formatter.__init__(self, msg)
+            self.use_color = use_color
+
+        def format(self, record):
+            levelname = record.levelname
+            if self.use_color and levelname in self.COLORS:
+                fore_color = 30 + self.COLORS[levelname]
+                levelname_color = self.COLOR_SEQ % fore_color + levelname + self.RESET_SEQ
+                record.levelname = levelname_color
+            return logging.Formatter.format(self, record)
+
+    # create console handler and set level to debug
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    ch.setFormatter(ColorFormatter())
+    logger.addHandler(ch)
+
+def get_today():
+    return time.strftime("%Y%m%d%H%M%S")
+
+set_logger(logger)
+
+class GenImage(object):
+    """
+    * Generate the following images in order:
+        - Linux SDK
+        - target images
+        - container image
+    * world build for packages feeds
+    * Save/Re-use PR database prserv.sqlite3
+    * Gen sources for IP review
+    """
+
+    def __init__(self):
+        supported_machines = [
+            'intel-x86-64',
+            'bcm-2xxx-rpi4',
+        ]
+
+        self.feed_archs_dict= {
+            'intel-x86-64': ['corei7_64', 'intel_x86_64', 'noarch'],
+            'bcm-2xxx-rpi4': ['cortexa72', 'bcm_2xxx_rpi4', 'noarch'],
+        }
+
+
+        parser = argparse.ArgumentParser(
+            description="Gen images for specified machine",
+            epilog="Use %(prog)s --help to get help")
+        parser.add_argument('-m', '--machine',
+            choices=supported_machines,
+            default=None,
+            required=True,
+            help='Specify machine')
+        parser.add_argument('-r', '--ip-review',
+            default=False,
+            help='Generate sources for IP review', action="store_true")
+        parser.add_argument('-b', '--pr-database',
+            default=None,
+            help='Specify PR database to use', action="store")
+        parser.add_argument('-o', '--outdir',
+            default=None,
+            help='Specify the output dir', action="store")
+        parser.add_argument('-p', '--product', choices=['lincd'], required=False,
+            default='lincd',
+            help='Specify the product', action="store")
+        parser.add_argument("-d", "--debug",
+            help = "Enable debug output",
+            action="store_const", const=logging.DEBUG, dest="loglevel", default=logging.INFO)
+        parser.add_argument("-q", "--quiet",
+            help = "Hide all output except error messages",
+            action="store_const", const=logging.ERROR, dest="loglevel")
+
+        self.args = parser.parse_args()
+
+        logger.setLevel(self.args.loglevel)
+
+        self.today = get_today()
+
+        self.project = get_project()
+
+        self.machine = self.args.machine
+
+        self.image_minimal = 'wrlinux-image-minimal'
+        self.image_full = 'wrlinux-image-full'
+
+        self.doc_dir = os.path.join(os.path.dirname(sys.argv[0]), 'doc')
+        self.data_dir = os.path.join(os.path.dirname(sys.argv[0]), 'data')
+
+        self.local_layer = os.path.join(self.project, 'layers/local')
+
+        recipes_dst_dir = os.path.join(self.local_layer, 'recipes-images/images')
+        recipe_src_minimal = os.path.join(self.data_dir, '%s.bb' % self.image_minimal)
+        recipe_src_full = os.path.join(self.data_dir, '%s.bb' % self.image_full)
+
+        if not os.path.exists(recipes_dst_dir):
+            logger.info('Creating %s' % recipes_dst_dir)
+            os.makedirs(recipes_dst_dir)
+
+        logger.info('Copying full and minimal recipes to %s' % recipes_dst_dir)
+        logger.info('You can remove them manually if not needed any more')
+        for i in (recipe_src_minimal, recipe_src_full):
+            shutil.copy(i, recipes_dst_dir)
+
+        bitbake_path = shutil.which('bitbake')
+        self.builddir = os.getenv('BUILDDIR')
+        if not (bitbake_path and self.builddir):
+            raise Exception('bitbake command is not found, this tools should be run after source oe-init-build-env')
+
+        self.local_conf = os.path.join(self.builddir, 'conf/local.conf')
+        self.local_conf_orig = '%s.orig' % self.local_conf
+        if os.path.exists(self.local_conf_orig):
+            logger.info('Using %s as original local.conf' % self.local_conf_orig)
+            shutil.copyfile(self.local_conf_orig, self.local_conf)
+        else:
+            if os.path.exists(self.local_conf):
+                logger.info('Saving %s as original local.conf' % self.local_conf)
+                shutil.copyfile(self.local_conf, self.local_conf_orig)
+            else:
+                raise Exception('Failed to find %s' % self.local_conf)
+
+        if self.args.product == 'lincd':
+            self.handoff = 'WRLinux-CD-Images'
+        else:
+            self.handoff = self.args.product
+
+        if self.args.outdir:
+            self.outdir = self.args.outdir
+        else:
+            self.outdir = os.path.join(self.builddir, 'outdir', self.handoff)
+
+        machine_dir = os.path.join(self.outdir, self.machine)
+        if os.path.exists(machine_dir):
+            machine_old = '%s.old.%s' % (machine_dir, self.today)
+            shutil.move(machine_dir, machine_old)
+
+        if not os.path.exists(self.outdir):
+            os.makedirs(self.outdir)
+
+        self.pr_db = os.path.join(self.builddir, 'cache/prserv.sqlite3')
+        self.pr_log = os.path.join(self.builddir, 'cache/prserv.log')
+        if self.args.pr_database:
+            if not self.args.pr_database.endswith('.sqlite3'):
+                raise Exception('Invalid PR databse file: %s' % self.args.pr_database)
+            logger.info('Using %s as pr database' % self.pr_db)
+            shutil.copy(self.args.pr_database, self.pr_db)
+            pr_log = self.args.pr_database.replace('.sqlite3', '.log')
+            if os.path.exists(pr_log):
+                shutil.copy(pr_log, self.pr_log)
+
+    def prepare(self):
+        shutil.copyfile(self.local_conf_orig, self.local_conf)
+
+        # Common config
+        feed_arch = self.feed_archs_dict[self.machine]
+
+        self.feed_path_prefix = os.path.join(self.handoff, self.machine)
+        common_conf ="""
+
+### Added by gen-image
+
+MACHINE = "%s"
+
+TMPDIR = "${TOPDIR}/tmp-${MACHINE}"
+DL_DIR = "${TOPDIR}/downloads"
+SSTATE_DIR = "${TOPDIR}/sstate-cache"
+
+DISTRO = "wrlinux-graphics"
+PACKAGE_CLASSES = "package_rpm"
+PRSERV_HOST = "localhost:0"
+
+# Disable multilib
+MULTILIBS = ""
+
+# Make /var/log save on persistent storage to make the image work for container
+VOLATILE_DIR = "0"
+
+# Packages repos
+INHERIT += "packagefeed-stability"
+PACKAGE_FEED_BASE_PATHS = "%s/repos/rpm"
+PACKAGE_FEED_ARCHS = "%s"
+
+SSTATE_PRUNE_OBSOLETEWORKDIR = "0"
+
+# ostree
+GPG_PATH = "${TOPDIR}/.gnupg"
+
+WRTEMPLATE = "feature/docker feature/kubernetes feature/ostree"
+WRTEMPLATE_append_intel-x86-64 = " feature/intel-openvino"
+
+KERNEL_FEATURES_append += "features/nfsd/nfsd-enable.scc"
+KERNEL_MODULE_AUTOLOAD += "nfsd"
+
+SDKMACHINE = "x86_64"
+""" % (self.machine, self.feed_path_prefix, ' '.join(feed_arch))
+        
+        with open(self.local_conf, 'a') as f:
+            f.write(common_conf)
+
+        output = self.do_build('-e')
+
+        feed_uris_defined = False
+        for line in output.split('\n'):
+            if line.startswith('PACKAGE_FEED_URIS='):
+                feed_uris_defined = True
+            if line.startswith('TMPDIR='):
+                self.tmpdir = line.split('=')[1].replace('"', '')
+
+        if not self.tmpdir:
+            raise Exception("Failed to figure tmpdir!")
+
+        if not feed_uris_defined:
+            logger.warning('PACKAGE_FEED_URIS is not defined. check README.md on how to define it')
+
+        self.repos_dir = os.path.join(self.outdir, self.machine, 'repos')
+        if not os.path.exists(self.repos_dir):
+            os.makedirs(self.repos_dir)
+
+    def do_build(self, target=None, conf=None):
+        if conf:
+            with open(self.local_conf, 'a') as f:
+                f.write(conf)
+
+        if not target:
+            target = self.image_full
+        output = run_bitbake_cmd(target, logger)
+        return output
+
+    def do_deploy(self, subdir, files):
+        logger.info('Deploying %s' % subdir)
+
+        def do_copy(src, dst_dir):
+            if not os.path.exists(dst_dir):
+                os.makedirs(dst_dir)
+            shutil.copy(src, dst_dir)
+
+        # The image file copy once, ovmf and document copy twice into the
+        # following dirs:
+        # - container-minimal
+        # - container-full
+        # - target-minimal
+        # - target-full
+        dst_dir = os.path.join(self.outdir, subdir)
+        dst_dir_minimal = os.path.join(self.outdir, subdir + '-minimal')
+        dst_dir_full = os.path.join(self.outdir, subdir + '-full')
+        copy_twice = False
+        if self.image_minimal in ' '.join(files):
+            copy_twice = True
+        for f in files:
+            if subdir.endswith('/sdk'):
+                do_copy(f, dst_dir)
+            elif self.image_minimal in f:
+                do_copy(f, dst_dir_minimal)
+            elif self.image_full in f:
+                do_copy(f, dst_dir_full)
+            elif copy_twice:
+                do_copy(f, dst_dir_minimal)
+                do_copy(f, dst_dir_full)
+            else:
+                do_copy(f, dst_dir)
+
+    def gen_sdk(self):
+        logger.info('Generating sdk...')
+
+        self.do_build('%s -cpopulate_sdk' % self.image_full)
+        deploy_files = []
+
+        deploy_dir = os.path.join(self.tmpdir, 'deploy/sdk')
+        suffixes = ['sdk.sh', 'sdk.host.manifest', 'sdk.target.manifest']
+        for f in suffixes:
+            wildcard = "%s/*-%s-%s-%s" % (deploy_dir, self.machine.replace('-', '_'), self.image_full, f)
+            files = glob.glob(wildcard)
+            if len(files) != 1:
+                raise Exception("Should be only one %s file but found %s: \n%s" % (f, len(files), '\n'.join(files)))
+            deploy_files.append(files[0])
+
+        deploy_files.append(os.path.join(self.doc_dir, 'sdk.README.md'))
+
+        self.do_deploy('%s/sdk' % self.machine, deploy_files)
+
+    def get_deploy_files(self, type='wic', ovmf=True, uboot=True, images=[]):
+        deploy_dir = os.path.join(self.tmpdir, 'deploy/images/%s' % self.machine)
+        deploy_files = []
+        if not images:
+            images = (self.image_minimal, self.image_full)
+        for image in images:
+            prefix = '%s/%s-%s' % (deploy_dir, image, self.machine)
+            deploy_files.append('%s.%s' % (prefix, type))
+            deploy_files.append('%s.manifest' % prefix)
+        if ovmf:
+            deploy_files.append('%s/ovmf.qcow2' % deploy_dir)
+        if uboot:
+            deploy_files.append('%s/qemu-u-boot-bcm-2xxx-rpi4.bin' % deploy_dir)
+        for f in deploy_files:
+            logger.debug('Deploy file: %s' % f)
+            if not os.path.exists(f):
+                raise Exception('Failed to find %s' % f)
+
+        return deploy_files
+
+    def gen_ostree(self):
+        logger.info('Generating target image...')
+
+        ostree_conf = """
+# For ostree
+OSTREE_REMOTE_URL = "${PACKAGE_FEED_URIS}/%s/repos/ostree_repo"
+DISTRO_VERSION_pn-grub-efi = "-"
+
+# Size of the Root partition 6GB
+OSTREE_FDISK_RSZ = "6144"
+""" % self.feed_path_prefix
+
+        deploy_files = set()
+        is_x86 = 'intel' in self.machine or 'x86-64' in self.machine
+
+        # Remove ostreerepo_dir to avoid mixing minimal and full, otherwise the
+        # minimal's size would be large in the second run.
+        ostreerepo_dir = os.path.join(self.tmpdir, 'deploy/images/%s/ostree_repo' % self.machine)
+        if os.path.exists(ostreerepo_dir):
+            ostreerepo_dir_saved = '%s.%s.%s' % (ostreerepo_dir, self.machine, self.today)
+            shutil.move(ostreerepo_dir, ostreerepo_dir_saved)
+        else:
+            logger.debug("%s doesn't exist" % ostreerepo_dir)
+
+        self.do_build('%s %s -cclean' % (self.image_minimal, self.image_full), conf=ostree_conf)
+
+        for image in (self.image_minimal, self.image_full):
+            self.do_build(target=image)
+
+            # Regenerate wic image to support disk resize
+            cmd = "%s/layers/wr-ostree/scripts/bootfs.sh -L -b %s -s 0 -a instdate=BUILD_DATE" % (self.project, image)
+            if self.machine == "bcm-2xxx-rpi4":
+                cmd += " -d /dev/mmcblk0,/dev/sda,/dev/vda"
+            run_cmd(cmd, logger)
+    
+            new_image = ""
+            for d_file in self.get_deploy_files(ovmf=is_x86, uboot=not is_x86, images=[image]):
+                if d_file.endswith(".wic"):
+                    basename = os.path.basename(d_file)[:-4]
+                    new_image = os.path.join(self.builddir, '%s.ustart.img.gz' % basename)
+                    os.rename('ustart.img.gz', new_image)
+                    cmd = 'gunzip -f %s' % new_image
+                    run_cmd(cmd, logger)
+                    new_image = new_image[:-3]
+                    deploy_files.add(new_image)
+                else:
+                    deploy_files.add(d_file)
+    
+        deploy_files.add(os.path.join(self.doc_dir, 'target_%s.README.md' %  self.machine))
+
+        self.do_deploy('%s/target' % self.machine, deploy_files)
+
+        logger.info('Deploying %s/repos/ostree_repo...' % self.machine)
+        dst_dir = os.path.join(self.repos_dir, 'ostree_repo')
+        shutil.copytree(ostreerepo_dir, dst_dir)
+
+    def gen_container(self):
+        logger.info('Generating container image...')
+
+        container_conf = """
+# For docker image
+IMAGE_ENABLE_CONTAINER = "1"
+"""
+        self.do_build(target=self.image_minimal, conf=container_conf)
+        self.do_build(target=self.image_full)
+
+        deploy_files = self.get_deploy_files(type='tar.bz2', ovmf=False, uboot=False)
+
+        deploy_files.append(os.path.join(self.doc_dir, 'container_%s.README.md' %  self.machine))
+        self.do_deploy('%s/container' % self.machine, deploy_files)
+
+    def gen_feeds(self):
+        logger.info('Generating packages feeds...')
+        # The docker won't be built in a world build since it is started by virtual.
+        self.do_build('world docker %s %s' % (self.image_minimal, self.image_full))
+
+        # Remove unneeded archs
+        rpm_dir = os.path.join(self.tmpdir, 'deploy/rpm')
+        feed_archs = self.feed_archs_dict[self.machine]
+        existed_archs = os.listdir(rpm_dir)
+        for e in existed_archs:
+            if not e in feed_archs:
+                e_path = os.path.join(rpm_dir, e)
+                logger.info('Removing unneeded data: %s' % e_path)
+                shutil.rmtree(e_path)
+
+        self.do_build('package-index')
+
+        logger.info('Deploying %s/repos/rpm' % self.machine)
+        dst_dir = os.path.join(self.repos_dir, 'rpm')
+        shutil.copytree(rpm_dir, dst_dir)
+
+    def post(self):
+        with open(self.local_conf, 'a') as f:
+            f.write('#### Done by gen-image')
+
+        # Save local.conf
+        local_conf_machine = '%s.%s' % (self.local_conf, self.machine)
+        shutil.copy(self.local_conf, local_conf_machine)
+        logger.info('The local.conf is saved to %s' % local_conf_machine)
+
+        # Save prserver
+        pr_dir = os.path.join(self.outdir, 'prserv')
+        pr_dir_old = '%s.old.%s' % (pr_dir, self.today)
+        if os.path.exists(pr_dir):
+            shutil.move(pr_dir, pr_dir_old)
+        os.makedirs(pr_dir)
+        shutil.copy(self.pr_db, pr_dir)
+        shutil.copy(self.pr_log, pr_dir)
+
+        # Generate sha256 for the following files
+        # - container/*.tar.bz2
+        # - target/*.img ovmf.qcow2
+        # - sdk/*.sh
+        tgts = ("container-*/*.tar.bz2", "target-*/*.img", "target-*/ovmf.qcow2", "sdk/*.sh")
+        sha256files = []
+        file_prefix = os.path.join(self.outdir, self.machine)
+        for tgt in tgts:
+            fmt = os.path.join(file_prefix, tgt)
+            for f in glob.glob(fmt):
+                sha256files.append(f)
+        outlist = []
+        if sha256files:
+                for sha256file in sha256files:
+                    basename = os.path.basename(sha256file)
+                    logger.info('Generating checksums for %s' % basename)
+                    with open(sha256file, 'rb') as inf:
+                        data = inf.read()
+                    m = hashlib.sha256()
+                    m.update(data)
+
+                    dirname = os.path.dirname(sha256file)
+                    outfile = os.path.join(dirname, 'sha256sum.txt')
+                    with open(outfile, 'a+') as f:
+                        f.write('%s *%s\n' % (m.hexdigest(), basename))
+        else:
+            logger.warning("The checksum is not generated since no files are found!")
+
+        # Create tarballs for minimal and full directories
+        for d in os.listdir(file_prefix):
+            if '-minimal' in d or '-full' in d:
+                cmd = 'tar --numeric-owner -cjvf %s.tar.bz2 %s' % (d, d)
+                logger.debug('Running %s' % cmd)
+                subprocess.check_output(cmd, shell=True, cwd=file_prefix)
+
+    def ip_review(self):
+        ip_conf = """
+# For IP review
+WRTEMPLATE += "feature/archiver"
+COPYLEFT_LICENSE_INCLUDE = "*"
+COPYLEFT_LICENSE_EXCLUDE = ""
+"""
+        logger.info('Generating sources for IP review')
+        # The docker won't be built in a world build since it is started with "virtual/".
+        # The "bitbake world docker --runall=deploy_archives" doesn't work, so build world.
+        self.do_build('world docker %s %s' % (self.image_minimal, self.image_full), conf=ip_conf)
+
+        # And sdk
+        self.do_build('%s -cpopulate_sdk' % self.image_full)
+
+        src_dir = os.path.join(self.tmpdir, 'deploy/sources')
+        logger.info('Deploying sources-%s' % self.machine)
+        dst_dir = os.path.join(self.outdir, 'sources-%s' % self.machine)
+        dst_dir_old = os.path.join(self.outdir, 'sources-%s.%s' % (self.machine, self.today))
+        if os.path.exists(dst_dir):
+            shutil.move(dst_dir, dst_dir_old)
+        shutil.copytree(src_dir, dst_dir)
+
+def main():
+    gen = GenImage()
+    gen.prepare()
+    gen.gen_sdk()
+    gen.gen_ostree()
+    gen.gen_container()
+    gen.gen_feeds()
+    if gen.args.ip_review:
+        gen.ip_review()
+    gen.post()
+
+if __name__ == "__main__":
+    try:
+        ret = main()
+    except Exception as esc:
+        ret = 1
+        import traceback
+        traceback.print_exc()
+    sys.exit(ret)
