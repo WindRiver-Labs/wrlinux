@@ -1,6 +1,6 @@
-From 26ca8b45a544a604292680c544ef4814a44a9230 Mon Sep 17 00:00:00 2001
-From: "Hongzhi.Song" <hongzhi.song@windriver.com>
-Date: Thu, 23 Aug 2018 23:17:07 -0400
+From 748afefcf7b894ef7d15b12e6b38bf066451bcf9 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Sun, 28 Jun 2020 23:43:19 -0700
 Subject: [PATCH] qemu-kvm: Add options to pin and prioritize vcpus
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
@@ -18,18 +18,21 @@ Signed-off-by: He Zhe <zhe.he@windriver.com>
 [fix context conflict]
 Upstream-Status: Pending
 Signed-off-by: Hongzhi.Song <hongzhi.song@windriver.com>
+
+Rebase to 5.0.0
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- cpus.c                | 146 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ cpus.c                | 146 ++++++++++++++++++++++++++++++++++++++++++
  include/sysemu/cpus.h |   1 +
  qemu-options.hx       |   8 +++
- vl.c                  |   3 ++
+ softmmu/vl.c          |   3 +
  4 files changed, 158 insertions(+)
 
 diff --git a/cpus.c b/cpus.c
-index b5844b7..28b7612 100644
+index ef441bdf..8f0c63ee 100644
 --- a/cpus.c
 +++ b/cpus.c
-@@ -1185,6 +1185,150 @@ static void qemu_wait_io_event(CPUState *cpu)
+@@ -1215,6 +1215,150 @@ static void qemu_wait_io_event(CPUState *cpu)
      qemu_wait_io_event_common(cpu);
  }
  
@@ -180,7 +183,7 @@ index b5844b7..28b7612 100644
  static void *qemu_kvm_cpu_thread_fn(void *arg)
  {
      CPUState *cpu = arg;
-@@ -1206,6 +1350,8 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
+@@ -1236,6 +1380,8 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
  
      kvm_init_cpu_signals(cpu);
  
@@ -190,7 +193,7 @@ index b5844b7..28b7612 100644
      cpu->created = true;
      qemu_cond_signal(&qemu_cpu_cond);
 diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
-index 731756d..a6e000c 100644
+index 3c1da6a0..108882d8 100644
 --- a/include/sysemu/cpus.h
 +++ b/include/sysemu/cpus.h
 @@ -30,6 +30,7 @@ void cpu_synchronize_all_post_init(void);
@@ -202,12 +205,12 @@ index 731756d..a6e000c 100644
  #ifndef CONFIG_USER_ONLY
  /* vl.c */
 diff --git a/qemu-options.hx b/qemu-options.hx
-index b1bf0f4..c88bda7 100644
+index 292d4e7c..406f2cc3 100644
 --- a/qemu-options.hx
 +++ b/qemu-options.hx
-@@ -591,6 +591,14 @@ STEXI
- @table @option
- ETEXI
+@@ -904,6 +904,14 @@ DEFHEADING()
+ 
+ DEFHEADING(Block device options:)
  
 +DEF("vcpu", HAS_ARG, QEMU_OPTION_vcpu,
 +    "-vcpu n[,affinity=cpumask][,prio=prio] Pin and/or prioritize a vcpu\n", QEMU_ARCH_ALL)
@@ -220,11 +223,11 @@ index b1bf0f4..c88bda7 100644
  DEF("fda", HAS_ARG, QEMU_OPTION_fda,
      "-fda/-fdb file  use 'file' as floppy disk 0/1 image\n", QEMU_ARCH_ALL)
  DEF("fdb", HAS_ARG, QEMU_OPTION_fdb, "", QEMU_ARCH_ALL)
-diff --git a/vl.c b/vl.c
-index 16b913f..4520299 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3650,6 +3650,9 @@ int main(int argc, char **argv, char **envp)
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index 32c00478..75190f9c 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -3514,6 +3514,9 @@ void qemu_init(int argc, char **argv, char **envp)
                      exit(1);
                  }
                  break;
@@ -235,5 +238,5 @@ index 16b913f..4520299 100644
                  vnc_parse(optarg, &error_fatal);
                  break;
 -- 
-2.8.1
+2.21.0
 
