@@ -17,12 +17,11 @@ SRC_URI += " \
 "
 
 PACKAGECONFIG[spice] = "--enable-spice,--disable-spice,spice,"
-PACKAGECONFIG[cap-ng] = "--enable-cap-ng,--disable-cap-ng,libcap-ng,"
 PACKAGECONFIG[linux-aio] = "--enable-linux-aio,--disable-linux-aio,libaio,"
 PACKAGECONFIG[xfsctl] = "--enable-xfsctl,--disable-xfsctl,xfsprogs,"
 PACKAGECONFIG[glusterfs] = "--enable-glusterfs,--disable-glusterfs,glusterfs,"
 PACKAGECONFIG[attr] = "--enable-attr,--disable-attr,attr,"
-PACKAGECONFIG[virtfs] = "--enable-virtfs --enable-attr,--disable-virtfs,attr libcap,"
+PACKAGECONFIG[virtfs] = "--enable-virtfs --enable-attr,--disable-virtfs,attr libcap-ng,"
 PACKAGECONFIG[rbd] = "--enable-rbd,--disable-rbd,ceph,ceph"
 PACKAGECONFIG[vhost] = "--enable-vhost-net,--disable-vhost-net,,"
 PACKAGECONFIG[ust] = "--enable-trace-backend=ust,--enable-trace-backend=nop,lttng-ust,"
@@ -32,7 +31,7 @@ PACKAGECONFIG[snappy] = "--enable-snappy,--disable-snappy,snappy,"
 # disable gl support for kvm
 PACKAGECONFIG[gl] = ",,,"
 
-PACKAGECONFIG_COMMON = "cap-ng linux-aio xfsctl attr \
+PACKAGECONFIG_COMMON = "libcap-ng linux-aio xfsctl attr \
                   virtfs fdt glusterfs \
                   vhost pie alsa kvm \
                  " 

@@ -1,4 +1,4 @@
-From 748afefcf7b894ef7d15b12e6b38bf066451bcf9 Mon Sep 17 00:00:00 2001
+From 3b2b17b13607c3fff891df1b818db22af9ca6b4d Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Sun, 28 Jun 2020 23:43:19 -0700
 Subject: [PATCH] qemu-kvm: Add options to pin and prioritize vcpus
@@ -24,9 +24,9 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  cpus.c                | 146 ++++++++++++++++++++++++++++++++++++++++++
  include/sysemu/cpus.h |   1 +
- qemu-options.hx       |   8 +++
+ qemu-options.hx       |   7 ++
  softmmu/vl.c          |   3 +
- 4 files changed, 158 insertions(+)
+ 4 files changed, 157 insertions(+)
 
 diff --git a/cpus.c b/cpus.c
 index ef441bdf..8f0c63ee 100644
@@ -205,20 +205,19 @@ index 3c1da6a0..108882d8 100644
  #ifndef CONFIG_USER_ONLY
  /* vl.c */
 diff --git a/qemu-options.hx b/qemu-options.hx
-index 292d4e7c..406f2cc3 100644
+index 292d4e7c..1a692e1b 100644
 --- a/qemu-options.hx
 +++ b/qemu-options.hx
-@@ -904,6 +904,14 @@ DEFHEADING()
+@@ -904,6 +904,13 @@ DEFHEADING()
  
  DEFHEADING(Block device options:)
  
 +DEF("vcpu", HAS_ARG, QEMU_OPTION_vcpu,
 +    "-vcpu n[,affinity=cpumask][,prio=prio] Pin and/or prioritize a vcpu\n", QEMU_ARCH_ALL)
-+STEXI
-+@item -vcpu @var{opts}
-+@findex -vcpu
-+Pin vcpu(s) to physical cores and set a realtime priority.
-+ETEXI
++SRST
++`` -vcpu n[,affinity=cpumask][,prio=prio]``
++    Pin vcpu(s) to physical cores and set a realtime priority.
++ERST
 +
  DEF("fda", HAS_ARG, QEMU_OPTION_fda,
      "-fda/-fdb file  use 'file' as floppy disk 0/1 image\n", QEMU_ARCH_ALL)
