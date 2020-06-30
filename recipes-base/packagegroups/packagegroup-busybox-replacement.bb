@@ -39,6 +39,7 @@ BUSYBOX_REPLACE_PACKAGES ??= "\
     unzip \
     util-linux \
     util-linux-mount \
+    util-linux-flock \
     which \
     ${@bb.utils.contains('INCOMPATIBLE_LICENSE', 'GPLv3', '', 'wget', d)} \
     "
