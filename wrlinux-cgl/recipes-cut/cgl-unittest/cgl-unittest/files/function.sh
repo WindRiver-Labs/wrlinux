@@ -311,12 +311,11 @@ check_localeth()
 get_targetip()
 {
     check_localeth
-    target_ip="`ifconfig $LOCAL_ETH | grep 'inet ' | sed 's/^.*inet addr://g' | \
-    sed 's/ *Mask.*$//g'|sed 's/ *Bcast.*$//g'`"
+    target_ip="`ip -4 address show $LOCAL_ETH | grep 'inet '|sed 's/.*inet \(\S\+\).*/\1/'`"
     if [ -z $target_ip ]; then
         cuterr "Invalid target ip"
     fi
-    echo $target_ip
+    echo ${target_ip:0:-3}
 }
 
 # customize the /etc/hosts
