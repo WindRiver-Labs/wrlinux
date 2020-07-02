@@ -128,7 +128,7 @@ localhostv4()
 #return a ip list of host in same subnet
 localhostv6()
 {
-   host=$(ping6 ff02::1 -c 2 -I $1 -s 56 | grep "64 bytes from" | awk '{print $4}')
+   host=$(ping -6 ff02::1 -c 2 -I $1 -s 56 | grep "64 bytes from" | awk '{print $4}')
    #$host is a list like fe80::21a:a0ff:febb:2b9b:
    # then remove the last :
    for h in $host

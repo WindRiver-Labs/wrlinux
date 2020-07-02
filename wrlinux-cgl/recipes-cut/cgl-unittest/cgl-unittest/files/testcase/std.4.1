@@ -18,10 +18,10 @@
 # The test strategy as below:
 # 1. check if ipv6 module is enabled or not
 # 2. check the local interface if configured with ipv6 address
-# 3. ping6 the ipv6 multicast address to get all the link ipv6 address
+# 3. ping -6 the ipv6 multicast address to get all the link ipv6 address
 #    on the same subnet
-# 4. ping6 all the ipv6 address on the same subnet and check the ping6 
-#    result, pass if all ping6 succeed 
+# 4. ping -6 all the ipv6 address on the same subnet and check the ping
+#    result, pass if all ping succeed
 
 TOPDIR=${CUTDIR-/opt/cut/}
 . $TOPDIR/function.sh
@@ -59,7 +59,7 @@ if [ x"$LOCAL_ETH" = x ]; then
 fi
 
 # check if configure ipv6 address locally
-v6addr=`ifconfig $LOCAL_ETH | grep 'inet6 addr:' | awk '{ print $3}'`
+v6addr=`ip -6 address show $LOCAL_ETH | grep 'inet6 '| sed 's/.*inet \(\S\+\).*/\1/' | awk '{print $2}'`
 if [ "X$v6addr" = "X" ]; then
     cuterr "Invalid ipv6 address"
 fi
@@ -77,25 +77,6 @@ else
 fi
 
 
-#find a up interface with ipv6 enabled
-if_all=$(ifconfig | grep "eth" |  grep "Link encap" | awk '{print $1}')
-for  if  in $if_all
-do
-    ip_t=$(ifconfig $if | grep 'inet6 addr: fe80::')
-    if [  "X$ip_t" =  "X" ]; then  # no ip address
-        continue
-    else # with avaliable ip address
-        NIC=$if
-    fi
-done
-
-if  [ "X$NIC" = "X" ]; then
-    echo "there is no avaliable IPV6 enabled interface, please check your kernel config!"
-    cutfail
-fi
-
-echo "find NIC: $NIC"
-
 #-----------------------------------------------------------------------
 #
 # FUNCTION:  do_test
@@ -110,8 +91,8 @@ do_test()
     do
         for packetsize in $PACKETSIZES
         do
-            ping6  -c $COUNT -s $packetsize -I $NIC $RHOST
-            [ $? -eq 0 ] || end_testcase "ping6 -c $COUNT -s $packetsize -I $NIC $RHOST"
+            ping -6 -c $COUNT -s $packetsize -I $LOCAL_ETH $RHOST
+            [ $? -eq 0 ] || end_testcase "ping -6 -c $COUNT -s $packetsize -I $LOCAL_ETH $RHOST"
             sleep $SLEEPTIME
         done
         break
@@ -137,7 +118,7 @@ end_testcase()
     else
         echo "Testing IPV6 base features:......Pass."
         echo "Succeed run test command:"
-        echo -e "\tping6 -c $COUNT -s $packetsize -I $NIC $RHOST"
+        echo -e "\tping -6 -c $COUNT -s $packetsize -I $LOCAL_ETH $RHOST"
         cutpass
     fi
 }
