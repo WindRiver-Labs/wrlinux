@@ -21,4 +21,7 @@ inherit wrlinux-image
 
 NO_RECOMMENDATIONS ??= "1"
 
-IMAGE_FEATURES += "wr-bsps"
+IMAGE_FEATURES += " \
+    ssh-server-openssh \
+    wr-bsps \
+"

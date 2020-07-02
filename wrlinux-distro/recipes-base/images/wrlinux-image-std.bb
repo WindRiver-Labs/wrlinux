@@ -23,6 +23,7 @@ inherit wrlinux-image
 
 IMAGE_FEATURES += " \
     package-management \
+    ssh-server-openssh \
     wr-core-db \
     wr-core-interactive \
     wr-core-net \

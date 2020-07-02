@@ -57,10 +57,6 @@ RDEPENDS_${PN}-net = "\
     dhcp-client \
     ethtool \
     net-tools \
-    openssh \
-    openssh-scp \
-    openssh-ssh \
-    openssh-sshd \
     rfkill \
     "
 
