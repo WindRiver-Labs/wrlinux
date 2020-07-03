@@ -8,9 +8,6 @@ LICENSE = "MIT"
 # we extend std image
 require recipes-base/images/wrlinux-image-std.bb
 
-
-IMAGE_FEATURES += "ssh-server-openssh"
-
 #  Networking common packages
 IMAGE_INSTALL += "packagegroup-wr-core-networking"
 
