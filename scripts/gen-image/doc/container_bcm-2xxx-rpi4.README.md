@@ -53,7 +53,7 @@ system. How to formally handle such dependencies is to be discussed.
 ## Build the images from sources
 $ mkdir wrlinux-cd
 $ cd wrlinux-cd
-$ git clone https://distro.windriver.com/sources/wrlinux/linux-cd/base/WRLinux-CD-Core/wrlinux-x/
+$ git clone -b WRLINUX_CI https://distro.windriver.com/sources/wrlinux/linux-cd/base/WRLinux-CD-Core/wrlinux-x/
 $ cd wrlinux-x
 $ git checkout <tag>
 
