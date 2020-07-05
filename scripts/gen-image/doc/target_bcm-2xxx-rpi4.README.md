@@ -119,14 +119,10 @@ Disable graphical output and redirect serial I/Os to console
 `-nographic`
 
 ## Install a package
-Run ostree upgrade wrapper to ensure kernel is up to date:
-    $ ostree_upgrade.sh
-
-And reboot:
-    $ reboot
-
-Note, the previous action is only needed when kernel is upgraded in the repo,
-otherwise it is not needed.
+Because dnf can't upgrade kernel on the ostree image, so run the following
+command to ensure kernel is up to date and reboot, this action is only needed
+when kernel is upgraded in the repo.
+    $ ostree_upgrade.sh -b
 
 The images are locked by default, so need unlock firstly:
     $ ostree admin unlock --hotfix
