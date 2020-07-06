@@ -1,4 +1,4 @@
-From eb1a14fb89940d6f1875f051b2aa3504b45c7c63 Mon Sep 17 00:00:00 2001
+From 8c9c7041359fcfe99295233194f44ee464912dd5 Mon Sep 17 00:00:00 2001
 From: Yi Zhao <yi.zhao@windriver.com>
 Date: Thu, 27 Sep 2018 10:36:40 +0800
 Subject: [PATCH] pppd: disable MS-CHAP authentication support
@@ -13,12 +13,12 @@ Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/pppd/Makefile.linux b/pppd/Makefile.linux
-index 2835e22..75c53ae 100644
+index 44c4193..c92debc 100644
 --- a/pppd/Makefile.linux
 +++ b/pppd/Makefile.linux
 @@ -37,7 +37,7 @@ LIBS =
  
- # Uncomment the next 2 lines to include support for Microsoft's
+ # Uncomment the next line to include support for Microsoft's
  # MS-CHAP authentication protocol.  Also, edit plugins/radius/Makefile.linux.
 -CHAPMS=y
 +#CHAPMS=y
@@ -26,5 +26,5 @@ index 2835e22..75c53ae 100644
  # Don't use MSLANMAN unless you really know what you're doing.
  #MSLANMAN=y
 -- 
-2.7.4
+2.17.1
 
