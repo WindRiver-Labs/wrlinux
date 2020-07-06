@@ -30,12 +30,12 @@ $ dnf remove <package>
 ## Dockerfile
 ### wrlinux-image-minimal
  FROM scratch
- ADD wrlinux-image-glibc-minimal-qemux86-64.tar.bz2 /
+ ADD wrlinux-image-minimal-intel-x86-64.tar.bz2 /
  CMD ["/bin/sh"]
 
 ### wrlinux-image-full
  FROM scratch
- ADD wrlinux-image-glibc-full-qemux86-64.tar.bz2 /
+ ADD wrlinux-image-full-intel-x86-64.tar.bz2 /
  CMD ["/bin/sh"]
 
 ## Known issues

@@ -19,7 +19,7 @@ large image via package manager dnf.
 
 ### wrlinux-image-full
 A full functional image that boots to a console, no busybox installed but other
-common tools such as coreutils, and openvino is installed by default.
+common tools such as coreutils.
 
 ## Install a package
 $ dnf install <package>
@@ -30,12 +30,12 @@ $ dnf remove <package>
 ## Dockerfile
 ### wrlinux-image-minimal
  FROM scratch
- ADD wrlinux-image-glibc-minimal-qemux86-64.tar.bz2 /
+ ADD wrlinux-image-minimal-bcm-2xxx-rpi4.tar.bz2 /
  CMD ["/bin/sh"]
 
 ### wrlinux-image-full
  FROM scratch
- ADD wrlinux-image-glibc-full-qemux86-64.tar.bz2 /
+ ADD wrlinux-image-full-bcm-2xxx-rpi4.tar.bz2 /
  CMD ["/bin/sh"]
 
 ## Known issues
