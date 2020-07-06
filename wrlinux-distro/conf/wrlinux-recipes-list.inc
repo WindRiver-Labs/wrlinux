@@ -1026,6 +1026,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     python3-dbusmock \
     python3-decorator \
     python3-defusedxml \
+    python3-distro \
     python3-distutils-extra \
     python3-django \
     python3-django-south \
@@ -1035,6 +1036,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     python3-dockerpty \
     python3-docopt \
     python3-docutils \
+    python3-dotenv \
     python3-extras \
     python3-fastentrypoints \
     python3-flask \
@@ -3464,7 +3466,6 @@ WRLINUX_ALL_RECIPES = " \
     python-attr \
     python-attrs \
     python-automat \
-    python-automaton \
     python-aws-iot-device-sdk-python \
     python-babel \
     python-backports-abc \
@@ -3538,7 +3539,6 @@ WRLINUX_ALL_RECIPES = " \
     python-falcon \
     python-feedformatter \
     python-feedparser \
-    python-flake8 \
     python-flask \
     python-flask-babel \
     python-flask-bcrypt \
@@ -3663,7 +3663,6 @@ WRLINUX_ALL_RECIPES = " \
     python-oslo.cache \
     python-oslo.concurrency \
     python-oslo.config \
-    python-oslo.context \
     python-oslo.db \
     python-oslo.i18n \
     python-oslo.log \
@@ -3673,13 +3672,10 @@ WRLINUX_ALL_RECIPES = " \
     python-oslo.privsep \
     python-oslo.reports \
     python-oslo.rootwrap \
-    python-oslo.serialization \
     python-oslo.service \
     python-oslo.versionedobjects \
     python-oslo.vmware \
-    python-oslotest \
     python-osprofiler \
-    python-ovsdbapp \
     python-packaging \
     python-paho-mqtt \
     python-pam \
@@ -3824,7 +3820,6 @@ WRLINUX_ALL_RECIPES = " \
     python-swiftclient \
     python-systemd \
     python-sysv-ipc \
-    python-taskflow \
     python-termcolor \
     python-thrift \
     python-toml \
@@ -3833,7 +3828,6 @@ WRLINUX_ALL_RECIPES = " \
     python-tornado-redis \
     python-tqdm \
     python-traceback2 \
-    python-trollius \
     python-trove \
     python-troveclient \
     python-twisted \
@@ -3876,7 +3870,6 @@ WRLINUX_ALL_RECIPES = " \
     python-xstatic-angular-schema-form \
     python-xstatic-bootstrap-datepicker \
     python-xstatic-bootstrap-scss \
-    python-xstatic-bootswatch \
     python-xstatic-d3 \
     python-xstatic-font-awesome \
     python-xstatic-hogan \
@@ -3931,6 +3924,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-attrs \
     python3-autobahn \
     python3-automat \
+    python3-automaton \
     python3-avahi \
     python3-aws-iot-device-sdk-python \
     python3-awscli \
@@ -3977,6 +3971,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-constantly \
     python3-contextlib2 \
     python3-coverage \
+    python3-cppy \
     python3-crcmod \
     python3-croniter \
     python3-cryptography \
@@ -4012,6 +4007,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-dogpile.cache \
     python3-dogpile.core \
     python3-dominate \
+    python3-dotenv \
     python3-dt-schema \
     python3-dynamic-dispatch \
     python3-ecdsa \
@@ -4030,6 +4026,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-feedformatter \
     python3-fire \
     python3-fixtures \
+    python3-flake8 \
     python3-flask \
     python3-flask-babel \
     python3-flask-bootstrap \
@@ -4189,9 +4186,13 @@ WRLINUX_ALL_RECIPES = " \
     python3-ordereddict \
     python3-os-client-config \
     python3-osc-lib \
+    python3-oslo.context \
     python3-oslo.i18n \
+    python3-oslo.serialization \
     python3-oslo.utils \
+    python3-oslotest \
     python3-ovs \
+    python3-ovsdbapp \
     python3-packaging \
     python3-padaos \
     python3-padatious \
@@ -4397,6 +4398,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-systemd \
     python3-sysv-ipc \
     python3-tabulate \
+    python3-taskflow \
     python3-tempita \
     python3-tempora \
     python3-tenacity \
@@ -4418,6 +4420,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-trafaret \
     python3-trafaret-config \
     python3-transitions \
+    python3-trollius \
     python3-twine \
     python3-twisted \
     python3-twitter \
