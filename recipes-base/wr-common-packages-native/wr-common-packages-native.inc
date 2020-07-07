@@ -62,7 +62,7 @@ DEPENDS = "\
     gpgme-native \
     gptfdisk-native \
     groff-native \
-    grub-efi-native \
+    grub-native \
     gtk+3-native \
     gtk-doc-native \
     harfbuzz-native \
