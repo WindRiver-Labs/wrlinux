@@ -17,4 +17,5 @@ IMAGE_FSTYPES_remove = "live wic wic.bmap"
 
 IMAGE_FEATURES ?= ""
 
-inherit image
+IMAGE_INSTALL ?= ""
+inherit core-image
