@@ -1,0 +1,121 @@
+From 3054a5bbb5514665941c62c4a4e025dff7eb8056 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 3 Jul 2020 09:42:21 +0800
+Subject: [PATCH] policy/modules/services/postfix: make postfix domain MLS
+ trusted for reading from files up to its clearance
+
+* Allow postfix to search /run/systemd/journal
+* Allow postfix_local_t to search logwatch_cache_t
+
+Fixes:
+avc:  denied  { search } for  pid=317 comm="postfix" name="journal"
+dev="tmpfs" ino=10990
+scontext=system_u:system_r:postfix_master_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:syslogd_runtime_t:s15:c0.c1023 tclass=dir
+permissive=0
+
+avc:  denied  { search } for  pid=732 comm="pickup" name="journal"
+dev="tmpfs" ino=10990
+scontext=system_u:system_r:postfix_pickup_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:syslogd_runtime_t:s15:c0.c1023 tclass=dir
+permissive=0
+
+avc:  denied  { search } for  pid=478 comm="qmgr" name="journal"
+dev="tmpfs" ino=10990
+scontext=system_u:system_r:postfix_qmgr_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:syslogd_runtime_t:s15:c0.c1023 tclass=dir
+permissive=0
+
+avc:  denied  { search } for  pid=3440 comm="postdrop" name="journal"
+dev="tmpfs" ino=10995
+scontext=system_u:system_r:postfix_postdrop_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:syslogd_runtime_t:s15:c0.c1023 tclass=dir
+permissive=0
+
+avc:  denied  { search } for  pid=3441 comm="cleanup" name="journal"
+dev="tmpfs" ino=10995
+scontext=system_u:system_r:postfix_cleanup_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:syslogd_runtime_t:s15:c0.c1023 tclass=dir
+permissive=0
+
+avc:  denied  { search } for  pid=3445 comm="local" name="journal"
+dev="tmpfs" ino=10995
+scontext=system_u:system_r:postfix_local_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:syslogd_runtime_t:s15:c0.c1023 tclass=dir
+permissive=0
+
+avc:  denied  { search } for  pid=2421 comm="local" name="logcheck"
+dev="vda" ino=29080
+scontext=system_u:system_r:postfix_local_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:logwatch_cache_t:s0 tclass=dir permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/postfix.te | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/policy/modules/services/postfix.te b/policy/modules/services/postfix.te
+index 653859a98..bc6765e1a 100644
+--- a/policy/modules/services/postfix.te
++++ b/policy/modules/services/postfix.te
+@@ -316,6 +316,8 @@ mta_spec_filetrans_aliases(postfix_master_t, postfix_etc_t, file)
+ mta_read_sendmail_bin(postfix_master_t)
+ mta_getattr_spool(postfix_master_t)
+ 
++mls_file_read_to_clearance(postfix_master_t)
++
+ optional_policy(`
+ 	cyrus_stream_connect(postfix_master_t)
+ ')
+@@ -418,6 +420,8 @@ corenet_tcp_connect_kismet_port(postfix_cleanup_t)
+ mta_read_aliases(postfix_cleanup_t)
+ mta_map_aliases(postfix_cleanup_t)
+ 
++mls_file_read_to_clearance(postfix_cleanup_t)
++
+ optional_policy(`
+ 	dkim_stream_connect(postfix_cleanup_t)
+ ')
+@@ -462,6 +466,10 @@ mta_map_aliases(postfix_local_t)
+ mta_read_config(postfix_local_t)
+ mta_send_mail(postfix_local_t)
+ 
++logwatch_search_cache_dir(postfix_local_t)
++
++mls_file_read_to_clearance(postfix_local_t)
++
+ tunable_policy(`postfix_local_write_mail_spool',`
+ 	mta_manage_spool(postfix_local_t)
+ ')
+@@ -575,6 +583,8 @@ delete_files_pattern(postfix_pickup_t, postfix_spool_maildrop_t, postfix_spool_m
+ mcs_file_read_all(postfix_pickup_t)
+ mcs_file_write_all(postfix_pickup_t)
+ 
++mls_file_read_to_clearance(postfix_pickup_t)
++
+ optional_policy(`
+ 	dbus_system_bus_client(postfix_pickup_t)
+ 	init_dbus_chat(postfix_pickup_t)
+@@ -649,6 +659,8 @@ term_dontaudit_use_all_ttys(postfix_postdrop_t)
+ 
+ mta_rw_user_mail_stream_sockets(postfix_postdrop_t)
+ 
++mls_file_read_to_clearance(postfix_postdrop_t)
++
+ optional_policy(`
+ 	apache_dontaudit_rw_fifo_file(postfix_postdrop_t)
+ 	apache_use_fds(postfix_postdrop_t)
+@@ -728,6 +740,8 @@ files_spool_filetrans(postfix_qmgr_t, postfix_spool_t, dir)
+ 
+ corecmd_exec_bin(postfix_qmgr_t)
+ 
++mls_file_read_to_clearance(postfix_qmgr_t)
++
+ optional_policy(`
+ 	dbus_send_system_bus(postfix_qmgr_t)
+ 	dbus_system_bus_client(postfix_qmgr_t)
+-- 
+2.17.1
+

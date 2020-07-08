@@ -1,4 +1,4 @@
-From da85641daa22ef2e522102c88981e7a95c5d6587 Mon Sep 17 00:00:00 2001
+From 6488161fd0d4909290b878bd51d88cdda095560d Mon Sep 17 00:00:00 2001
 From: Liwei Song <liwei.song@windriver.com>
 Date: Fri, 3 Jan 2020 10:19:20 +0800
 Subject: [PATCH] allow mount to dirs under /tmp
@@ -12,12 +12,14 @@ tcontext=root:object_r:user_tmp_t:s0 tclass=dir permissive=0
 Upstream-Status: Pending
 
 Signed-off-by: Liwei Song <liwei.song@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 ---
- policy/modules/system/mount.te | 4 ++++
- 1 file changed, 4 insertions(+)
+ policy/modules/system/mount.te      |  4 ++++
+ policy/modules/system/userdomain.if | 18 ++++++++++++++++++
+ 2 files changed, 22 insertions(+)
 
 diff --git a/policy/modules/system/mount.te b/policy/modules/system/mount.te
-index 70e66bac5118..a7c4d2314835 100644
+index b0b501560..2f2ad1446 100644
 --- a/policy/modules/system/mount.te
 +++ b/policy/modules/system/mount.te
 @@ -49,6 +49,10 @@ mount_read_loopback_files(mount_t)
@@ -26,11 +28,40 @@ index 70e66bac5118..a7c4d2314835 100644
  
 +
 +# Allow mount to dirs under /tmp
-+userdom_mounton_tmp_dirs(mount_t);
++userdom_mounton_tmp_dirs(mount_t)
 +
  can_exec(mount_t, mount_exec_t)
  
  files_tmp_filetrans(mount_t, mount_tmp_t, { file dir })
+diff --git a/policy/modules/system/userdomain.if b/policy/modules/system/userdomain.if
+index 3d166c109..12a36c771 100644
+--- a/policy/modules/system/userdomain.if
++++ b/policy/modules/system/userdomain.if
+@@ -3369,6 +3369,24 @@ interface(`userdom_mounton_user_runtime_dirs',`
+ 	allow $1 user_runtime_t:dir mounton;
+ ')
+ 
++#######################################
++## <summary>
++##  Mount a filesystem on user tmp dir
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`userdom_mounton_tmp_dirs',`
++	gen_require(`
++		type user_tmp_t;
++	')
++
++	allow $1 user_tmp_t:dir mounton;
++')
++
+ ########################################
+ ## <summary>
+ ##	Relabel to user runtime directories.
 -- 
 2.17.1
 

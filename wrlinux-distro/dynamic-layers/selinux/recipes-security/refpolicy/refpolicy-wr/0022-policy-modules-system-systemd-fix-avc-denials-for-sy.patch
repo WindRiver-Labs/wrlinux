@@ -1,0 +1,161 @@
+From 5193772db631bb8373179eff9e36660b422c99f0 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 4 Jun 2020 19:30:17 +0200
+Subject: [PATCH] policy/modules/system/systemd: fix avc denials for
+ systemd_user_runtime_dir_t
+
+Fixes:
+avc:  denied  { create } for  pid=1947 comm="systemd-user-ru" name="reg"
+scontext=system_u:system_r:systemd_user_runtime_dir_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:user_runtime_t:s0 tclass=file permissive=0
+
+avc:  denied  { create } for  pid=1947 comm="systemd-user-ru"
+name="fifo"
+scontext=system_u:system_r:systemd_user_runtime_dir_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:user_runtime_t:s0 tclass=fifo_file
+permissive=0
+
+avc:  denied  { create } for  pid=1947 comm="systemd-user-ru"
+name="sock"
+scontext=system_u:system_r:systemd_user_runtime_dir_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:user_runtime_t:s0 tclass=sock_file
+permissive=0
+
+avc:  denied  { create } for  pid=1947 comm="systemd-user-ru" name="chr"
+scontext=system_u:system_r:systemd_user_runtime_dir_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:user_runtime_t:s0 tclass=chr_file
+permissive=0
+
+avc:  denied  { create } for  pid=1947 comm="systemd-user-ru" name="blk"
+scontext=system_u:system_r:systemd_user_runtime_dir_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:user_runtime_t:s0 tclass=blk_file
+permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/systemd.te    |  7 +++
+ policy/modules/system/userdomain.if | 90 +++++++++++++++++++++++++++++
+ 2 files changed, 97 insertions(+)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index f6bb61fc5..b941fe1dc 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -1426,4 +1426,11 @@ userdom_manage_user_runtime_dirs(systemd_user_runtime_dir_t)
+ userdom_mounton_user_runtime_dirs(systemd_user_runtime_dir_t)
+ userdom_relabelto_user_runtime_dirs(systemd_user_runtime_dir_t)
+ 
++# for /run/user/uid/inaccessible
++userdom_manage_user_runtime_files(systemd_user_runtime_dir_t)
++userdom_manage_user_runtime_chr_files(systemd_user_runtime_dir_t)
++userdom_manage_user_runtime_blk_files(systemd_user_runtime_dir_t)
++userdom_manage_user_runtime_fifo_files(systemd_user_runtime_dir_t)
++userdom_manage_user_runtime_sock_files(systemd_user_runtime_dir_t)
++
+ dbus_system_bus_client(systemd_user_runtime_dir_t)
+diff --git a/policy/modules/system/userdomain.if b/policy/modules/system/userdomain.if
+index 1b5eb2444..ef4dff850 100644
+--- a/policy/modules/system/userdomain.if
++++ b/policy/modules/system/userdomain.if
+@@ -3379,6 +3379,96 @@ interface(`userdom_relabelfrom_user_runtime_dirs',`
+ 	allow $1 user_runtime_t:dir relabelfrom;
+ ')
+ 
++########################################
++## <summary>
++##  manage character user runtime files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`userdom_manage_user_runtime_chr_files', `
++	gen_require(`
++		type user_runtime_t;
++	')
++
++	manage_chr_files_pattern($1, user_runtime_t, user_runtime_t)
++')
++
++########################################
++## <summary>
++##  manage user runtime block device files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`userdom_manage_user_runtime_blk_files', `
++	gen_require(`
++		type user_runtime_t;
++	')
++
++	manage_blk_files_pattern($1, user_runtime_t, user_runtime_t)
++')
++
++########################################
++## <summary>
++##  manage user runtime fifo files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`userdom_manage_user_runtime_fifo_files', `
++	gen_require(`
++		type user_runtime_t;
++	')
++
++	manage_fifo_files_pattern($1, user_runtime_t, user_runtime_t)
++')
++
++########################################
++## <summary>
++##  manage user runtime files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`userdom_manage_user_runtime_files', `
++	gen_require(`
++		type user_runtime_t;
++	')
++
++	manage_files_pattern($1, user_runtime_t, user_runtime_t)
++')
++
++########################################
++## <summary>
++##  manage user runtime sock files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`userdom_manage_user_runtime_sock_files', `
++	gen_require(`
++		type user_runtime_t;
++	')
++
++	manage_sock_files_pattern($1, user_runtime_t, user_runtime_t)
++')
++
+ ########################################
+ ## <summary>
+ ##	delete user runtime files
+-- 
+2.17.1
+

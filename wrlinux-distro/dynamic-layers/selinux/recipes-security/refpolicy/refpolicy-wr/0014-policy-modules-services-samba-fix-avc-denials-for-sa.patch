@@ -1,0 +1,123 @@
+From 2d5067362d40cc991b1f5a838f51e87c020308c9 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 3 Jul 2020 14:21:16 +0800
+Subject: [PATCH] policy/modules/services/samba: fix avc denials for samba
+
+* Allow smbd_t/nmbd_t to search tmpfs_t dir
+* Allow nmbd_t to map samba_var_t files
+* Allow nmbd_t to manage samba_var_t dirs
+* Allow samba creating connections to the system bus
+* Allow smbd_t to send and receive messages from avahi over dbus
+
+Fixes:
+avc:  denied  { search } for  pid=279 comm="nmbd" name="/" dev="tmpfs"
+ino=12458 scontext=system_u:system_r:nmbd_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:tmpfs_t:s0 tclass=dir permissive=0
+
+avc:  denied  { map } for  pid=279 comm="nmbd"
+path="/var/lib/samba/names.tdb" dev="vda" ino=31256
+scontext=system_u:system_r:nmbd_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:samba_var_t:s0 tclass=file permissive=0
+
+avc:  denied  { create } for  pid=278 comm="nmbd" name="msg.lock"
+scontext=system_u:system_r:nmbd_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:samba_var_t:s0 tclass=dir permissive=0
+
+avc:  denied  { search } for  pid=344 comm="smbd" name="dbus"
+dev="tmpfs" ino=14026 scontext=system_u:system_r:smbd_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:system_dbusd_runtime_t:s0 tclass=dir
+permissive=0
+
+tavc:  denied  { write } for  pid=344 comm="smbd"
+name="system_bus_socket" dev="tmpfs" ino=14029
+scontext=system_u:system_r:smbd_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:system_dbusd_runtime_t:s0 tclass=sock_file
+permissive=0
+
+avc:  denied  { connectto } for  pid=344 comm="smbd"
+path="/run/dbus/system_bus_socket"
+scontext=system_u:system_r:smbd_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:system_dbusd_t:s0-s15:c0.c1023
+tclass=unix_stream_socket permissive=0
+
+smbd[308]:   reopen_one_log: Unable to open new log file '/var/log/samba/log.smbd': Permission denied
+
+avc:  denied  { search } for  pid=308 comm="smbd" name="/" dev="tmpfs"
+ino=12440 scontext=system_u:system_r:smbd_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:tmpfs_t:s0 tclass=dir permissive=0
+
+avc:  denied  { send_msg } for msgtype=method_call
+interface=org.freedesktop.DBus.Peer member=Ping
+dest=org.freedesktop.Avahi spid=312 tpid=236
+scontext=system_u:system_r:smbd_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:avahi_t:s0-s15:c0.c1023 tclass=dbus
+permissive=0
+
+avc:  denied  { send_msg } for msgtype=signal
+interface=org.freedesktop.Avahi.Server member=StateChanged
+dest=org.freedesktop.DBus spid=236 tpid=312
+scontext=system_u:system_r:avahi_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:smbd_t:s0-s15:c0.c1023 tclass=dbus
+permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/samba.te | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/policy/modules/services/samba.te b/policy/modules/services/samba.te
+index 030f0bd3a..4d5414b55 100644
+--- a/policy/modules/services/samba.te
++++ b/policy/modules/services/samba.te
+@@ -302,6 +302,7 @@ manage_dirs_pattern(smbd_t, samba_var_t, samba_var_t)
+ manage_files_pattern(smbd_t, samba_var_t, samba_var_t)
+ manage_lnk_files_pattern(smbd_t, samba_var_t, samba_var_t)
+ manage_sock_files_pattern(smbd_t, samba_var_t, samba_var_t)
++mmap_read_files_pattern(smbd_t, samba_var_t, samba_var_t)
+ files_var_filetrans(smbd_t, samba_var_t, dir, "samba")
+ 
+ manage_dirs_pattern(smbd_t, smbd_tmp_t, smbd_tmp_t)
+@@ -326,6 +327,9 @@ kernel_read_kernel_sysctls(smbd_t)
+ kernel_read_software_raid_state(smbd_t)
+ kernel_read_system_state(smbd_t)
+ 
++dbus_system_bus_client(smbd_t)
++avahi_dbus_chat(smbd_t)
++
+ corecmd_exec_bin(smbd_t)
+ corecmd_exec_shell(smbd_t)
+ 
+@@ -367,6 +371,7 @@ fs_search_auto_mountpoints(smbd_t)
+ fs_getattr_rpc_dirs(smbd_t)
+ fs_list_inotifyfs(smbd_t)
+ fs_get_all_fs_quotas(smbd_t)
++fs_search_tmpfs(smbd_t)
+ 
+ term_use_ptmx(smbd_t)
+ 
+@@ -535,10 +540,12 @@ append_files_pattern(nmbd_t, samba_log_t, samba_log_t)
+ create_files_pattern(nmbd_t, samba_log_t, samba_log_t)
+ setattr_files_pattern(nmbd_t, samba_log_t, samba_log_t)
+ 
++manage_dirs_pattern(nmbd_t, samba_var_t, samba_var_t)
+ manage_files_pattern(nmbd_t, samba_var_t, samba_var_t)
+ manage_files_pattern(nmbd_t, samba_var_t, samba_var_t)
+ manage_lnk_files_pattern(nmbd_t, samba_var_t, samba_var_t)
+ manage_sock_files_pattern(nmbd_t, samba_var_t, samba_var_t)
++mmap_read_files_pattern(nmbd_t, samba_var_t, samba_var_t)
+ files_var_filetrans(nmbd_t, samba_var_t, dir, "nmbd")
+ files_var_filetrans(nmbd_t, samba_var_t, dir, "samba")
+ 
+@@ -579,6 +586,7 @@ files_list_var_lib(nmbd_t)
+ 
+ fs_getattr_all_fs(nmbd_t)
+ fs_search_auto_mountpoints(nmbd_t)
++fs_search_tmpfs(nmbd_t)
+ 
+ auth_use_nsswitch(nmbd_t)
+ 
+-- 
+2.17.1
+

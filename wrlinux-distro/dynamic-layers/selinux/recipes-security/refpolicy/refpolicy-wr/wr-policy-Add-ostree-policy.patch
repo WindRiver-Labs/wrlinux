@@ -1,0 +1,212 @@
+From ed82d604058c628467bac790524d26b20c8202ad Mon Sep 17 00:00:00 2001
+From: Liwei Song <liwei.song@windriver.com>
+Date: Thu, 9 Jan 2020 02:21:51 +0000
+Subject: [PATCH] Add ostree policy
+
+ostree is use to upgrade the whole system, add the policy for it.
+
+Upstream-Status: Pending
+
+Signed-off-by: Liwei Song <liwei.song@windriver.com>
+---
+ policy/modules/admin/ostree.fc |   3 +
+ policy/modules/admin/ostree.if |  49 ++++++++++++++++
+ policy/modules/admin/ostree.te | 104 +++++++++++++++++++++++++++++++++
+ policy/modules/roles/sysadm.te |   4 ++
+ 4 files changed, 160 insertions(+)
+ create mode 100644 policy/modules/admin/ostree.fc
+ create mode 100644 policy/modules/admin/ostree.if
+ create mode 100644 policy/modules/admin/ostree.te
+
+diff --git a/policy/modules/admin/ostree.fc b/policy/modules/admin/ostree.fc
+new file mode 100644
+index 000000000..a595b5d8c
+--- /dev/null
++++ b/policy/modules/admin/ostree.fc
+@@ -0,0 +1,3 @@
++# Core definitions
++/usr/bin/ostree_reset.sh	--	gen_context(system_u:object_r:ostree_exec_t,s0)
++/usr/bin/ostree	--	gen_context(system_u:object_r:ostree_exec_t,s0)
+diff --git a/policy/modules/admin/ostree.if b/policy/modules/admin/ostree.if
+new file mode 100644
+index 000000000..e781f6fa2
+--- /dev/null
++++ b/policy/modules/admin/ostree.if
+@@ -0,0 +1,49 @@
++## <summary>Utilities for the ostree module.</summary>
++#
++
++########################################
++## <summary>
++##      Execute ostree in the ostree domain.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed to transition.
++##      </summary>
++## </param>
++#
++interface(`ostree_domtrans',`
++        gen_require(`
++                type ostree_t, ostree_exec_t;
++        ')
++
++        corecmd_search_bin($1)
++        domtrans_pattern($1, ostree_exec_t, ostree_t)
++')
++
++
++########################################
++## <summary>
++##      Execute ostree in the ostree domain,
++##      and allow the specified roles the
++##      ostree domain.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed to transition.
++##      </summary>
++## </param>
++## <param name="role">
++##      <summary>
++##      Role allowed access.
++##      </summary>
++## </param>
++## <rolecap/>
++#
++interface(`ostree_run',`
++        gen_require(`
++                attribute_role ostree_roles;
++        ')
++
++        ostree_domtrans($1)
++        roleattribute $2 ostree_roles;
++')
+diff --git a/policy/modules/admin/ostree.te b/policy/modules/admin/ostree.te
+new file mode 100644
+index 000000000..b9d2bb774
+--- /dev/null
++++ b/policy/modules/admin/ostree.te
+@@ -0,0 +1,104 @@
++policy_module(ostree, 2019.2)
++
++#####################################
++
++attribute_role ostree_roles;
++
++type ostree_t;
++type ostree_exec_t;
++init_system_domain(ostree_t, ostree_exec_t)
++domain_obj_id_change_exemption(ostree_t)
++domain_role_change_exemption(ostree_t)
++domain_system_change_exemption(ostree_t)
++domain_interactive_fd(ostree_t)
++domain_entry_file(ostree_t, ostree_exec_t)
++role ostree_roles types ostree_t;
++can_exec(ostree_t, ostree_exec_t)
++
++####################################
++# ostree policy
++#
++
++allow ostree_t self:capability { chown dac_override dac_read_search fowner fsetid kill setgid setuid setpcap linux_immutable net_bind_service net_broadcast net_admin net_raw ipc_lock ipc_owner sys_rawio sys_chroot sys_ptrace sys_pacct sys_admin sys_boot sys_nice sys_resource sys_time sys_tty_config mknod lease audit_write audit_control setfcap };
++allow ostree_t self:process { transition signal_perms ptrace getsched setsched getsession getpgid setpgid getcap setcap share getattr setfscreate noatsecure siginh rlimitinh dyntransition execmem setkeycreate setsockcreate getrlimit };
++
++allow ostree_t self:fd use;
++allow ostree_t self:fifo_file rw_fifo_file_perms;
++allow ostree_t self:unix_dgram_socket sendto;
++allow ostree_t self:unix_stream_socket { accept connectto listen };
++allow ostree_t self:udp_socket connect;
++allow ostree_t self:tcp_socket { accept listen };
++allow ostree_t self:msg { send receive };
++allow ostree_t self:file rw_file_perms;
++allow ostree_t self:netlink_kobject_uevent_socket create_socket_perms;
++
++kernel_read_crypto_sysctls(ostree_t)
++kernel_read_network_state(ostree_t)
++kernel_read_system_state(ostree_t)
++kernel_read_kernel_sysctls(ostree_t)
++kernel_read_network_state_symlinks(ostree_t)
++kernel_rw_irq_sysctls(ostree_t)
++
++term_getattr_unallocated_ttys(ostree_t)
++term_write_all_ttys(ostree_t)
++term_list_ptys(ostree_t)
++userdom_use_user_terminals(ostree_t)
++userdom_use_unpriv_users_fds(ostree_t)
++
++corecmd_exec_all_executables(ostree_t)
++
++corenet_all_recvfrom_unlabeled(ostree_t)
++corenet_all_recvfrom_netlabel(ostree_t)
++corenet_tcp_sendrecv_generic_if(ostree_t)
++corenet_tcp_sendrecv_generic_node(ostree_t)
++corenet_tcp_sendrecv_all_ports(ostree_t)
++corenet_sendrecv_all_client_packets(ostree_t)
++corenet_tcp_connect_all_ports(ostree_t)
++
++dev_list_sysfs(ostree_t)
++dev_list_usbfs(ostree_t)
++dev_read_urand(ostree_t)
++dev_read_raw_memory(ostree_t)
++
++dev_manage_all_dev_nodes(ostree_t)
++dev_relabel_all_dev_nodes(ostree_t)
++
++dev_create_generic_blk_files(ostree_t)
++dev_create_generic_chr_files(ostree_t)
++
++domain_read_all_domains_state(ostree_t)
++domain_getattr_all_domains(ostree_t)
++domain_use_interactive_fds(ostree_t)
++domain_signull_all_domains(ostree_t)
++
++files_manage_non_auth_files(ostree_t)
++files_exec_etc_files(ostree_t)
++files_relabel_non_auth_files(ostree_t)
++files_manage_non_auth_files(ostree_t)
++files_map_non_auth_files(ostree_t)
++
++fs_getattr_all_dirs(ostree_t)
++fs_getattr_all_fs(ostree_t)
++
++sysnet_dns_name_resolve(ostree_t);
++
++mls_file_read_all_levels(ostree_t)
++mls_file_write_all_levels(ostree_t)
++mls_file_relabel(ostree_t)
++mls_file_upgrade(ostree_t)
++mls_file_downgrade(ostree_t)
++
++storage_raw_write_fixed_disk(ostree_t)
++storage_raw_read_fixed_disk(ostree_t)
++
++auth_manage_shadow(ostree_t)
++auth_relabel_shadow(ostree_t)
++auth_rw_shadow(ostree_t)
++
++init_domtrans_script(ostree_t)
++init_use_script_ptys(ostree_t)
++init_signull_script(ostree_t)
++
++libs_exec_ld_so(ostree_t)
++libs_exec_lib_files(ostree_t)
++libs_run_ldconfig(ostree_t, ostree_roles)
+diff --git a/policy/modules/roles/sysadm.te b/policy/modules/roles/sysadm.te
+index 8daf8f9eb..71b0ae6b9 100644
+--- a/policy/modules/roles/sysadm.te
++++ b/policy/modules/roles/sysadm.te
+@@ -1139,6 +1139,10 @@ optional_policy(`
+ 	tboot_run_txtstat(sysadm_t, sysadm_r)
+ ')
+ 
++optional_policy(`
++	ostree_run(sysadm_t, sysadm_r)
++')
++
+ optional_policy(`
+ 	tcsd_admin(sysadm_t, sysadm_r)
+ ')
+-- 
+2.17.1
+

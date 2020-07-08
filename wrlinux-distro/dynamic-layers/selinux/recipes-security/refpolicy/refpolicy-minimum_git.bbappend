@@ -4,7 +4,4 @@
 
 POLICY_NAME = "wr-minimum"
 
-include refpolicy-targeted_wr.inc
-
-SRC_URI += "file://wr-policy-minimum-fix-avc-denials.patch \
-           "
+include refpolicy_wr.inc

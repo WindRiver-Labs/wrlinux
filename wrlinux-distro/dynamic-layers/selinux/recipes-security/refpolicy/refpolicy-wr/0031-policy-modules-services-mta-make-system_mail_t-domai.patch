@@ -1,0 +1,36 @@
+From 4a44598012b24f0f215e4a8232490d0982baf26a Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 10 Jul 2020 09:25:04 +0800
+Subject: [PATCH] policy/modules/services/mta: make system_mail_t domain MLS
+ trusted for reading from files up to its clearance
+
+Fixes:
+avc:  denied  { search } for  pid=1012 comm="sendmail" name="journal"
+dev="tmpfs" ino=14165
+scontext=system_u:system_r:system_mail_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:syslogd_runtime_t:s15:c0.c1023 tclass=dir
+permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/mta.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/services/mta.te b/policy/modules/services/mta.te
+index a92e318ca..218c3f7f8 100644
+--- a/policy/modules/services/mta.te
++++ b/policy/modules/services/mta.te
+@@ -200,6 +200,8 @@ init_rw_stream_sockets(system_mail_t)
+ 
+ userdom_use_user_terminals(system_mail_t)
+ 
++mls_file_read_to_clearance(system_mail_t)
++
+ optional_policy(`
+ 	apt_use_fds(system_mail_t)
+ 	apt_use_ptys(system_mail_t)
+-- 
+2.17.1
+

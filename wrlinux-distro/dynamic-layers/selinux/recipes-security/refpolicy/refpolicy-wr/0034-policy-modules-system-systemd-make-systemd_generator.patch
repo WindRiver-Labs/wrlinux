@@ -1,0 +1,35 @@
+From 3830104e797ca3a2e90730503ff63b4ba6fd108e Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 10 Jul 2020 10:04:17 +0800
+Subject: [PATCH] policy/modules/system/systemd: make systemd_generator_t
+ domain MLS trusted for read to files up to its clearance
+
+Fixes:
+avc:  denied  { read } for  pid=125 comm="systemd-gpt-aut" name="sdb"
+dev="devtmpfs" ino=42
+scontext=system_u:system_r:systemd_generator_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:fixed_disk_device_t:s15:c0.c1023
+tclass=blk_file permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/systemd.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 3e1c482a8..d6a66be83 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -405,6 +405,7 @@ systemd_log_parse_environment(systemd_generator_t)
+ 
+ term_dontaudit_use_unallocated_ttys(systemd_generator_t)
+ mls_file_write_to_clearance(systemd_generator_t)
++mls_file_read_to_clearance(systemd_generator_t)
+ 
+ optional_policy(`
+ 	fstools_exec(systemd_generator_t)
+-- 
+2.17.1
+

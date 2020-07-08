@@ -1,0 +1,208 @@
+From d427c37569297d4583ea46f7975c7e91d9342149 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 4 Jun 2020 10:30:19 +0200
+Subject: [PATCH] policy/modules/system/systemd: fix avc denials for systemd
+ userdb
+
+Fixes:
+avc:  denied  { write } for  pid=304 comm="login"
+name="io.systemd.Multiplexer" dev="tmpfs" ino=11016
+scontext=system_u:system_r:local_login_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:init_runtime_t:s0 tclass=sock_file
+permissive=0
+
+avc:  denied  { read } for  pid=304 comm="login" name="userdb"
+dev="tmpfs" ino=10946
+scontext=system_u:system_r:local_login_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:init_runtime_t:s0 tclass=dir permissive=0
+
+avc:  denied  { connectto } for  pid=198 comm="systemd-logind"
+path="/run/systemd/userdb/io.systemd.Multiplexer"
+scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:initrc_t:s0-s15:c0.c1023
+tclass=unix_stream_socket permissive=0
+
+avc:  denied  { read } for  pid=198 comm="systemd-logind"
+name="io.systemd.NameServiceSwitch" dev="tmpfs" ino=11018
+scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:init_runtime_t:s0 tclass=lnk_file
+permissive=0
+
+avc:  denied  { connectto } for  pid=198 comm="systemd-logind"
+path="/run/systemd/userdb/io.systemd.DynamicUser"
+scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:init_t:s0-s15:c0.c1023
+tclass=unix_stream_socket permissive=0
+
+avc:  denied  { read } for  pid=198 comm="systemd-logind" name="shadow"
+dev="vda" ino=1139
+scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:shadow_t:s0 tclass=file permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/authlogin.te |  4 +++
+ policy/modules/system/init.if      | 20 +++++++++++++++
+ policy/modules/system/init.te      |  1 +
+ policy/modules/system/systemd.fc   |  1 +
+ policy/modules/system/systemd.if   | 41 ++++++++++++++++++++++++++++++
+ policy/modules/system/systemd.te   |  5 ++++
+ 6 files changed, 72 insertions(+)
+
+diff --git a/policy/modules/system/authlogin.te b/policy/modules/system/authlogin.te
+index e999fa798..26535d0b5 100644
+--- a/policy/modules/system/authlogin.te
++++ b/policy/modules/system/authlogin.te
+@@ -426,6 +426,10 @@ files_read_etc_files(nsswitch_domain)
+ 
+ sysnet_dns_name_resolve(nsswitch_domain)
+ 
++ifdef(`init_systemd', `
++	systemd_stream_connect_userdb(nsswitch_domain)
++')
++
+ tunable_policy(`authlogin_nsswitch_use_ldap',`
+ 	miscfiles_read_generic_certs(nsswitch_domain)
+ 	sysnet_use_ldap(nsswitch_domain)
+diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
+index ab24b5d9b..cba9d1b30 100644
+--- a/policy/modules/system/init.if
++++ b/policy/modules/system/init.if
+@@ -923,6 +923,26 @@ interface(`init_stream_connect',`
+ 	allow $1 init_t:unix_stream_socket getattr;
+ ')
+ 
++########################################
++## <summary>
++##	Connect to init with a unix socket.
++##  Without any additional permissions.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`init_unix_stream_socket_connectto',`
++	gen_require(`
++		type init_t, initrc_t;
++	')
++
++	allow $1 init_t:unix_stream_socket connectto;
++	allow $1 initrc_t:unix_stream_socket connectto;
++')
++
+ ########################################
+ ## <summary>
+ ##	Inherit and use file descriptors from init.
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index feed5af5f..eaf96ce04 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -476,6 +476,7 @@ ifdef(`init_systemd',`
+ 	systemd_relabelto_journal_dirs(init_t)
+ 	systemd_relabelto_journal_files(init_t)
+ 	systemd_rw_networkd_netlink_route_sockets(init_t)
++	systemd_create_userdb_sockets(init_t)
+ 
+ 	term_create_devpts_dirs(init_t)
+ 	term_create_ptmx(init_t)
+diff --git a/policy/modules/system/systemd.fc b/policy/modules/system/systemd.fc
+index f9b808a00..e17fa1754 100644
+--- a/policy/modules/system/systemd.fc
++++ b/policy/modules/system/systemd.fc
+@@ -72,6 +72,7 @@
+ /run/systemd/seats(/.*)?	gen_context(system_u:object_r:systemd_sessions_runtime_t,s0)
+ /run/systemd/sessions(/.*)?	gen_context(system_u:object_r:systemd_sessions_runtime_t,s0)
+ /run/systemd/users(/.*)?	gen_context(system_u:object_r:systemd_logind_runtime_t,s0)
++/run/systemd/userdb(/.*)?	gen_context(system_u:object_r:systemd_userdb_runtime_t,s0)
+ /run/systemd/inhibit(/.*)?	gen_context(system_u:object_r:systemd_logind_inhibit_runtime_t,s0)
+ /run/systemd/nspawn(/.*)?	gen_context(system_u:object_r:systemd_nspawn_runtime_t,s0)
+ /run/systemd/machines(/.*)?	gen_context(system_u:object_r:systemd_machined_runtime_t,s0)
+diff --git a/policy/modules/system/systemd.if b/policy/modules/system/systemd.if
+index b81300835..c63b43625 100644
+--- a/policy/modules/system/systemd.if
++++ b/policy/modules/system/systemd.if
+@@ -426,6 +426,47 @@ interface(`systemd_signull_logind',`
+ 	allow $1 systemd_logind_t:process signull;
+ ')
+ 
++########################################
++## <summary>
++##  Create sockets under /run/systemd/userdb .
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_create_userdb_sockets', `
++	gen_require(`
++		type systemd_userdb_runtime_t;
++	')
++
++	manage_sock_files_pattern($1, systemd_userdb_runtime_t, systemd_userdb_runtime_t)
++	init_runtime_filetrans($1, systemd_userdb_runtime_t, dir, "userdb")
++')
++
++########################################
++## <summary>
++##  Connect to /run/systemd/userdb/io.systemd.DynamicUser .
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_stream_connect_userdb', `
++	gen_require(`
++		type systemd_userdb_runtime_t;
++	')
++
++	init_search_runtime($1)
++	allow $1 systemd_userdb_runtime_t:dir list_dir_perms;
++	allow $1 systemd_userdb_runtime_t:sock_file write_sock_file_perms;
++	allow $1 systemd_userdb_runtime_t:lnk_file read_lnk_file_perms;
++	init_unix_stream_socket_connectto($1)
++')
++
+ ########################################
+ ## <summary>
+ ##	Allow reading /run/systemd/machines
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 6384ccecf..f6bb61fc5 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -242,6 +242,9 @@ init_system_domain(systemd_user_runtime_dir_t, systemd_user_runtime_dir_exec_t)
+ type systemd_user_tmpfs_t;
+ userdom_user_tmpfs_file(systemd_user_tmpfs_t)
+ 
++type systemd_userdb_runtime_t;
++files_runtime_file(systemd_userdb_runtime_t)
++
+ #
+ # Unit file types
+ #
+@@ -574,6 +577,7 @@ term_setattr_unallocated_ttys(systemd_logind_t)
+ term_use_unallocated_ttys(systemd_logind_t)
+ 
+ auth_manage_faillog(systemd_logind_t)
++auth_use_nsswitch(systemd_logind_t)
+ 
+ init_dbus_send_script(systemd_logind_t)
+ init_get_all_units_status(systemd_logind_t)
+@@ -623,6 +627,7 @@ userdom_relabelfrom_user_runtime_dirs(systemd_logind_t)
+ userdom_relabelto_user_runtime_dirs(systemd_logind_t)
+ userdom_setattr_user_ttys(systemd_logind_t)
+ userdom_use_user_ttys(systemd_logind_t)
++auth_read_shadow(systemd_logind_t)
+ 
+ mls_file_read_to_clearance(systemd_logind_t)
+ 
+-- 
+2.17.1
+

@@ -1,0 +1,36 @@
+From d0bdaeed799ffff1f694aba2cc855c1fab8d66ad Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 3 Jul 2020 08:57:51 +0800
+Subject: [PATCH] policy/modules/services/inetd: make inetd_t domain MLS
+ trusted for reading from files up to its clearance
+
+Allow inetd_t to search /run/systemd/journal
+
+Fixes:
+avc:  denied  { search } for  pid=286 comm="xinetd" name="journal"
+dev="tmpfs" ino=10990 scontext=system_u:system_r:inetd_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:syslogd_runtime_t:s15:c0.c1023 tclass=dir
+permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/inetd.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/services/inetd.te b/policy/modules/services/inetd.te
+index 994d36764..e7d8528fe 100644
+--- a/policy/modules/services/inetd.te
++++ b/policy/modules/services/inetd.te
+@@ -161,6 +161,7 @@ mls_socket_read_to_clearance(inetd_t)
+ mls_socket_write_to_clearance(inetd_t)
+ mls_net_outbound_all_levels(inetd_t)
+ mls_process_set_level(inetd_t)
++mls_file_read_to_clearance(inetd_t)
+ 
+ userdom_dontaudit_use_unpriv_user_fds(inetd_t)
+ userdom_dontaudit_search_user_home_dirs(inetd_t)
+-- 
+2.17.1
+

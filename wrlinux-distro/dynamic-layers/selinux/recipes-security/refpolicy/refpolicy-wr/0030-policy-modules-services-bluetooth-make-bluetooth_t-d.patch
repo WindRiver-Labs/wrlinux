@@ -1,0 +1,61 @@
+From 4ccced4b8b2857c28ad1e8ca606487cc92f8813f Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 10 Jul 2020 09:18:12 +0800
+Subject: [PATCH] policy/modules/services/bluetooth: make bluetooth_t domain
+ MLS trusted for reading from files up to its clearance
+
+* Make bluetooth_t domain MLS trusted for reading from files up to its clearance
+* Allow bluetooth_t to create alg_socket
+* Allow bluetooth_t to send and receive messages from systemd hostnamed over dbus
+
+Fixes:
+avc:  denied  { search } for  pid=268 comm="bluetoothd" name="journal"
+dev="tmpfs" ino=14165
+scontext=system_u:system_r:bluetooth_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:syslogd_runtime_t:s15:c0.c1023 tclass=dir
+permissive=0
+
+avc:  denied  { create } for  pid=268 comm="bluetoothd"
+scontext=system_u:system_r:bluetooth_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:bluetooth_t:s0-s15:c0.c1023 tclass=alg_socket
+permissive=0
+
+avc:  denied  { send_msg } for msgtype=method_call
+interface=org.freedesktop.DBus.Properties member=GetAll
+dest=org.freedesktop.hostname1 spid=266 tpid=312
+scontext=system_u:system_r:bluetooth_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:systemd_hostnamed_t:s0-s15:c0.c1023
+tclass=dbus permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/bluetooth.te | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/policy/modules/services/bluetooth.te b/policy/modules/services/bluetooth.te
+index 63e50aeda..c94bf4c7f 100644
+--- a/policy/modules/services/bluetooth.te
++++ b/policy/modules/services/bluetooth.te
+@@ -61,6 +61,7 @@ allow bluetooth_t self:unix_stream_socket { accept connectto listen };
+ allow bluetooth_t self:tcp_socket { accept listen };
+ allow bluetooth_t self:netlink_kobject_uevent_socket create_socket_perms;
+ allow bluetooth_t self:bluetooth_socket create_stream_socket_perms;
++allow bluetooth_t self:alg_socket create;
+ 
+ read_files_pattern(bluetooth_t, bluetooth_conf_t, bluetooth_conf_t)
+ 
+@@ -129,6 +130,9 @@ userdom_dontaudit_use_user_terminals(bluetooth_t)
+ userdom_dontaudit_search_user_home_dirs(bluetooth_t)
+ 
+ init_dbus_send_script(bluetooth_t)
++systemd_dbus_chat_hostnamed(bluetooth_t)
++
++mls_file_read_to_clearance(bluetooth_t)
+ 
+ optional_policy(`
+ 	dbus_system_bus_client(bluetooth_t)
+-- 
+2.17.1
+

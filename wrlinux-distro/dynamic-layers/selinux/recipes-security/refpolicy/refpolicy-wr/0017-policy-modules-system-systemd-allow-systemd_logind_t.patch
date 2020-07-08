@@ -1,0 +1,37 @@
+From cc324ef18a012ac392da4eb6280e33f0002557da Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Wed, 8 Jul 2020 13:53:28 +0800
+Subject: [PATCH] policy/modules/system/systemd: allow systemd_logind_t to
+ watch initrc_runtime_t
+
+Fixes:
+avc:  denied  { watch } for  pid=200 comm="systemd-logind"
+path="/run/utmp" dev="tmpfs" ino=12766
+scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:initrc_runtime_t:s0 tclass=file permissive=0
+
+systemd-logind[200]: Failed to create inotify watch on /var/run/utmp, ignoring: Permission denied
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/systemd.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 7e573645b..6384ccecf 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -586,6 +586,8 @@ init_stop_all_units(systemd_logind_t)
+ init_start_system(systemd_logind_t)
+ init_stop_system(systemd_logind_t)
+ 
++allow systemd_logind_t initrc_runtime_t:file watch;
++
+ locallogin_read_state(systemd_logind_t)
+ 
+ seutil_libselinux_linked(systemd_logind_t)
+-- 
+2.17.1
+

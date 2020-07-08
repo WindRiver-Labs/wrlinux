@@ -1,0 +1,38 @@
+From 37e4a3de9d9c89af23105878a7eca4fc648eec39 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 3 Jul 2020 09:42:21 +0800
+Subject: [PATCH] policy/modules/services/bind: make named_t domain MLS trusted
+ for reading from files up to its clearance
+
+Allow named_t to search /run/systemd/journal
+
+Fixes:
+avc:  denied  { search } for  pid=295 comm="isc-worker0000"
+name="journal" dev="tmpfs" ino=10990
+scontext=system_u:system_r:named_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:syslogd_runtime_t:s15:c0.c1023 tclass=dir
+permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/bind.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/services/bind.te b/policy/modules/services/bind.te
+index 3b247a293..751774fbe 100644
+--- a/policy/modules/services/bind.te
++++ b/policy/modules/services/bind.te
+@@ -164,6 +164,8 @@ miscfiles_read_generic_tls_privkey(named_t)
+ userdom_dontaudit_use_unpriv_user_fds(named_t)
+ userdom_dontaudit_search_user_home_dirs(named_t)
+ 
++mls_file_read_to_clearance(named_t)
++
+ tunable_policy(`named_tcp_bind_http_port',`
+ 	corenet_sendrecv_http_server_packets(named_t)
+ 	corenet_tcp_bind_http_port(named_t)
+-- 
+2.17.1
+

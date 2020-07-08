@@ -4,4 +4,4 @@
 
 POLICY_NAME = "wr-targeted"
 
-include refpolicy-targeted_wr.inc
+include refpolicy_wr.inc

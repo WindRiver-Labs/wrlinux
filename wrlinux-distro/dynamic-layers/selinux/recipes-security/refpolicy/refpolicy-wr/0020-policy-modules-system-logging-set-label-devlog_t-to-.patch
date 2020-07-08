@@ -1,0 +1,78 @@
+From eb370e76d76c814c1debf03608c6f31fd575ad30 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 14 May 2019 16:02:19 +0800
+Subject: [PATCH] policy/modules/system/logging: set label devlog_t to symlink
+ /dev/log
+
+* Set labe devlog_t to symlink /dev/log
+* Allow syslogd_t to manage devlog_t link file
+
+Fixes:
+avc:  denied  { unlink } for  pid=250 comm="rsyslogd" name="log"
+dev="devtmpfs" ino=10997
+scontext=system_u:system_r:syslogd_t:s15:c0.c1023
+tcontext=system_u:object_r:device_t:s0 tclass=lnk_file permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/logging.fc | 1 +
+ policy/modules/system/logging.if | 4 ++++
+ policy/modules/system/logging.te | 1 +
+ 3 files changed, 6 insertions(+)
+
+diff --git a/policy/modules/system/logging.fc b/policy/modules/system/logging.fc
+index dee26a9f4..02f0b6270 100644
+--- a/policy/modules/system/logging.fc
++++ b/policy/modules/system/logging.fc
+@@ -1,4 +1,5 @@
+ /dev/log		-s	gen_context(system_u:object_r:devlog_t,mls_systemhigh)
++/dev/log		-l	gen_context(system_u:object_r:devlog_t,s0)
+ 
+ /etc/rsyslog\.conf					--	gen_context(system_u:object_r:syslog_conf_t,s0)
+ /etc/syslog\.conf					--	gen_context(system_u:object_r:syslog_conf_t,s0)
+diff --git a/policy/modules/system/logging.if b/policy/modules/system/logging.if
+index e3cbe4f1a..9a876be1a 100644
+--- a/policy/modules/system/logging.if
++++ b/policy/modules/system/logging.if
+@@ -661,6 +661,7 @@ interface(`logging_send_syslog_msg',`
+ 	')
+ 
+ 	allow $1 devlog_t:sock_file write_sock_file_perms;
++	allow $1 devlog_t:lnk_file read_lnk_file_perms;
+ 
+ 	# systemd journal socket is in /run/systemd/journal/dev-log
+ 	init_search_run($1)
+@@ -723,6 +724,7 @@ interface(`logging_relabelto_devlog_sock_files',`
+ 	')
+ 
+ 	allow $1 devlog_t:sock_file relabelto_sock_file_perms;
++	allow $1 devlog_t:lnk_file relabelto_lnk_file_perms;
+ ')
+ 
+ ########################################
+@@ -742,6 +744,8 @@ interface(`logging_create_devlog',`
+ 
+ 	allow $1 devlog_t:sock_file manage_sock_file_perms;
+ 	dev_filetrans($1, devlog_t, sock_file)
++	allow $1 devlog_t:lnk_file manage_lnk_file_perms;
++	dev_filetrans($1, devlog_t, lnk_file)
+ 	init_runtime_filetrans($1, devlog_t, sock_file, "syslog")
+ ')
+ 
+diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
+index c22613c0b..5f29cde41 100644
+--- a/policy/modules/system/logging.te
++++ b/policy/modules/system/logging.te
+@@ -407,6 +407,7 @@ allow syslogd_t syslog_conf_t:dir list_dir_perms;
+ 
+ # Create and bind to /dev/log or /var/run/log.
+ allow syslogd_t devlog_t:sock_file manage_sock_file_perms;
++allow syslogd_t devlog_t:lnk_file manage_lnk_file_perms;
+ files_runtime_filetrans(syslogd_t, devlog_t, sock_file)
+ init_runtime_filetrans(syslogd_t, devlog_t, sock_file, "dev-log")
+ 
+-- 
+2.17.1
+

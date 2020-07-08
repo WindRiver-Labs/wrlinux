@@ -1,0 +1,38 @@
+From 8db1f23f14f08fd9982a27a5aa9ab6ef1dcfa6ea Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Tue, 2 Jan 2018 09:34:11 +0000
+Subject: [PATCH] policy/modules/system/userdomain: allow secadm to read
+ selinux policy
+
+Fixes:
+$ newrole -r secadm_r -- -c "sesearch -A -s mount_t -t shell_exec_t -c file"
+[Errno 13] Permission denied: '/sys/fs/selinux/policy'
+
+avc:  denied  { read_policy } for  pid=327 comm="python3"
+scontext=root:secadm_r:secadm_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:security_t:s15:c0.c1023 tclass=security
+permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/userdomain.if | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/system/userdomain.if b/policy/modules/system/userdomain.if
+index 5aab9ada7..1b5eb2444 100644
+--- a/policy/modules/system/userdomain.if
++++ b/policy/modules/system/userdomain.if
+@@ -1433,6 +1433,7 @@ template(`userdom_security_admin_template',`
+ 	selinux_set_enforce_mode($1)
+ 	selinux_set_all_booleans($1)
+ 	selinux_set_parameters($1)
++	selinux_read_policy($1)
+ 
+ 	files_relabel_non_auth_files($1)
+ 	auth_relabel_shadow($1)
+-- 
+2.17.1
+

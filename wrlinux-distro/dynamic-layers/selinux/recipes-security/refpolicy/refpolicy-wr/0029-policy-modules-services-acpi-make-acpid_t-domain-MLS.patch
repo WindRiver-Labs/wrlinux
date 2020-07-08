@@ -1,0 +1,47 @@
+From c954f502c6b74717fee3a886f06415696ea509f4 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 10 Jul 2020 09:07:00 +0800
+Subject: [PATCH] policy/modules/services/acpi: make acpid_t domain MLS trusted
+ for reading from files up to its clearance
+
+Fixes:
+avc:  denied  { search } for  pid=265 comm="acpid" name="journal"
+dev="tmpfs" ino=14165 scontext=system_u:system_r:acpid_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:syslogd_runtime_t:s15:c0.c1023 tclass=dir
+permissive=0
+
+avc:  denied  { watch } for  pid=269 comm="acpid" path="/dev/input"
+dev="devtmpfs" ino=35 scontext=system_u:system_r:acpid_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:device_t:s0 tclass=dir permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/acpi.te | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/policy/modules/services/acpi.te b/policy/modules/services/acpi.te
+index 26d16a369..742b93f5a 100644
+--- a/policy/modules/services/acpi.te
++++ b/policy/modules/services/acpi.te
+@@ -105,6 +105,7 @@ dev_rw_acpi_bios(acpid_t)
+ dev_rw_sysfs(acpid_t)
+ dev_dontaudit_getattr_all_chr_files(acpid_t)
+ dev_dontaudit_getattr_all_blk_files(acpid_t)
++dev_watch_dev_dirs(acpid_t)
+ 
+ files_exec_etc_files(acpid_t)
+ files_read_etc_runtime_files(acpid_t)
+@@ -154,6 +155,8 @@ userdom_dontaudit_use_unpriv_user_fds(acpid_t)
+ userdom_dontaudit_search_user_home_dirs(acpid_t)
+ userdom_dontaudit_search_user_home_content(acpid_t)
+ 
++mls_file_read_to_clearance(acpid_t)
++
+ optional_policy(`
+ 	automount_domtrans(acpid_t)
+ ')
+-- 
+2.17.1
+
