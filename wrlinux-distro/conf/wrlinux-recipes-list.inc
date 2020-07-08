@@ -23,6 +23,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     apr-util \
     apt \
     argp-standalone \
+    arm-trusted-firmware \
     asciidoc \
     aspell \
     assimp \
@@ -44,6 +45,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     babeltrace2 \
     base-files \
     base-passwd \
+    base-pdi \
     bash \
     bash-completion \
     bazel \
@@ -54,6 +56,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     bind \
     binutils \
     bison \
+    bitstream-microblaze \
     blktool \
     blktrace \
     blueman \
@@ -181,6 +184,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     dejagnu \
     depmodwrapper-cross \
     desktop-file-utils \
+    device-tree \
     dhcp \
     dialog \
     diffoscope \
@@ -230,6 +234,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     exo \
     expat \
     expect \
+    extract-cdo \
     f2fs-tools \
     faad2 \
     fbset \
@@ -246,10 +251,13 @@ WRLINUX_SUPPORTED_RECIPES = " \
     font-util \
     fontconfig \
     formfactor \
+    fpga-manager-util \
     freediameter \
     freeradius \
     freetype \
     fribidi \
+    fs-boot \
+    fsbl \
     fuse \
     garcon \
     gawk \
@@ -424,7 +432,9 @@ WRLINUX_SUPPORTED_RECIPES = " \
     kernel-devsrc \
     kernel-initramfs \
     kernel-initramfs-image \
+    kernel-module-hdmi \
     kernel-module-mali \
+    kernel-module-vcu \
     kexec-tools \
     key-store \
     keybinder \
@@ -525,6 +535,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     liblockfile \
     liblogging \
     libmailtools-perl \
+    libmali-xlnx \
     libmatchbox \
     libmcrypt \
     libmhash \
@@ -556,6 +567,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     libnss-nis \
     libogg \
     libomxil \
+    libomxil-xlnx \
     libpam \
     libpcap \
     libpciaccess \
@@ -619,6 +631,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     libva \
     libva-initial \
     libva-utils \
+    libvcu-xlnx \
     libvirt \
     libvmi \
     libvorbis \
@@ -682,6 +695,8 @@ WRLINUX_SUPPORTED_RECIPES = " \
     linux-intel-dev \
     linux-intel-rt \
     linux-libc-headers \
+    linux-xlnx \
+    linux-xlnx-dev \
     linux-yocto \
     linux-yocto-dev \
     lksctp-tools \
@@ -825,6 +840,9 @@ WRLINUX_SUPPORTED_RECIPES = " \
     open-isns \
     open-model-zoo \
     open-vm-tools \
+    openamp-fw-echo-testd \
+    openamp-fw-mat-muld \
+    openamp-fw-rpc-demo \
     opencv \
     openhpi \
     openipmi \
@@ -959,10 +977,13 @@ WRLINUX_SUPPORTED_RECIPES = " \
     pixman \
     pkgconf \
     pkgconfig \
+    platform-init \
+    plm \
     pm-graph \
     pm-utils \
     pmdk \
     pmtools \
+    pmu-firmware \
     pointercal-xinput \
     policycoreutils \
     polkit \
@@ -981,6 +1002,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     protobuf \
     protobuf-c \
     pseudo \
+    psm-firmware \
     psmisc \
     psplash \
     ptest-runner \
@@ -1344,6 +1366,8 @@ WRLINUX_SUPPORTED_RECIPES = " \
     u-boot-imx \
     u-boot-tools \
     u-boot-uenv \
+    u-boot-zynq-scr \
+    u-boot-zynq-uenv \
     ucarp \
     udev-extraconf \
     udisks2 \
@@ -1370,6 +1394,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     vala \
     valgrind \
     vblade \
+    vcu-firmware \
     vdso-test \
     vim \
     vim-tiny \
@@ -1500,6 +1525,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     xfsprogs \
     xfwm4 \
     xhost \
+    xilinx-mcs \
     xinetd \
     xinit \
     xinput \
@@ -1554,6 +1580,7 @@ WRLINUX_ALL_RECIPES = " \
     adwaita-icon-theme \
     aer-inject \
     agent-proxy \
+    ai-engine-driver \
     aircrack-ng \
     alsa-equal \
     alsa-lib \
@@ -1581,6 +1608,7 @@ WRLINUX_ALL_RECIPES = " \
     apr-util \
     apt \
     argp-standalone \
+    arm-trusted-firmware \
     arno-iptables-firewall \
     arptables \
     arpwatch \
@@ -1620,6 +1648,7 @@ WRLINUX_ALL_RECIPES = " \
     backport-iwlwifi \
     base-files \
     base-passwd \
+    base-pdi \
     bash \
     bash-completion \
     bastille \
@@ -1637,6 +1666,8 @@ WRLINUX_ALL_RECIPES = " \
     binutils \
     biossums \
     bison \
+    bitstream-extraction \
+    bitstream-microblaze \
     blktool \
     blktrace \
     blueman \
@@ -1648,6 +1679,7 @@ WRLINUX_ALL_RECIPES = " \
     boot-config \
     bootchart \
     bootchart2 \
+    bootgen \
     botan \
     bpftool \
     bpftrace \
@@ -1864,6 +1896,7 @@ WRLINUX_ALL_RECIPES = " \
     depmodwrapper-cross \
     desktop-file-utils \
     dev86 \
+    device-tree \
     devilspie2 \
     devmem2 \
     dfu-util \
@@ -1959,6 +1992,8 @@ WRLINUX_ALL_RECIPES = " \
     exo \
     expat \
     expect \
+    external-hdf \
+    extract-cdo \
     ez-ipupdate \
     f2fs-tools \
     faac \
@@ -1986,6 +2021,7 @@ WRLINUX_ALL_RECIPES = " \
     firewalld \
     flac \
     flashrom \
+    flashstrip \
     flatbuffers \
     flex \
     fltk \
@@ -2005,6 +2041,9 @@ WRLINUX_ALL_RECIPES = " \
     fontconfig \
     fontforge \
     formfactor \
+    fpga-init \
+    fpga-manager-script \
+    fpga-manager-util \
     fping \
     frame \
     freediameter \
@@ -2013,6 +2052,8 @@ WRLINUX_ALL_RECIPES = " \
     freerdp \
     freetype \
     fribidi \
+    fs-boot \
+    fsbl \
     fscryptctl \
     ftgl \
     fts \
@@ -2355,6 +2396,7 @@ WRLINUX_ALL_RECIPES = " \
     kata-runtime \
     kata-shim \
     kbd \
+    kc705-bitstream \
     kconfig-frontends \
     kea \
     keepalived \
@@ -2362,7 +2404,9 @@ WRLINUX_ALL_RECIPES = " \
     kernel-initramfs \
     kernel-initramfs-image \
     kernel-module-emlog \
+    kernel-module-hdmi \
     kernel-module-mali \
+    kernel-module-vcu \
     kernel-selftest \
     kexec-tools \
     kexec-tools-klibc \
@@ -2635,6 +2679,7 @@ WRLINUX_ALL_RECIPES = " \
     libogg \
     libol \
     libomxil \
+    libomxil-xlnx \
     liboop \
     libopenmpt \
     libopus \
@@ -2767,6 +2812,7 @@ WRLINUX_ALL_RECIPES = " \
     libva-initial \
     libva-utils \
     libvcard \
+    libvcu-xlnx \
     libvdpau \
     libvirt \
     libvmi \
@@ -2851,6 +2897,8 @@ WRLINUX_ALL_RECIPES = " \
     linux-intel-dev \
     linux-intel-rt \
     linux-libc-headers \
+    linux-xlnx \
+    linux-xlnx-dev \
     linux-yocto \
     linux-yocto-dev \
     linux-yocto-rt \
@@ -2878,6 +2926,7 @@ WRLINUX_ALL_RECIPES = " \
     logrotate \
     logwarn \
     logwatch \
+    lopper \
     loudmouth \
     lowpan-tools \
     lprng \
@@ -2927,6 +2976,7 @@ WRLINUX_ALL_RECIPES = " \
     matchbox-theme-sato \
     matchbox-wm \
     maven \
+    mb-realoc \
     mbedtls \
     mbuffer \
     mc \
@@ -3161,6 +3211,9 @@ WRLINUX_ALL_RECIPES = " \
     open-model-zoo \
     open-vm-tools \
     openal-soft \
+    openamp-fw-echo-testd \
+    openamp-fw-mat-muld \
+    openamp-fw-rpc-demo \
     openbox \
     opencl-clang \
     opencl-clhpp \
@@ -3397,6 +3450,8 @@ WRLINUX_ALL_RECIPES = " \
     pkcs11-helper \
     pkgconf \
     pkgconfig \
+    platform-init \
+    plm \
     ply \
     plymouth \
     pm-graph \
@@ -3404,6 +3459,8 @@ WRLINUX_ALL_RECIPES = " \
     pm-utils \
     pmdk \
     pmtools \
+    pmu-firmware \
+    pmu-rom \
     pngcheck \
     po4a \
     poco \
@@ -3438,6 +3495,7 @@ WRLINUX_ALL_RECIPES = " \
     proxy-libintl \
     pry \
     pseudo \
+    psm-firmware \
     psmisc \
     psplash \
     psqlodbc \
@@ -3935,6 +3993,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-bcrypt \
     python3-beautifulsoup4 \
     python3-behave \
+    python3-betamax \
     python3-bitarray \
     python3-bitstring \
     python3-blinker \
@@ -4009,6 +4068,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-dominate \
     python3-dotenv \
     python3-dt-schema \
+    python3-dtc \
     python3-dynamic-dispatch \
     python3-ecdsa \
     python3-editor \
@@ -4135,6 +4195,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-ldap \
     python3-lesscpy \
     python3-libarchive-c \
+    python3-libconf \
     python3-license-expression \
     python3-lockfile \
     python3-logutils \
@@ -4493,6 +4554,8 @@ WRLINUX_ALL_RECIPES = " \
     qat16 \
     qat17 \
     qemu \
+    qemu-devicetrees \
+    qemu-xilinx \
     qemuwrapper-cross \
     qmllive \
     qpdf \
@@ -4580,6 +4643,7 @@ WRLINUX_ALL_RECIPES = " \
     readline \
     redhat-security \
     redis \
+    redis-plus-plus \
     refpolicy-mcs \
     refpolicy-minimum \
     refpolicy-mls \
@@ -4904,6 +4968,10 @@ WRLINUX_ALL_RECIPES = " \
     u-boot-imx \
     u-boot-tools \
     u-boot-uenv \
+    u-boot-xlnx \
+    u-boot-xlnx-dev \
+    u-boot-zynq-scr \
+    u-boot-zynq-uenv \
     ubi-utils-klibc \
     ucarp \
     uchardet \
@@ -4932,6 +5000,7 @@ WRLINUX_ALL_RECIPES = " \
     unixodbc \
     unzip \
     update-rc.d \
+    updateboot \
     upm \
     upower \
     uriparser \
@@ -4961,6 +5030,7 @@ WRLINUX_ALL_RECIPES = " \
     valijson \
     vblade \
     vboxguestdrivers \
+    vcu-firmware \
     vdso-test \
     vgabios \
     vim \
@@ -5141,6 +5211,8 @@ WRLINUX_ALL_RECIPES = " \
     xfwm4-themes \
     xgamma \
     xhost \
+    xilinx-bootbin \
+    xilinx-mcs \
     xinetd \
     xinit \
     xinput \
@@ -5174,6 +5246,7 @@ WRLINUX_ALL_RECIPES = " \
     xrdp \
     xrefresh \
     xrestop \
+    xrt \
     xscreensaver \
     xserver-common \
     xserver-nodm-init \
@@ -5220,6 +5293,7 @@ WRLINUX_ALL_RECIPES = " \
     zlib-qat \
     zlog \
     znc \
+    zocl \
     zram \
     zsh \
     zstd \
