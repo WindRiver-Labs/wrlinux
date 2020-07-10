@@ -5,3 +5,9 @@ TOOLCHAIN_HOST_TASK_append = " \
     nativesdk-bootfs \
 "
 TOOLCHAIN_TARGET_TASK_append = " qemuwrapper-cross"
+
+POPULATE_SDK_PRE_TARGET_COMMAND += "copy_pkgdata_to_sdk;"
+copy_pkgdata_to_sdk() {
+    install -d ${SDK_OUTPUT}${SDKPATHNATIVE}${datadir}/pkgdata
+    cp -rf ${PKGDATA_DIR} ${SDK_OUTPUT}${SDKPATHNATIVE}${datadir}/pkgdata/
+}
