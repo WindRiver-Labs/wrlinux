@@ -1,4 +1,4 @@
-From 58a45909f2e3b69d4b3f946ec6149204f953b372 Mon Sep 17 00:00:00 2001
+From d78c706aa1a995562abb6e8e053be251d8170834 Mon Sep 17 00:00:00 2001
 From: Liwei Song <liwei.song@windriver.com>
 Date: Fri, 21 Feb 2020 11:23:19 +0800
 Subject: [PATCH] Allow sshd_t and staff_t read symlinks
@@ -30,17 +30,18 @@ Signed-off-by: Liwei Song <liwei.song@windriver.com>
  4 files changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/config/file_contexts.subs_dist b/config/file_contexts.subs_dist
-index 67f476868..c249c5207 100644
+index b5f8c5355..600d445dc 100644
 --- a/config/file_contexts.subs_dist
 +++ b/config/file_contexts.subs_dist
-@@ -43,7 +43,3 @@
- /usr/lib/busybox/bin /usr/bin
+@@ -44,8 +44,4 @@
  /usr/lib/busybox/sbin /usr/sbin
  /usr/lib/busybox/usr /usr
--
+ 
 -# The genhomedircon.py will expand /root home directory to /home/root
 -# Add an aliase for it
 -/root /home/root
+-
+ /usr/etc /etc
 diff --git a/policy/modules/roles/staff.te b/policy/modules/roles/staff.te
 index 6d840a584..55eaddf4b 100644
 --- a/policy/modules/roles/staff.te

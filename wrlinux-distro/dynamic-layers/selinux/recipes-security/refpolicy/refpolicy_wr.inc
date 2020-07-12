@@ -45,6 +45,7 @@ SRC_URI += "\
         "
 
 OSTREE_POLICY_PATCHES = "\
+        file://wr-policy-file_contexts.subs_dist-fix-label-for-usr-etc.patch \
         file://wr-policy-files-add-lable-if-mnt-opt-media-is-symlinks-file.patch \
         file://wr-policy-system-mount.te-allow-mount-on-symlink-file.patch \
         file://wr-policy-system-locallogin.te-allow-login-read-symlink-file.patch \

@@ -1,0 +1,27 @@
+From e5a9a0cac0c57355004ac90067051c93a0526321 Mon Sep 17 00:00:00 2001
+From: Liwei Song <liwei.song@windriver.com>
+Date: Wed, 8 Jan 2020 05:48:58 +0000
+Subject: [PATCH] file_contexts.subs_dist: fix label for /usr/etc
+
+/usr/etc should has the same label with /etc
+
+Upstream-Status: Pending
+
+Signed-off-by: Liwei Song <liwei.song@windriver.com>
+---
+ config/file_contexts.subs_dist | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/config/file_contexts.subs_dist b/config/file_contexts.subs_dist
+index 67f476868..b5f8c5355 100644
+--- a/config/file_contexts.subs_dist
++++ b/config/file_contexts.subs_dist
+@@ -47,3 +47,5 @@
+ # The genhomedircon.py will expand /root home directory to /home/root
+ # Add an aliase for it
+ /root /home/root
++
++/usr/etc /etc
+-- 
+2.17.1
+
