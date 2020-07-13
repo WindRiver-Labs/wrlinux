@@ -2707,7 +2707,6 @@ WRLINUX_ALL_RECIPES = " \
     libqofono \
     libraw1394 \
     librdmacm \
-    librealsense \
     librelp \
     librepo \
     libreport \
@@ -3410,6 +3409,7 @@ WRLINUX_ALL_RECIPES = " \
     pamela \
     pango \
     pangomm \
+    parallel-deqp-runner \
     parole \
     parson \
     parted \
@@ -3594,7 +3594,6 @@ WRLINUX_ALL_RECIPES = " \
     python-enum34 \
     python-epydoc \
     python-evdev \
-    python-falcon \
     python-feedformatter \
     python-feedparser \
     python-flask \
@@ -3667,7 +3666,6 @@ WRLINUX_ALL_RECIPES = " \
     python-jsonpointer \
     python-jsonref \
     python-jsonschema \
-    python-kazoo \
     python-keyring \
     python-keystone \
     python-keystone-hybrid-backend \
@@ -3933,7 +3931,6 @@ WRLINUX_ALL_RECIPES = " \
     python-xstatic-hogan \
     python-xstatic-jquery \
     python-xstatic-jquery-migrate \
-    python-xstatic-jquery-ui \
     python-xstatic-jquery.quicksearch \
     python-xstatic-jquery.tablesorter \
     python-xstatic-jsencrypt \
@@ -3945,7 +3942,6 @@ WRLINUX_ALL_RECIPES = " \
     python-xstatic-roboto-fontface \
     python-xstatic-spin \
     python-xstatic-term.js \
-    python-xstatic-tv4 \
     python-yappi \
     python-zake \
     python-zaqarclient \
@@ -4080,9 +4076,11 @@ WRLINUX_ALL_RECIPES = " \
     python3-eventlet \
     python3-extras \
     python3-fail2ban \
+    python3-falcon \
     python3-fann2 \
     python3-fasteners \
     python3-fastentrypoints \
+    python3-fastnumbers \
     python3-feedformatter \
     python3-fire \
     python3-fixtures \
@@ -4151,6 +4149,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-hyperlink \
     python3-i18n \
     python3-ibmiotf \
+    python3-icu \
     python3-idna \
     python3-idna-ssl \
     python3-imageio \
@@ -4182,6 +4181,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-jsonrpcserver \
     python3-jsonschema \
     python3-kafka \
+    python3-kazoo \
     python3-kconfiglib \
     python3-keras-applications \
     python3-keras-preprocessing \
@@ -4227,6 +4227,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-msm \
     python3-multidict \
     python3-nacl \
+    python3-natsort \
     python3-ndg-httpsclient \
     python3-netaddr \
     python3-netifaces \
@@ -4542,8 +4543,10 @@ WRLINUX_ALL_RECIPES = " \
     python3-xstatic-jasmine \
     python3-xstatic-jquery \
     python3-xstatic-jquery-migrate \
+    python3-xstatic-jquery-ui \
     python3-xstatic-roboto-fontface \
     python3-xstatic-smart-table \
+    python3-xstatic-tv4 \
     python3-xxhash \
     python3-yappi \
     python3-yarl \
