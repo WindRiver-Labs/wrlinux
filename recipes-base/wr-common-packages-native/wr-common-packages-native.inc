@@ -125,7 +125,6 @@ DEPENDS = "\
     lz4-native \
     lzip-native \
     lzo-native \
-    lzop-native \
     m4-native \
     make-native \
     makedepend-native \
