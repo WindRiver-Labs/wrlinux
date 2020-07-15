@@ -283,7 +283,7 @@ SDKMACHINE = "x86_64"
             raise Exception("Failed to figure tmpdir!")
 
         if not feed_uris_defined:
-            logger.warning('PACKAGE_FEED_URIS is not defined. check README.md on how to define it')
+            raise Exception('PACKAGE_FEED_URIS is not defined. check README.md on how to define it')
 
         self.repos_dir = os.path.join(self.outdir, self.machine, 'repos')
         if not os.path.exists(self.repos_dir):
