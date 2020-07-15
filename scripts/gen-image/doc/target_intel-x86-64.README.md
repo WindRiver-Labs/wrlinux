@@ -156,9 +156,6 @@ $ cd wrlinux-cd
 $ git clone -b WRLINUX_CI https://distro.windriver.com/sources/wrlinux/linux-cd/base/WRLinux-CD-Core/wrlinux-x/
 $ cd wrlinux-x
 $ git checkout <tag>
-
-The initial tag is vWRLINUX_CI_10.20.27.0
-
 $ cd ../
 $ ./wrlinux-x/setup.sh --all-layers --dl-layers
 $ . environment-setup-x86_64-wrlinuxsdk-linux
