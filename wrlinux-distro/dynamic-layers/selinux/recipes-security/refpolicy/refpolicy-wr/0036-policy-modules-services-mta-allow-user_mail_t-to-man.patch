@@ -1,0 +1,41 @@
+From 8dbe123485d87e207d7743c7fec0e84954adba0a Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Fri, 26 Feb 2016 07:24:57 -0500
+Subject: [PATCH] policy/modules/services/mta: allow user_mail_t to manage
+ etc_aliases_t file
+
+Fixes:
+$ newaliases
+postalias: fatal: open database /etc/aliases.db: Permission denied
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/mta.te | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/policy/modules/services/mta.te b/policy/modules/services/mta.te
+index 218c3f7f8..795a9773e 100644
+--- a/policy/modules/services/mta.te
++++ b/policy/modules/services/mta.te
+@@ -413,6 +413,15 @@ dev_read_sysfs(user_mail_t)
+ 
+ userdom_use_user_terminals(user_mail_t)
+ 
++# WRL fix:
++# create /etc/aliases* with type etc_aliases_t
++files_etc_filetrans(user_mail_t, etc_aliases_t, { file lnk_file sock_file fifo_file })
++
++# create, read, write, and delete mail address aliases
++mta_manage_aliases(user_mail_t)
++
++mls_file_read_to_clearance(user_mail_t)
++
+ optional_policy(`
+ 	allow user_mail_t self:capability dac_override;
+ 
+-- 
+2.17.1
+

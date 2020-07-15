@@ -42,6 +42,7 @@ SRC_URI += "\
         file://0033-policy-modules-system-systemd-make-systemd_rfkill_t-.patch \
         file://0034-policy-modules-system-systemd-make-systemd_generator.patch \
         file://0035-policy-modules-kernel-domain-allow-domain-to-map-gen.patch \
+        file://0036-policy-modules-services-mta-allow-user_mail_t-to-man.patch \
         "
 
 OSTREE_POLICY_PATCHES = "\
