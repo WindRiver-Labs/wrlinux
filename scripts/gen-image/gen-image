@@ -439,7 +439,7 @@ IMAGE_ENABLE_CONTAINER = "1"
 
         deploy_files = self.get_deploy_files(type='tar.bz2', ovmf=False, uboot=False)
 
-        deploy_files.append(os.path.join(self.doc_dir, 'container_%s.README.md' %  self.machine))
+        deploy_files.append(os.path.join(self.doc_dir, 'container.README.md'))
         self.do_deploy('%s/container' % self.machine, deploy_files)
 
     def gen_feeds(self):
