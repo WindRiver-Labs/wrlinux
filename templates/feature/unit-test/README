@@ -1,0 +1,10 @@
+This template adds unit testing frameworks supported by
+Wind River to the image.
+
+To use this template, add the following to your setup line:
+
+    --templates feature/unit-test
+
+#@TYPE: Wrtemplate
+#@NAME: unit-test
+#@DESCRIPTION: Adds unit testing frameworks
