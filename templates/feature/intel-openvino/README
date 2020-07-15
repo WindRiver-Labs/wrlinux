@@ -5,18 +5,18 @@
 ===========
 
 Intel Open Visual Inference and Neural network Optimization (OpenVINO)
-is use to helps developers and data scientists speed up computer vision
+is use to help developers and data scientists speed up computer vision
 workloads, streamline deep learning inference and deployments, and enable
 easy, heterogeneous execution across Intel platforms.
 
 2. Build Configuration
 ======================
 
-When OpenVNIO feature is included in your build, the following components
+When OpenVINO feature is included in your build, the following components
 will be added to your final image:
 
-    dldt-inference-engine
-    dldt-model-optimizer
+    openvino-inference-engine
+    openvino-model-optimizerdldt-model-optimizer
     open-model-zoo
 
 To enable this feature, please add the following configuration parameter:
