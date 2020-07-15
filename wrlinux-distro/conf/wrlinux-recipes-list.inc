@@ -3718,7 +3718,6 @@ WRLINUX_ALL_RECIPES = " \
     python-os-xenapi \
     python-oslo.cache \
     python-oslo.concurrency \
-    python-oslo.config \
     python-oslo.db \
     python-oslo.i18n \
     python-oslo.log \
@@ -4248,6 +4247,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-ordereddict \
     python3-os-client-config \
     python3-osc-lib \
+    python3-oslo.config \
     python3-oslo.context \
     python3-oslo.i18n \
     python3-oslo.serialization \
