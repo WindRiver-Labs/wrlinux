@@ -183,11 +183,11 @@ class GenImage(object):
         self.local_conf = os.path.join(self.builddir, 'conf/local.conf')
         self.local_conf_orig = '%s.orig' % self.local_conf
         if os.path.exists(self.local_conf_orig):
-            logger.info('Using %s as original local.conf' % self.local_conf_orig)
+            logger.info('Found %s, use it as local.conf' % self.local_conf_orig)
             shutil.copyfile(self.local_conf_orig, self.local_conf)
         else:
             if os.path.exists(self.local_conf):
-                logger.info('Saving %s as original local.conf' % self.local_conf)
+                logger.info('No local.conf.orig found, saving conf/local.conf to local.conf.orig')
                 shutil.copyfile(self.local_conf, self.local_conf_orig)
             else:
                 raise Exception('Failed to find %s' % self.local_conf)
