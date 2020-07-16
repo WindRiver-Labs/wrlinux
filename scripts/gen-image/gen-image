@@ -412,9 +412,6 @@ OSTREE_FDISK_RSZ = "6144"
                     basename = os.path.basename(d_file)[:-4]
                     new_image = os.path.join(self.builddir, '%s.ustart.img.gz' % basename)
                     os.rename('ustart.img.gz', new_image)
-                    cmd = 'gunzip -f %s' % new_image
-                    run_cmd(cmd, logger)
-                    new_image = new_image[:-3]
                     deploy_files.add(new_image)
                 else:
                     deploy_files.add(d_file)
