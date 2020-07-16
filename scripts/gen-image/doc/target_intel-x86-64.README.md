@@ -57,10 +57,10 @@ and un-mount those that are mounted, for example:
 
 Now burn the image onto the USB drive:
     For full image
-    $ sudo dd if=wrlinux-image-full-intel-x86-64.ustart.img of=/dev/sdf conv=notrunc
+    $ sudo zcat image-full-intel-x86-64.ustart.img.gz | dd of=/dev/sdf conv=notrunc
 
     Or minimal image
-    $ sudo dd if=wrlinux-image-minimal-intel-x86-64.ustart.img of=/dev/sdf conv=notrunc
+    $ sudo zcat wrlinux-image-minimal-intel-x86-64.ustart.img.gz |  dd of=/dev/sdf conv=notrunc
 
     $ sync
     $ eject /dev/sdf
@@ -71,30 +71,30 @@ result in a system booted to the Grub boot menuo.
 
 ### On Qemu
 Create a 14G disk image
-    $ qemu-img create -f raw path_to/img 14G
+    $ qemu-img create -f raw boot-image-qemu.hddimg 14G
 
 Burn the image onto 14G disk image:
     For full image
-    $ dd if=path_to/wrlinux-image-full-intel-x86-64.ustart.img of=path_to/img conv=notrunc
+    $ zcat wrlinux-image-full-intel-x86-64.ustart.img.gz | dd of=boot-image-qemu.hddimg conv=notrunc
 
     For minimal image
-    $ dd if=path_to/wrlinux-image-minimal-intel-x86-64.ustart.img of=path_to/img conv=notrunc
+    $ zcat wrlinux-image-minimal-intel-x86-64.ustart.img.gz | dd of=boot-image-qemu.hddimg conv=notrunc
 
 For qemu x86_64 with KVM:
 
     $ /usr/bin/qemu-system-x86_64 -net nic -net user -m 512 \
-        -drive if=none,id=hd,file=path_to/img,format=raw \
+        -drive if=none,id=hd,file=boot-image-qemu.hddimg,format=raw \
         -device virtio-scsi-pci,id=scsi -device scsi-hd,drive=hd \
         -cpu kvm64 -enable-kvm \
-        -drive if=pflash,format=qcow2,file=path_to/ovmf.qcow2
+        -drive if=pflash,format=qcow2,file=ovmf.qcow2
 
 For qemu x86_64 without KVM:
 
     $ /usr/bin/qemu-system-x86_64 -net nic -net user -m 512 \
-        -drive if=none,id=hd,file=path_to/img,format=raw \
+        -drive if=none,id=hd,file=boot-image-qemu.hddimg,format=raw \
         -device virtio-scsi-pci,id=scsi -device scsi-hd,drive=hd \
         -cpu Nehalem \
-        -drive if=pflash,format=qcow2,file=path_to/ovmf.qcow2
+        -drive if=pflash,format=qcow2,file=ovmf.qcow2
 
 #### Qemu Simulator
 /usr/bin/qemu-system-x86_64
@@ -109,7 +109,7 @@ Set guest startup RAM size, 512MB
 
 #### Qemu Image
 Use virtio-scsi-pci to load image
-`-drive if=none,id=hd,file=path_to/img,format=raw -device virtio-scsi-pci,id=scsi -device scsi-hd,drive=hd`
+`-drive if=none,id=hd,file=boot-image-qemu.hddimg,format=raw -device virtio-scsi-pci,id=scsi -device scsi-hd,drive=hd`
 
 #### Qemu CPU
 - KVM
@@ -126,7 +126,7 @@ If above refer does not work (such as you do not have root right to enable kvm)
 
 #### Qemu Bootloader
 Enable UEFI support for Virtual Machines
-`-drive if=pflash,format=qcow2,file=path_to/ovmf.qcow2`
+`-drive if=pflash,format=qcow2,file=ovmf.qcow2`
 
 #### Qemu No Graphic
 Disable graphical output and redirect serial I/Os to console

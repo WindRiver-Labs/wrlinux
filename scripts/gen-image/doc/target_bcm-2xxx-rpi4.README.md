@@ -58,10 +58,10 @@ and un-mount those that are mounted, for example:
 
 Now burn the image onto the micro SD card:
     For full image
-    $ sudo dd if=wrlinux-image-full-bcm-2xxx-rpi4.ustart.img of=/dev/sdf conv=notrunc
+    $ sudo zcat wrlinux-image-full-bcm-2xxx-rpi4.ustart.img.gz | dd of=/dev/sdf conv=notrunc
 
     Or minimal image
-    $ sudo dd if=wrlinux-image-minimal-bcm-2xxx-rpi4.ustart.img of=/dev/sdf conv=notrunc
+    $ sudo zcat wrlinux-image-minimal-bcm-2xxx-rpi4.ustart.img.gz | dd of=/dev/sdf conv=notrunc
 
     $ sync
     $ eject /dev/sdf
@@ -73,23 +73,23 @@ This should result in a system booted to the u-boot menu.
 
 ### On Qemu
 Create a 14G disk image
-    $ qemu-img create -f raw path_to/img 14G
+    $ qemu-img create -f raw boot-image-qemu.hddimg 14G
 
 Burn the image onto 14G disk image:
     For full image
-    $ dd if=path_to/wrlinux-image-full-bcm-2xxx-rpi4.ustart.img of=path_to/img conv=notrunc
+    $ zcat wrlinux-image-full-bcm-2xxx-rpi4.ustart.img.gz | dd of=boot-image-qemu.hddimg conv=notrunc
 
     For minimal image
-    $ dd if=path_to/wrlinux-image-minimal-bcm-2xxx-rpi4.ustart.img of=path_to/img conv=notrunc
+    $ zcat wrlinux-image-minimal-bcm-2xxx-rpi4.ustart.img.gz | dd of=boot-image-qemu.hddimg conv=notrunc
 
 For qemu aarch64:
 
     $ /usr/bin/qemu-system-aarch64 -machine virt -cpu cortex-a57 \
         -device virtio-net-device,netdev=net0 -netdev user,id=net0 \
         -m 512 \
-        -bios path_to/qemu-u-boot-bcm-2xxx-rpi4.bin \
+        -bios qemu-u-boot-bcm-2xxx-rpi4.bin \
         -nographic \
-        -drive id=disk0,file=path_to/img,if=none,format=raw -device virtio-blk-device,drive=disk0
+        -drive id=disk0,file=boot-image-qemu.hddimg,if=none,format=raw -device virtio-blk-device,drive=disk0
 
 #### Qemu Simulator
 /usr/bin/qemu-system-aarch64
@@ -104,7 +104,7 @@ Set guest startup RAM size, 512MB
 
 #### Qemu Image
 Use virtio-blk-device to load image
-`-drive id=disk0,file=path_to/img,if=none,format=raw -device virtio-blk-device,drive=disk0`
+`-drive id=disk0,file=boot-image-qemu.hddimg,if=none,format=raw -device virtio-blk-device,drive=disk0`
 
 #### Qemu CPU
 Use QEMU 2.11 ARM Virtual Machine with CPU cortex-a57
