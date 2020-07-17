@@ -411,9 +411,11 @@ OSTREE_FDISK_RSZ = "6144"
                 if d_file.endswith(".wic"):
                     basename = os.path.basename(d_file)[:-4]
                     new_image = os.path.join(self.builddir, '%s.ustart.img.gz' % basename)
+                    new_bmap = os.path.join(self.builddir, '%s.ustart.bmap' % basename)
                     os.rename('ustart.img.gz', new_image)
+                    os.rename('ustart.img.bmap', new_bmap)
                     deploy_files.add(new_image)
-                    deploy_files.add('ustart.img.bmap')
+                    deploy_files.add(new_bmap)
                 else:
                     deploy_files.add(d_file)
 
@@ -481,9 +483,9 @@ IMAGE_ENABLE_CONTAINER = "1"
 
         # Generate sha256 for the following files
         # - container/*.tar.bz2
-        # - target/*.img ovmf.qcow2
+        # - target/*.img.gz ovmf.qcow2
         # - sdk/*.sh
-        tgts = ("container-*/*.tar.bz2", "target-*/*.img", "target-*/ovmf.qcow2", "sdk/*.sh")
+        tgts = ("container-*/*.tar.bz2", "target-*/*.img.gz", "target-*/ovmf.qcow2", "sdk/*.sh")
         sha256files = []
         file_prefix = os.path.join(self.outdir, self.machine)
         for tgt in tgts:
