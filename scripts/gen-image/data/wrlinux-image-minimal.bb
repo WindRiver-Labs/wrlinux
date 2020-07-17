@@ -26,6 +26,7 @@ IMAGE_INSTALL = "\
     busybox \
     busybox-syslog \
     openssh \
+    ca-certificates \
 "
 
 # - No packagegroup-busybox-replacement since it is busybox based.

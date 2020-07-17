@@ -14,6 +14,7 @@ CONTAINER_CORE_BOOT ?= " \
 IMAGE_INSTALL = "\
     ${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', '${CONTAINER_CORE_BOOT}', 'packagegroup-core-boot kernel-modules', d)} \
     openssh \
+    ca-certificates \
     "
 
 # - The ostree are not needed for container image.
