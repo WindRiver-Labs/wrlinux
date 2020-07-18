@@ -1,0 +1,113 @@
+From c6c191699d3efe6d79094ff660f427865c9c73c2 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Mon, 7 Mar 2016 22:24:32 -0500
+Subject: [PATCH] policy/modules/admin/su: fix su failure for non-root users
+
+Reference sources: selinux-policy-3.13.1-128.21.fc22.src.rpm
+Changes come from: policy-f22-base.patch
+
+* Allow *_su_t passwd_t and useradd_t to search /run/systemd/journal
+* Allow *_su_t to create connections to the system bus
+* Allow systemd_logind_t to read the process state of all domains
+
+Fixes:
+avc:  denied  { search } for  pid=2454 comm="su" name="journal"
+dev="tmpfs" ino=11004 scontext=root:secadm_r:secadm_su_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:syslogd_runtime_t:s15:c0.c1023 tclass=dir
+permissive=0
+
+avc:  denied  { search } for  pid=1610 comm="useradd" name="journal"
+dev="tmpfs" ino=11004 scontext=root:sysadm_r:useradd_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:syslogd_runtime_t:s15:c0.c1023 tclass=dir
+permissive=0
+
+avc:  denied  { search } for  pid=1616 comm="passwd" name="journal"
+dev="tmpfs" ino=11004 scontext=root:sysadm_r:passwd_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:syslogd_runtime_t:s15:c0.c1023 tclass=dir
+permissive=0
+
+avc:  denied  { search } for  pid=1655 comm="unix_chkpwd" name="journal"
+dev="tmpfs" ino=11004 scontext=root:sysadm_r:chkpwd_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:syslogd_runtime_t:s15:c0.c1023 tclass=dir
+permissive=0
+
+avc:  denied  { search } for  pid=201 comm="systemd-logind" name="2496"
+dev="proc" ino=30014
+scontext=system_u:system_r:systemd_logind_t:s0-s15:c0.c1023
+tcontext=root:sysadm_r:sysadm_su_t:s0-s15:c0.c1023 tclass=dir
+permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/admin/su.if         | 4 ++++
+ policy/modules/admin/usermanage.te | 2 ++
+ policy/modules/system/authlogin.te | 2 ++
+ policy/modules/system/systemd.te   | 1 +
+ 4 files changed, 9 insertions(+)
+
+diff --git a/policy/modules/admin/su.if b/policy/modules/admin/su.if
+index 270111efc..31221a640 100644
+--- a/policy/modules/admin/su.if
++++ b/policy/modules/admin/su.if
+@@ -200,6 +200,10 @@ template(`su_role_template',`
+ 	init_rw_utmp($1_su_t)
+ 
+ 	mls_file_write_all_levels($1_su_t)
++	mls_file_read_to_clearance($1_su_t)
++
++	# creating connections to the system bus
++	dbus_system_bus_client($1_su_t)
+ 
+ 	logging_send_syslog_msg($1_su_t)
+ 
+diff --git a/policy/modules/admin/usermanage.te b/policy/modules/admin/usermanage.te
+index 59507184a..649a71885 100644
+--- a/policy/modules/admin/usermanage.te
++++ b/policy/modules/admin/usermanage.te
+@@ -319,6 +319,7 @@ fs_search_auto_mountpoints(passwd_t)
+ 
+ mls_file_write_all_levels(passwd_t)
+ mls_file_downgrade(passwd_t)
++mls_file_read_to_clearance(passwd_t)
+ 
+ selinux_get_fs_mount(passwd_t)
+ selinux_validate_context(passwd_t)
+@@ -495,6 +496,7 @@ fs_search_auto_mountpoints(useradd_t)
+ fs_getattr_xattr_fs(useradd_t)
+ 
+ mls_file_upgrade(useradd_t)
++mls_file_read_to_clearance(useradd_t)
+ 
+ # Allow access to context for shadow file
+ selinux_get_fs_mount(useradd_t)
+diff --git a/policy/modules/system/authlogin.te b/policy/modules/system/authlogin.te
+index 26535d0b5..0b95a8cc4 100644
+--- a/policy/modules/system/authlogin.te
++++ b/policy/modules/system/authlogin.te
+@@ -136,6 +136,8 @@ seutil_dontaudit_use_newrole_fds(chkpwd_t)
+ 
+ userdom_use_user_terminals(chkpwd_t)
+ 
++mls_file_read_to_clearance(chkpwd_t)
++
+ ifdef(`distro_ubuntu',`
+ 	optional_policy(`
+ 		unconfined_domain(chkpwd_t)
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index d6a66be83..52a0f77cd 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -634,6 +634,7 @@ userdom_use_user_ttys(systemd_logind_t)
+ auth_read_shadow(systemd_logind_t)
+ 
+ mls_file_read_to_clearance(systemd_logind_t)
++domain_read_all_domains_state(systemd_logind_t)
+ 
+ # Needed to work around patch not yet merged into the systemd-logind supported on RHEL 7.x
+ # The change in systemd by Nicolas Iooss on 02-Feb-2016 with hash 4b51966cf6c06250036e428608da92f8640beb96
+-- 
+2.17.1
+
