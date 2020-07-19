@@ -1,0 +1,31 @@
+From 8cd1a78ae9ec8f10fcec9d09f58560b62fad6095 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Sun, 19 Jul 2020 21:52:10 +0800
+Subject: [PATCH] wic: set DEFAULT_OVERHEAD_FACTOR
+
+Set DEFAULT_OVERHEAD_FACTOR to 3 to assure enough
+space for ostree image
+
+Upstream-Status: Inappropriate [wrlinux specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ scripts/lib/wic/ksparser.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/lib/wic/ksparser.py b/scripts/lib/wic/ksparser.py
+index 650b976223..f4d47d8574 100644
+--- a/scripts/lib/wic/ksparser.py
++++ b/scripts/lib/wic/ksparser.py
+@@ -120,7 +120,7 @@ class KickStart():
+     """Kickstart parser implementation."""
+ 
+     DEFAULT_EXTRA_SPACE = 10*1024
+-    DEFAULT_OVERHEAD_FACTOR = 1.3
++    DEFAULT_OVERHEAD_FACTOR = 3
+ 
+     def __init__(self, confpath):
+ 
+-- 
+2.18.2
+

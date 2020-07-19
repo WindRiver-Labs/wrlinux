@@ -16,6 +16,7 @@ SRC_URI = "git://git.yoctoproject.org/poky;branch=dunfell \
            file://0001-update-wic-help-create-for-sdk.patch \
            file://0001-get-FAKEROOTCMD-from-environment.patch \
            file://0001-get-vars-from-environment.patch \
+           file://0001-wic-set-DEFAULT_OVERHEAD_FACTOR.patch \
            "
 
 S = "${WORKDIR}/git"
