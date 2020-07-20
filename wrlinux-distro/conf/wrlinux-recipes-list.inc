@@ -3224,6 +3224,7 @@ WRLINUX_ALL_RECIPES = " \
     opencv \
     openembedded-release \
     openflow \
+    opengl-es-cts \
     openh264 \
     openhpi \
     openipmi \
@@ -4115,7 +4116,9 @@ WRLINUX_ALL_RECIPES = " \
     python3-gg-group-setup \
     python3-git \
     python3-gitdb \
+    python3-gmpy2 \
     python3-gmqtt \
+    python3-gnupg \
     python3-google-api-core \
     python3-google-api-python-client \
     python3-google-auth \
@@ -4297,6 +4300,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-pretend \
     python3-prettytable \
     python3-priority \
+    python3-privacyidea \
     python3-productmd \
     python3-progress \
     python3-prompt-toolkit \
@@ -4380,6 +4384,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-pywbem \
     python3-pyyaml \
     python3-pyzmq \
+    python3-qrcode \
     python3-raven \
     python3-rcssmin \
     python3-rdflib \
@@ -4524,6 +4529,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-wsme \
     python3-wtforms \
     python3-xlrd \
+    python3-xlsxwriter \
     python3-xmlrunner \
     python3-xmltodict \
     python3-xmodem \
@@ -5053,6 +5059,7 @@ WRLINUX_ALL_RECIPES = " \
     vsftpd \
     vte \
     vte9 \
+    vulkan-cts \
     vulkan-demos \
     vulkan-headers \
     vulkan-loader \
