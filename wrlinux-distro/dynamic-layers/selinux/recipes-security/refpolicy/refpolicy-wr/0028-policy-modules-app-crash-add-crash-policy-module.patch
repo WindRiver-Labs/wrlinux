@@ -1,4 +1,4 @@
-From bd29f2f9190317a27d6356c8fb88ddc223601d89 Mon Sep 17 00:00:00 2001
+From a14407895c4f81e6bdaaba00abebc4cb5bd49ef9 Mon Sep 17 00:00:00 2001
 From: Xin Ouyang <Xin.Ouyang@windriver.com>
 Date: Sun, 28 Apr 2019 16:21:26 +0800
 Subject: [PATCH] policy/modules/app/crash: add crash policy module
@@ -87,7 +87,7 @@ index 000000000..1b548d330
 +')
 diff --git a/policy/modules/apps/crash.te b/policy/modules/apps/crash.te
 new file mode 100644
-index 000000000..c1fa24259
+index 000000000..59b61c96b
 --- /dev/null
 +++ b/policy/modules/apps/crash.te
 @@ -0,0 +1,58 @@
@@ -121,7 +121,7 @@ index 000000000..c1fa24259
 +kernel_read_core_if(crash_t)
 +dontaudit crash_t proc_kcore_t:file write;
 +
-+modutils_domtrans_insmod(crash_t)
++modutils_domtrans(crash_t)
 +
 +corecmd_exec_bin(crash_t)
 +corecmd_exec_shell(crash_t)
