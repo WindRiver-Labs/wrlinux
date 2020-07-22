@@ -695,8 +695,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     linux-intel-dev \
     linux-intel-rt \
     linux-libc-headers \
-    linux-xlnx \
-    linux-xlnx-dev \
     linux-yocto \
     linux-yocto-dev \
     lksctp-tools \
@@ -1044,6 +1042,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     python3-cryptography \
     python3-cryptography-vectors \
     python3-cython \
+    python3-dasbus \
     python3-dbus \
     python3-dbusmock \
     python3-decorator \
@@ -2896,8 +2895,6 @@ WRLINUX_ALL_RECIPES = " \
     linux-intel-dev \
     linux-intel-rt \
     linux-libc-headers \
-    linux-xlnx \
-    linux-xlnx-dev \
     linux-yocto \
     linux-yocto-dev \
     linux-yocto-rt \
@@ -3539,12 +3536,10 @@ WRLINUX_ALL_RECIPES = " \
     python-bitarray \
     python-blinker \
     python-booleanpy \
-    python-boto \
     python-cachetools \
     python-can \
     python-castellan \
     python-ceilometer \
-    python-ceilometerclient \
     python-certifi \
     python-cffi \
     python-chardet \
@@ -3572,11 +3567,8 @@ WRLINUX_ALL_RECIPES = " \
     python-dbusmock \
     python-decorator \
     python-deprecated \
-    python-designateclient \
     python-distutils-extra \
     python-django \
-    python-django-appconf \
-    python-django-babel \
     python-django-compressor \
     python-django-nose \
     python-django-openstack-auth \
@@ -3996,6 +3988,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-blivet \
     python3-blivetgui \
     python3-booleanpy \
+    python3-boto \
     python3-boto3 \
     python3-botocore \
     python3-bugsnag \
@@ -4035,6 +4028,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-cssselect \
     python3-cycler \
     python3-cython \
+    python3-dasbus \
     python3-dateutil \
     python3-dbus \
     python3-dbus-next \
@@ -4044,12 +4038,14 @@ WRLINUX_ALL_RECIPES = " \
     python3-decorator \
     python3-defusedxml \
     python3-deprecation \
+    python3-designateclient \
     python3-dicttoxml \
     python3-dill \
     python3-distro \
     python3-distutils-extra \
     python3-django \
     python3-django-appconf \
+    python3-django-babel \
     python3-django-south \
     python3-djangorestframework \
     python3-dnspython \
