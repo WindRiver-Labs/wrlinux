@@ -258,7 +258,7 @@ SSTATE_PRUNE_OBSOLETEWORKDIR = "0"
 # ostree
 GPG_PATH = "${TOPDIR}/.gnupg"
 
-WRTEMPLATE = "feature/docker feature/kubernetes feature/ostree"
+WRTEMPLATE = "feature/docker feature/kubernetes feature/ostree feature/cbas"
 WRTEMPLATE_append_intel-x86-64 = " feature/intel-openvino"
 
 KERNEL_FEATURES_append += "features/nfsd/nfsd-enable.scc"
@@ -350,6 +350,23 @@ SDKMACHINE = "x86_64"
         deploy_files.append(os.path.join(self.doc_dir, 'sdk.README.md'))
 
         self.do_deploy('%s/sdk' % self.machine, deploy_files)
+
+    def gen_cbas_sdk(self):
+        logger.info('Generating app sdk for CBAS...')
+        self.do_build('container-base -cpopulate_sdk')
+
+        deploy_files = []
+        deploy_dir = os.path.join(self.tmpdir, 'deploy/sdk')
+        suffixes = ['sdk.sh', 'sdk.host.manifest', 'sdk.target.manifest']
+        for f in suffixes:
+            wildcard = "%s/*-%s-container-base-%s" % (deploy_dir, self.machine.replace('-', '_'), f)
+            files = glob.glob(wildcard)
+            if len(files) != 1:
+                raise Exception("Should be only one %s file but found %s: \n%s" % (f, len(files), '\n'.join(files)))
+            deploy_files.append(files[0])
+
+        deploy_files.append(os.path.join(self.doc_dir, 'appsdk.README.md'))
+        self.do_deploy('%s/cbas-sdk' % self.machine, deploy_files)
 
     def get_deploy_files(self, type='wic', ovmf=True, uboot=True, images=[]):
         deploy_dir = os.path.join(self.tmpdir, 'deploy/images/%s' % self.machine)
@@ -548,6 +565,7 @@ def main():
     gen.gen_feeds()
     if gen.args.ip_review:
         gen.ip_review()
+    gen.gen_cbas_sdk()
     gen.post()
 
 if __name__ == "__main__":
