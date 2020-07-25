@@ -7,18 +7,132 @@ X86-64
 Check sdk.host.manifest and sdk.target.manifest
 
 ## Install the SDK
-$ ./wrlinux-*-container-base-sdk..sh
+$ ./wrlinux-*-container-base-sdk.sh
 
 ## Enable SDK
 $ . environment-setup-*-wrs-linux
 
 Check environment-setup-*-wrs-linux for the exported variables.
 
-# Generate a image from package feed
+## Application SDK Management Tool for CBAS
+$ appsdk -h
+usage: appsdk [-h] [-d] [-q] {gensdk,checksdk,genrpm,genimage} ...
+
+Application SDK Management Tool for CBAS
+
+positional arguments:
+  {gensdk,checksdk,genrpm,genimage}
+                        Subcommands. "appsdk <subcommand> --help" to get more info
+    gensdk              Generate a new SDK
+    checksdk            Sanity check for SDK
+    genrpm              Build RPM package
+    genimage            Generate images from package feeds for specified machines
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -d, --debug           Enable debug output
+  -q, --quiet           Hide all output except error messages
+
+Use appsdk <subcommand> --help to get help
+
+### Generate a new SDK
+$ appsdk gensdk -h
+usage: appsdk gensdk [-h] [-f FILE] [-o OUTPUT]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f FILE, --file FILE  An input yaml file specifying image information. Default to image.yaml in current directory
+  -o OUTPUT, --output OUTPUT
+                        The path of the generated SDK. Default to deploy/AppSDK.sh in current directory
+
+$ appsdk gensdk -f input.yaml
+
+Input yaml format:
+[input yaml sample]
+packages: # A list of packages to be installed on target sysroot
+- pkg1
+- pkg2
+[input yaml sample]
+
+
+### Sanity check for SDK
+$ appsdk checksdk
+
+
+### Build RPM package
+appsdk genrpm -h
+usage: appsdk genrpm [-h] -f FILE -i INSTALLDIR [-o OUTPUTDIR] [--pkgarch PKGARCH]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f FILE, --file FILE  A yaml or spec file specifying package information
+  -i INSTALLDIR, --installdir INSTALLDIR
+                        An installdir serving as input to generate RPM package
+  -o OUTPUTDIR, --outputdir OUTPUTDIR
+                        Output directory to hold the generated RPM package
+  --pkgarch PKGARCH     package arch about the generated RPM package
+
+
+### Generate a image from package feed
+$ appsdk genimage -h
+usage: appsdk genimage [-h] [-m {intel-x86-64}] [-o OUTDIR] [-w WORKDIR] [-t {wic,ostree-repo,container,all}] [-n NAME] [-u URL]
+                       [-p PKG] [--no-clean]
+                       [input]
+
+positional arguments:
+  input                 An input yaml file that the tool can be run against a package feed to generate an image
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -m {intel-x86-64}, --machine {intel-x86-64}
+                        Specify machine
+  -o OUTDIR, --outdir OUTDIR
+                        Specify output dir, default is current working directory
+  -w WORKDIR, --workdir WORKDIR
+                        Specify work dir, default is current working directory
+  -t {wic,ostree-repo,container,all}, --type {wic,ostree-repo,container,all}
+                        Specify image type, default is all
+  -n NAME, --name NAME  Specify image name
+  -u URL, --url URL     Specify extra urls of rpm package feeds
+  -p PKG, --pkg PKG     Specify extra package to be installed
+  --no-clean            Do not cleanup generated rootfs in workdir
+
 $ appsdk genimage input.yaml
 
-# Regenerate a sdk with third party package (package feed)
-$ appsdk gensdk -f input.yaml
+Input yaml format:
+[input yaml sample]
+features:
+  pkg_globs: '*-src, *-dev, *-dbg' # Install complementary packages based upon the list of currently installed
+                                   # packages e.g. *-src, *-dev, *-dbg
+gpg:
+  gpg_path: /tmp/.cbas_gnupg
+  ostree:
+    gpg_password: windriver
+    gpgid: Wind-River-Linux-Sample
+    gpgkey: $OECORE_NATIVE_SYSROOT/usr/share/create_full_image/rpm_keys/RPM-GPG-PRIVKEY-Wind-River-Linux-Sample
+machine: intel-x86-64
+name: wrlinux-image-small  # Image name
+ostree:
+  ostree_osname: wrlinux
+  ostree_remote_url: http://XXXX/WRLinux-CD-Images/intel-x86-64/repos/ostree_repo
+  ostree_skip_boot_diff: '2'
+  ostree_use_ab: '1'
+package_feeds:
+- http://XXXX/WRLinux-CD-Images/intel-x86-64/repos/rpm/corei7_64
+- http://XXXX/WRLinux-CD-Images/intel-x86-64/repos/rpm/intel_x86_64
+packages: # A list of packages to be installed on target image
+- pkg1
+- pkg2
+wic: # Set partition size of wic image
+  OSTREE_FLUX_PART: fluxdata
+  OSTREE_WKS_BOOT_SIZE: '--size=256M' # Allocate 256MB to /boot
+  OSTREE_WKS_EFI_SIZE: --size=32M # Allocate 32MB to /boot/efi, only works on intel-x86-64
+  OSTREE_WKS_FLUX_SIZE: '' # Allocate size to /var
+  OSTREE_WKS_ROOT_SIZE: '' # Allocate size to rootfs
+[input yaml sample]
+
+###
+
 
 ## License
 The sdk is provided under the GPL-2.0 license.
