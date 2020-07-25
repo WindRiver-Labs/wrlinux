@@ -8,6 +8,9 @@ LICENSE = "MIT"
 # Control the installed packages strictly
 WRTEMPLATE_IMAGE = "0"
 
+PACKAGE_INSTALL = "packagegroup-base"
+NO_RECOMMENDATIONS = "1"
+
 # Implementation of Full Image generator with Application SDK
 TOOLCHAIN_HOST_TASK_append = " \
     nativesdk-wic \
