@@ -2,7 +2,7 @@ SUMMARY = "Provide nativesdk wic"
 DESCRIPTION = "A nativsdk wic which is working on Yocto build system \
 poky (oe-core and bitbake)"
 
-LICENSE = "GPL-2.0-only & MIT"
+LICENSE = "GPL-2.0 & MIT"
 LIC_FILES_CHKSUM = " \
     file://LICENSE.MIT;md5=030cb33d2af49ccebca74d0588b84a21 \
     file://LICENSE.GPL-2.0-only;md5=4ee23c52855c222cba72583d301d2338 \
@@ -33,6 +33,8 @@ RDEPENDS_${PN} += " \
     nativesdk-squashfs-tools \
     nativesdk-pseudo \
     nativesdk-e2fsprogs \
+    nativesdk-e2fsprogs-mke2fs \
+    nativesdk-e2fsprogs-e2fsck \
     nativesdk-util-linux \
     nativesdk-tar \
 "
