@@ -168,6 +168,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     cube-server \
     cube-update \
     cube-vrf \
+    cunit \
     cups \
     curl \
     cwautomacros \
@@ -3529,7 +3530,6 @@ WRLINUX_ALL_RECIPES = " \
     python-backports-init \
     python-backports-ssl \
     python-barbican \
-    python-barbicanclient \
     python-bcrypt \
     python-beautifulsoup4 \
     python-behave \
@@ -3707,20 +3707,13 @@ WRLINUX_ALL_RECIPES = " \
     python-os-client-config \
     python-os-traits \
     python-os-vif \
-    python-os-win \
     python-os-xenapi \
     python-oslo.cache \
-    python-oslo.concurrency \
     python-oslo.db \
     python-oslo.i18n \
-    python-oslo.log \
     python-oslo.messaging \
-    python-oslo.middleware \
-    python-oslo.policy \
     python-oslo.privsep \
     python-oslo.reports \
-    python-oslo.rootwrap \
-    python-oslo.service \
     python-oslo.versionedobjects \
     python-oslo.vmware \
     python-osprofiler \
@@ -3855,7 +3848,6 @@ WRLINUX_ALL_RECIPES = " \
     python-sparts \
     python-speaklater \
     python-sqlalchemy \
-    python-sqlalchemy-migrate \
     python-sqlparse \
     python-statistics \
     python-stevedore \
@@ -3863,7 +3855,6 @@ WRLINUX_ALL_RECIPES = " \
     python-subprocess32 \
     python-subunit \
     python-suds \
-    python-suds-jurko \
     python-swift \
     python-swiftclient \
     python-systemd \
@@ -3978,12 +3969,14 @@ WRLINUX_ALL_RECIPES = " \
     python3-babel \
     python3-backports-functools-lru-cache \
     python3-bandit \
+    python3-barbicanclient \
     python3-bcrypt \
     python3-beautifulsoup4 \
     python3-behave \
     python3-betamax \
     python3-bitarray \
     python3-bitstring \
+    python3-bitstruct \
     python3-blinker \
     python3-blivet \
     python3-blivetgui \
@@ -3996,6 +3989,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-cached-property \
     python3-cachetools \
     python3-can \
+    python3-cantools \
     python3-cassandra-driver \
     python3-cbor \
     python3-cbor2 \
@@ -4029,6 +4023,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-cycler \
     python3-cython \
     python3-dasbus \
+    python3-dateparser \
     python3-dateutil \
     python3-dbus \
     python3-dbus-next \
@@ -4041,6 +4036,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-designateclient \
     python3-dicttoxml \
     python3-dill \
+    python3-diskcache \
     python3-distro \
     python3-distutils-extra \
     python3-django \
@@ -4245,11 +4241,18 @@ WRLINUX_ALL_RECIPES = " \
     python3-ordered-set \
     python3-ordereddict \
     python3-os-client-config \
+    python3-os-win \
     python3-osc-lib \
+    python3-oslo.concurrency \
     python3-oslo.config \
     python3-oslo.context \
     python3-oslo.i18n \
+    python3-oslo.log \
+    python3-oslo.middleware \
+    python3-oslo.policy \
+    python3-oslo.rootwrap \
     python3-oslo.serialization \
+    python3-oslo.service \
     python3-oslo.utils \
     python3-oslotest \
     python3-ovs \
@@ -4447,6 +4450,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-sphinx \
     python3-spidev \
     python3-sqlalchemy \
+    python3-sqlalchemy-migrate \
     python3-sqlparse \
     python3-sqlsoup \
     python3-sshtunnel \
