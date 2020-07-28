@@ -40,6 +40,18 @@ to get its usage of physical memory. That exposes its process' address space and
 its physical memory location to a kernel exploitation. Please review your
 security policies to ensure this risk is mitigated if needed.
 
+2.1 NXP Bsps Specification
+--------------------------
+For NXP bsps, users should follow the above configuration to make related
+bsp to use this dpdk template, and users should notice that the provider of
+dpdk for NXP bsps is meta-freescale. Besides, NXP bsps will specify the dpdk
+version in machine conf by default, like:
+        PREFERRED_VERSION_dpdk= "19.11-20.12"
+
+in conf/machine/<bsp-name>.conf.
+Users can build the project as normal, the outcomes will include the dpdk
+package in rootfs.
+
 3. DPDK Linuxapp Setup
 ======================
 A kernel module named vfio_pci.ko that must be inserted on the target prior to
@@ -103,6 +115,35 @@ eal_flags_autotest requires -m parameter with a correct value.
 Various DPDK example application are built along with DPDK. To include
 these in your image add the 'dpdk-example' package to your image using
 IMAGE_INSTALL_append or similar in your local.conf.
+
+4.1 DPDK verification for NXP bsps
+----------------------------------
+For NXP bsps, the followings show how to verify the DPDK feature.
+
+4.1.1 Boot Arguments
+--------------------
+The following boot arguments can be used in order to obtain the best performance
+for DPDK applications:
+  default_hugepagesz=1024m hugepagesz=1024m hugepages=8 isolcpus=1-15 iommu.passthrough=1
+
+4.1.2 Sample Applications
+-------------------------
+For NXP bsps, there are various network architectures support DPDK, such as DPAA2.
+The next section will show how to test DPDK based on DPAA2
+
+4.1.2.1 DPDK on DPAA2
+---------------------
+In order to verify the DPDK on DPAA2, you can use the steps like the following
+to run the sample applications. Take the l2fwd as example:
+  1. Setup the MAX_QUEUES and configure the DPAA2 resource container:
+       export MAX_QUEUES=8
+       /usr/share/dpdk/dpaa2/dynamic_dpl.sh dpmac.3 dpmac.4
+  2. Setup the environment variable using the container name reported by
+     dynamic_dpl.sh command:
+       export DPRC=dprc.2
+  3. Run the layer 2 forwarding application:
+       /usr/share/dpdk/examples/l2fwd -c 0x6 -n 1 -- -p 0x3 -q 1
+
 
 5. DPDK compilation with optimization
 =====================================
