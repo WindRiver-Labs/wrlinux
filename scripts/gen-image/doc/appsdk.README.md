@@ -12,6 +12,97 @@ $ ./wrlinux-*-container-base-sdk.sh
 ## Enable SDK
 $ . environment-setup-*-wrs-linux
 
+## Use case by simple hello-world example
+
+Here's a simple example of how to use appsdk.
+
+1. Download source and build.
+
+   e.g.
+   wget http://ftp.gnu.org/gnu/hello/hello-2.10.tar.gz
+   tar xzvf hello-2.10.tar.gz
+   cd hello-2.10
+   ./configure $CONFIGURE_FLAGS
+   make
+   make DESTDIR=/path/to/install-hello install
+
+2. Generate RPM package
+
+   2a) Create yaml file for hello as below.
+   name: hello
+   version: '2.10'
+   release: r0
+   summary: Hello World Program From Gnu
+   license: GPLv3
+
+   description: |
+     A simple hello world program that only does one thing.
+     It's from GNU.
+
+   post_install: |
+     #!/bin/sh
+     echo "This is the post install script of hello program"
+     echo "It only prints some message."
+
+   2b) appsdk genrpm -f hello.yaml -i /path/to/install-hello
+
+3. Publish the RPM package
+
+   3a) Publish the RPM to repo
+
+       appsdk publishrpm -r /path/to/http_service_data/rpms deploy/rpms/corei7_64/hello-2.10-r0.corei7_64.rpm
+
+   3b) [OPTIONAL] Setup http service
+
+       python3 -m http.server 8888 --directory /path/to/http_service_data
+
+4. Use the RPM package on target
+
+   4a) Setup RPM repo
+       echo > /etc/yum.repos.d/test.repo <<EOF
+       [appsdk-test-repo]
+       name=appsdk test repo
+       baseurl=http://HOST_IP:8888/rpms/
+       gpgcheck=0
+       EOF
+
+   4b) Install hello package
+
+       dnf install hello
+
+   4c) Run hello program
+
+       e.g.
+       root@intel-x86-64:~# hello
+       Hello, world!
+
+5. Use the RPM package as input as `appsdk genimage` and `appsdk gensdk`
+
+   5a) Modify yaml file
+
+       Add 'http://HOST_IP:8888/rpms' to package_feeds section.
+       Add 'hello' to packages section.
+
+       e.g.
+       machine: intel-x86-64
+       name: custom-image
+       package_feeds:
+       - http://128.224.153.74/intel-x86-64/rpm/noarch
+       - http://128.224.153.74/intel-x86-64/rpm/x86_64_nativesdk
+       - http://128.224.153.74/intel-x86-64/rpm/corei7_64
+       - http://128.224.153.74/intel-x86-64/rpm/intel_x86_64
+       - http://128.224.153.232:8888/rpms
+       packages:
+       - hello
+       - base-files
+       - base-passwd
+       - bash
+       - systemd
+
+    5b) appsdk genimage image-with-hello.yaml
+        appsdk gensdk -f image-with-hello.yaml
+
+
 Check environment-setup-*-wrs-linux for the exported variables.
 
 ## Application SDK Management Tool for CBAS
@@ -71,6 +162,18 @@ optional arguments:
   -o OUTPUTDIR, --outputdir OUTPUTDIR
                         Output directory to hold the generated RPM package
   --pkgarch PKGARCH     package arch about the generated RPM package
+
+
+### Publish RPM package
+appsdk publishrpm -h
+usage: appsdk publishrpm [-h] -r REPO [rpms [rpms ...]]
+
+positional arguments:
+  rpms                  RPM package paths
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -r REPO, --repo REPO  RPM repo path
 
 
 ### Generate a image from package feed
