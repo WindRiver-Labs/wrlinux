@@ -111,6 +111,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     conntrack-tools \
     consolekit \
     consul \
+    container-base \
     container-shutdown-notifier \
     containerd-docker \
     containerd-opencontainers \
