@@ -46,6 +46,7 @@ SRC_URI += "\
         file://0037-policy-modules-admin-su-fix-su-failure-for-non-root-.patch \
         file://0038-policy-modules-system-selinuxutil-allow-secadm-to-ma.patch \
         file://0039-policy-modules-admin-newgrp-add-newgrp-policy-module.patch \
+        file://0040-policy-modules-services-watchdog-allow-watchdog_t-to.patch \
         "
 
 OSTREE_POLICY_PATCHES = "\

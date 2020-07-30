@@ -1,0 +1,66 @@
+From 309181eb723ed82df227d5ed2a41369bff1723da Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Fri, 5 Feb 2016 02:39:21 -0500
+Subject: [PATCH] policy/modules/services/watchdog: allow watchdog_t to create
+ /var/log/watchdog
+
+* Patches ported from Fedora 22:
+  Reference sources: selinux-policy-3.13.1-128.21.fc22.src.rpm
+  Changes come from: policy-f22-services.patch
+
+Fixes:
+  avc: denied { create } for pid=372 comm="watchdog" name="watchdog" \
+  scontext=system_u:system_r:watchdog_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:var_log_t:s0 \
+  tclass=dir
+
+  avc: denied { search } for pid=385 comm="watchdog" name="journal" \
+  dev="tmpfs" ino=8203 \
+  scontext=system_u:system_r:watchdog_t:s0-s15:c0.c1023 \
+  tcontext=system_u:object_r:syslogd_runtime_t:s15:c0.c1023 \
+  tclass=dir
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/watchdog.te | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/policy/modules/services/watchdog.te b/policy/modules/services/watchdog.te
+index 5da3aa328..d8ec8806a 100644
+--- a/policy/modules/services/watchdog.te
++++ b/policy/modules/services/watchdog.te
+@@ -30,8 +30,9 @@ allow watchdog_t self:fifo_file rw_fifo_file_perms;
+ allow watchdog_t self:rawip_socket create_socket_perms;
+ allow watchdog_t self:tcp_socket { accept listen };
+ 
+-allow watchdog_t watchdog_log_t:file { append_file_perms create_file_perms setattr_file_perms };
+-logging_log_filetrans(watchdog_t, watchdog_log_t, file)
++manage_files_pattern(watchdog_t, watchdog_log_t, watchdog_log_t)
++manage_dirs_pattern(watchdog_t, watchdog_log_t, watchdog_log_t)
++logging_log_filetrans(watchdog_t, watchdog_log_t, { dir file })
+ 
+ manage_files_pattern(watchdog_t, watchdog_runtime_t, watchdog_runtime_t)
+ files_runtime_filetrans(watchdog_t, watchdog_runtime_t, file)
+@@ -71,6 +72,7 @@ files_read_all_runtime_files(watchdog_t)
+ fs_unmount_xattr_fs(watchdog_t)
+ fs_getattr_all_fs(watchdog_t)
+ fs_search_auto_mountpoints(watchdog_t)
++fs_search_tmpfs(watchdog_t)
+ 
+ auth_append_login_records(watchdog_t)
+ 
+@@ -83,6 +85,8 @@ sysnet_dns_name_resolve(watchdog_t)
+ userdom_dontaudit_use_unpriv_user_fds(watchdog_t)
+ userdom_dontaudit_search_user_home_dirs(watchdog_t)
+ 
++mls_file_read_to_clearance(watchdog_t)
++
+ optional_policy(`
+ 	mta_send_mail(watchdog_t)
+ ')
+-- 
+2.17.1
+
