@@ -10,7 +10,7 @@ cd -
 case $1 in
     create)
         shift
-        FAKEROOTCMD=${FAKEROOTCMD} wic create -n $OECORE_NATIVE_SYSROOT -s -b $OECORE_TARGET_SYSROOT/usr/share $@
+        FAKEROOTCMD=${FAKEROOTCMD} wic create -n $OECORE_NATIVE_SYSROOT -s $@
         ;;
     *)
         wic $@

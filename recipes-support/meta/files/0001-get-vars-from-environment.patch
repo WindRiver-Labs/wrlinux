@@ -4,8 +4,10 @@ Date: Thu, 14 May 2020 17:01:22 +0800
 Subject: [PATCH] get vars from environment
 
 Since wic in sdk does not support bitbake, get IMAGE_ROOTFS/
-DEPLOY_DIR_IMAGE/STAGING_DATADIR/RECIPE_SYSROOT_NATIVE from
+DEPLOY_DIR_IMAGE/RECIPE_SYSROOT_NATIVE from
 environment rather than bitbake
+
+Set DEPLOY_DIR_IMAGE to bootimg_dir
 
 Upstream-Status: Inappropriate [wrlinux specific]
 
@@ -27,7 +29,7 @@ index 24700f380f..5857ec18ee 100755
 -        bootimg_dir = get_bitbake_var("STAGING_DATADIR", options.image_name)
 +        rootfs_dir = os.environ.get("IMAGE_ROOTFS")
 +        kernel_dir = os.environ.get("DEPLOY_DIR_IMAGE")
-+        bootimg_dir = os.environ.get("STAGING_DATADIR")
++        bootimg_dir = os.environ.get("DEPLOY_DIR_IMAGE")
  
          native_sysroot = options.native_sysroot
          if options.vars_dir and not native_sysroot:
