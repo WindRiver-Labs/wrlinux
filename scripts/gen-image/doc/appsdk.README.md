@@ -86,6 +86,11 @@ Here's a simple example of how to use appsdk.
        e.g.
        machine: intel-x86-64
        name: custom-image
+       image_type:
+       - ostree-repo
+       - wic
+       - container
+       - ustart
        package_feeds:
        - http://128.224.153.74/intel-x86-64/rpm/noarch
        - http://128.224.153.74/intel-x86-64/rpm/x86_64_nativesdk
@@ -203,7 +208,7 @@ optional arguments:
 $ appsdk genimage input.yaml
 
 Input yaml format:
-[input yaml sample]
+[input yaml sample on intel-86-64 begin]
 features:
   pkg_globs: '*-src, *-dev, *-dbg' # Install complementary packages based upon the list of currently installed
                                    # packages e.g. *-src, *-dev, *-dbg
@@ -215,6 +220,11 @@ gpg:
     gpgkey: $OECORE_NATIVE_SYSROOT/usr/share/create_full_image/rpm_keys/RPM-GPG-PRIVKEY-Wind-River-Linux-Sample
 machine: intel-x86-64
 name: wrlinux-image-small  # Image name
+image_type:
+- ostree-repo # deploy/ostree_repo
+- wic         # deploy/wrlinux-image-small-intel-x86-64.wic
+- container   # deploy/wrlinux-image-small-intel-x86-64.tar.bz2
+- ustart      # deploy/wrlinux-image-small-intel-x86-64.ustart.img.gz
 ostree:
   ostree_osname: wrlinux
   ostree_remote_url: http://XXXX/WRLinux-CD-Images/intel-x86-64/repos/ostree_repo
@@ -223,6 +233,7 @@ ostree:
 package_feeds:
 - http://XXXX/WRLinux-CD-Images/intel-x86-64/repos/rpm/corei7_64
 - http://XXXX/WRLinux-CD-Images/intel-x86-64/repos/rpm/intel_x86_64
+- http://XXXX/WRLinux-CD-Images/intel-x86-64/repos/rpm/noarch
 packages: # A list of packages to be installed on target image
 - pkg1
 - pkg2
@@ -232,7 +243,7 @@ wic: # Set partition size of wic image
   OSTREE_WKS_EFI_SIZE: --size=32M # Allocate 32MB to /boot/efi, only works on intel-x86-64
   OSTREE_WKS_FLUX_SIZE: '' # Allocate size to /var
   OSTREE_WKS_ROOT_SIZE: '' # Allocate size to rootfs
-[input yaml sample]
+[input yaml sample on intel-86-64 end]
 
 ###
 
