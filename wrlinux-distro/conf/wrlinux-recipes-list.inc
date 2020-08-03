@@ -2684,6 +2684,7 @@ WRLINUX_ALL_RECIPES = " \
     liboop \
     libopenmpt \
     libopus \
+    libopusenc \
     libotr \
     libowfat \
     libp11 \
@@ -3160,6 +3161,7 @@ WRLINUX_ALL_RECIPES = " \
     nmap \
     nmon \
     nng \
+    nngpp \
     node-iothub-explorer \
     node-red \
     node-red-contrib-azureiothubnode \
@@ -3615,7 +3617,6 @@ WRLINUX_ALL_RECIPES = " \
     python-futures \
     python-gdata \
     python-gevent \
-    python-gevent-websocket \
     python-glance \
     python-glance-store \
     python-glanceclient \
@@ -3663,8 +3664,6 @@ WRLINUX_ALL_RECIPES = " \
     python-keyring \
     python-keystone \
     python-keystone-hybrid-backend \
-    python-keystoneclient \
-    python-keystonemiddleware \
     python-lazy-object-proxy \
     python-ldap \
     python-license-expression \
@@ -3708,7 +3707,6 @@ WRLINUX_ALL_RECIPES = " \
     python-os-client-config \
     python-os-traits \
     python-os-vif \
-    python-os-xenapi \
     python-oslo.cache \
     python-oslo.db \
     python-oslo.i18n \
@@ -3716,7 +3714,6 @@ WRLINUX_ALL_RECIPES = " \
     python-oslo.privsep \
     python-oslo.reports \
     python-oslo.versionedobjects \
-    python-oslo.vmware \
     python-osprofiler \
     python-packaging \
     python-paho-mqtt \
@@ -3753,7 +3750,6 @@ WRLINUX_ALL_RECIPES = " \
     python-pyasn1-modules \
     python-pybind11 \
     python-pybluez \
-    python-pycadf \
     python-pycodestyle \
     python-pyconnman \
     python-pycparser \
@@ -3829,7 +3825,6 @@ WRLINUX_ALL_RECIPES = " \
     python-scrypt \
     python-sdnotify \
     python-selectors34 \
-    python-semantic-version \
     python-semver \
     python-serpent \
     python-setuptools \
@@ -3877,7 +3872,6 @@ WRLINUX_ALL_RECIPES = " \
     python-typing \
     python-tzlocal \
     python-ujson \
-    python-unicodecsv \
     python-unidiff \
     python-urllib3 \
     python-vcversioner \
@@ -3890,13 +3884,11 @@ WRLINUX_ALL_RECIPES = " \
     python-webdav \
     python-webencodings \
     python-websocket-client \
-    python-websockify \
     python-werkzeug \
     python-which \
     python-whoosh \
     python-wrapt \
     python-wtforms \
-    python-xattr \
     python-xlrd \
     python-xstatic \
     python-xstatic-angular \
@@ -3927,8 +3919,6 @@ WRLINUX_ALL_RECIPES = " \
     python-xstatic-spin \
     python-xstatic-term.js \
     python-yappi \
-    python-zake \
-    python-zaqarclient \
     python-zipp \
     python-zopeinterface \
     python3 \
@@ -4182,6 +4172,8 @@ WRLINUX_ALL_RECIPES = " \
     python3-keras-preprocessing \
     python3-keyring \
     python3-keystoneauth1 \
+    python3-keystoneclient \
+    python3-keystonemiddleware \
     python3-kiwisolver \
     python3-knack \
     python3-kombu \
@@ -4243,6 +4235,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-ordereddict \
     python3-os-client-config \
     python3-os-win \
+    python3-os-xenapi \
     python3-osc-lib \
     python3-oslo.concurrency \
     python3-oslo.config \
@@ -4255,6 +4248,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-oslo.serialization \
     python3-oslo.service \
     python3-oslo.utils \
+    python3-oslo.vmware \
     python3-oslotest \
     python3-ovs \
     python3-ovsdbapp \
@@ -4317,6 +4311,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-pyaudio \
     python3-pybind11 \
     python3-pybluez \
+    python3-pycadf \
     python3-pycairo \
     python3-pychromecast \
     python3-pycodestyle \
@@ -4500,6 +4495,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-tzlocal \
     python3-u-msgpack-python \
     python3-ujson \
+    python3-unicodecsv \
     python3-unidiff \
     python3-uritemplate \
     python3-urllib3 \
@@ -4521,6 +4517,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-webrtcvad \
     python3-websocket-client \
     python3-websockets \
+    python3-websockify \
     python3-webtest \
     python3-werkzeug \
     python3-wheel \
@@ -4529,6 +4526,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-wsgiref \
     python3-wsme \
     python3-wtforms \
+    python3-xattr \
     python3-xlrd \
     python3-xlsxwriter \
     python3-xmlrunner \
@@ -4557,6 +4555,8 @@ WRLINUX_ALL_RECIPES = " \
     python3-xxhash \
     python3-yappi \
     python3-yarl \
+    python3-zake \
+    python3-zaqarclient \
     python3-zc-lockfile \
     python3-zipp \
     python3-zopeinterface \
