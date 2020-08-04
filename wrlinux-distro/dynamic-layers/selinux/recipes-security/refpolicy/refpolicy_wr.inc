@@ -48,6 +48,7 @@ SRC_URI += "\
         file://0039-policy-modules-admin-newgrp-add-newgrp-policy-module.patch \
         file://0040-policy-modules-services-watchdog-allow-watchdog_t-to.patch \
         file://0041-policy-modules-system-mount-allow-mount_t-to-getattr.patch \
+        file://0042-policy-modules-roles-sysadm-allow-sysadm_t-to-read-f.patch \
         "
 
 OSTREE_POLICY_PATCHES = "\
