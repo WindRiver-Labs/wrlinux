@@ -183,24 +183,22 @@ optional arguments:
 
 ### Generate a image from package feed
 $ appsdk genimage -h
-usage: appsdk genimage [-h] [-m {intel-x86-64}] [-o OUTDIR] [-w WORKDIR] [-t {wic,ostree-repo,container,all}] [-n NAME] [-u URL]
-                       [-p PKG] [--no-clean]
-                       [input]
+usage: appsdk genimage [-h] [-o OUTDIR] [-g GPGPATH] [-w WORKDIR] [-t {wic,ostree-repo,container,ustart,all}] [-n NAME] [-u URL] [-p PKG] [--no-clean] [input]
 
 positional arguments:
   input                 An input yaml file that the tool can be run against a package feed to generate an image
 
 optional arguments:
   -h, --help            show this help message and exit
-  -m {intel-x86-64}, --machine {intel-x86-64}
-                        Specify machine
   -o OUTDIR, --outdir OUTDIR
                         Specify output dir, default is current working directory
+  -g GPGPATH, --gpgpath GPGPATH
+                        Specify gpg homedir, it overrides 'gpg_path' in Yaml, default is /tmp/.cbas_gnupg
   -w WORKDIR, --workdir WORKDIR
                         Specify work dir, default is current working directory
-  -t {wic,ostree-repo,container,all}, --type {wic,ostree-repo,container,all}
-                        Specify image type, default is all
-  -n NAME, --name NAME  Specify image name
+  -t {wic,ostree-repo,container,ustart,all}, --type {wic,ostree-repo,container,ustart,all}
+                        Specify image type, it overrides 'image_type' in Yaml, default is all
+  -n NAME, --name NAME  Specify image name, it overrides 'name' in Yaml
   -u URL, --url URL     Specify extra urls of rpm package feeds
   -p PKG, --pkg PKG     Specify extra package to be installed
   --no-clean            Do not cleanup generated rootfs in workdir
