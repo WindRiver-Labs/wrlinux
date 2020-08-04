@@ -1,0 +1,5 @@
+Key for ls1043 secure boot demo
+
+Note & Warning:
+  This rsa key is only used to demonstrate secure boot feature on
+  ls1043ardb platform, and it should never be directly used in your real product.
