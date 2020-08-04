@@ -27,6 +27,15 @@ copy_pkgdata_to_sdk() {
         -C ${TMPDIR}/pkgdata ${MACHINE}
 }
 
+POPULATE_SDK_PRE_TARGET_COMMAND += "copy_ostree_initramfs_to_sdk;"
+copy_ostree_initramfs_to_sdk() {
+    install -d ${SDK_OUTPUT}${SDKPATHNATIVE}${datadir}/genimage/data/initramfs
+    if [ -L ${DEPLOY_DIR_IMAGE}/${INITRAMFS_IMAGE}-${MACHINE}.${INITRAMFS_FSTYPES} ];then
+        cp -f ${DEPLOY_DIR_IMAGE}/${INITRAMFS_IMAGE}-${MACHINE}.${INITRAMFS_FSTYPES} \
+            ${SDK_OUTPUT}${SDKPATHNATIVE}${datadir}/genimage/data/initramfs/
+    fi
+}
+
 # Make sure code changes can result in rebuild
 do_populate_sdk[vardeps] += "extract_pkgdata_postinst"
 SDK_POST_INSTALL_COMMAND += "${extract_pkgdata_postinst}"
