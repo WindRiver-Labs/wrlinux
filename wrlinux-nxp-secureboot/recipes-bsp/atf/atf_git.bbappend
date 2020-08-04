@@ -1,9 +1,11 @@
 SRCREV= "4a82c939a0211196e2b80a495f966383803753bb"
 
 PLAT = "${MACHINE}"
+PLAT_nxp-ls1043 = "ls1043ardb"
 PLAT_ls1088ardb-pb = "ls1088ardb"
 PLAT_lx2160ardb-rev2 = "lx2160ardb"
 PLATFORM_lx2160ardb-rev2 = "lx2160ardb_rev2"
+PLATFORM_nxp-ls1043 = "ls1043ardb"
 ddrphyopt_lx2160ardb-rev2 = "fip_ddr_sec"
 
 do_compile() {
