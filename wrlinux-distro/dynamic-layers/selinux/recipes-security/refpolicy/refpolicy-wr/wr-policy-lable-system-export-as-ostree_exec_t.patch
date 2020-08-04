@@ -1,4 +1,4 @@
-From 9e3f65fee444f2103548b6afd297fd6a920fb44d Mon Sep 17 00:00:00 2001
+From e87b54566c3facb59f997b8879ed5ee7c4ff3dc5 Mon Sep 17 00:00:00 2001
 From: Liwei Song <liwei.song@windriver.com>
 Date: Mon, 24 Feb 2020 10:52:55 +0800
 Subject: [PATCH] lable system-export as ostree_exec_t
@@ -10,18 +10,17 @@ Upstream-Status: Pending
 
 Signed-off-by: Liwei Song <liwei.song@windriver.com>
 ---
- policy/modules/admin/ostree.fc | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ policy/modules/admin/ostree.fc | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/policy/modules/admin/ostree.fc b/policy/modules/admin/ostree.fc
-index a595b5d8c..3f9ed1be0 100644
+index a595b5d8c..80cb2c6a4 100644
 --- a/policy/modules/admin/ostree.fc
 +++ b/policy/modules/admin/ostree.fc
 @@ -1,3 +1,4 @@
  # Core definitions
  /usr/bin/ostree_reset.sh	--	gen_context(system_u:object_r:ostree_exec_t,s0)
--/usr/bin/ostree	--	gen_context(system_u:object_r:ostree_exec_t,s0)
-+/usr/bin/ostree			--	gen_context(system_u:object_r:ostree_exec_t,s0)
+ /usr/bin/ostree	--	gen_context(system_u:object_r:ostree_exec_t,s0)
 +/usr/bin/system-export		--	gen_context(system_u:object_r:ostree_exec_t,s0)
 -- 
 2.17.1

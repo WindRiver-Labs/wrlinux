@@ -1,0 +1,51 @@
+From e676a14709958aa5c7e1f0c6d00567a8cb543109 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Mon, 3 Aug 2020 17:28:11 +0800
+Subject: [PATCH] policy/modules/system/systemd: allow systemd_generator_t to
+ read fstab and boot_t link files
+
+Fixes:
+avc:  denied  { read } for  pid=275 comm="systemd-fstab-g" name="fstab"
+dev="sdb3" ino=42
+scontext=system_u:system_r:systemd_generator_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:unlabeled_t:s0 tclass=file permissive=0
+systemd-fstab-generator[275]: Failed to open /etc/fstab: Permission
+denied
+
+audit: type=1400 audit(1596436245.683:5): avc:  denied  { write } for
+pid=273 comm="ostree-system-g" name="/" dev="tmpfs" ino=3049
+scontext=system_u:system_r:systemd_generator_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:var_run_t:s0-s15:c0.c1023 tclass=dir
+permissive=0
+
+audit: type=1400 audit(1596436245.690:6): avc:  denied  { read } for
+pid=273 comm="ostree-system-g" name="0" dev="sdb2" ino=12
+scontext=system_u:system_r:systemd_generator_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:boot_t:s0 tclass=lnk_file permissive=0
+
+Upstream-Status: Inappropriate [ostree specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/systemd.te | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 52a0f77cd..de6d241eb 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -403,6 +403,11 @@ storage_raw_read_fixed_disk(systemd_generator_t)
+ 
+ systemd_log_parse_environment(systemd_generator_t)
+ 
++kernel_read_unlabeled_files(systemd_generator_t)
++files_read_boot_symlinks(systemd_generator_t)
++files_check_write_runtime_dirs(systemd_generator_t)
++files_rw_runtime_files(systemd_generator_t)
++
+ term_dontaudit_use_unallocated_ttys(systemd_generator_t)
+ mls_file_write_to_clearance(systemd_generator_t)
+ mls_file_read_to_clearance(systemd_generator_t)
+-- 
+2.17.1
+

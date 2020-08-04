@@ -1,0 +1,32 @@
+From a132c3a05173549687fd1f8699437c273a19d9a4 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 4 Aug 2020 10:46:11 +0800
+Subject: [PATCH] file_contexts.subs_dist: set aliases for /var/home and
+ /var/rootdirs/ directories
+
+The /home, /root, /mnt, /media and /opt directories are symbolic links
+of /var/home and /var/rootdirs/* on ostree. Set aliases for them.
+
+Upstream-Status: Inappropriate [ostree specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ config/file_contexts.subs_dist | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/config/file_contexts.subs_dist b/config/file_contexts.subs_dist
+index 600d445dc..d00c30516 100644
+--- a/config/file_contexts.subs_dist
++++ b/config/file_contexts.subs_dist
+@@ -45,3 +45,8 @@
+ /usr/lib/busybox/usr /usr
+ 
+ /usr/etc /etc
++/var/home /home
++/var/rootdirs/root /root
++/var/rootdirs/mnt /mnt
++/var/rootdirs/media /media
++/var/rootdirs/opt /opt
+-- 
+2.17.1
+

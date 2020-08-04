@@ -1,0 +1,37 @@
+From c35409bbea14834434464fe4c667bce1f07aca21 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 3 Mar 2016 06:24:24 -0500
+Subject: [PATCH] policy/modules/system/mount: allow mount_t to getattr of all
+ filesystems
+
+Reference sources: selinux-policy-3.13.1-128.21.fc22.src.rpm
+Changes come from: policy-f22-base.patch
+
+Fixes:
+avc:  denied  { getattr } for  pid=1857 comm="umount" name="/"
+dev="sdb1" ino=1 scontext=system_u:system_r:mount_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:dosfs_t:s0 tclass=filesystem permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/mount.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/system/mount.te b/policy/modules/system/mount.te
+index 5bb4fe631..7ddbc860e 100644
+--- a/policy/modules/system/mount.te
++++ b/policy/modules/system/mount.te
+@@ -105,6 +105,7 @@ fs_getattr_tmpfs(mount_t)
+ fs_getattr_rpc_pipefs(mount_t)
+ fs_getattr_cifs(mount_t)
+ fs_getattr_nfs(mount_t)
++fs_getattr_all_fs(mount_t)
+ fs_mount_all_fs(mount_t)
+ fs_unmount_all_fs(mount_t)
+ fs_remount_all_fs(mount_t)
+-- 
+2.17.1
+

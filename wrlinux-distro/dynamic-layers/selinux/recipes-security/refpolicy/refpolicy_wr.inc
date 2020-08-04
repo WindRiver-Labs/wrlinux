@@ -47,6 +47,7 @@ SRC_URI += "\
         file://0038-policy-modules-system-selinuxutil-allow-secadm-to-ma.patch \
         file://0039-policy-modules-admin-newgrp-add-newgrp-policy-module.patch \
         file://0040-policy-modules-services-watchdog-allow-watchdog_t-to.patch \
+        file://0041-policy-modules-system-mount-allow-mount_t-to-getattr.patch \
         "
 
 OSTREE_POLICY_PATCHES = "\
@@ -58,6 +59,11 @@ OSTREE_POLICY_PATCHES = "\
         file://wr-policy-Add-ostree-policy.patch \
         file://wr-policy-Allow-sshd_t-and-staff_t-read-symlinks.patch \
         file://wr-policy-lable-system-export-as-ostree_exec_t.patch \
+        file://wr-policy-file_contexts.subs_dist-set-aliases-for-var-home-and.patch \
+        file://wr-policy-modules-system-mount-allow-mount-command-to-m.patch \
+        file://wr-policy-modules-system-systemd-allow-systemd_generato.patch \
+        file://wr-policy-modules-system-userdomain-allow-domain-read-h.patch \
+        file://wr-policy-modules-system-systemd-allow-systemd_tmpfiles.patch \
         "
 
 SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', 'ostree', '${OSTREE_POLICY_PATCHES}', '', d)}"

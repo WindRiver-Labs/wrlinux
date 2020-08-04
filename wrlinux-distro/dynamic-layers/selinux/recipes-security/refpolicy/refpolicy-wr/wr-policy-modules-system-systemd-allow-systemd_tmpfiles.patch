@@ -1,0 +1,37 @@
+From 8125dcf53e5e56b7e1d2471fe80634884613bdbf Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 4 Aug 2020 15:06:58 +0800
+Subject: [PATCH] policy/modules/system/systemd: allow systemd_tmpfiles_t to
+ read and write generic kernel sysctls
+
+Fixes:
+avc:  denied  { write } for  pid=457 comm="systemd-tmpfile"
+name="printk" dev="proc" ino=17898
+scontext=system_u:system_r:systemd_tmpfiles_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:sysctl_kernel_t:s0 tclass=file permissive=0
+
+systemd-tmpfiles[457]: Failed to open file "/proc/sys/kernel/printk": Permission denied
+
+Upstream-Status: Inappropriate [ostree specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/systemd.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index de6d241eb..130a7ce08 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -1288,6 +1288,8 @@ mls_file_upgrade(systemd_tmpfiles_t)
+ userdom_manage_user_runtime_root_dirs(systemd_tmpfiles_t)
+ userdom_relabel_user_runtime_root_dirs(systemd_tmpfiles_t)
+ 
++kernel_rw_kernel_sysctl(systemd_tmpfiles_t)
++
+ tunable_policy(`systemd_tmpfiles_manage_all',`
+ 	# systemd-tmpfiles can be configured to manage anything.
+ 	# have a last-resort option for users to do this.
+-- 
+2.17.1
+
