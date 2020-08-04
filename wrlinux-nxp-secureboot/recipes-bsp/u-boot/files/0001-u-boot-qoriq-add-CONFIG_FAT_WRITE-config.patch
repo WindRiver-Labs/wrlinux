@@ -1,0 +1,22 @@
+From ae387511373262de77ff9e127e95d17f9a928346 Mon Sep 17 00:00:00 2001
+From: Limeng <Meng.Li@windriver.com>
+Date: Fri, 24 Jul 2020 13:27:09 +0800
+Subject: [PATCH] u-boot-qoriq: add CONFIG_FAT_WRITE config
+
+Signed-off-by: Meng Li <Meng.Li@windriver.com>
+---
+ configs/ls1043ardb_tfa_SECURE_BOOT_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configs/ls1043ardb_tfa_SECURE_BOOT_defconfig b/configs/ls1043ardb_tfa_SECURE_BOOT_defconfig
+index 28fd2f3002..0a1dbc46ff 100644
+--- a/configs/ls1043ardb_tfa_SECURE_BOOT_defconfig
++++ b/configs/ls1043ardb_tfa_SECURE_BOOT_defconfig
+@@ -56,3 +56,4 @@ CONFIG_EFI_LOADER_BOUNCE_BUFFER=y
+ CONFIG_CMD_SETEXPR=y
+ CONFIG_DM_I2C=y
+ CONFIG_DM_GPIO=y
++CONFIG_FAT_WRITE=y
+-- 
+2.17.1
+
