@@ -1,0 +1,8 @@
+# short-description: Create a ls1043 disk image (SD card)
+# long-description: Create a partitioned disk image for NXP ls1043
+# The first partition is NULL, reserved for uboot.
+# The second partition is to accommodate kernel, dtb and rootfs.
+
+part u-boot --source rawcopy --sourceparams="file=firmware_ls1043ardb_uboot_sdboot_secure.img" --ondisk mmcblk0 --no-table --align 4
+part /boot --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot --active --align 61440
+part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --label root --align 4096
