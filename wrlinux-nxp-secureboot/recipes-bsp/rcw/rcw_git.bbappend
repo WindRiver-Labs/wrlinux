@@ -13,3 +13,7 @@ do_install () {
         oe_runmake BOARDS=${M} DESTDIR=${D}/boot/rcw/ install
     fi
 }
+FILESEXTRAPATHS_prepend_nxp-ls1043 := "${THISDIR}/files:"
+SRC_URI_append_nxp-ls1043 = " \
+    file://0001-rcw-remove-BOOT_HO-flag.patch \
+"

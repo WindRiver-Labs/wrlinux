@@ -1,0 +1,28 @@
+From e60702c589694c00f35d3326545f4d45994445ff Mon Sep 17 00:00:00 2001
+From: Limeng <Meng.Li@windriver.com>
+Date: Fri, 24 Jul 2020 15:41:17 +0800
+Subject: [PATCH] rcw: remove BOOT_HO flag
+
+Remove BOOT_HO flag to aovid holding on cpu core when
+enable secure boot feature.
+
+Signed-off-by: Meng Li <Meng.Li@windriver.com>
+---
+ ls1043ardb/RR_FQPP_1455/rcw_1600_sdboot_sben.rcw | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/ls1043ardb/RR_FQPP_1455/rcw_1600_sdboot_sben.rcw b/ls1043ardb/RR_FQPP_1455/rcw_1600_sdboot_sben.rcw
+index 3230759..1bcb651 100644
+--- a/ls1043ardb/RR_FQPP_1455/rcw_1600_sdboot_sben.rcw
++++ b/ls1043ardb/RR_FQPP_1455/rcw_1600_sdboot_sben.rcw
+@@ -49,7 +49,6 @@ DDR_FDBK_MULT=2
+ DDR_REFCLK_SEL=1
+ PBI_SRC=6
+ SB_EN=1
+-BOOT_HO=1
+ IFC_MODE=64
+ HWA_CGA_M1_CLK_SEL=6
+ DRAM_LAT=1
+-- 
+2.17.1
+
