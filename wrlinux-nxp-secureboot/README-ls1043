@@ -1,0 +1,423 @@
+	Secure Boot Design On ls1043ardb Platform
+
+
+1. About this document
+======================
+This document provides detail description about how to enable secure
+boot on ls1043ardb board. It includes the implementation principles
+of secure boot, implementation example step by step and so on.
+
+Dependencies
+------------
+This layer depends on the nxp-ls1043 and meta-freescale layers supplied
+by Wind River Linux.
+
+Maintenance
+-----------
+This layer is maintained by Wind River Systems, Inc.
+Contact <support@windriver.com> or your support representative for more
+information on submitting changes.
+
+Building the wrlinux-nxp-secureboot layer
+-----------------------------------------
+This layer should be added to bblayers.conf.
+
+Statement
+---------
+Before starting secure boot feature development, please read this README and other
+reference Documents listed in section 9.
+
+This layer is only used for assisting users in developing their product.
+About the final product, it is need to program the ITS fuse at the same
+time or after programming all other fuses in the SoC. See the Trust Architecture
+User Guide for details about Trusted Manufacturing Process.
+
+
+2. Preparations & Prerequisites
+===============================
+To use secure boot feature, assume that you are:
+ - Familiar with wrlinux product and know how to basic BSP project.
+ - Familiar with ARMv8 and ls1043 SoC architecture.
+ - Familiar with the basic concepts of security, like openssl, authentication,
+   encryption, hardware root trust, RSA, AES, key source, certificate, etc.
+
+Hardware preparations:
+ - A host machine installed with wrlinux product.
+ - ls1043ardb development board.
+ - An SD Card.
+
+Switch Configuration:
+Set up SW3, SW4 and SW5 as below table for booting from an SD card.
+
+Switch	D1   D2   D3   D4   D5   D6   D7   D8
+SW3	ON   OFF  OFF  ON   OFF  OFF  ON   ON
+SW4	OFF  OFF  ON   OFF  OFF  OFF  OFF  OFF
+SW5	OFF  OFF  ON   OFF  OFF  OFF  OFF  OFF
+
+
+3. Secure Boot Process
+======================
+
+Secure boot process uses a digital signature validation routine, already present in ISBC(Internal Secure Boot Code) resides in BootROM.
+This routine performs:
+1> Calculate the hash (SHA-256) over the CSF header, next level boot Image and public key.
+2> Decrypt the signature to obtain stored hash using public key and compare it with freshly
+   calculated hash value. If the comparison passes, the image can be considered as authentic,
+   otherwise core will go into the spin loop.
+
+   There is figure as below to show the secure boot process clearly.
+
+				Code Signing										Signature Verification
+										|
+        +--------------+							|    +--------------+
+        |     	       | \							|    |     	    | \
+	|  CSF Header  |  \							|    |  CSF Header  |  \
+	|	       |<-|---------------------+				|    |		    |   |
+	+--------------+  |			|				|    +--------------+   |
+        +--------------+  |			|				|    +--------------+   |
+        |     	       |  |			|				|    |     	    |   |
+	|  S/G Table   |<-|---------------------+				|    |  S/G Table   |   |
+	|	       |  |			|				|    |		    |   |
+	+--------------+  |	+----------------------------------+		|    +--------------+   |	+---------------------------------------------------+
+        +--------------+  |	|				   |		|    +--------------+   |	|	Internal Secure Boot Code		    |
+        |     	       |  |	|		Code		   |		|    |		    |   |	|	(on-chip ROM)				    |
+        |     	       |  |	|		Signing Tool	   |		|    |		    |   |	|						    |
+        |     	       |  |	|				   |		|    |		    |   |	|						    |
+        |     	       |  |	|  +-----------+		   |		|    |		    |   |	|						    |
+	|     	       |  \	|  |  Message  |		   |	     |\ |    |		    |   |	|  +-----------+    +-----------+    +-----------+  |
+	|	       |   ------->|  Digest   |		   |         | \|    |		    |   \	|  |  Message  |    |  Compare  |    |  	 |  |
+        |   Image      |  /	|  |  Hash     |		   |         |  \    |   Image      |    --------->|  Digest   |--->|  Hash     |--->| Pass/Fail |  |
+        |              |  |	|  +-----------+		   |    +----+   \   |              |   /	|  |  Hash     |    |  Sum      |    |           |  |
+	|     	       |  |	|	    |			   |    |         \  |              |   |	|  +-----------+    +-----------+    +-----------+  |
+	|	       |  |	|           v			   |    |          \ |              |   |	|                          ^			    |
+        |     	       |  |	|  +-------------+    +---------+  |    |          / |              |   |	|			   |			    |
+        |  	       |  |	|  | Private Key |    | Private |  |    |         /  |              |   |	|			   |			    |
+	|	       |  |	|  | Encryption  |<---| Key	|  |    +----+   /   |              |   |	|			   |			    |
+	|	       |  |	|  +-------------+    +---------+  |         |  /    |              |   |	|		     +------------+                 |
+	+--------------+  |	| 	   |		   	   |         | /|    +--------------+   |	|   +-----------+    | Public     |                 |
+        +--------------+  |	|	   |	      +---------+  |         |/ |    +--------------+   |	|   |  Verify   |    | Key        |                 |
+        |   Public     |<-/-----|----------|----------| Public  |  |		|    |   Public     |  /	|   |  Key/List |--->| Decryption |                 |
+	|   Key(s)     | /	|	   |	      | Key	|  |		|    |   Key(s)     |-/---------|-->+-----------+    +------------+                 |
+	+--------------+	|	   |	      +---------+  |		|    +--------------+		|         ^		   ^			    |
+        +--------------+	|          |               |       |		|    +--------------+		|         |	           |			    |
+        |  Signature   |<------------------+	           |       |		|    |  Signature   |-----------|---------|----------------+			    |
+	+--------------+	|		           |       |		|    +--------------+		|         |                 			    |
+        +--------------+	|  +---------+             |       |		|    +--------------+		+---------|-----------------------------------------+
+        |  Fuse Box    |	|  |  Hash   |		   |       |		|    |  Fuse Box    |			  |
+	|  Public Key  |<----------| Key/List|<------------+       |		|    |  Public Key  |---------------------+
+	|  /List Hash  |	|  +---------+                     |		|    |  /List Hash  |
+	+--------------+	+----------------------------------+		|    +--------------+
+										|
+
+As shown in the left side of the figure, the Code Signing Tool (CST) includes the following functions.
+
+ - CSF Header: Command Sequence File Header
+	    This header provides the ISBC with flags, pointers, offsets, and lengths necessary to perform image validation.
+ - S/G Table:  Scatter Gather Table
+	    Optional (N/A for some stages which support only single image)
+	    Allows support for multiple non-contiguous images.
+ - Public Key list: SRK (Super Root Key) Table
+		 One or more public keys is appended to the image. The CSF header indicates which of the keys is to be used
+		 in signature validation.
+ - Signature: The SHA-256 hash of the CSF header + S/G table + Image
+
+ - Generating RSA public and private key pairs: The RSA private key is exported for the user to store securely
+					     The CST also supports using public & private keys input by the user
+ - Hashing the public key or public key list: This hash becomes the Super Root Key Hash which is stored in the SFP hash registers.
+
+As shown in the right side of the figure, the secure boot process runs Signature Verification in reverse.
+
+1> The ISBC locates the CSF header and S/G table to further locate the image, public key list, and signature
+2> The public key (list) is hashed and compared to the SRKH
+3> If the public key is good, it is used to decrypt the signature (recover the hash)
+4> The CSF header + S/G table + Image + Public key list are hashed, with the result compared to above. If the two hashes
+   match, image is considered to be authentic.
+
+
+4. Burn OTPMK(One Time Programmable Master Key)
+===============================================
+
+4.1 Generate CST with LSDK
+--------------------------
+
+1> Download LSDK
+   Go to Downloads tab at https://www.nxp.com/lsdk. Download Layerscape Software Development Kit. Enter login details,
+   accept the agreement to download the flexbuild source tarball in the name format flexbuild_<version>.tgz
+   For example, flexbuild_lsdk2004_update_290520.tgz
+
+2> Build CST with below commands
+	$ tar xvzf flexbuild_<version>.tgz
+	$ cd flexbuild_<verison>
+	$ source setup.env
+	$ flex-builder -h
+	$ flex-builder -c cst
+
+4.2 Create OTPMK
+----------------
+
+Create One Time Programmable Master Key with below commands
+
+	$ cd packages/apps/security/cst
+	$ ./gen_otpmk_drbg -b 2
+
+There will be OTPMK generated as below:
+
+	#----------------------------------------------------#
+	#-------         --------     --------        -------#
+	#------- CST (Code Signing Tool) Version 2.0  -------#
+	#-------         --------     --------        -------#
+	#----------------------------------------------------#
+
+Input string not provided
+Generating a random string
+-------------------------------------------
+* Hash_DRBG library invoked
+* Seed being taken from /dev/random
+-------------------------------------------
+OTPMK[255:0] is:
+94059d0315926e5943c0f7c07e3850d2f97e8cb31f0bc4067c9c53d35fa6a9cb
+
+ NAME    |     BITS     |    VALUE  
+_________|______________|____________
+OTPMKR 0 | 255-224	|   94059d03 
+OTPMKR 1 | 223-192	|   15926e59 
+OTPMKR 2 | 191-160	|   43c0f7c0 
+OTPMKR 3 | 159-128	|   7e3850d2 
+OTPMKR 4 | 127- 96	|   f97e8cb3 
+OTPMKR 5 |  95- 64	|   1f0bc406 
+OTPMKR 6 |  63- 32	|   7c9c53d3 
+OTPMKR 7 |  31-  0	|   5fa6a9cb 
+
+Note: Above OTPMK is only an example, it is generated with a random strategy, customer will get
+      different value when run above commands on their side.
+
+4.3 Write OTPMK into FUSE register
+----------------------------------
+
+Note: The OTPMK is only able to be written FUSE register one time, as soon as you send command to
+      program fuse register, you can not modify or reset the OTPMKR registers.
+
+1> Put J13 to enable PWR_PROG_SFP.
+
+2> Power on ls1043ardb board with a bootloader without secure feature, and then enter u-boot command line terminal.
+   Run below commands to program fuse register.
+
+	Check initial SNVS state
+	=> md 0x1e90014
+	The OTPMK_ZERO bit in SecMon_HP Status Register to indicate whether OTPMK has been programmed.
+
+	Write OTPMK fuse values on shadow registers
+	=> mw.l 1e80234 <OTPMK1>
+	=> mw.l 1e80238 <OTPMK2>
+	=> mw.l 1e8023c <OTPMK3>
+	=> mw.l 1e80240 <OTPMK4>
+	=> mw.l 1e80244 <OTPMK5>
+	=> mw.l 1e80248 <OTPMK6>
+	=> mw.l 1e8024c <OTPMK7>
+	=> mw.l 1e80250 <OTPMK8>
+
+	Check initial SNVS state
+	=> md 0x1e90014
+
+	Check parity errors
+	=> md 1e80024
+
+	Write OTPMK into fuse register
+	=> mw 1e80020 0x02000000
+
+	Reset and check that SNVS state
+	=> md 0x1e90014
+
+
+5. Generate SRK(Super Root Key)
+===============================
+
+5.1 Generate CST with LSDK
+--------------------------
+
+Please refer to section 4.1.
+
+5.2 Create SRK
+--------------
+
+Create SRK(Super Root Key) with below commands
+
+	$ cd packages/apps/security/cst
+	$ ./gen_keys -h
+	$ ./gen_keys 4096
+	or define key file name with below parameters
+	$ ./gen_keys 4096 -k <key name>.pub -p <key name>.pri
+
+There will be SRK generated as below:
+
+	#----------------------------------------------------#
+	#-------         --------     --------        -------#
+	#------- CST (Code Signing Tool) Version 2.0  -------#
+	#-------         --------     --------        -------#
+	#----------------------------------------------------#
+
+===============================================================
+This product includes software developed by the OpenSSL Project
+for use in the OpenSSL Toolkit (http://www.openssl.org/)
+This product includes cryptographic software written by
+Eric Young (eay@cryptsoft.com)
+===============================================================
+
+Generated SRK pair stored in :
+		PUBLIC KEY <key name>.pub
+		PRIVATE KEY <key name>.pri
+
+Note: There is a pair of SRK in wrlinux-nxp-secureboot/ls_key/rsa4096-sample-key.
+      If users want to use their own SRK, please put it into wrlinux-nxp-secureboot/ls_key,
+      and then edit file ls-secure-boot.inc, set SECURE_PRI_KEY and SECURE_PUB_KEY
+      with correct SRK path.
+
+
+6. Enable secure boot for BSP nxp-ls1043
+========================================
+
+Detail steps as below:
+
+	$ mkdir <path_to_project>
+	$ cd <path_to_project>
+	$ <path_to_wrlinux>/wrlinux-x/setup.sh --machine nxp-ls1043 --distro wrlinux --dl-layers --accept-eula=yes
+	$ source ./environment-setup-x86_64-wrlinuxsdk-linux
+	$ source ./oe-init-build-env
+	$ bitbake-layers add-layer <path_to_project>/layers/wrlinux/wrlinux-nxp-secureboot
+	Edit file <path_to_project>/build/conf/local.conf to set BB_NO_NETWORK as 0.
+	$ bitbake wrlinux-image-std
+
+Note:
+The secure boot layer is an internal layer in wrlinux, it doesn't support to add
+this layer with --layer option during setup project.
+
+
+7. Burn SRKH(Super Root Key Hash)
+=================================
+
+7.1 Notice
+----------
+
+The SRKH register is only able to be written one time, as soon as you send command to program fuse registers,
+you cannot modify or reset the SRKH registers. Therefore, please MAKE SURE that the hash value is calculated
+from the SRK that is used when building BSP project.
+In order to reduce the risk of mistake, after building BSP nxp-ls1043, the SRK pair and the corresponding hash
+value are stored in <path_to_project>/build/tmp-glibc/deploy/images/nxp-ls1043/
+
+7.2 Write SRKH into FUSE register
+---------------------------------
+
+Below SRKH value is only a example, if users have their own SRK, it is need to use corresponding hash value in
+file <path_to_project>/build/tmp-glibc/deploy/images/nxp-ls1043/srk_hash.txt
+
+1> Get the SRKH value
+   Open file <path_to_project>/build/tmp-glibc/deploy/images/nxp-ls1043/srk_hash.txt.
+   SRK Hash as below:
+   SRK (Public Key) Hash:
+   5d156e89d2f986cf9d1768af7acc69fba8ae2899dc9d9e692f6882f610324442
+	 SFP SRKHR0 = 5d156e89
+	 SFP SRKHR1 = d2f986cf
+	 SFP SRKHR2 = 9d1768af
+	 SFP SRKHR3 = 7acc69fb
+	 SFP SRKHR4 = a8ae2899
+	 SFP SRKHR5 = dc9d9e69
+	 SFP SRKHR6 = 2f6882f6
+	 SFP SRKHR7 = 10324442
+
+2> Swap SRKH value byte order
+   CST generates the SRKH in the same endianness as SFP.
+   To program the SRKH in an ARM core running little endian mode, a byte swap is required.
+
+   Register name		Example value		Endianness swap
+	SRKHR0			5d156e89		896e155d
+	SRKHR1			d2f986cf		cf86f9d2
+	SRKHR2			9d1768af		af68179d
+	SRKHR3			7acc69fb		fb69cc7a
+	SRKHR4			a8ae2899		9928aea8
+	SRKHR5			dc9d9e69		699e9ddc
+	SRKHR6			2f6882f6		f682682f
+	SRKHR7			10324442		42443210
+
+
+3> Write SRKH value into FUSE register
+   Put J13 to enable PWR_PROG_SFP.
+   Power on ls1043ardb board with a bootloader without secure feature, and then enter u-boot command line terminal.
+   Run below commands to program SRKH register.
+
+	Write the SRKH value to registers
+	=> mm 0x01E80254
+	=> 01e80254: 00000000 ? 896e155d
+	=> 01e80258: 00000000 ? cf86f9d2
+	=> 01e8025c: 00000000 ? af68179d
+	=> 01e80260: 00000000 ? fb69cc7a
+	=> 01e80264: 00000000 ? 9928aea8
+	=> 01e80268: 00000000 ? 699e9ddc
+	=> 01e8026c: 00000000 ? f682682f
+	=> 01e80270: 00000000 ? 42443210
+
+	Display and verify that the SRKH registers were programmed in the previous step
+	=> md 0x01E80254
+	=> 01e80254: 896e155d cf86f9d2 af68179d fb69cc7a
+	=> 01e80264: 9928aea8 699e9ddc f682682f 42443210
+
+	Confirm to program fuse block
+	=> mw 0x1e80020 0x02000000
+
+	Reset and then check the Fuse Programming is permanent
+	=> reset
+	=> md 0x01E80254
+	=> 01e80254: 896e155d cf86f9d2 af68179d fb69cc7a
+	=> 01e80264: 9928aea8 699e9ddc f682682f 42443210
+
+
+8. Run secure boot
+==================
+
+8.1 Burn WIC image into SD card
+-------------------------------
+
+Run below command to burn WIC image into SD card
+
+	$ sudo dd if=wrlinux-image-std-nxp-ls1043.wic of=/dev/your_sd_dev conv=fsync status=progress
+
+8.2 Verify secure boot
+----------------------
+
+Insert SD card into SD slot(J21), and then power on board with SW2
+There will be secure log as below:
+
+	......
+	NOTICE:  INITIALIZING SEC
+	NOTICE:  Verifying RSA
+	NOTICE:  Verifying hash
+	NOTICE:  Verifying RSA
+	NOTICE:  Verifying hash
+	......
+	switch to partitions #0, OK
+	mmc0 is current device
+	Scanning mmc 0:1...
+	Found U-Boot script /ls1043ardb_boot.scr
+	1257 bytes read in 13 ms (93.8 KiB/s)
+	2560 bytes read in 13 ms (191.4 KiB/s)
+	esbc_validate command successful
+	## Executing script at 80000000
+	17338928 bytes read in 761 ms (21.7 MiB/s)
+	32249 bytes read in 17 ms (1.8 MiB/s)
+	validating secureboot
+	Decapsulating linux image
+
+	Decapsulating blob to get data
+	Blob decapsulation successful.
+	Decapsulating dtb image
+	......
+
+
+9. References
+=============
+
+[1] Layerscape Software Development Kit User Guide, LSDK 20.04_290520
+[2] QorIQ LS1043A Reference Design Board Getting Started Guide
+[3] QorIQ LS1043A Reference Manual
+[4] QorIQ LS1043A Security (SEC) Reference Manual
+[5] Enable Trust Architecture and Secure Boot on LS10xx, Illustrated with the LS1043A RDB System
+[6] QorIQ Trust Architecture 2.1 User Guide
