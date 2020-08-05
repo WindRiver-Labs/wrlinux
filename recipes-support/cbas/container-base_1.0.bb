@@ -46,3 +46,6 @@ extract_pkgdata_postinst() {
 
 inherit wrlinux-image features_check
 REQUIRED_DISTRO_FEATURES = "ostree cbas"
+
+# Make sure the existence of ostree initramfs image
+do_populate_sdk[depends] += "initramfs-ostree-image:do_image_complete"
