@@ -4186,6 +4186,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-license-expression \
     python3-lockfile \
     python3-logutils \
+    python3-lorem \
     python3-lrparsing \
     python3-luma-core \
     python3-luma-oled \
