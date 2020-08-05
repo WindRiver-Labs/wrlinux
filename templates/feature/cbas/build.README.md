@@ -1,10 +1,13 @@
 # Wind River Linux App SDK for CBAS - How to build
+Provide two ways to build
+- Way 1 - Step by step for each machine;
+- Way 2 - Reuse binary distribution build by a script gen-image
 
 ## Supported machine
 intel-x86-64
 bcm-2xxx-rpi4
 
-## Steps
+## Way 1: Step by step
 ### Setup project
 $ setup.sh --machines=[intel-x86-64|bcm-2xxx-rpi4] --dl-layers \
     --templates feature/ostree feature/cbas --layers wr-ostree
@@ -25,24 +28,67 @@ ENDOF
 $ bitbake world && bitbake package-index
 
 $ ls tmp/deploy/rpm/*/repodata/repomd.xml -1
-tmp/deploy/rpm/corei7_64/repodata/repomd.xml
-tmp/deploy/rpm/intel_x86_64/repodata/repomd.xml
-tpm/deploy/rpm/noarch/repodata/repomd.xml
+tmp-glibc/deploy/rpm/corei7_64/repodata/repomd.xml
+tmp-glibc/deploy/rpm/intel_x86_64/repodata/repomd.xml
+tmp-glibc/deploy/rpm/noarch/repodata/repomd.xml
 
 Or
 
 $ ls tmp/deploy/rpm/*/repodata/repomd.xml -1
-tmp/deploy/rpm/cortexa72/repodata/repomd.xml
-tmp/deploy/rpm/bcm_2xxx_rpi4/repodata/repomd.xml
-tpm/deploy/rpm/noarch/repodata/repomd.xml
+tmp-glibc/deploy/rpm/cortexa72/repodata/repomd.xml
+tmp-glibc/deploy/rpm/bcm_2xxx_rpi4/repodata/repomd.xml
+tmp-glibc/deploy/rpm/noarch/repodata/repomd.xml
+
+Above ls only list required repodata
 
 #### Create container-base appsdk
 $ bitbake container-base -cpopulate_sdk
 
-$ ls tmp/deploy/sdk/*-container-base-sdk.sh
+$ ls tmp-glibc/deploy/sdk/wrlinux-graphics-*-container-base-sdk.sh
 
 ### Setup rpm repo on http server
+Setup a web server (such as httpd, apache2), and create a symlink
+to deploy dir
+
 $ ln -snf path-to-build/tmp-glibc/deploy /var/www/html/cbas
+
+### App SDK
+wget http://<web-server-url>/cbas/sdk/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-intel_x86_64-container-base-sdk.sh
+
+Or
+
+wget http://<web-server-url>/cbas/sdk/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-bcm_2xxx_rpi4-container-base-sdk.sh
+
+## Way 2: Reuse binary distribution build
+### Setup project
+$ setup.sh --dl-layers --templates feature/ostree feature/cbas \
+    --layers wr-ostree
+
+### Source a build
+$ . ./oe-init-build-env
+
+### Set local.conf
+cat << ENDOF >> conf/local.conf
+PACKAGE_FEED_URIS = "http://<web-server-url>/cbas"
+ENDOF
+
+### Build
+../layers/wrlinux/scripts/gen-image/gen-image -p lincd -m intel-x86-64 && \
+    ../layers/wrlinux/scripts/gen-image/gen-image -p lincd -m bcm-2xxx-rpi4
+
+### Setup rpm repo on http server
+Setup a web server (such as httpd, apache2), and create a symlink
+to outdir
+
+$ ln -snf path-to-build/outdir /var/www/html/cbas
+
+### App SDK
+wget http://<web-server-url>/cbas/WRLinux-CD-Images/intel-x86-64/cbas-sdk/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-intel_x86_64-container-base-sdk.sh
+
+And
+
+wget http://<web-server-url>/cbas/WRLinux-CD-Images/bcm-2xxx-rpi4/cbas-sdk/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-bcm_2xxx_rpi4-container-base-sdk.sh
+
 
 ## License
 The sdk is provided under the GPL-2.0 license.
