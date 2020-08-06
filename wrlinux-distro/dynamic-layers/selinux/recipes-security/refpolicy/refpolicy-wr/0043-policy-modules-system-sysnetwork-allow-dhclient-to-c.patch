@@ -1,0 +1,182 @@
+From 413fe5440f42deb3a3f39b0352721136bc580e04 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Wed, 5 Aug 2020 16:44:02 +0800
+Subject: [PATCH] policy/modules/system/sysnetwork: allow dhclient to create
+ /etc/resolv.conf
+
+* Set default labels (net_conf_t) for /etc/resolv.conf symbolic link.
+* Allow dhclient to remove symlink /etc/resolv.conf.
+* Allow dhclient to write /etc/ntp.conf.
+
+Fixes:
+avc:  denied  { search } for  pid=788 comm="dhclient-script"
+name="resolve" dev="tmpfs" ino=19288
+scontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:systemd_resolved_runtime_t:s0 tclass=dir
+permissive=0
+
+avc:  denied  { getattr } for  pid=788 comm="dhclient-script"
+path="/run/systemd/resolve/resolv.conf" dev="tmpfs" ino=22311
+scontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:systemd_resolved_runtime_t:s0 tclass=file
+permissive=0
+
+avc:  denied  { unlink } for  pid=802 comm="mv" name="resolv.conf"
+dev="sdb2" ino=1114 scontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:etc_t:s0 tclass=lnk_file permissive=0
+
+avc:  denied  { write } for  pid=1204 comm="dhclient-script"
+name="ntp.conf" dev="sdb2" ino=722
+scontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:ntp_conf_t:s0 tclass=file permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/ntp.if      | 57 +++++++++++++++++++++++++++++
+ policy/modules/system/sysnetwork.fc |  1 +
+ policy/modules/system/sysnetwork.if |  1 +
+ policy/modules/system/sysnetwork.te | 12 +++++-
+ 4 files changed, 70 insertions(+), 1 deletion(-)
+
+diff --git a/policy/modules/services/ntp.if b/policy/modules/services/ntp.if
+index a469c69a0..fe17b4cae 100644
+--- a/policy/modules/services/ntp.if
++++ b/policy/modules/services/ntp.if
+@@ -34,6 +34,63 @@ interface(`ntp_read_config',`
+ 	allow $1 ntp_conf_t:file read_file_perms;
+ ')
+ 
++########################################
++## <summary>
++##	Write ntp.conf
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`ntp_write_config',`
++	gen_require(`
++		type ntp_conf_t;
++	')
++
++	files_search_etc($1)
++	allow $1 ntp_conf_t:file write_file_perms;
++')
++
++#######################################
++## <summary>
++##  Create ntp.conf
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`ntp_create_config',`
++	gen_require(`
++		type ntp_conf_t;
++	')
++
++	files_search_etc($1)
++	allow $1 ntp_conf_t:file create_file_perms;
++')
++
++#######################################
++## <summary>
++##  Relabel ntp.conf
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`ntp_relabel_config',`
++	gen_require(`
++		type ntp_conf_t;
++	')
++
++	files_search_etc($1)
++	allow $1 ntp_conf_t:file { relabelfrom relabelto };
++')
++
+ ########################################
+ ## <summary>
+ ##	Execute ntp server in the ntpd domain.
+diff --git a/policy/modules/system/sysnetwork.fc b/policy/modules/system/sysnetwork.fc
+index d8902d725..325eaeb0c 100644
+--- a/policy/modules/system/sysnetwork.fc
++++ b/policy/modules/system/sysnetwork.fc
+@@ -21,6 +21,7 @@ ifdef(`distro_debian',`
+ /etc/hostname		--	gen_context(system_u:object_r:net_conf_t,s0)
+ /etc/denyhosts.*	--	gen_context(system_u:object_r:net_conf_t,s0)
+ /etc/resolv\.conf.*	--	gen_context(system_u:object_r:net_conf_t,s0)
++/etc/resolv\.conf.*	-l	gen_context(system_u:object_r:net_conf_t,s0)
+ /etc/yp\.conf.*		--	gen_context(system_u:object_r:net_conf_t,s0)
+ 
+ /etc/dhcp3(/.*)?		gen_context(system_u:object_r:dhcp_etc_t,s0)
+diff --git a/policy/modules/system/sysnetwork.if b/policy/modules/system/sysnetwork.if
+index 1cd1c65a4..2f821bd6e 100644
+--- a/policy/modules/system/sysnetwork.if
++++ b/policy/modules/system/sysnetwork.if
+@@ -514,6 +514,7 @@ interface(`sysnet_manage_config',`
+ 
+ 	ifdef(`distro_redhat',`
+ 		manage_files_pattern($1, net_conf_t, net_conf_t)
++		manage_lnk_files_pattern($1, net_conf_t, net_conf_t)
+ 	')
+ ')
+ 
+diff --git a/policy/modules/system/sysnetwork.te b/policy/modules/system/sysnetwork.te
+index 62c98446d..1f7586e9f 100644
+--- a/policy/modules/system/sysnetwork.te
++++ b/policy/modules/system/sysnetwork.te
+@@ -49,7 +49,7 @@ ifdef(`distro_debian',`
+ #
+ # DHCP client local policy
+ #
+-allow dhcpc_t self:capability { dac_override fsetid net_admin net_bind_service net_raw setpcap sys_nice sys_resource sys_tty_config };
++allow dhcpc_t self:capability { dac_override fsetid net_admin net_bind_service net_raw setpcap sys_nice sys_resource sys_tty_config sys_admin };
+ dontaudit dhcpc_t self:capability { sys_ptrace sys_tty_config };
+ # for access("/etc/bashrc", X_OK) on Red Hat
+ dontaudit dhcpc_t self:capability { dac_read_search sys_module };
+@@ -80,7 +80,10 @@ files_runtime_filetrans(dhcpc_t, dhcpc_runtime_t, { file dir })
+ # Allow read/write to /etc/resolv.conf and /etc/ntp.conf. Note that any files
+ # in /etc created by dhcpcd will be labelled net_conf_t.
+ sysnet_manage_config(dhcpc_t)
++sysnet_read_config(dhcpc_t)
++sysnet_relabel_config(dhcpc_t)
+ files_etc_filetrans(dhcpc_t, net_conf_t, file)
++files_tmp_filetrans(dhcpc_t, net_conf_t, file, "resolv.conf.dhclient-new")
+ 
+ # create temp files
+ manage_dirs_pattern(dhcpc_t, dhcpc_tmp_t, dhcpc_tmp_t)
+@@ -174,6 +177,12 @@ ifdef(`init_systemd',`
+ 	init_search_units(dhcpc_t)
+ ')
+ 
++optional_policy(`
++	ntp_create_config(dhcpc_t)
++	ntp_write_config(dhcpc_t)
++	ntp_relabel_config(dhcpc_t)
++')
++
+ optional_policy(`
+ 	avahi_domtrans(dhcpc_t)
+ ')
+@@ -254,6 +263,7 @@ optional_policy(`
+ optional_policy(`
+ 	seutil_sigchld_newrole(dhcpc_t)
+ 	seutil_dontaudit_search_config(dhcpc_t)
++	seutil_domtrans_setfiles(dhcpc_t)
+ ')
+ 
+ optional_policy(`
+-- 
+2.17.1
+
