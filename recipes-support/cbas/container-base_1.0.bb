@@ -36,6 +36,39 @@ copy_ostree_initramfs_to_sdk() {
     fi
 }
 
+IMAGE_CLASSES += "qemuboot"
+do_populate_sdk_prepend() {
+    localdata = bb.data.createCopy(d)
+    if localdata.getVar('MACHINE') == 'bcm-2xxx-rpi4':
+        localdata.appendVar('QB_OPT_APPEND', ' -bios @DEPLOYDIR@/qemu-u-boot-bcm-2xxx-rpi4.bin')
+    localdata.setVar('QB_MEM', '-m 512')
+
+    bb.build.exec_func('do_write_qemuboot_conf', localdata)
+}
+
+
+POPULATE_SDK_PRE_TARGET_COMMAND += "copy_qemu_data;"
+copy_qemu_data() {
+    install -d ${SDK_OUTPUT}${SDKPATHNATIVE}${datadir}/qemu_data
+    if [ -e ${DEPLOY_DIR_IMAGE}/qemu-u-boot-bcm-2xxx-rpi4.bin ]; then
+        cp -f ${DEPLOY_DIR_IMAGE}/qemu-u-boot-bcm-2xxx-rpi4.bin ${SDK_OUTPUT}${SDKPATHNATIVE}${datadir}/qemu_data/
+    fi
+    if [ -e ${DEPLOY_DIR_IMAGE}/ovmf.qcow2 ]; then
+        cp -f ${DEPLOY_DIR_IMAGE}/ovmf.qcow2 ${SDK_OUTPUT}${SDKPATHNATIVE}${datadir}/qemu_data/
+    fi
+
+    sed -e '/^staging_bindir_native =/d' \
+        -e '/^staging_dir_host =/d' \
+        -e '/^staging_dir_native = /d' \
+        -e '/^kernel_imagetype =/d' \
+        -e 's/^deploy_dir_image =.*$/deploy_dir_image = @DEPLOYDIR@/' \
+        -e 's/^image_link_name =.*$/image_link_name = @IMAGE_LINK_NAME@/' \
+        -e 's/^image_name =.*$/image_name = @IMAGE_NAME@/' \
+        -e 's/^qb_default_fstype =.*$/qb_default_fstype = wic/' \
+            ${IMGDEPLOYDIR}/container-base-${MACHINE}.qemuboot.conf > \
+                ${SDK_OUTPUT}${SDKPATHNATIVE}${datadir}/qemu_data/qemuboot.conf.in
+}
+
 # Make sure code changes can result in rebuild
 do_populate_sdk[vardeps] += "extract_pkgdata_postinst"
 SDK_POST_INSTALL_COMMAND += "${extract_pkgdata_postinst}"
