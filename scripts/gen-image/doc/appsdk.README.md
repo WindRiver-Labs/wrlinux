@@ -6,11 +6,12 @@ X86-64
 ## Installed packages
 Check sdk.host.manifest and sdk.target.manifest
 
-## Install the SDK
-$ ./wrlinux-*-container-base-sdk.sh
+## Install the SDK to <dir>
+$ ./wrlinux-*-container-base-sdk.sh -y -d <dir>
 
 ## Enable SDK
-$ . environment-setup-*-wrs-linux
+$ cd <workdir>
+$ . <dir>/environment-setup-*-wrs-linux
 
 ## Application SDK Management Tool for CBAS
 $ appsdk -h
