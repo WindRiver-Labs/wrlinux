@@ -52,6 +52,8 @@ to deploy dir
 
 $ ln -snf path-to-build/tmp-glibc/deploy /var/www/html/cbas
 
+Then http://<web-server-url>/cbas is accessible
+
 ### App SDK
 wget http://<web-server-url>/cbas/sdk/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-intel_x86_64-container-base-sdk.sh
 
@@ -81,6 +83,8 @@ Setup a web server (such as httpd, apache2), and create a symlink
 to outdir
 
 $ ln -snf path-to-build/outdir /var/www/html/cbas
+
+Then http://<web-server-url>/cbas is accessible
 
 ### App SDK
 wget http://<web-server-url>/cbas/WRLinux-CD-Images/intel-x86-64/cbas-sdk/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-intel_x86_64-container-base-sdk.sh

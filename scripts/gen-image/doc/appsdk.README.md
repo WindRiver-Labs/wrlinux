@@ -15,22 +15,24 @@ $ . <dir>/environment-setup-*-wrs-linux
 
 ## Application SDK Management Tool for CBAS
 $ appsdk -h
-usage: appsdk [-h] [-d] [-q] {gensdk,checksdk,genrpm,genimage} ...
+usage: appsdk [-h] [-d] [-q] [--log-dir LOGDIR] {gensdk,checksdk,genrpm,publishrpm,genimage} ...
 
 Application SDK Management Tool for CBAS
 
 positional arguments:
-  {gensdk,checksdk,genrpm,genimage}
+  {gensdk,checksdk,genrpm,publishrpm,genimage}
                         Subcommands. "appsdk <subcommand> --help" to get more info
     gensdk              Generate a new SDK
     checksdk            Sanity check for SDK
     genrpm              Build RPM package
+    publishrpm          Publish RPM package
     genimage            Generate images from package feeds for specified machines
 
 optional arguments:
   -h, --help            show this help message and exit
   -d, --debug           Enable debug output
   -q, --quiet           Hide all output except error messages
+  --log-dir LOGDIR      Specify dir to save debug messages as log.appsdk regardless of the logging level
 
 Use appsdk <subcommand> --help to get help
 
@@ -45,13 +47,6 @@ optional arguments:
                         The path of the generated SDK. Default to deploy/AppSDK.sh in current directory
 
 $ appsdk gensdk -f input.yaml
-
-Input yaml format:
-[input yaml sample]
-packages: # A list of packages to be installed on target sysroot
-- pkg1
-- pkg2
-[input yaml sample]
 
 ### Sanity check for SDK
 $ appsdk checksdk
