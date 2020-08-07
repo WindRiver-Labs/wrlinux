@@ -284,7 +284,18 @@ Detail steps as below:
 	$ source ./environment-setup-x86_64-wrlinuxsdk-linux
 	$ source ./oe-init-build-env
 	$ bitbake-layers add-layer <path_to_project>/layers/wrlinux/wrlinux-nxp-secureboot
+
 	Edit file <path_to_project>/build/conf/local.conf to set BB_NO_NETWORK as 0.
+	Edit file <path_to_project>/build/conf/local.conf to add below content at the end of the file.
+	PNWHITELIST_ls-secure-layer += 'secure-boot-qoriq'
+	PNWHITELIST_freescale-layer += 'cst'
+	PNWHITELIST_freescale-layer += 'atf'
+	PNWHITELIST_networking-layer += 'mbedtls'
+	PNWHITELIST_freescale-layer += 'uefi'
+	PNWHITELIST_freescale-layer += 'qe-ucode'
+	PNWHITELIST_freescale-layer += 'fm-ucode'
+	PNWHITELIST_freescale-layer += 'ls2-phy'
+
 	$ bitbake wrlinux-image-std
 
 Note:

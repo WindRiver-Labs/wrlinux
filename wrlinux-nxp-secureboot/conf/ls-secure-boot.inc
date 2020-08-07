@@ -48,13 +48,4 @@ RCWNAND_nxp-ls1043 ?= "RR_FQPP_1455/rcw_1600_nandboot"
 QE_UCODE_nxp-ls1043 = "iram_Type_A_LS1021a_r1.0.bin"
 EXTRA_IMAGEDEPENDS_nxp-ls1043 += "fm-ucode rcw qe-ucode uefi atf ls2-phy secure-boot-qoriq"
 
-PNWHITELIST_ls-secure-layer += 'secure-boot-qoriq'
-PNWHITELIST_freescale-layer += 'cst'
-PNWHITELIST_freescale-layer += 'atf'
-PNWHITELIST_networking-layer += 'mbedtls'
-PNWHITELIST_freescale-layer += 'uefi'
-PNWHITELIST_freescale-layer += 'qe-ucode'
-PNWHITELIST_freescale-layer += 'fm-ucode'
-PNWHITELIST_freescale-layer += 'ls2-phy'
-
 MACHINE_LS_nxp-ls1043 = "ls1043ardb"
