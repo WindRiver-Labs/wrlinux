@@ -1,0 +1,44 @@
+From 65becf85b9ea3e3332435d9f3208798ce3b54fe4 Mon Sep 17 00:00:00 2001
+From: Quanyang Wang <quanyang.wang@windriver.com>
+Date: Thu, 6 Aug 2020 15:59:47 +0800
+Subject: [PATCH] gcc-plugins: use HOSTCXX to detect the designated initializer
+ GNU extension instead of HOSTCC
+
+In yocto, HOSTCC is redefined as gcc plus many libraries and header
+files paths, meanwhile HOSTCXX is the default value "g++". Because of
+the commit 77342a02ff6e ("gcc-plugins: drop support for GCC <= 4.7"),
+gcc-plugin.sh use HOSTCC to detect the feature of GNU extension of
+gcc, this will result that HOSTCC can compile the file successfully
+but use HOSTCXX will go into a failure.
+
+This is a workaround to fix the compile error as below:
+
+HOSTCXX -fPIC scripts/gcc-plugins/arm_ssp_per_task_plugin.o
+In file included from build/tmp-glibc/work/xilinx_zynq-wrs-linux-gnueabi/linux-yocto-dev/5.8-rc++gitAUTOINC+d22beb8f8a_7ac5bca887-r0/recipe-sysroot-native/usr/bin/arm-wrs-linux-gnueabi/../../lib/arm-wrs-linux-gnueabi/gcc/arm-wrs-linux-gnueabi/10.1.0/plugin/include/gcc-plugin.h:28:0,
+from build/tmp-glibc/work-shared/xilinx-zynq/kernel-source/scripts/gcc-plugins/gcc-common.h:7,
+from build/tmp-glibc/work-shared/xilinx-zynq/kernel-source/scripts/gcc-plugins/arm_ssp_per_task_plugin.c:3:
+build/tmp-glibc/work/xilinx_zynq-wrs-linux-gnueabi/linux-yocto-dev/5.8-rc++gitAUTOINC+d22beb8f8a_7ac5bca887-r0/recipe-sysroot-native/usr/bin/arm-wrs-linux-gnueabi/../../lib/arm-wrs-linux-gnueabi/gcc/arm-wrs-linux-gnueabi/10.1.0/plugin/include/system.h:687:10: fatal error: gmp.h: No such file or directory
+^~~~~~~
+compilation terminated.
+
+Signed-off-by: Quanyang Wang <quanyang.wang@windriver.com>
+---
+ scripts/gcc-plugin.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/gcc-plugin.sh b/scripts/gcc-plugin.sh
+index b79fd0bea838..0722d9adac2b 100755
+--- a/scripts/gcc-plugin.sh
++++ b/scripts/gcc-plugin.sh
+@@ -8,7 +8,7 @@ srctree=$(dirname "$0")
+ gccplugins_dir=$($* -print-file-name=plugin)
+ 
+ # we need a c++ compiler that supports the designated initializer GNU extension
+-$HOSTCC -c -x c++ -std=gnu++98 - -fsyntax-only -I $srctree/gcc-plugins -I $gccplugins_dir/include 2>/dev/null <<EOF
++$HOSTCXX -c -x c++ -std=gnu++98 - -fsyntax-only -I $srctree/gcc-plugins -I $gccplugins_dir/include 2>/dev/null <<EOF
+ #include "gcc-common.h"
+ class test {
+ public:
+-- 
+2.17.1
+
