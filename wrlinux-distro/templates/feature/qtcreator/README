@@ -6,6 +6,14 @@ Supported BSP: qemux86-64|bcm-2xxx-rpi4|intel-x86-64
 This template is often used with a desktop environment. Please add feature/xfce and layer meta-qt5:
   --layers meta-qt5 --templates feature/xfce feature/qtcreator
 
+For bcm-2xxx-rpi4 BSP builds only, see feature/qtbase/README for:
+    - a bcm-2xxx-rpi4 extra graphics layer requirement.
+
+Build the platform project image:
+$ bitbake wrlinux-image-std
+
+When deploying the image using QEMU, add "-vga virtio" to qemuparams.
+
 Once booted into the image, open a terminal and type
 $ /usr/bin/qtcreator
 

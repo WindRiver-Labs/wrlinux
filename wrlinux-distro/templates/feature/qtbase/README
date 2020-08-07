@@ -6,6 +6,17 @@ Supported BSP: qemux86-64|bcm-2xxx-rpi4|intel-x86-64
 This template is often used with a desktop environment. Please add feature/xfce and layer meta-qt5:
     --layers meta-qt5 --templates feature/xfce feature/qtbase
 
+(For bcm-2xxx-rpi4 BSP builds only) Add the projectDir/layers/bcm-2xxx-rpi4/rpi-graphics layer.
+1) Add the projectDir/layers/bcm-2xxx-rpi4/rpi-graphics layer.
+    $ bitbake-layers add-layer projectDir/layers/bcm-2xxx-rpi4/rpi-graphics
+2) Update the build directory conf/local.conf file to enable the BSP.
+    MACHINE = "bcm-2xxx-rpi4"
+
+Build the platform project image:
+$ bitbake wrlinux-image-std
+
+When deploying the image using QEMU, add "-vga virtio" to qemuparams.
+
 #@TYPE: Wrtemplate
 #@NAME: qtbase
 #@DESCRIPTION: Add qtbase to the image
