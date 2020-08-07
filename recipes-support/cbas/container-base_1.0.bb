@@ -8,7 +8,6 @@ LICENSE = "MIT"
 # Control the installed packages strictly
 WRTEMPLATE_IMAGE = "0"
 
-PACKAGE_INSTALL = "packagegroup-base"
 NO_RECOMMENDATIONS = "1"
 
 # Implementation of Full Image generator with Application SDK
@@ -44,6 +43,8 @@ do_populate_sdk_prepend() {
     localdata.setVar('QB_MEM', '-m 512')
 
     bb.build.exec_func('do_write_qemuboot_conf', localdata)
+
+    d.setVar('PACKAGE_INSTALL', 'packagegroup-base')
 }
 
 
@@ -76,6 +77,37 @@ extract_pkgdata_postinst() {
     cd $target_sdk_dir/sysroots/${SDK_SYS}${datadir}/pkgdata/;
     tar xf pkgdata.tar.bz2;
 }
+
+IMAGE_INSTALL = "\
+    base-files \
+    base-passwd \
+    ${VIRTUAL-RUNTIME_update-alternatives} \
+    openssh \
+    ca-certificates \
+    packagegroup-base \
+    "
+
+# - The ostree are not needed for container image.
+# - No docker or k8s by default
+IMAGE_INSTALL_remove = "\
+    ostree ostree-upgrade-mgr \
+    kubernetes \
+    docker \
+    virtual/containerd \
+    python3-docker-compose \
+"
+
+# Only need tar.bz2 for container image
+IMAGE_FSTYPES_remove = " \
+    live wic wic.bmap ostreepush otaimg \
+"
+
+# No bsp packages for container
+python () {
+    d.setVar('WRTEMPLATE_CONF_WRIMAGE_MACH', 'wrlnoimage_mach.inc')
+}
+
+IMAGE_FEATURES += "package-management"
 
 inherit wrlinux-image features_check
 REQUIRED_DISTRO_FEATURES = "ostree cbas"
