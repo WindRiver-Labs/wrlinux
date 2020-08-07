@@ -256,7 +256,7 @@ PACKAGE_FEED_ARCHS = "%s"
 SSTATE_PRUNE_OBSOLETEWORKDIR = "0"
 
 # ostree
-GPG_PATH = "${TOPDIR}/.gnupg"
+GPG_PATH ?= "${TOPDIR}/.gnupg"
 OSTREE_USE_AB = "0"
 
 WRTEMPLATE = "feature/docker feature/kubernetes feature/ostree feature/cbas"
