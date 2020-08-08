@@ -70,10 +70,10 @@ into a bootable USB socket on the target, and power on.  This should
 result in a system booted to the Grub boot menuo.
 
 ### On Qemu
-Create a 14G disk image
-    $ qemu-img create -f raw boot-image-qemu.hddimg 14G
+Create a 8G disk image
+    $ qemu-img create -f raw boot-image-qemu.hddimg 8G
 
-Burn the image onto 14G disk image:
+Burn the image onto 8G disk image:
     For full image
     $ zcat wrlinux-image-full-intel-x86-64.ustart.img.gz | dd of=boot-image-qemu.hddimg conv=notrunc
 

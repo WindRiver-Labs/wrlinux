@@ -257,6 +257,7 @@ SSTATE_PRUNE_OBSOLETEWORKDIR = "0"
 
 # ostree
 GPG_PATH = "${TOPDIR}/.gnupg"
+OSTREE_USE_AB = "0"
 
 WRTEMPLATE = "feature/docker feature/kubernetes feature/ostree feature/cbas"
 WRTEMPLATE_append_intel-x86-64 = " feature/intel-openvino"
@@ -396,8 +397,8 @@ SDKMACHINE = "x86_64"
 OSTREE_REMOTE_URL = "${PACKAGE_FEED_URIS}/%s/repos/ostree_repo"
 DISTRO_VERSION_pn-grub-efi = "-"
 
-# Size of the Root partition 6GB
-OSTREE_FDISK_RSZ = "6144"
+# Size of the Root partition 4GB
+OSTREE_FDISK_RSZ = "4096"
 """ % self.feed_path_prefix
 
         deploy_files = set()

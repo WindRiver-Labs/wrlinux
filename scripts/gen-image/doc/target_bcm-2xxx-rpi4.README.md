@@ -72,10 +72,10 @@ This should result in a system booted to the u-boot menu.
 
 
 ### On Qemu
-Create a 14G disk image
-    $ qemu-img create -f raw boot-image-qemu.hddimg 14G
+Create a 8G disk image
+    $ qemu-img create -f raw boot-image-qemu.hddimg 8G
 
-Burn the image onto 14G disk image:
+Burn the image onto 8G disk image:
     For full image
     $ zcat wrlinux-image-full-bcm-2xxx-rpi4.ustart.img.gz | dd of=boot-image-qemu.hddimg conv=notrunc
 
