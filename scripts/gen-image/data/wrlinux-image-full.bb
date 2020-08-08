@@ -11,8 +11,17 @@ CONTAINER_CORE_BOOT ?= " \
     ${VIRTUAL-RUNTIME_update-alternatives} \
 "
 
+TARGET_IMAGE_INSTALL ?= " \
+    kernel-modules \
+    packagegroup-core-boot \
+    packagegroup-core-x11-base \
+    packagegroup-xfce-base \
+    wr-themes \
+    gsettings-desktop-schemas \
+"
+
 IMAGE_INSTALL = "\
-    ${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', '${CONTAINER_CORE_BOOT}', 'packagegroup-core-boot kernel-modules', d)} \
+    ${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', '${CONTAINER_CORE_BOOT}', '${TARGET_IMAGE_INSTALL}', d)} \
     openssh \
     ca-certificates \
     "
