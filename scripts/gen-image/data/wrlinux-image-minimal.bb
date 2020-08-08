@@ -50,5 +50,15 @@ IMAGE_INSTALL_append_bcm-2xxx-rpi4 = " ${@bb.utils.contains('OSTREE_BOOTLOADER',
 IMAGE_FEATURES += "package-management"
 
 inherit wrlinux-image
+inherit extrausers
 
 NO_RECOMMENDATIONS = "1"
+
+python () {
+    if not bb.utils.to_boolean(d.getVar('IMAGE_ENABLE_CONTAINER')):
+        # Set root password to root
+        d.setVar('EXTRA_USERS_PARAMS', 'usermod -P root root;')
+}
+
+# Remove debug-tweaks
+EXTRA_IMAGE_FEATURES = ""

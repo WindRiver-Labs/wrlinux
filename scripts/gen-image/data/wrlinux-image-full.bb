@@ -50,8 +50,14 @@ python () {
         d.setVar('WRTEMPLATE_CONF_WRIMAGE_MACH', 'wrlnoimage_mach.inc')
     else:
         d.appendVar('IMAGE_FEATURES', ' wr-bsps')
+        # Set root password to root
+        d.setVar('EXTRA_USERS_PARAMS', 'usermod -P root root;')
 }
 
 IMAGE_FEATURES += "package-management"
 
 inherit wrlinux-image
+inherit extrausers
+
+# Remove debug-tweaks
+EXTRA_IMAGE_FEATURES = ""
