@@ -16,6 +16,7 @@ TARGET_CORE_BOOT ?= " \
     dhcp-client \
     kernel-module-fuse \
     kernel-module-sch-fq-codel \
+    glib-networking \
 "
 
 # Control the installed packages strictly
