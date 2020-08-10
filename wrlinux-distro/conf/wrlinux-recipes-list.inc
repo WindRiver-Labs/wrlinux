@@ -1677,6 +1677,7 @@ WRLINUX_ALL_RECIPES = " \
     boinc-client \
     bonnie++ \
     boost \
+    boost-url \
     boot-config \
     bootchart \
     bootchart2 \
@@ -3705,7 +3706,6 @@ WRLINUX_ALL_RECIPES = " \
     python-openstacksdk \
     python-os-brick \
     python-os-client-config \
-    python-os-traits \
     python-os-vif \
     python-oslo.cache \
     python-oslo.db \
@@ -3729,12 +3729,10 @@ WRLINUX_ALL_RECIPES = " \
     python-periphery \
     python-pexpect \
     python-pika \
-    python-pika-pool \
     python-pint \
     python-pip \
     python-pluggy \
     python-ply \
-    python-posix-ipc \
     python-pretend \
     python-prettytable \
     python-priority \
@@ -3797,7 +3795,6 @@ WRLINUX_ALL_RECIPES = " \
     python-pytest \
     python-pytest-helpers-namespace \
     python-pytest-runner \
-    python-pytest-salt \
     python-pytest-tempdir \
     python-python-editor \
     python-pytoml \
@@ -3828,7 +3825,6 @@ WRLINUX_ALL_RECIPES = " \
     python-semver \
     python-serpent \
     python-setuptools \
-    python-setuptools-git \
     python-setuptools-scm \
     python-sh \
     python-sijax \
@@ -3849,13 +3845,9 @@ WRLINUX_ALL_RECIPES = " \
     python-stevedore \
     python-strict-rfc3339 \
     python-subprocess32 \
-    python-subunit \
     python-suds \
     python-swift \
-    python-swiftclient \
     python-systemd \
-    python-sysv-ipc \
-    python-termcolor \
     python-thrift \
     python-toml \
     python-tooz \
@@ -3917,7 +3909,6 @@ WRLINUX_ALL_RECIPES = " \
     python-xstatic-rickshaw \
     python-xstatic-roboto-fontface \
     python-xstatic-spin \
-    python-xstatic-term.js \
     python-yappi \
     python-zipp \
     python-zopeinterface \
@@ -4235,6 +4226,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-ordered-set \
     python3-ordereddict \
     python3-os-client-config \
+    python3-os-traits \
     python3-os-win \
     python3-os-xenapi \
     python3-osc-lib \
@@ -4458,6 +4450,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-suds-jurko \
     python3-supervisor \
     python3-suricata-update \
+    python3-swiftclient \
     python3-sympy \
     python3-systemd \
     python3-sysv-ipc \
@@ -4473,6 +4466,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-testresources \
     python3-testscenarios \
     python3-testtools \
+    python3-textparser \
     python3-texttable \
     python3-thrift \
     python3-tinyrecord \
@@ -4552,6 +4546,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-xstatic-jquery-ui \
     python3-xstatic-roboto-fontface \
     python3-xstatic-smart-table \
+    python3-xstatic-term.js \
     python3-xstatic-tv4 \
     python3-xxhash \
     python3-yappi \
