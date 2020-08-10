@@ -1,5 +1,6 @@
-This template enables an sftp-server to be included with the image.
+This template enables an sftp-server and the OpenSSH SSH server to be
+included with the image.
 
 #@TYPE: Wrtemplate
 #@NAME: sftp-server
-#@DESCRIPTION: Add sftp-server to the image
+#@DESCRIPTION: Add sftp-server and the OpenSSH SSH server to the image
