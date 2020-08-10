@@ -1,6 +1,6 @@
-From 7cd923e4a918d8b8427615f65ef83da8f508fefc Mon Sep 17 00:00:00 2001
-From: Roy Li <rongqing.li@windriver.com>
-Date: Fri, 8 Sep 2017 15:00:40 +0800
+From 93ceaccbe2c5ee14de6c79778f9b36fa2fd538dc Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 10 Aug 2020 07:30:27 -0700
 Subject: [PATCH] add a interface to skip automount devtmpfs to /dev/ path
 
 Upstream-Status: Inappropriate [other]
@@ -20,32 +20,33 @@ exist, to skip mount devtmpfs to /dev/ path
 
 Signed-off-by: Roy Li <rongqing.li@windriver.com>
 
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  src/core/mount-setup.c | 10 +++++++++-
  1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/src/core/mount-setup.c b/src/core/mount-setup.c
-index a0c5f5a..7c5c5ad 100644
+index feb88f3e6e..71f37aad57 100644
 --- a/src/core/mount-setup.c
 +++ b/src/core/mount-setup.c
-@@ -73,13 +73,15 @@ typedef struct MountPoint {
+@@ -60,13 +60,15 @@ typedef struct MountPoint {
  #define N_EARLY_MOUNT 4
  #endif
  
 +bool skip_mount_dev();
 +
  static const MountPoint mount_table[] = {
-         { "sysfs",       "/sys",                      "sysfs",      NULL,                      MS_NOSUID|MS_NOEXEC|MS_NODEV,
+         { "sysfs",       "/sys",                      "sysfs",      NULL,                                      MS_NOSUID|MS_NOEXEC|MS_NODEV,
            NULL,          MNT_FATAL|MNT_IN_CONTAINER },
-         { "proc",        "/proc",                     "proc",       NULL,                      MS_NOSUID|MS_NOEXEC|MS_NODEV,
+         { "proc",        "/proc",                     "proc",       NULL,                                      MS_NOSUID|MS_NOEXEC|MS_NODEV,
            NULL,          MNT_FATAL|MNT_IN_CONTAINER },
-         { "devtmpfs",    "/dev",                      "devtmpfs",   "mode=755",                MS_NOSUID|MS_STRICTATIME,
+         { "devtmpfs",    "/dev",                      "devtmpfs",   "mode=755" TMPFS_LIMITS_DEV,               MS_NOSUID|MS_NOEXEC|MS_STRICTATIME,
 -          NULL,          MNT_FATAL|MNT_IN_CONTAINER },
 +          skip_mount_dev,          MNT_FATAL|MNT_IN_CONTAINER },
-         { "securityfs",  "/sys/kernel/security",      "securityfs", NULL,                      MS_NOSUID|MS_NOEXEC|MS_NODEV,
+         { "securityfs",  "/sys/kernel/security",      "securityfs", NULL,                                      MS_NOSUID|MS_NOEXEC|MS_NODEV,
            NULL,          MNT_NONE                   },
  #if ENABLE_SMACK
-@@ -144,6 +146,12 @@ bool mount_point_is_api(const char *path) {
+@@ -133,6 +135,12 @@ bool mount_point_is_api(const char *path) {
          return path_startswith(path, "/sys/fs/cgroup/");
  }
  
@@ -58,3 +59,6 @@ index a0c5f5a..7c5c5ad 100644
  bool mount_point_ignore(const char *path) {
          const char *i;
  
+-- 
+2.21.0
+
