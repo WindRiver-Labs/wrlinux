@@ -41,6 +41,9 @@ tmp-glibc/deploy/rpm/noarch/repodata/repomd.xml
 
 Above ls only list required repodata
 
+#### Create base reference container
+$ bitbake container-base
+
 #### Create container-base appsdk
 $ bitbake container-base -cpopulate_sdk
 
@@ -53,6 +56,13 @@ to deploy dir
 $ ln -snf path-to-build/tmp-glibc/deploy /var/www/html/cbas
 
 Then http://<web-server-url>/cbas is accessible
+
+### Base reference container
+wget http://<web-server-url>/cbas/images/intel-x86-64/container-base-intel-x86-64.tar.bz2
+
+Or
+
+wget http://<web-server-url>/cbas/images/bcm-2xxx-rpi4/container-base-bcm-2xxx-rpi4.tar.bz2
 
 ### App SDK
 wget http://<web-server-url>/cbas/sdk/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-intel_x86_64-container-base-sdk.sh
@@ -86,13 +96,19 @@ $ ln -snf path-to-build/outdir /var/www/html/cbas
 
 Then http://<web-server-url>/cbas is accessible
 
-### App SDK
-wget http://<web-server-url>/cbas/WRLinux-CD-Images/intel-x86-64/cbas-sdk/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-intel_x86_64-container-base-sdk.sh
+### Base reference container
+wget http://<web-server-url>/cbas/WRLinux-CD-Images/intel-x86-64/cbas-intel-x86-64/container-base-intel-x86-64.tar.bz2
 
 And
 
-wget http://<web-server-url>/cbas/WRLinux-CD-Images/bcm-2xxx-rpi4/cbas-sdk/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-bcm_2xxx_rpi4-container-base-sdk.sh
+wget http://<web-server-url>/cbas/WRLinux-CD-Images/bcm-2xxx-rpi4/cbas-bcm-2xxx-rpi4/container-base-bcm-2xxx-rpi4.tar.bz2
 
+### App SDK
+wget http://<web-server-url>/cbas/WRLinux-CD-Images/intel-x86-64/cbas-intel-x86-64/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-intel_x86_64-container-base-sdk.sh
+
+And
+
+wget http://<web-server-url>/cbas/WRLinux-CD-Images/bcm-2xxx-rpi4/cbas-bcm-2xxx-rpi4/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-bcm_2xxx_rpi4-container-base-sdk.sh
 
 ## License
 The sdk is provided under the GPL-2.0 license.
