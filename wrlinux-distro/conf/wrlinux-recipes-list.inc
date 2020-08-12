@@ -1148,6 +1148,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     python3-requests \
     python3-requests-file \
     python3-requests-ftp \
+    python3-requests-toolbelt \
     python3-rfc3987 \
     python3-scons \
     python3-setuptools \
@@ -1365,6 +1366,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     tzdata \
     u-boot \
     u-boot-imx \
+    u-boot-s32 \
     u-boot-tools \
     u-boot-uenv \
     u-boot-zynq-scr \
@@ -2135,6 +2137,7 @@ WRLINUX_ALL_RECIPES = " \
     gnome-backgrounds \
     gnome-bluetooth \
     gnome-calculator \
+    gnome-calendar \
     gnome-common \
     gnome-control-center \
     gnome-desktop-testing \
@@ -3043,6 +3046,7 @@ WRLINUX_ALL_RECIPES = " \
     minicom \
     minicoredumper \
     minidlna \
+    minifi-cpp \
     minini \
     miniupnpd \
     mixlib-authentication \
@@ -3949,6 +3953,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-awscli \
     python3-azure-iot-device \
     python3-babel \
+    python3-backcall \
     python3-backports-functools-lru-cache \
     python3-bandit \
     python3-barbicanclient \
@@ -4136,6 +4141,8 @@ WRLINUX_ALL_RECIPES = " \
     python3-intervals \
     python3-ipaddress \
     python3-ipy \
+    python3-ipython \
+    python3-ipython-genutils \
     python3-iso3166 \
     python3-iso8601 \
     python3-isodate \
@@ -4144,7 +4151,9 @@ WRLINUX_ALL_RECIPES = " \
     python3-janus \
     python3-jaraco-functools \
     python3-javaobj-py3 \
+    python3-jdatetime \
     python3-jdcal \
+    python3-jedi \
     python3-jeepney \
     python3-jinja2 \
     python3-jmespath \
@@ -4256,6 +4265,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-paramiko \
     python3-parse \
     python3-parse-type \
+    python3-parso \
     python3-passlib \
     python3-paste \
     python3-pastedeploy \
@@ -4268,6 +4278,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-periphery \
     python3-petact \
     python3-pexpect \
+    python3-pickleshare \
     python3-pid \
     python3-pika \
     python3-pika-pool \
@@ -4335,6 +4346,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-pymisp \
     python3-pymongo \
     python3-pymysql \
+    python3-pynacl \
     python3-pynetlinux \
     python3-pyopenssl \
     python3-pyparsing \
@@ -4477,6 +4489,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-tqdm \
     python3-trafaret \
     python3-trafaret-config \
+    python3-traitlets \
     python3-transitions \
     python3-trollius \
     python3-twine \
@@ -4972,6 +4985,7 @@ WRLINUX_ALL_RECIPES = " \
     tzinfo-data \
     u-boot \
     u-boot-imx \
+    u-boot-s32 \
     u-boot-tools \
     u-boot-uenv \
     u-boot-xlnx \
