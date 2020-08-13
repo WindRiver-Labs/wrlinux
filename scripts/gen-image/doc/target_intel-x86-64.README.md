@@ -41,6 +41,10 @@ specified branch configured in /sysroot/ostree/repo/config.
 - qemux86-64
 
 ## How to install/boot binary image
+
+WARNING: The default password for root is root, change password is highly
+recommended after login to the image.
+
 ### On Board
 Under Linux, insert a USB flash drive.  Assuming the USB flash drive
 takes device /dev/sdf, use dd to copy the image to it.  Before the image

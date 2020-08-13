@@ -41,6 +41,10 @@ specified branch configured in /sysroot/ostree/repo/config.
 - qemuarm64
 
 ## How to install/boot binary image
+
+WARNING: The default password for root is root, change password is highly
+recommended after login to the image.
+
 ### On Board
 Under Linux, insert a micro SD card to a USB SD Card Reader.
 Assuming the USB SD Card Reader takes device /dev/sdf, use dd
