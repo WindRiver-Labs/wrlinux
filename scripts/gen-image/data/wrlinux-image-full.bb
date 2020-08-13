@@ -14,7 +14,6 @@ CONTAINER_CORE_BOOT ?= " \
 TARGET_IMAGE_INSTALL ?= " \
     kernel-modules \
     packagegroup-core-boot \
-    packagegroup-core-x11-base \
     packagegroup-xfce-base \
     wr-themes \
     gsettings-desktop-schemas \
@@ -50,6 +49,7 @@ python () {
         d.setVar('WRTEMPLATE_CONF_WRIMAGE_MACH', 'wrlnoimage_mach.inc')
     else:
         d.appendVar('IMAGE_FEATURES', ' wr-bsps')
+        d.appendVar('IMAGE_FEATURES', ' x11-base')
         # Set root password to root
         d.setVar('EXTRA_USERS_PARAMS', 'usermod -P root root;')
 }
