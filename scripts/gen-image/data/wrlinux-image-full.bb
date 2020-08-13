@@ -25,14 +25,18 @@ IMAGE_INSTALL = "\
     ca-certificates \
     "
 
-# - The ostree are not needed for container image.
-# - No docker or k8s by default
-IMAGE_INSTALL_remove = "\
-    ${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', 'ostree ostree-upgrade-mgr', '', d)} \
-    kubernetes \
+# Not needed by container image.
+CONTAINER_IMAGE_REMOVE ?= "\
+    ostree ostree-upgrade-mgr \
     docker \
     virtual/containerd \
     python3-docker-compose \
+"
+
+# No k8s by default
+IMAGE_INSTALL_remove = "\
+    ${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', '${CONTAINER_IMAGE_REMOVE}', '', d)} \
+    kubernetes \
 "
 
 # Only need tar.bz2 for container image
