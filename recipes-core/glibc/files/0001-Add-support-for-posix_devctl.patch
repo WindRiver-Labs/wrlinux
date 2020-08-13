@@ -1,4 +1,4 @@
-From 906fdf140852b33e41ba777da30c1e4694ac17e3 Mon Sep 17 00:00:00 2001
+From 687197490c22b27e0a32414e7f6fc5592ec88372 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 16 Aug 2019 11:12:10 +0800
 Subject: [PATCH] Add support for posix_devctl()
@@ -17,50 +17,53 @@ Upstream-Status: Pending
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- bits/confname.h                                    |   2 +
- posix/Makefile                                     |   3 +-
- posix/Versions                                     |   5 +
- posix/devctl.h                                     |  51 +++++++++
- posix/getconf.c                                    |   2 +
- posix/posix_devctl.c                               |  31 ++++++
- posix/sysconf.c                                    |   7 ++
- posix/unistd.h                                     |   4 +
- sysdeps/mach/hurd/i386/libc.abilist                |   1 +
- sysdeps/unix/sysv/linux/aarch64/libc.abilist       |   1 +
- sysdeps/unix/sysv/linux/alpha/libc.abilist         |   1 +
- sysdeps/unix/sysv/linux/arm/libc.abilist           |   1 +
- sysdeps/unix/sysv/linux/csky/libc.abilist          |   1 +
- sysdeps/unix/sysv/linux/hppa/libc.abilist          |   1 +
- sysdeps/unix/sysv/linux/i386/libc.abilist          |   1 +
- sysdeps/unix/sysv/linux/ia64/libc.abilist          |   1 +
- sysdeps/unix/sysv/linux/m68k/coldfire/libc.abilist |   1 +
- sysdeps/unix/sysv/linux/m68k/m680x0/libc.abilist   |   1 +
- sysdeps/unix/sysv/linux/microblaze/libc.abilist    |   1 +
- .../unix/sysv/linux/mips/mips32/fpu/libc.abilist   |   1 +
- .../unix/sysv/linux/mips/mips32/nofpu/libc.abilist |   1 +
- .../unix/sysv/linux/mips/mips64/n32/libc.abilist   |   1 +
- .../unix/sysv/linux/mips/mips64/n64/libc.abilist   |   1 +
- sysdeps/unix/sysv/linux/nios2/libc.abilist         |   1 +
- sysdeps/unix/sysv/linux/posix_devctl.c             | 116 +++++++++++++++++++++
- .../sysv/linux/powerpc/powerpc32/fpu/libc.abilist  |   1 +
- .../linux/powerpc/powerpc32/nofpu/libc.abilist     |   1 +
- .../sysv/linux/powerpc/powerpc64/be/libc.abilist   |   1 +
- .../sysv/linux/powerpc/powerpc64/le/libc.abilist   |   1 +
- sysdeps/unix/sysv/linux/riscv/rv64/libc.abilist    |   1 +
- sysdeps/unix/sysv/linux/s390/s390-32/libc.abilist  |   1 +
- sysdeps/unix/sysv/linux/s390/s390-64/libc.abilist  |   1 +
- sysdeps/unix/sysv/linux/sh/libc.abilist            |   1 +
- sysdeps/unix/sysv/linux/sparc/sparc32/libc.abilist |   1 +
- sysdeps/unix/sysv/linux/sparc/sparc64/libc.abilist |   1 +
- sysdeps/unix/sysv/linux/x86_64/64/libc.abilist     |   1 +
- sysdeps/unix/sysv/linux/x86_64/x32/libc.abilist    |   1 +
- 37 files changed, 248 insertions(+), 1 deletion(-)
+ bits/confname.h                               |   2 +
+ posix/Makefile                                |   3 +-
+ posix/Versions                                |   5 +
+ posix/devctl.h                                |  51 ++++++++
+ posix/getconf.c                               |   2 +
+ posix/posix_devctl.c                          |  31 +++++
+ posix/sysconf.c                               |   7 ++
+ posix/unistd.h                                |   4 +
+ sysdeps/mach/hurd/i386/libc.abilist           |   1 +
+ sysdeps/unix/sysv/linux/aarch64/libc.abilist  |   1 +
+ sysdeps/unix/sysv/linux/alpha/libc.abilist    |   1 +
+ sysdeps/unix/sysv/linux/arm/be/libc.abilist   |   1 +
+ sysdeps/unix/sysv/linux/arm/le/libc.abilist   |   1 +
+ sysdeps/unix/sysv/linux/csky/libc.abilist     |   1 +
+ sysdeps/unix/sysv/linux/hppa/libc.abilist     |   1 +
+ sysdeps/unix/sysv/linux/i386/libc.abilist     |   1 +
+ sysdeps/unix/sysv/linux/ia64/libc.abilist     |   1 +
+ .../sysv/linux/m68k/coldfire/libc.abilist     |   1 +
+ .../unix/sysv/linux/m68k/m680x0/libc.abilist  |   1 +
+ .../sysv/linux/microblaze/be/libc.abilist     |   1 +
+ .../sysv/linux/microblaze/le/libc.abilist     |   1 +
+ .../sysv/linux/mips/mips32/fpu/libc.abilist   |   1 +
+ .../sysv/linux/mips/mips32/nofpu/libc.abilist |   1 +
+ .../sysv/linux/mips/mips64/n32/libc.abilist   |   1 +
+ .../sysv/linux/mips/mips64/n64/libc.abilist   |   1 +
+ sysdeps/unix/sysv/linux/nios2/libc.abilist    |   1 +
+ sysdeps/unix/sysv/linux/posix_devctl.c        | 116 ++++++++++++++++++
+ .../linux/powerpc/powerpc32/fpu/libc.abilist  |   1 +
+ .../powerpc/powerpc32/nofpu/libc.abilist      |   1 +
+ .../linux/powerpc/powerpc64/be/libc.abilist   |   1 +
+ .../linux/powerpc/powerpc64/le/libc.abilist   |   1 +
+ .../unix/sysv/linux/riscv/rv64/libc.abilist   |   1 +
+ .../unix/sysv/linux/s390/s390-32/libc.abilist |   1 +
+ .../unix/sysv/linux/s390/s390-64/libc.abilist |   1 +
+ sysdeps/unix/sysv/linux/sh/be/libc.abilist    |   1 +
+ sysdeps/unix/sysv/linux/sh/le/libc.abilist    |   1 +
+ .../sysv/linux/sparc/sparc32/libc.abilist     |   1 +
+ .../sysv/linux/sparc/sparc64/libc.abilist     |   1 +
+ .../unix/sysv/linux/x86_64/64/libc.abilist    |   1 +
+ .../unix/sysv/linux/x86_64/x32/libc.abilist   |   1 +
+ 40 files changed, 251 insertions(+), 1 deletion(-)
  create mode 100644 posix/devctl.h
  create mode 100644 posix/posix_devctl.c
  create mode 100644 sysdeps/unix/sysv/linux/posix_devctl.c
 
 diff --git a/bits/confname.h b/bits/confname.h
-index 1476f61..83c3274 100644
+index 5dc8215093..e287b44153 100644
 --- a/bits/confname.h
 +++ b/bits/confname.h
 @@ -492,6 +492,8 @@ enum
@@ -73,7 +76,7 @@ index 1476f61..83c3274 100644
  
      _SC_IPV6 = _SC_LEVEL1_ICACHE_SIZE + 50,
 diff --git a/posix/Makefile b/posix/Makefile
-index 8ac6743..3671435 100644
+index 4507d84bf1..965d333022 100644
 --- a/posix/Makefile
 +++ b/posix/Makefile
 @@ -23,7 +23,7 @@ subdir	:= posix
@@ -94,7 +97,7 @@ index 8ac6743..3671435 100644
  	streams-compat
  
 diff --git a/posix/Versions b/posix/Versions
-index 7d06a6d..0208d96 100644
+index 7d06a6d0c0..0208d96514 100644
 --- a/posix/Versions
 +++ b/posix/Versions
 @@ -147,6 +147,11 @@ libc {
@@ -111,7 +114,7 @@ index 7d06a6d..0208d96 100644
      __nanosleep_nocancel; __pause_nocancel;
 diff --git a/posix/devctl.h b/posix/devctl.h
 new file mode 100644
-index 0000000..1010035
+index 0000000000..1010035a26
 --- /dev/null
 +++ b/posix/devctl.h
 @@ -0,0 +1,51 @@
@@ -167,7 +170,7 @@ index 0000000..1010035
 +#endif /* _POSIX_26_C_SOURCE == 200312L */
 +#endif /* _DEVCTL_H */
 diff --git a/posix/getconf.c b/posix/getconf.c
-index 0211fde..70ec8db 100644
+index a8ba876c14..ffd88feb14 100644
 --- a/posix/getconf.c
 +++ b/posix/getconf.c
 @@ -403,6 +403,8 @@ static const struct conf vars[] =
@@ -181,7 +184,7 @@ index 0211fde..70ec8db 100644
  
 diff --git a/posix/posix_devctl.c b/posix/posix_devctl.c
 new file mode 100644
-index 0000000..a002274
+index 0000000000..a002274bf0
 --- /dev/null
 +++ b/posix/posix_devctl.c
 @@ -0,0 +1,31 @@
@@ -217,7 +220,7 @@ index 0000000..a002274
 +}
 +stub_warning (posix_devctl)
 diff --git a/posix/sysconf.c b/posix/sysconf.c
-index 47afac9..befc6b0 100644
+index ba303384c1..68b677a944 100644
 --- a/posix/sysconf.c
 +++ b/posix/sysconf.c
 @@ -148,6 +148,13 @@ __sysconf (int name)
@@ -235,7 +238,7 @@ index 47afac9..befc6b0 100644
      case _SC_CHILD_MAX:
      case _SC_CLK_TCK:
 diff --git a/posix/unistd.h b/posix/unistd.h
-index 55a989f..4e522c1 100644
+index 0dd4200ad6..26ad94923d 100644
 --- a/posix/unistd.h
 +++ b/posix/unistd.h
 @@ -85,6 +85,10 @@ __BEGIN_DECLS
@@ -250,10 +253,10 @@ index 55a989f..4e522c1 100644
  #ifdef __USE_XOPEN2K8
  # define _XOPEN_VERSION	700
 diff --git a/sysdeps/mach/hurd/i386/libc.abilist b/sysdeps/mach/hurd/i386/libc.abilist
-index 1fc7ab2..e4736d4 100644
+index 7c2cb2b05a..ab70a47ad6 100644
 --- a/sysdeps/mach/hurd/i386/libc.abilist
 +++ b/sysdeps/mach/hurd/i386/libc.abilist
-@@ -2037,6 +2037,7 @@ GLIBC_2.27 wcstof64x F
+@@ -2042,6 +2042,7 @@ GLIBC_2.27 wcstof64x F
  GLIBC_2.27 wcstof64x_l F
  GLIBC_2.28 fcntl64 F
  GLIBC_2.28 renameat2 F
@@ -262,7 +265,7 @@ index 1fc7ab2..e4736d4 100644
  GLIBC_2.29 _hurd_port_move F
  GLIBC_2.29 posix_spawn_file_actions_addchdir_np F
 diff --git a/sysdeps/unix/sysv/linux/aarch64/libc.abilist b/sysdeps/unix/sysv/linux/aarch64/libc.abilist
-index a4c3193..0251083 100644
+index a4c31932cb..0251083be6 100644
 --- a/sysdeps/unix/sysv/linux/aarch64/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/aarch64/libc.abilist
 @@ -2133,6 +2133,7 @@ GLIBC_2.27 wcstof64x F
@@ -274,10 +277,10 @@ index a4c3193..0251083 100644
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
 diff --git a/sysdeps/unix/sysv/linux/alpha/libc.abilist b/sysdeps/unix/sysv/linux/alpha/libc.abilist
-index fe85a35..4212a54 100644
+index e7f2174ac2..9ad7c4ba22 100644
 --- a/sysdeps/unix/sysv/linux/alpha/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/alpha/libc.abilist
-@@ -2028,6 +2028,7 @@ GLIBC_2.27 wcstof64x F
+@@ -2033,6 +2033,7 @@ GLIBC_2.27 wcstof64x F
  GLIBC_2.27 wcstof64x_l F
  GLIBC_2.28 fcntl64 F
  GLIBC_2.28 renameat2 F
@@ -285,10 +288,22 @@ index fe85a35..4212a54 100644
  GLIBC_2.28 statx F
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
-diff --git a/sysdeps/unix/sysv/linux/arm/libc.abilist b/sysdeps/unix/sysv/linux/arm/libc.abilist
-index bc3df8d..213dae2 100644
---- a/sysdeps/unix/sysv/linux/arm/libc.abilist
-+++ b/sysdeps/unix/sysv/linux/arm/libc.abilist
+diff --git a/sysdeps/unix/sysv/linux/arm/be/libc.abilist b/sysdeps/unix/sysv/linux/arm/be/libc.abilist
+index b152c0e24a..8751c88481 100644
+--- a/sysdeps/unix/sysv/linux/arm/be/libc.abilist
++++ b/sysdeps/unix/sysv/linux/arm/be/libc.abilist
+@@ -118,6 +118,7 @@ GLIBC_2.27 wcstof64_l F
+ GLIBC_2.28 fcntl F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/arm/le/libc.abilist b/sysdeps/unix/sysv/linux/arm/le/libc.abilist
+index 9371927927..6cac372b3b 100644
+--- a/sysdeps/unix/sysv/linux/arm/le/libc.abilist
++++ b/sysdeps/unix/sysv/linux/arm/le/libc.abilist
 @@ -118,6 +118,7 @@ GLIBC_2.27 wcstof64_l F
  GLIBC_2.28 fcntl F
  GLIBC_2.28 fcntl64 F
@@ -298,7 +313,7 @@ index bc3df8d..213dae2 100644
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
 diff --git a/sysdeps/unix/sysv/linux/csky/libc.abilist b/sysdeps/unix/sysv/linux/csky/libc.abilist
-index 9b3cee6..215c099 100644
+index 9b3cee65bb..215c099602 100644
 --- a/sysdeps/unix/sysv/linux/csky/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/csky/libc.abilist
 @@ -1525,6 +1525,7 @@ GLIBC_2.29 remque F
@@ -310,10 +325,10 @@ index 9b3cee6..215c099 100644
  GLIBC_2.29 rewind F
  GLIBC_2.29 rewinddir F
 diff --git a/sysdeps/unix/sysv/linux/hppa/libc.abilist b/sysdeps/unix/sysv/linux/hppa/libc.abilist
-index 75edece..96a04e8 100644
+index df6d96fbae..27bca7ca9e 100644
 --- a/sysdeps/unix/sysv/linux/hppa/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/hppa/libc.abilist
-@@ -1875,6 +1875,7 @@ GLIBC_2.27 wcstof64_l F
+@@ -1880,6 +1880,7 @@ GLIBC_2.27 wcstof64_l F
  GLIBC_2.28 fcntl F
  GLIBC_2.28 fcntl64 F
  GLIBC_2.28 renameat2 F
@@ -322,10 +337,10 @@ index 75edece..96a04e8 100644
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
 diff --git a/sysdeps/unix/sysv/linux/i386/libc.abilist b/sysdeps/unix/sysv/linux/i386/libc.abilist
-index edeaf8e..b3b04b0 100644
+index fcb625b6bf..5f59fb4b44 100644
 --- a/sysdeps/unix/sysv/linux/i386/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/i386/libc.abilist
-@@ -2040,6 +2040,7 @@ GLIBC_2.27 wcstof64x_l F
+@@ -2045,6 +2045,7 @@ GLIBC_2.27 wcstof64x_l F
  GLIBC_2.28 fcntl F
  GLIBC_2.28 fcntl64 F
  GLIBC_2.28 renameat2 F
@@ -334,10 +349,10 @@ index edeaf8e..b3b04b0 100644
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
 diff --git a/sysdeps/unix/sysv/linux/ia64/libc.abilist b/sysdeps/unix/sysv/linux/ia64/libc.abilist
-index b5d460e..acb0184 100644
+index cb556c5998..176b6bcead 100644
 --- a/sysdeps/unix/sysv/linux/ia64/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/ia64/libc.abilist
-@@ -1909,6 +1909,7 @@ GLIBC_2.27 wcstof64x F
+@@ -1914,6 +1914,7 @@ GLIBC_2.27 wcstof64x F
  GLIBC_2.27 wcstof64x_l F
  GLIBC_2.28 fcntl64 F
  GLIBC_2.28 renameat2 F
@@ -346,7 +361,7 @@ index b5d460e..acb0184 100644
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
 diff --git a/sysdeps/unix/sysv/linux/m68k/coldfire/libc.abilist b/sysdeps/unix/sysv/linux/m68k/coldfire/libc.abilist
-index 05633b3..a551ad1 100644
+index 5e3cdea246..499b0dea0e 100644
 --- a/sysdeps/unix/sysv/linux/m68k/coldfire/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/m68k/coldfire/libc.abilist
 @@ -119,6 +119,7 @@ GLIBC_2.27 wcstof64_l F
@@ -358,10 +373,10 @@ index 05633b3..a551ad1 100644
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
 diff --git a/sysdeps/unix/sysv/linux/m68k/m680x0/libc.abilist b/sysdeps/unix/sysv/linux/m68k/m680x0/libc.abilist
-index 47eb7b4..b031e79 100644
+index ea5e7a41af..bd08bb2881 100644
 --- a/sysdeps/unix/sysv/linux/m68k/m680x0/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/m68k/m680x0/libc.abilist
-@@ -1984,6 +1984,7 @@ GLIBC_2.27 wcstof64_l F
+@@ -1989,6 +1989,7 @@ GLIBC_2.27 wcstof64_l F
  GLIBC_2.28 fcntl F
  GLIBC_2.28 fcntl64 F
  GLIBC_2.28 renameat2 F
@@ -369,10 +384,22 @@ index 47eb7b4..b031e79 100644
  GLIBC_2.28 statx F
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
-diff --git a/sysdeps/unix/sysv/linux/microblaze/libc.abilist b/sysdeps/unix/sysv/linux/microblaze/libc.abilist
-index f7ced48..f39b6e3 100644
---- a/sysdeps/unix/sysv/linux/microblaze/libc.abilist
-+++ b/sysdeps/unix/sysv/linux/microblaze/libc.abilist
+diff --git a/sysdeps/unix/sysv/linux/microblaze/be/libc.abilist b/sysdeps/unix/sysv/linux/microblaze/be/libc.abilist
+index ac55b0acd7..58aa710617 100644
+--- a/sysdeps/unix/sysv/linux/microblaze/be/libc.abilist
++++ b/sysdeps/unix/sysv/linux/microblaze/be/libc.abilist
+@@ -2125,6 +2125,7 @@ GLIBC_2.27 wcstof64_l F
+ GLIBC_2.28 fcntl F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/microblaze/le/libc.abilist b/sysdeps/unix/sysv/linux/microblaze/le/libc.abilist
+index f7ced487f7..f39b6e3616 100644
+--- a/sysdeps/unix/sysv/linux/microblaze/le/libc.abilist
++++ b/sysdeps/unix/sysv/linux/microblaze/le/libc.abilist
 @@ -2125,6 +2125,7 @@ GLIBC_2.27 wcstof64_l F
  GLIBC_2.28 fcntl F
  GLIBC_2.28 fcntl64 F
@@ -382,10 +409,10 @@ index f7ced48..f39b6e3 100644
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
 diff --git a/sysdeps/unix/sysv/linux/mips/mips32/fpu/libc.abilist b/sysdeps/unix/sysv/linux/mips/mips32/fpu/libc.abilist
-index e49dc42..8155733 100644
+index 06c2e64edd..fac8900e1b 100644
 --- a/sysdeps/unix/sysv/linux/mips/mips32/fpu/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/mips/mips32/fpu/libc.abilist
-@@ -1962,6 +1962,7 @@ GLIBC_2.27 wcstof64_l F
+@@ -1967,6 +1967,7 @@ GLIBC_2.27 wcstof64_l F
  GLIBC_2.28 fcntl F
  GLIBC_2.28 fcntl64 F
  GLIBC_2.28 renameat2 F
@@ -394,10 +421,10 @@ index e49dc42..8155733 100644
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
 diff --git a/sysdeps/unix/sysv/linux/mips/mips32/nofpu/libc.abilist b/sysdeps/unix/sysv/linux/mips/mips32/nofpu/libc.abilist
-index daa3b60..c2901af 100644
+index bdfd073b86..72a1dddd7f 100644
 --- a/sysdeps/unix/sysv/linux/mips/mips32/nofpu/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/mips/mips32/nofpu/libc.abilist
-@@ -1960,6 +1960,7 @@ GLIBC_2.27 wcstof64_l F
+@@ -1965,6 +1965,7 @@ GLIBC_2.27 wcstof64_l F
  GLIBC_2.28 fcntl F
  GLIBC_2.28 fcntl64 F
  GLIBC_2.28 renameat2 F
@@ -406,10 +433,10 @@ index daa3b60..c2901af 100644
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
 diff --git a/sysdeps/unix/sysv/linux/mips/mips64/n32/libc.abilist b/sysdeps/unix/sysv/linux/mips/mips64/n32/libc.abilist
-index 457ce0b..c5175c5 100644
+index 3d61d4974a..a3ed8d9cf1 100644
 --- a/sysdeps/unix/sysv/linux/mips/mips64/n32/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/mips/mips64/n32/libc.abilist
-@@ -1968,6 +1968,7 @@ GLIBC_2.27 wcstof64x_l F
+@@ -1973,6 +1973,7 @@ GLIBC_2.27 wcstof64x_l F
  GLIBC_2.28 fcntl F
  GLIBC_2.28 fcntl64 F
  GLIBC_2.28 renameat2 F
@@ -418,10 +445,10 @@ index 457ce0b..c5175c5 100644
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
 diff --git a/sysdeps/unix/sysv/linux/mips/mips64/n64/libc.abilist b/sysdeps/unix/sysv/linux/mips/mips64/n64/libc.abilist
-index 63d5c03..4258e7e 100644
+index 675acca5db..2f8759f4d4 100644
 --- a/sysdeps/unix/sysv/linux/mips/mips64/n64/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/mips/mips64/n64/libc.abilist
-@@ -1963,6 +1963,7 @@ GLIBC_2.27 wcstof64x F
+@@ -1968,6 +1968,7 @@ GLIBC_2.27 wcstof64x F
  GLIBC_2.27 wcstof64x_l F
  GLIBC_2.28 fcntl64 F
  GLIBC_2.28 renameat2 F
@@ -430,7 +457,7 @@ index 63d5c03..4258e7e 100644
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
 diff --git a/sysdeps/unix/sysv/linux/nios2/libc.abilist b/sysdeps/unix/sysv/linux/nios2/libc.abilist
-index 7fec0c9..e7fef8a 100644
+index 7fec0c9670..e7fef8aa60 100644
 --- a/sysdeps/unix/sysv/linux/nios2/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/nios2/libc.abilist
 @@ -2166,6 +2166,7 @@ GLIBC_2.27 wcstof64_l F
@@ -443,7 +470,7 @@ index 7fec0c9..e7fef8a 100644
  GLIBC_2.28 thrd_equal F
 diff --git a/sysdeps/unix/sysv/linux/posix_devctl.c b/sysdeps/unix/sysv/linux/posix_devctl.c
 new file mode 100644
-index 0000000..2fd7ae6
+index 0000000000..2fd7ae61a8
 --- /dev/null
 +++ b/sysdeps/unix/sysv/linux/posix_devctl.c
 @@ -0,0 +1,116 @@
@@ -564,10 +591,10 @@ index 0000000..2fd7ae6
 +  return ret;
 +}
 diff --git a/sysdeps/unix/sysv/linux/powerpc/powerpc32/fpu/libc.abilist b/sysdeps/unix/sysv/linux/powerpc/powerpc32/fpu/libc.abilist
-index 9200a54..5fba2d1 100644
+index 1e8ff6f83e..72c65fdb6c 100644
 --- a/sysdeps/unix/sysv/linux/powerpc/powerpc32/fpu/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/powerpc/powerpc32/fpu/libc.abilist
-@@ -1988,6 +1988,7 @@ GLIBC_2.27 wcstof64_l F
+@@ -1993,6 +1993,7 @@ GLIBC_2.27 wcstof64_l F
  GLIBC_2.28 fcntl F
  GLIBC_2.28 fcntl64 F
  GLIBC_2.28 renameat2 F
@@ -576,10 +603,10 @@ index 9200a54..5fba2d1 100644
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
 diff --git a/sysdeps/unix/sysv/linux/powerpc/powerpc32/nofpu/libc.abilist b/sysdeps/unix/sysv/linux/powerpc/powerpc32/nofpu/libc.abilist
-index ef77799..3d99b6c 100644
+index b5a0751d90..7ee4d1f6c2 100644
 --- a/sysdeps/unix/sysv/linux/powerpc/powerpc32/nofpu/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/powerpc/powerpc32/nofpu/libc.abilist
-@@ -1992,6 +1992,7 @@ GLIBC_2.27 wcstof64_l F
+@@ -1997,6 +1997,7 @@ GLIBC_2.27 wcstof64_l F
  GLIBC_2.28 fcntl F
  GLIBC_2.28 fcntl64 F
  GLIBC_2.28 renameat2 F
@@ -588,7 +615,7 @@ index ef77799..3d99b6c 100644
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
 diff --git a/sysdeps/unix/sysv/linux/powerpc/powerpc64/be/libc.abilist b/sysdeps/unix/sysv/linux/powerpc/powerpc64/be/libc.abilist
-index 2860df8..3da0746 100644
+index 0c86217fc6..03ddd806ed 100644
 --- a/sysdeps/unix/sysv/linux/powerpc/powerpc64/be/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/powerpc/powerpc64/be/libc.abilist
 @@ -118,6 +118,7 @@ GLIBC_2.27 wcstof64 F
@@ -600,7 +627,7 @@ index 2860df8..3da0746 100644
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
 diff --git a/sysdeps/unix/sysv/linux/powerpc/powerpc64/le/libc.abilist b/sysdeps/unix/sysv/linux/powerpc/powerpc64/le/libc.abilist
-index 2229a1d..87c2cca 100644
+index 2229a1dcc0..87c2cca687 100644
 --- a/sysdeps/unix/sysv/linux/powerpc/powerpc64/le/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/powerpc/powerpc64/le/libc.abilist
 @@ -2223,6 +2223,7 @@ GLIBC_2.27 wcstof64x F
@@ -612,7 +639,7 @@ index 2229a1d..87c2cca 100644
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
 diff --git a/sysdeps/unix/sysv/linux/riscv/rv64/libc.abilist b/sysdeps/unix/sysv/linux/riscv/rv64/libc.abilist
-index 31010e6..71d893c 100644
+index 31010e6cf7..71d893c9bb 100644
 --- a/sysdeps/unix/sysv/linux/riscv/rv64/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/riscv/rv64/libc.abilist
 @@ -2095,6 +2095,7 @@ GLIBC_2.27 xprt_register F
@@ -624,10 +651,10 @@ index 31010e6..71d893c 100644
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
 diff --git a/sysdeps/unix/sysv/linux/s390/s390-32/libc.abilist b/sysdeps/unix/sysv/linux/s390/s390-32/libc.abilist
-index 576295d..83fef13 100644
+index 4feca641b0..2b1591d808 100644
 --- a/sysdeps/unix/sysv/linux/s390/s390-32/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/s390/s390-32/libc.abilist
-@@ -1997,6 +1997,7 @@ GLIBC_2.27 wcstof64x_l F
+@@ -2002,6 +2002,7 @@ GLIBC_2.27 wcstof64x_l F
  GLIBC_2.28 fcntl F
  GLIBC_2.28 fcntl64 F
  GLIBC_2.28 renameat2 F
@@ -636,10 +663,10 @@ index 576295d..83fef13 100644
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
 diff --git a/sysdeps/unix/sysv/linux/s390/s390-64/libc.abilist b/sysdeps/unix/sysv/linux/s390/s390-64/libc.abilist
-index abf0473..c44b8e0 100644
+index efe588a072..b4cc3bb658 100644
 --- a/sysdeps/unix/sysv/linux/s390/s390-64/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/s390/s390-64/libc.abilist
-@@ -1902,6 +1902,7 @@ GLIBC_2.27 wcstof64x F
+@@ -1907,6 +1907,7 @@ GLIBC_2.27 wcstof64x F
  GLIBC_2.27 wcstof64x_l F
  GLIBC_2.28 fcntl64 F
  GLIBC_2.28 renameat2 F
@@ -647,11 +674,23 @@ index abf0473..c44b8e0 100644
  GLIBC_2.28 statx F
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
-diff --git a/sysdeps/unix/sysv/linux/sh/libc.abilist b/sysdeps/unix/sysv/linux/sh/libc.abilist
-index 41977f6..8d8499f 100644
---- a/sysdeps/unix/sysv/linux/sh/libc.abilist
-+++ b/sysdeps/unix/sysv/linux/sh/libc.abilist
-@@ -1879,6 +1879,7 @@ GLIBC_2.27 wcstof64_l F
+diff --git a/sysdeps/unix/sysv/linux/sh/be/libc.abilist b/sysdeps/unix/sysv/linux/sh/be/libc.abilist
+index 6bfc2b7439..21618eaf77 100644
+--- a/sysdeps/unix/sysv/linux/sh/be/libc.abilist
++++ b/sysdeps/unix/sysv/linux/sh/be/libc.abilist
+@@ -1884,6 +1884,7 @@ GLIBC_2.27 wcstof64_l F
+ GLIBC_2.28 fcntl F
+ GLIBC_2.28 fcntl64 F
+ GLIBC_2.28 renameat2 F
++GLIBC_2.28 posix_devctl F
+ GLIBC_2.28 statx F
+ GLIBC_2.28 thrd_current F
+ GLIBC_2.28 thrd_equal F
+diff --git a/sysdeps/unix/sysv/linux/sh/le/libc.abilist b/sysdeps/unix/sysv/linux/sh/le/libc.abilist
+index 4b057bf4a2..4cece847be 100644
+--- a/sysdeps/unix/sysv/linux/sh/le/libc.abilist
++++ b/sysdeps/unix/sysv/linux/sh/le/libc.abilist
+@@ -1884,6 +1884,7 @@ GLIBC_2.27 wcstof64_l F
  GLIBC_2.28 fcntl F
  GLIBC_2.28 fcntl64 F
  GLIBC_2.28 renameat2 F
@@ -660,10 +699,10 @@ index 41977f6..8d8499f 100644
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
 diff --git a/sysdeps/unix/sysv/linux/sparc/sparc32/libc.abilist b/sysdeps/unix/sysv/linux/sparc/sparc32/libc.abilist
-index 3d2f00c..c3cef0e 100644
+index 49cd597fd6..66bdef24a5 100644
 --- a/sysdeps/unix/sysv/linux/sparc/sparc32/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/sparc/sparc32/libc.abilist
-@@ -1991,6 +1991,7 @@ GLIBC_2.27 wcstof64x_l F
+@@ -1996,6 +1996,7 @@ GLIBC_2.27 wcstof64x_l F
  GLIBC_2.28 fcntl F
  GLIBC_2.28 fcntl64 F
  GLIBC_2.28 renameat2 F
@@ -672,10 +711,10 @@ index 3d2f00c..c3cef0e 100644
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
 diff --git a/sysdeps/unix/sysv/linux/sparc/sparc64/libc.abilist b/sysdeps/unix/sysv/linux/sparc/sparc64/libc.abilist
-index 2f20643..59502a4 100644
+index 95e68e0ba1..1682176aec 100644
 --- a/sysdeps/unix/sysv/linux/sparc/sparc64/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/sparc/sparc64/libc.abilist
-@@ -1932,6 +1932,7 @@ GLIBC_2.27 wcstof64x F
+@@ -1937,6 +1937,7 @@ GLIBC_2.27 wcstof64x F
  GLIBC_2.27 wcstof64x_l F
  GLIBC_2.28 fcntl64 F
  GLIBC_2.28 renameat2 F
@@ -684,10 +723,10 @@ index 2f20643..59502a4 100644
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
 diff --git a/sysdeps/unix/sysv/linux/x86_64/64/libc.abilist b/sysdeps/unix/sysv/linux/x86_64/64/libc.abilist
-index 59f85d9..78b2bbb 100644
+index 1f2dbd1451..b643e8563e 100644
 --- a/sysdeps/unix/sysv/linux/x86_64/64/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/x86_64/64/libc.abilist
-@@ -1890,6 +1890,7 @@ GLIBC_2.27 wcstof64x F
+@@ -1895,6 +1895,7 @@ GLIBC_2.27 wcstof64x F
  GLIBC_2.27 wcstof64x_l F
  GLIBC_2.28 fcntl64 F
  GLIBC_2.28 renameat2 F
@@ -696,10 +735,10 @@ index 59f85d9..78b2bbb 100644
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
 diff --git a/sysdeps/unix/sysv/linux/x86_64/x32/libc.abilist b/sysdeps/unix/sysv/linux/x86_64/x32/libc.abilist
-index 67a4e23..ae3c5be 100644
+index 59da85a5d8..acf5a152f3 100644
 --- a/sysdeps/unix/sysv/linux/x86_64/x32/libc.abilist
 +++ b/sysdeps/unix/sysv/linux/x86_64/x32/libc.abilist
-@@ -2141,6 +2141,7 @@ GLIBC_2.27 wcstof64x F
+@@ -2146,6 +2146,7 @@ GLIBC_2.27 wcstof64x F
  GLIBC_2.27 wcstof64x_l F
  GLIBC_2.28 fcntl64 F
  GLIBC_2.28 renameat2 F
@@ -708,5 +747,5 @@ index 67a4e23..ae3c5be 100644
  GLIBC_2.28 thrd_current F
  GLIBC_2.28 thrd_equal F
 -- 
-2.7.4
+2.18.2
 
