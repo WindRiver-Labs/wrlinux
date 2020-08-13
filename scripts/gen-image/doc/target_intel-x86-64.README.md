@@ -162,6 +162,12 @@ $ cd wrlinux-x
 $ git checkout <tag>
 $ cd ../
 $ ./wrlinux-x/setup.sh --all-layers --dl-layers
+
+There might be extra sources which are required to build the images or sdk:
+https://distro.windriver.com/release/wrlinux/linux-cd/base/WRLinux-CD-Images/extra-sources/<tag>
+
+Download the patches and apply them to related repos if there are any.
+
 $ . environment-setup-x86_64-wrlinuxsdk-linux
 $ . oe-init-build-env
 $ ../layers/wrlinux/scripts/gen-image/gen-image -m intel-x86-64
