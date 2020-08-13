@@ -57,10 +57,10 @@ and un-mount those that are mounted, for example:
 
 Now burn the image onto the USB drive:
     For full image
-    $ sudo zcat image-full-intel-x86-64.ustart.img.gz | dd of=/dev/sdf conv=notrunc
+    $ zcat image-full-intel-x86-64.ustart.img.gz | sudo dd of=/dev/sdf bs=1M status=progress
 
     Or minimal image
-    $ sudo zcat wrlinux-image-minimal-intel-x86-64.ustart.img.gz |  dd of=/dev/sdf conv=notrunc
+    $ zcat wrlinux-image-minimal-intel-x86-64.ustart.img.gz | sudo dd of=/dev/sdf bs=1M status=progress
 
     $ sync
     $ eject /dev/sdf
