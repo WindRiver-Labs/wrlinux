@@ -78,10 +78,12 @@ optional arguments:
 
 ### Generate a image from package feed
 $ appsdk genimage -h
-usage: appsdk genimage [-h] [-o OUTDIR] [-g GPGPATH] [-w WORKDIR] [-t {wic,ostree-repo,container,ustart,all}] [-n NAME] [-u URL] [-p PKG] [--no-clean] [input]
+usage: appsdk genimage [-h] [-o OUTDIR] [-g GPGPATH] [-w WORKDIR] [-t {wic,vmdk,vdi,ostree-repo,container,ustart,all}] [-n NAME]
+                       [-u URL] [-p PKG] [--no-clean]
+                       [input [input ...]]
 
 positional arguments:
-  input                 An input yaml file that the tool can be run against a package feed to generate an image
+  input                 Input yaml files that the tool can be run against a package feed to generate an image
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -91,7 +93,7 @@ optional arguments:
                         Specify gpg homedir, it overrides 'gpg_path' in Yaml, default is /tmp/.cbas_gnupg
   -w WORKDIR, --workdir WORKDIR
                         Specify work dir, default is current working directory
-  -t {wic,ostree-repo,container,ustart,all}, --type {wic,ostree-repo,container,ustart,all}
+  -t {wic,vmdk,vdi,ostree-repo,container,ustart,all}, --type {wic,vmdk,vdi,ostree-repo,container,ustart,all}
                         Specify image type, it overrides 'image_type' in Yaml, default is all
   -n NAME, --name NAME  Specify image name, it overrides 'name' in Yaml
   -u URL, --url URL     Specify extra urls of rpm package feeds
@@ -99,6 +101,10 @@ optional arguments:
   --no-clean            Do not cleanup generated rootfs in workdir
 
 $ appsdk genimage input.yaml
+
+It supports multiple input yaml files, which collects packages
+from multiple input yaml files as many as possible, but for other
+params, the duplicated is not allowed.
 
 Input yaml format:
 [input yaml sample on intel-86-64 begin]
@@ -137,6 +143,13 @@ wic: # Set partition size of wic image
   OSTREE_WKS_FLUX_SIZE: '' # Allocate size to /var
   OSTREE_WKS_ROOT_SIZE: '' # Allocate size to rootfs
 [input yaml sample on intel-86-64 end]
+
+After first run, there is yaml example in deploy dir:
+
+$ ls deploy/yaml_example/
+package_management.yaml  vboxguestdrivers.yaml  xfce_desktop.yaml
+
+User could manipulate packages through these yaml files.
 
 ## Use case by simple hello-world example
 
