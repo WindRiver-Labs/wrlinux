@@ -46,6 +46,7 @@ do_install() {
 
     install -d ${D}${bindir}
     install -m 755 ${WORKDIR}/wic_wrapper.sh ${D}${bindir}/wic
+    ln -snf -r ${D}${datadir}/poky/meta/recipes-core/systemd/systemd-systemctl/systemctl ${D}${bindir}/systemctl
 }
 
 FILES_${PN} += "${SDKPATHNATIVE}"
