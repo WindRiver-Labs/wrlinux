@@ -68,7 +68,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     bootchart2 \
     bridge-utils \
     btrfs-tools \
-    build-compare \
     build-sysroots \
     builder \
     buildtools-extended-tarball \
@@ -238,7 +237,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     expect \
     extract-cdo \
     f2fs-tools \
-    faad2 \
     fbset \
     fbset-modes \
     fcgi \
@@ -997,6 +995,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     ppp \
     ppp-dialin \
     pps-tools \
+    prefsbl \
     prelink \
     procps \
     protobuf \
@@ -1031,6 +1030,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     python3-attrs \
     python3-automat \
     python3-bcrypt \
+    python3-betamax \
     python3-blivet \
     python3-blivetgui \
     python3-cached-property \
@@ -1038,6 +1038,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     python3-cffi \
     python3-chardet \
     python3-click \
+    python3-cmd2 \
     python3-colorama \
     python3-constantly \
     python3-coverage \
@@ -1091,7 +1092,9 @@ WRLINUX_SUPPORTED_RECIPES = " \
     python3-mako \
     python3-markdown \
     python3-markupsafe \
+    python3-mccabe \
     python3-meh \
+    python3-mock \
     python3-more-itertools \
     python3-nacl \
     python3-ndg-httpsclient \
@@ -1106,6 +1109,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     python3-paramiko \
     python3-pathlib2 \
     python3-pbr \
+    python3-pep8 \
     python3-pexpect \
     python3-pid \
     python3-pillow \
@@ -1129,6 +1133,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     python3-pycryptodomex \
     python3-pydbus \
     python3-pyelftools \
+    python3-pyflakes \
     python3-pygments \
     python3-pygobject \
     python3-pyhamcrest \
@@ -1136,6 +1141,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     python3-pyopenssl \
     python3-pyparsing \
     python3-pyparted \
+    python3-pyperclip \
     python3-pyrsistent \
     python3-pyserial \
     python3-pysocks \
@@ -1397,6 +1403,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     vala \
     valgrind \
     vblade \
+    vboxguestdrivers \
     vcu-firmware \
     vdso-test \
     vim \
@@ -1695,7 +1702,6 @@ WRLINUX_ALL_RECIPES = " \
     btrfs-tools \
     buck-security \
     build-appliance-image \
-    build-compare \
     build-sysroots \
     builder \
     buildtools-extended-tarball \
@@ -1996,6 +2002,7 @@ WRLINUX_ALL_RECIPES = " \
     exo \
     expat \
     expect \
+    exprtk \
     external-hdf \
     extract-cdo \
     ez-ipupdate \
@@ -2142,6 +2149,7 @@ WRLINUX_ALL_RECIPES = " \
     gnome-control-center \
     gnome-desktop-testing \
     gnome-desktop3 \
+    gnome-disk-utility \
     gnome-doc-utils-stub \
     gnome-flashback \
     gnome-font-viewer \
@@ -3491,6 +3499,7 @@ WRLINUX_ALL_RECIPES = " \
     ppp-dialin \
     pps-tools \
     pptp-linux \
+    prefsbl \
     prelink \
     procmail \
     procps \
@@ -4789,6 +4798,7 @@ WRLINUX_ALL_RECIPES = " \
     sip3 \
     skopeo \
     slang \
+    slimboot-tools \
     slirp4netns \
     slop \
     smack \
@@ -5283,6 +5293,7 @@ WRLINUX_ALL_RECIPES = " \
     xuser-account \
     xvinfo \
     xvisor \
+    xvisor-image-minimal \
     xwd \
     xwininfo \
     xwud \
