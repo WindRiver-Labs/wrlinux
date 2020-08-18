@@ -37,6 +37,7 @@ RDEPENDS_${PN} += " \
     nativesdk-e2fsprogs-e2fsck \
     nativesdk-util-linux \
     nativesdk-tar \
+    nativesdk-chrpath \
 "
 
 do_install() {
