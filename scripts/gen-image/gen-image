@@ -533,9 +533,9 @@ IMAGE_ENABLE_CONTAINER = "1"
         else:
             logger.warning("The checksum is not generated since no files are found!")
 
-        # Create tarballs for minimal and full directories
+        # Create tarballs for target minimal/full and sdk directories
         for d in os.listdir(file_prefix):
-            if '-minimal-' in d or '-full-' in d or 'sdk-' in d or 'cbas-' in d:
+            if '-minimal-' in d or '-full-' in d or 'sdk-' in d or 'cbas-' in d and not d.startswith('container-'):
                 cmd = 'tar --numeric-owner -cjvf %s.tar.bz2 %s' % (d, d)
                 logger.debug('Running %s' % cmd)
                 subprocess.check_output(cmd, shell=True, cwd=file_prefix)
