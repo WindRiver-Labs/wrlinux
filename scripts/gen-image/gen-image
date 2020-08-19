@@ -202,10 +202,7 @@ class GenImage(object):
         else:
             self.outdir = os.path.join(self.builddir, 'outdir', self.handoff)
 
-        machine_dir = os.path.join(self.outdir, self.machine)
-        if os.path.exists(machine_dir):
-            machine_old = '%s.old.%s' % (machine_dir, self.today)
-            shutil.move(machine_dir, machine_old)
+        self.mv_to_old(self.machine)
 
         if not os.path.exists(self.outdir):
             os.makedirs(self.outdir)
@@ -291,6 +288,15 @@ SDKMACHINE = "x86_64"
         self.repos_dir = os.path.join(self.outdir, self.machine, 'repos')
         if not os.path.exists(self.repos_dir):
             os.makedirs(self.repos_dir)
+
+    def mv_to_old(self, src_name):
+        src = os.path.join(self.outdir, src_name)
+        old_dir = os.path.join(self.outdir, 'old')
+        dst = os.path.join(old_dir, '%s.%s' % (src_name, self.today))
+        if not os.path.exists(old_dir):
+            os.makedirs(old_dir)
+        if os.path.exists(src):
+            shutil.move(src, dst)
 
     def do_build(self, target=None, conf=None):
         if conf:
@@ -498,9 +504,7 @@ IMAGE_ENABLE_CONTAINER = "1"
 
         # Save prserver
         pr_dir = os.path.join(self.outdir, 'prserv')
-        pr_dir_old = '%s.old.%s' % (pr_dir, self.today)
-        if os.path.exists(pr_dir):
-            shutil.move(pr_dir, pr_dir_old)
+        self.mv_to_old('prserv')
         os.makedirs(pr_dir)
         shutil.copy(self.pr_db, pr_dir)
         shutil.copy(self.pr_log, pr_dir)
@@ -558,9 +562,7 @@ COPYLEFT_LICENSE_EXCLUDE = ""
         src_dir = os.path.join(self.tmpdir, 'deploy/sources')
         logger.info('Deploying sources-%s' % self.machine)
         dst_dir = os.path.join(self.outdir, 'sources-%s' % self.machine)
-        dst_dir_old = os.path.join(self.outdir, 'sources-%s.%s' % (self.machine, self.today))
-        if os.path.exists(dst_dir):
-            shutil.move(dst_dir, dst_dir_old)
+        self.mv_to_old('sources-%s' % self.machine)
         shutil.copytree(src_dir, dst_dir)
 
 def main():
