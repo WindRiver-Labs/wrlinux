@@ -127,7 +127,7 @@ class GenImage(object):
             help='Specify machine')
         parser.add_argument('-r', '--ip-review',
             default=False,
-            help='Generate sources for IP review', action="store_true")
+            help='Only generate sources for IP review', action="store_true")
         parser.add_argument('-b', '--pr-database',
             default=None,
             help='Specify PR database to use', action="store")
@@ -566,13 +566,14 @@ COPYLEFT_LICENSE_EXCLUDE = ""
 def main():
     gen = GenImage()
     gen.prepare()
-    gen.gen_sdk()
-    gen.gen_ostree()
-    gen.gen_container()
-    gen.gen_feeds()
     if gen.args.ip_review:
         gen.ip_review()
-    gen.gen_cbas()
+    else:
+        gen.gen_ostree()
+        gen.gen_container()
+        gen.gen_feeds()
+        gen.gen_sdk()
+        gen.gen_cbas()
     gen.post()
 
 if __name__ == "__main__":
