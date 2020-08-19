@@ -218,6 +218,8 @@ class GenImage(object):
             if os.path.exists(pr_log):
                 shutil.copy(pr_log, self.pr_log)
 
+        self.repos_dir = os.path.join(self.outdir, self.machine, 'repos')
+
     def prepare(self):
         shutil.copyfile(self.local_conf_orig, self.local_conf)
 
@@ -284,10 +286,6 @@ SDKMACHINE = "x86_64"
 
         if not feed_uris_defined:
             raise Exception('PACKAGE_FEED_URIS is not defined. check README.md on how to define it')
-
-        self.repos_dir = os.path.join(self.outdir, self.machine, 'repos')
-        if not os.path.exists(self.repos_dir):
-            os.makedirs(self.repos_dir)
 
     def mv_to_old(self, src_name):
         src = os.path.join(self.outdir, src_name)
@@ -488,6 +486,9 @@ IMAGE_ENABLE_CONTAINER = "1"
                 shutil.rmtree(e_path)
 
         self.do_build('package-index')
+
+        if not os.path.exists(self.repos_dir):
+            os.makedirs(self.repos_dir)
 
         logger.info('Deploying %s/repos/rpm' % self.machine)
         dst_dir = os.path.join(self.repos_dir, 'rpm')
