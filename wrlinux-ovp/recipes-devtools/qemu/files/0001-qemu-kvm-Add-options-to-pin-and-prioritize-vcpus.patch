@@ -22,7 +22,7 @@ Signed-off-by: Hongzhi.Song <hongzhi.song@windriver.com>
 Rebase to 5.0.0
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- cpus.c                | 146 ++++++++++++++++++++++++++++++++++++++++++
+ softmmu/cpus.c                | 146 ++++++++++++++++++++++++++++++++++++++++++
  include/sysemu/cpus.h |   1 +
  qemu-options.hx       |   7 ++
  softmmu/vl.c          |   3 +
@@ -30,8 +30,8 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 
 diff --git a/cpus.c b/cpus.c
 index ef441bdf..8f0c63ee 100644
---- a/cpus.c
-+++ b/cpus.c
+--- a/softmmu/cpus.c
++++ b/softmmu/cpus.c
 @@ -1215,6 +1215,150 @@ static void qemu_wait_io_event(CPUState *cpu)
      qemu_wait_io_event_common(cpu);
  }
