@@ -1,0 +1,68 @@
+From c632b936e795d9e8532197b9f318b12023d2bc7b Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Thu, 13 Aug 2020 12:53:27 +0000
+Subject: [PATCH] functions.sh: Fix Process Substitution error
+
+Fixed when version inside os-release is updated, and rebuild with
+packagefeed-stability.bbclass:
+
+$ bitbake os-release
+
+The version in /et/os-release is upgraded, so os-release.rpm should be updated
+in tmp/deploy/rpm/, but it doesn't, and check log.do_package_compare_rpm, there
+is an error:
+
+functions.sh: line 283: /dev/fd/62: No such file or directory
+
+This is because code like 'cat < <(echo "hello")' doesn't work in bitbake
+shell, the problem can be reproduced in devshell:
+
+$ bitbake <recipe> -cdevshell
+$ cat < <(echo "hello")
+bash: /dev/fd/62: No such file or directory
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ functions.sh | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/functions.sh b/functions.sh
+index ce89dbe..e1f3b29 100755
+--- a/functions.sh
++++ b/functions.sh
+@@ -288,6 +288,7 @@ function cmp_rpm_meta ()
+ 
+     file1=`mktemp`
+     file2=`mktemp`
++    file_diff=`mktemp`
+     rpm_meta_old=`mktemp`
+     rpm_meta_new=`mktemp`
+ 
+@@ -372,11 +373,12 @@ function cmp_rpm_meta ()
+       RES=0
+     else
+       # Get only files with different MD5sums
++      diff -U0 $file1 $file2 | sed -E -n -e '/^-\//{s/^-//;s/ [0-9a-f]+ [0-9]+$//;p}' > $file_diff
+       while read
+       do
+         : "${REPLY}"
+         files+=( "${REPLY}" )
+-      done < <(diff -U0 $file1 $file2 | sed -E -n -e '/^-\//{s/^-//;s/ [0-9a-f]+ [0-9]+$//;p}')
++      done < $file_diff
+     fi
+ 
+     if test -n "$sh"; then
+@@ -393,7 +395,7 @@ function cmp_rpm_meta ()
+       done >> "${sh}"
+     fi
+     #
+-    rm $file1 $file2
++    rm $file1 $file2 $file_diff
+     [ "$difffound" = 1 ] && RES=1
+     return $RES
+ }
+-- 
+2.26.2
+
