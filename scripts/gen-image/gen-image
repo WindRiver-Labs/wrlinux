@@ -255,6 +255,8 @@ PACKAGE_FEED_ARCHS = "%s"
 
 SSTATE_PRUNE_OBSOLETEWORKDIR = "0"
 
+INHERIT += "rm_work"
+
 # ostree
 GPG_PATH ?= "${TOPDIR}/.gnupg"
 OSTREE_USE_AB = "0"
