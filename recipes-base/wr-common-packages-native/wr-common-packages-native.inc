@@ -156,6 +156,7 @@ DEPENDS = "\
     postfix-native \
     prelink-native \
     pseudo-native \
+    python-native \
     python3-iniparse-native \
     python3-jsmin-native \
     python3-m2crypto-native \
