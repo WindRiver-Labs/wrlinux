@@ -360,12 +360,15 @@ monitor_web()
         service apache2 stop || cuterr "Failed to stop web service"
     fi
 
-    # sleep at least one monitor period
-    sleep 60
-
-    # check the monitor event
-    crm status show | grep WebSite_monitor | grep "not running" && \
-        cutpass || cutfail
+    # try 5 monitor periods
+    for i in $(seq 1 5)
+    do
+        sleep 60
+        if crm status show | grep WebSite_monitor | grep "not running";then
+            cutpass
+        fi
+    done
+    cutfail
 }
 
 main_fun()
