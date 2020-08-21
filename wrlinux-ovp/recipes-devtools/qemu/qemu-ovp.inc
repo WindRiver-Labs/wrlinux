@@ -4,7 +4,7 @@
 
 # qemu-native should not depend on these packages
 DEPENDS_append = " dtc pixman util-linux"
-EXTRA_OECONF_append += "--disable-sdl --enable-fdt --disable-smartcard --cross-prefix=${TARGET_PREFIX}"
+EXTRA_OECONF_append += "--disable-sdl --enable-fdt --enable-profiler --disable-smartcard --cross-prefix=${TARGET_PREFIX}"
 
 FILESEXTRAPATHS_append := ":${THISDIR}/files"
 
