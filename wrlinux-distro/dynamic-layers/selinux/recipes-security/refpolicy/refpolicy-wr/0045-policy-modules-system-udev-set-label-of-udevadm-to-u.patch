@@ -1,0 +1,61 @@
+From da76410bf312d4fcbf6c914409c65e52edccd873 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 21 Aug 2020 11:23:09 +0800
+Subject: [PATCH] policy/modules/system/udev: set label of udevadm to
+ udev_exec_t
+
+Since systemd 246, /lib/systemd/systemd-udevd has become a symlink to
+/bin/udevadm. This means that udevd is now run in the udevadm_t domain,
+and that breaks things.
+
+Original labels as reference:
+/usr/bin/udevadm        system_u:object_r:udevadm_exec_t:SystemLow
+/usr/lib/systemd/systemd-udevd  system_u:object_r:udev_exec_t:SystemLow
+
+Change the label of udevadm from udevadm_exec_t to udev_exec_t.
+
+Fixes:
+systemd-udevd[268]: Failed to determine number of local CPUs, ignoring: Permission denied
+systemd-udevd[268]: Failed to get cgroup: Permission denied
+systemd-udevd[268]: Failed to create socketpair for communicating with workers: Permission denied
+systemd-udevd[268]: Assertion 'close_nointr(fd) != -EBADF' failed at src/basic/fd-util.c:72, function safe_close(). Aborting.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/udev.fc | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/policy/modules/system/udev.fc b/policy/modules/system/udev.fc
+index ceb5b70b3..d26b9287e 100644
+--- a/policy/modules/system/udev.fc
++++ b/policy/modules/system/udev.fc
+@@ -10,7 +10,7 @@
+ /etc/udev/scripts/.+ --	gen_context(system_u:object_r:udev_helper_exec_t,s0)
+ 
+ /usr/bin/udev		--	gen_context(system_u:object_r:udev_exec_t,s0)
+-/usr/bin/udevadm	--	gen_context(system_u:object_r:udevadm_exec_t,s0)
++/usr/bin/udevadm	--	gen_context(system_u:object_r:udev_exec_t,s0)
+ /usr/bin/udevd		--	gen_context(system_u:object_r:udev_exec_t,s0)
+ /usr/bin/udevinfo	--	gen_context(system_u:object_r:udev_exec_t,s0)
+ /usr/bin/udevsend	--	gen_context(system_u:object_r:udev_exec_t,s0)
+@@ -22,13 +22,13 @@ ifdef(`distro_debian',`
+ ')
+ 
+ /usr/sbin/udev		--	gen_context(system_u:object_r:udev_exec_t,s0)
+-/usr/sbin/udevadm	--	gen_context(system_u:object_r:udevadm_exec_t,s0)
++/usr/sbin/udevadm	--	gen_context(system_u:object_r:udev_exec_t,s0)
+ /usr/sbin/udevd		--	gen_context(system_u:object_r:udev_exec_t,s0)
+ /usr/sbin/udevsend	--	gen_context(system_u:object_r:udev_exec_t,s0)
+ /usr/sbin/udevstart	--	gen_context(system_u:object_r:udev_exec_t,s0)
+ /usr/sbin/wait_for_sysfs --	gen_context(system_u:object_r:udev_exec_t,s0)
+ 
+-/usr/libexec/udevadm	--	gen_context(system_u:object_r:udevadm_exec_t,s0)
++/usr/libexec/udevadm	--	gen_context(system_u:object_r:udev_exec_t,s0)
+ 
+ ifdef(`distro_redhat',`
+ /usr/sbin/start_udev --	gen_context(system_u:object_r:udev_exec_t,s0)
+-- 
+2.17.1
+

@@ -1,0 +1,35 @@
+From 6195d1643a82ff2431207e28edaa56661c21651c Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 21 Aug 2020 11:40:30 +0800
+Subject: [PATCH] policy/modules/system/systemd: allow systemd_resolved_t to
+ manage systemd_resolved_runtime_t link files
+
+Fixes:
+avc:  denied  { create } for  pid=329 comm="systemd-resolve"
+name=".#stub-resolv.conf53cb7f9d1e3aa72b"
+scontext=system_u:system_r:systemd_resolved_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:systemd_resolved_runtime_t:s0 tclass=lnk_file
+permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/systemd.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 4b8b325d7..4aea047b5 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -1092,6 +1092,7 @@ allow systemd_resolved_t systemd_networkd_runtime_t:dir watch;
+ 
+ manage_dirs_pattern(systemd_resolved_t, systemd_resolved_runtime_t, systemd_resolved_runtime_t)
+ manage_files_pattern(systemd_resolved_t, systemd_resolved_runtime_t, systemd_resolved_runtime_t)
++manage_lnk_files_pattern(systemd_resolved_t, systemd_resolved_runtime_t, systemd_resolved_runtime_t)
+ init_runtime_filetrans(systemd_resolved_t, systemd_resolved_runtime_t, dir)
+ 
+ dev_read_sysfs(systemd_resolved_t)
+-- 
+2.17.1
+

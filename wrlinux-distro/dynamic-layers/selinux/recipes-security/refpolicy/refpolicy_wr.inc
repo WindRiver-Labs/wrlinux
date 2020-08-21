@@ -51,6 +51,8 @@ SRC_URI += "\
         file://0042-policy-modules-roles-sysadm-allow-sysadm_t-to-read-f.patch \
         file://0043-policy-modules-system-sysnetwork-allow-dhclient-to-c.patch \
         file://0044-policy-modules-system-systemd-allow-systemd_generato.patch \
+        file://0045-policy-modules-system-udev-set-label-of-udevadm-to-u.patch \
+        file://0046-policy-modules-system-systemd-allow-systemd_resolved.patch \
         "
 
 OSTREE_POLICY_PATCHES = "\
