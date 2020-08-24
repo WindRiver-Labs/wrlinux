@@ -22,9 +22,34 @@ TOOLCHAIN_TARGET_TASK_append = " qemuwrapper-cross"
 POPULATE_SDK_PRE_TARGET_COMMAND += "copy_pkgdata_to_sdk;"
 copy_pkgdata_to_sdk() {
     install -d ${SDK_OUTPUT}${SDKPATHNATIVE}${datadir}/pkgdata
-    tar cfj ${SDK_OUTPUT}${SDKPATHNATIVE}${datadir}/pkgdata/pkgdata.tar.bz2 \
-        -C ${TMPDIR}/pkgdata ${MACHINE}
+    if [ -e ${DEPLOY_DIR_RPM}/.pkgdata.tar.bz2 -a -e ${DEPLOY_DIR_RPM}/.pkgdata.tar.bz2.sha256sum ]; then
+        cp ${DEPLOY_DIR_RPM}/.pkgdata.tar.bz2 \
+            ${SDK_OUTPUT}${SDKPATHNATIVE}${datadir}/pkgdata/pkgdata.tar.bz2
+        cp ${DEPLOY_DIR_RPM}/.pkgdata.tar.bz2.sha256sum \
+            ${SDK_OUTPUT}${SDKPATHNATIVE}${datadir}/pkgdata/pkgdata.tar.bz2.sha256sum
+    fi
+
+    if [ ! -e ${SDK_OUTPUT}${SDKPATHNATIVE}${datadir}/pkgdata/pkgdata.tar.bz2 ]; then
+        copy_pkgdata ${SDK_OUTPUT}${SDKPATHNATIVE}${datadir}/pkgdata
+    fi
 }
+
+copy_pkgdata() {
+    dest=$1
+    install -d $dest
+    tar cfj $dest/pkgdata.tar.bz2 -C ${TMPDIR}/pkgdata ${MACHINE}
+    (
+        cd $dest;
+        sha256sum pkgdata.tar.bz2 > pkgdata.tar.bz2.sha256sum
+    )
+}
+
+do_copy_pkgdata_to_rpm_repo() {
+    copy_pkgdata ${DEPLOY_DIR_RPM}
+    mv ${DEPLOY_DIR_RPM}/pkgdata.tar.bz2 ${DEPLOY_DIR_RPM}/.pkgdata.tar.bz2
+    mv ${DEPLOY_DIR_RPM}/pkgdata.tar.bz2.sha256sum ${DEPLOY_DIR_RPM}/.pkgdata.tar.bz2.sha256sum
+}
+addtask copy_pkgdata_to_rpm_repo
 
 POPULATE_SDK_PRE_TARGET_COMMAND += "copy_ostree_initramfs_to_sdk;"
 copy_ostree_initramfs_to_sdk() {
@@ -75,7 +100,8 @@ do_populate_sdk[vardeps] += "extract_pkgdata_postinst"
 SDK_POST_INSTALL_COMMAND += "${extract_pkgdata_postinst}"
 extract_pkgdata_postinst() {
     cd $target_sdk_dir/sysroots/${SDK_SYS}${datadir}/pkgdata/;
-    tar xf pkgdata.tar.bz2;
+    mkdir $target_sdk_dir/sysroots/pkgdata;
+    tar xf pkgdata.tar.bz2 -C $target_sdk_dir/sysroots/pkgdata;
 }
 
 IMAGE_INSTALL = "\
