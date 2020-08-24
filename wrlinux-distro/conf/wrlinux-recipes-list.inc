@@ -68,6 +68,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     bootchart2 \
     bridge-utils \
     btrfs-tools \
+    build-compare \
     build-sysroots \
     builder \
     buildtools-extended-tarball \
@@ -264,7 +265,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     gcc \
     gcc-runtime \
     gcc-sanitizers \
-    gcc-source-10.1.0 \
+    gcc-source-10.2.0 \
     gconf \
     gcr \
     gd \
@@ -699,7 +700,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     linux-yocto-dev \
     lksctp-tools \
     llvm \
-    llvm-project-source-10.0.1 \
+    llvm-project-source-11.0.0 \
     lmbench \
     lmsensors \
     lmsensors-config \
@@ -834,6 +835,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     oci-runtime-tools \
     oci-systemd-hook \
     ofono \
+    onednn \
     onig \
     open-isns \
     open-model-zoo \
@@ -1642,6 +1644,7 @@ WRLINUX_ALL_RECIPES = " \
     autoconf-archive \
     autofs \
     automake \
+    autossh \
     avahi \
     avro-c \
     aws-iot-device-sdk-cpp \
@@ -1669,6 +1672,7 @@ WRLINUX_ALL_RECIPES = " \
     bcm2835-bootfiles \
     bdftopcf \
     bdwgc \
+    bearssl \
     bigbuckbunny-1080p \
     bigbuckbunny-480p \
     bigbuckbunny-720p \
@@ -1702,6 +1706,7 @@ WRLINUX_ALL_RECIPES = " \
     btrfs-tools \
     buck-security \
     build-appliance-image \
+    build-compare \
     build-sysroots \
     builder \
     buildtools-extended-tarball \
@@ -2086,7 +2091,7 @@ WRLINUX_ALL_RECIPES = " \
     gcc \
     gcc-runtime \
     gcc-sanitizers \
-    gcc-source-10.1.0 \
+    gcc-source-10.2.0 \
     gconf \
     gcr \
     gd \
@@ -2401,6 +2406,7 @@ WRLINUX_ALL_RECIPES = " \
     json \
     json-c \
     json-glib \
+    json-schema-validator \
     json-spirit \
     jsoncpp \
     jsonrpc \
@@ -2922,7 +2928,7 @@ WRLINUX_ALL_RECIPES = " \
     lldpd \
     llvm \
     llvm-common \
-    llvm-project-source-10.0.1 \
+    llvm-project-source-11.0.0 \
     lmbench \
     lms \
     lmsensors \
@@ -3797,7 +3803,6 @@ WRLINUX_ALL_RECIPES = " \
     python-pyroute2 \
     python-pyrsistent \
     python-pyrtm \
-    python-pysaml2 \
     python-pyscss \
     python-pyserial \
     python-pysmi \
@@ -3809,7 +3814,6 @@ WRLINUX_ALL_RECIPES = " \
     python-pytest-helpers-namespace \
     python-pytest-runner \
     python-pytest-tempdir \
-    python-python-editor \
     python-pytoml \
     python-pytun \
     python-pytz \
@@ -3902,21 +3906,13 @@ WRLINUX_ALL_RECIPES = " \
     python-xstatic-angular-fileupload \
     python-xstatic-angular-gettext \
     python-xstatic-angular-irdragndrop \
-    python-xstatic-angular-lrdragndrop \
-    python-xstatic-angular-mock \
     python-xstatic-angular-schema-form \
     python-xstatic-bootstrap-datepicker \
     python-xstatic-bootstrap-scss \
     python-xstatic-d3 \
     python-xstatic-font-awesome \
     python-xstatic-hogan \
-    python-xstatic-jquery \
-    python-xstatic-jquery-migrate \
-    python-xstatic-jquery.quicksearch \
-    python-xstatic-jquery.tablesorter \
     python-xstatic-jsencrypt \
-    python-xstatic-magic-search \
-    python-xstatic-mdi \
     python-xstatic-objectpath \
     python-xstatic-qunit \
     python-xstatic-rickshaw \
@@ -4323,6 +4319,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-pyatspi \
     python3-pyaudio \
     python3-pybind11 \
+    python3-pybind11-json \
     python3-pybluez \
     python3-pycadf \
     python3-pycairo \
@@ -4368,6 +4365,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-pyro4 \
     python3-pyroute2 \
     python3-pyrsistent \
+    python3-pysaml2 \
     python3-pyscaffold \
     python3-pyserial \
     python3-pysnmp \
@@ -4555,6 +4553,8 @@ WRLINUX_ALL_RECIPES = " \
     python3-xstatic-angular-fileupload \
     python3-xstatic-angular-gettext \
     python3-xstatic-angular-irdragndrop \
+    python3-xstatic-angular-lrdragndrop \
+    python3-xstatic-angular-mock \
     python3-xstatic-angular-schema-form \
     python3-xstatic-bootstrap-datepicker \
     python3-xstatic-bootstrap-scss \
@@ -4566,6 +4566,10 @@ WRLINUX_ALL_RECIPES = " \
     python3-xstatic-jquery \
     python3-xstatic-jquery-migrate \
     python3-xstatic-jquery-ui \
+    python3-xstatic-jquery.quicksearch \
+    python3-xstatic-jquery.tablesorter \
+    python3-xstatic-magic-search \
+    python3-xstatic-mdi \
     python3-xstatic-roboto-fontface \
     python3-xstatic-smart-table \
     python3-xstatic-term.js \
