@@ -1,0 +1,67 @@
+From 6b7384f6ae97d7025ee473a8b1b3d76ebd6d5c52 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Mon, 24 Aug 2020 11:29:09 +0800
+Subject: [PATCH] policy/modules/system/modutils: allow mod_t to access
+ confidentiality of class lockdown
+
+The SELinux lockdown implementation was introduced since kernel 5.6 by
+commit 59438b46471ae6cdfb761afc8c9beaf1e428a331. We need to allow mod_t
+and udev_t to access confidentiality of class lockdown to mount tracefs.
+
+Fixes:
+kernel: Could not create tracefs 'iwlwifi_data/filter' entry
+kernel: Could not create tracefs 'enable' entry
+kernel: Could not create tracefs 'id' entry
+kernel: Could not create tracefs 'filter' entry
+kernel: Could not create tracefs 'trigger' entry
+kernel: Could not create tracefs 'format' entry
+
+audit[170]: AVC avc:  denied  { confidentiality } for  pid=170
+comm="modprobe" lockdown_reason="use of tracefs"
+scontext=system_u:system_r:kmod_t:s15:c0.c1023
+tcontext=system_u:system_r:kmod_t:s15:c0.c1023 tclass=lockdown
+permissive=0
+
+audit[190]: AVC avc:  denied  { confidentiality } for  pid=190
+comm="systemd-udevd" lockdown_reason="use of tracefs"
+scontext=system_u:system_r:udev_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:udev_t:s0-s15:c0.c1023 tclass=lockdown
+permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/modutils.te | 2 ++
+ policy/modules/system/udev.te     | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/policy/modules/system/modutils.te b/policy/modules/system/modutils.te
+index 8fd009742..f929cc25e 100644
+--- a/policy/modules/system/modutils.te
++++ b/policy/modules/system/modutils.te
+@@ -41,6 +41,8 @@ dontaudit kmod_t self:capability sys_admin;
+ allow kmod_t self:udp_socket create_socket_perms;
+ allow kmod_t self:rawip_socket create_socket_perms;
+ 
++allow kmod_t self:lockdown confidentiality;
++
+ # Read module config and dependency information
+ list_dirs_pattern(kmod_t, modules_conf_t, modules_conf_t)
+ read_files_pattern(kmod_t, modules_conf_t, modules_conf_t)
+diff --git a/policy/modules/system/udev.te b/policy/modules/system/udev.te
+index e483d63d3..7861950ab 100644
+--- a/policy/modules/system/udev.te
++++ b/policy/modules/system/udev.te
+@@ -66,6 +66,8 @@ allow udev_t self:rawip_socket create_socket_perms;
+ # for systemd-udevd to rename interfaces
+ allow udev_t self:netlink_route_socket nlmsg_write;
+ 
++allow udev_t self:lockdown confidentiality;
++
+ can_exec(udev_t, udev_exec_t)
+ 
+ allow udev_t udev_helper_exec_t:dir list_dir_perms;
+-- 
+2.17.1
+

@@ -53,6 +53,7 @@ SRC_URI += "\
         file://0044-policy-modules-system-systemd-allow-systemd_generato.patch \
         file://0045-policy-modules-system-udev-set-label-of-udevadm-to-u.patch \
         file://0046-policy-modules-system-systemd-allow-systemd_resolved.patch \
+        file://0047-policy-modules-system-modutils-allow-mod_t-to-access.patch \
         "
 
 OSTREE_POLICY_PATCHES = "\
