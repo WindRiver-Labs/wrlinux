@@ -41,7 +41,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     babeltrace \
     base-files \
     base-passwd \
-    base-pdi \
     bash \
     bash-completion \
     bc \
@@ -221,7 +220,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     exo \
     expat \
     expect \
-    extract-cdo \
     f2fs-tools \
     faad2 \
     fbset \
@@ -244,8 +242,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     freeradius \
     freetype \
     fribidi \
-    fs-boot \
-    fsbl \
     fuse \
     garcon \
     gawk \
@@ -279,7 +275,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     glibmm \
     glide \
     glusterfs \
-    gma500-gfx-check \
     gmp \
     gnome-common \
     gnome-desktop-testing \
@@ -396,7 +391,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     ipmitool \
     ippool \
     iproute2 \
-    ipsec-demo \
     ipsec-test \
     iptables \
     iputils \
@@ -417,7 +411,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     kernel-initramfs \
     kernel-initramfs-image \
     kernel-module-mali \
-    kernel-module-vcu \
     kexec-tools \
     key-store \
     keybinder \
@@ -474,7 +467,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     libestr \
     libevdev \
     libevent \
-    libexecinfo \
     libexif \
     libfakekey \
     libfastjson \
@@ -540,7 +532,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     libnss-nis \
     libogg \
     libomxil \
-    libomxil-xlnx \
     libpam \
     libpcap \
     libpciaccess \
@@ -598,7 +589,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     libuser \
     libva \
     libva-utils \
-    libvcu-xlnx \
     libvirt \
     libvmi \
     libvorbis \
@@ -660,6 +650,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     linux-libc-headers \
     linux-yocto \
     linux-yocto-dev \
+    linux-yocto-rt \
     linuxptp \
     lksctp-tools \
     llvm \
@@ -760,7 +751,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     nasm \
     ncurses \
     ndctl \
-    ne10 \
     neard \
     net-snmp \
     net-tools \
@@ -798,9 +788,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     onig \
     open-isns \
     open-vm-tools \
-    openamp-fw-echo-testd \
-    openamp-fw-mat-muld \
-    openamp-fw-rpc-demo \
     openhpi \
     openipmi \
     openjpeg \
@@ -931,13 +918,10 @@ WRLINUX_SUPPORTED_RECIPES = " \
     pixman \
     pkgconf \
     pkgconfig \
-    platform-init \
-    plm \
     pm-graph \
     pm-utils \
     pmdk \
     pmtools \
-    pmu-firmware \
     pointercal-xinput \
     policycoreutils \
     polkit \
@@ -956,7 +940,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     protobuf \
     protobuf-c \
     pseudo \
-    psm-firmware \
     psmisc \
     psplash \
     ptest-runner \
@@ -1060,7 +1043,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     python3-docopt \
     python3-docutils \
     python3-extras \
-    python3-fastentrypoints \
     python3-flask \
     python3-git \
     python3-gitdb \
@@ -1141,7 +1123,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     python3-wrapt \
     python3-zipp \
     python3-zopeinterface \
-    qat16 \
     qat17 \
     qemu \
     qemuwrapper-cross \
@@ -1306,7 +1287,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     u-boot-socfpga \
     u-boot-tools \
     u-boot-uenv \
-    u-boot-zynq-uenv \
     ucarp \
     udev-extraconf \
     udisks2 \
@@ -1332,7 +1312,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     vala \
     valgrind \
     vblade \
-    vcu-firmware \
     vdso-test \
     vim \
     vim-tiny \
@@ -2271,6 +2250,7 @@ WRLINUX_ALL_RECIPES = " \
     kernel-devsrc \
     kernel-initramfs \
     kernel-initramfs-image \
+    kernel-module-hdmi \
     kernel-module-mali \
     kernel-module-vcu \
     kernel-selftest \
@@ -2754,6 +2734,7 @@ WRLINUX_ALL_RECIPES = " \
     logrotate \
     logwarn \
     logwatch \
+    lopper \
     loudmouth \
     lowpan-tools \
     lprng \
@@ -3942,6 +3923,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-dogpile.cache \
     python3-dominate \
     python3-dt-schema \
+    python3-dtc \
     python3-editor \
     python3-engineio \
     python3-entrypoints \
