@@ -188,12 +188,14 @@ Here's a simple example of how to use appsdk.
 3. Publish the RPM package
 
    3a) Publish the RPM to repo
-
-       appsdk publishrpm -r /path/to/http_service_data/rpms deploy/rpms/corei7_64/hello-2.10-r0.corei7_64.rpm
+       mkdir -p /path/to/http_service_data/third_party_repo
+       appsdk publishrpm -r /path/to/http_service_data/third_party_repo  deploy/rpms/corei7_64/hello-2.10-r0.corei7_64.rpm
 
    3b) [OPTIONAL] Setup http service
 
        python3 -m http.server 8888 --directory /path/to/http_service_data
+
+       Use browser to access http://HOST_IP:8888/third_party_repo/
 
 4. Use the RPM package on target
 
@@ -201,7 +203,7 @@ Here's a simple example of how to use appsdk.
        echo > /etc/yum.repos.d/test.repo <<EOF
        [appsdk-test-repo]
        name=appsdk test repo
-       baseurl=http://HOST_IP:8888/rpms/
+       baseurl=http://HOST_IP:8888/third_party_repo/
        gpgcheck=0
        EOF
 
@@ -219,7 +221,7 @@ Here's a simple example of how to use appsdk.
 
    5a) Modify yaml file
 
-       Add 'http://HOST_IP:8888/rpms' to package_feeds section.
+       Add 'http://HOST_IP:8888/third_party_repo/' to package_feeds section.
        Add 'hello' to packages section.
 
        e.g.
@@ -231,11 +233,10 @@ Here's a simple example of how to use appsdk.
        - container
        - ustart
        package_feeds:
-       - http://128.224.153.74/intel-x86-64/rpm/noarch
-       - http://128.224.153.74/intel-x86-64/rpm/x86_64_nativesdk
-       - http://128.224.153.74/intel-x86-64/rpm/corei7_64
-       - http://128.224.153.74/intel-x86-64/rpm/intel_x86_64
-       - http://128.224.153.232:8888/rpms
+       - http://<web-server-url>/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm/noarch/
+       - http://<web-server-url>/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm/corei7_64/
+       - http://<web-server-url>/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm/intel_x86_64/
+       - http://HOST_IP:8888/third_party_repo
        packages:
        - hello
        - base-files
