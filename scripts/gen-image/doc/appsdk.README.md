@@ -109,37 +109,56 @@ params, the duplicated is not allowed.
 Input yaml format:
 [input yaml sample on intel-86-64 begin]
 features:
-  pkg_globs: '*-src, *-dev, *-dbg' # Install complementary packages based upon the list of currently installed
-                                   # packages e.g. *-src, *-dev, *-dbg
+  image_linguas: 'en-us'       # Specifies the list of locales to
+                               # install into the image during the
+                               # root filesystem construction process.
+  pkg_globs: '*-src, *-dev, *-dbg' # Install complementary packages
+                                   # based upon the list of currently
+                                   # installed packages
+                                   # e.g. *-src, *-dev, *-dbg
 gpg:
-  gpg_path: /tmp/.cbas_gnupg
+  gpg_path: /tmp/.cbas_gnupg   # Specify gpg homedir, dir length is no
+                               # more than 80 chars, make sure the
+                               # permission on dir
   ostree:
     gpg_password: windriver
     gpgid: Wind-River-Linux-Sample
-    gpgkey: $OECORE_NATIVE_SYSROOT/usr/share/create_full_image/rpm_keys/RPM-GPG-PRIVKEY-Wind-River-Linux-Sample
-machine: intel-x86-64
-name: wrlinux-image-small  # Image name
+    gpgkey: $OECORE_NATIVE_SYSROOT/usr/share/genimage/rpm_keys/RPM-GPG-PRIVKEY-Wind-River-Linux-Sample
 image_type:
 - ostree-repo # deploy/ostree_repo
 - wic         # deploy/wrlinux-image-small-intel-x86-64.wic
 - container   # deploy/wrlinux-image-small-intel-x86-64.tar.bz2
+- vmdk        # deploy/wrlinux-image-small-intel-x86-64.wic.vmdk
+- vdi         # deploy/wrlinux-image-small-intel-x86-64.wic.vdi
 - ustart      # deploy/wrlinux-image-small-intel-x86-64.ustart.img.gz
+machine: intel-x86-64
+name: wrlinux-image-small  # Image name
 ostree:
+  OSTREE_CONSOLE: console=ttyS0,115200 console=tty1
+  OSTREE_FDISK_BLM: '2506'
+  OSTREE_FDISK_BSZ: '200'
+  OSTREE_FDISK_FSZ: '32'
+  OSTREE_FDISK_RSZ: '4096'
+  OSTREE_FDISK_VSZ: '0'
+  OSTREE_GRUB_PW_FILE: $OECORE_NATIVE_SYSROOT/usr/share/bootfs/boot_keys/ostree_grub_pw
+  OSTREE_GRUB_USER: root
   ostree_osname: wrlinux
-  ostree_remote_url: http://XXXX/WRLinux-CD-Images/intel-x86-64/repos/ostree_repo
+  ostree_remote_url: http://XXXX/cbas/WRLinux-CD-Images/intel-x86-64/repos/ostree_repo
   ostree_skip_boot_diff: '2'
-  ostree_use_ab: '1'
+  ostree_use_ab: '0'
 package_feeds:
-- http://XXXX/WRLinux-CD-Images/intel-x86-64/repos/rpm/corei7_64
-- http://XXXX/WRLinux-CD-Images/intel-x86-64/repos/rpm/intel_x86_64
-- http://XXXX/WRLinux-CD-Images/intel-x86-64/repos/rpm/noarch
+- http://XXXX/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm/intel_x86_64
+- http://XXXX/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm/intel_x86_64
+- http://XXXX/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm/noarch
 packages: # A list of packages to be installed on target image
 - pkg1
 - pkg2
+remote_pkgdatadir: http://XXXX/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm
 wic: # Set partition size of wic image
   OSTREE_FLUX_PART: fluxdata
   OSTREE_WKS_BOOT_SIZE: '--size=256M' # Allocate 256MB to /boot
-  OSTREE_WKS_EFI_SIZE: --size=32M # Allocate 32MB to /boot/efi, only works on intel-x86-64
+  OSTREE_WKS_EFI_SIZE: --size=32M # Allocate 32MB to /boot/efi,
+                                  # only works on intel-x86-64
   OSTREE_WKS_FLUX_SIZE: '' # Allocate size to /var
   OSTREE_WKS_ROOT_SIZE: '' # Allocate size to rootfs
 [input yaml sample on intel-86-64 end]
