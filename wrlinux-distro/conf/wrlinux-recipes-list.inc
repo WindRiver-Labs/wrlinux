@@ -23,7 +23,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     apr-util \
     apt \
     argp-standalone \
-    arm-trusted-firmware \
     asciidoc \
     aspell \
     assimp \
@@ -45,7 +44,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     babeltrace2 \
     base-files \
     base-passwd \
-    base-pdi \
     bash \
     bash-completion \
     bazel \
@@ -56,7 +54,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     bind \
     binutils \
     bison \
-    bitstream-microblaze \
     blktool \
     blktrace \
     blueman \
@@ -141,7 +138,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     coreutils \
     corosync \
     cpio \
-    cpuburn-arm \
     cpupower \
     cracklib \
     crash \
@@ -186,7 +182,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     dejagnu \
     depmodwrapper-cross \
     desktop-file-utils \
-    device-tree \
     dhcp \
     dialog \
     diffoscope \
@@ -236,7 +231,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     exo \
     expat \
     expect \
-    extract-cdo \
     f2fs-tools \
     fbset \
     fbset-modes \
@@ -252,13 +246,10 @@ WRLINUX_SUPPORTED_RECIPES = " \
     font-util \
     fontconfig \
     formfactor \
-    fpga-manager-util \
     freediameter \
     freeradius \
     freetype \
     fribidi \
-    fs-boot \
-    fsbl \
     fuse \
     garcon \
     gawk \
@@ -293,7 +284,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     glide \
     glog \
     glusterfs \
-    gma500-gfx-check \
     gmp \
     gnome-common \
     gnome-desktop-testing \
@@ -433,9 +423,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     kernel-devsrc \
     kernel-initramfs \
     kernel-initramfs-image \
-    kernel-module-hdmi \
-    kernel-module-mali \
-    kernel-module-vcu \
     kexec-tools \
     key-store \
     keybinder \
@@ -495,7 +482,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     libestr \
     libevdev \
     libevent \
-    libexecinfo \
     libexif \
     libfakekey \
     libfastjson \
@@ -536,7 +522,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     liblockfile \
     liblogging \
     libmailtools-perl \
-    libmali-xlnx \
     libmatchbox \
     libmcrypt \
     libmhash \
@@ -568,13 +553,11 @@ WRLINUX_SUPPORTED_RECIPES = " \
     libnss-nis \
     libogg \
     libomxil \
-    libomxil-xlnx \
     libpam \
     libpcap \
     libpciaccess \
     libpcre \
     libpcre2 \
-    libpfm4 \
     libpipeline \
     libpng \
     libproc-waitstat-perl \
@@ -632,7 +615,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     libva \
     libva-initial \
     libva-utils \
-    libvcu-xlnx \
     libvirt \
     libvmi \
     libvorbis \
@@ -692,9 +674,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     lighttpd \
     linux-dummy \
     linux-firmware \
-    linux-intel \
-    linux-intel-dev \
-    linux-intel-rt \
     linux-libc-headers \
     linux-yocto \
     linux-yocto-dev \
@@ -799,7 +778,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     nasm \
     ncurses \
     ndctl \
-    ne10 \
     neard \
     net-snmp \
     net-tools \
@@ -840,9 +818,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     open-isns \
     open-model-zoo \
     open-vm-tools \
-    openamp-fw-echo-testd \
-    openamp-fw-mat-muld \
-    openamp-fw-rpc-demo \
     opencv \
     openhpi \
     openipmi \
@@ -977,13 +952,10 @@ WRLINUX_SUPPORTED_RECIPES = " \
     pixman \
     pkgconf \
     pkgconfig \
-    platform-init \
-    plm \
     pm-graph \
     pm-utils \
     pmdk \
     pmtools \
-    pmu-firmware \
     pointercal-xinput \
     policycoreutils \
     polkit \
@@ -997,13 +969,11 @@ WRLINUX_SUPPORTED_RECIPES = " \
     ppp \
     ppp-dialin \
     pps-tools \
-    prefsbl \
     prelink \
     procps \
     protobuf \
     protobuf-c \
     pseudo \
-    psm-firmware \
     psmisc \
     psplash \
     ptest-runner \
@@ -1185,8 +1155,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     python3-wrapt \
     python3-zipp \
     python3-zopeinterface \
-    qat16 \
-    qat17 \
     qemu \
     qemuwrapper-cross \
     qt3d \
@@ -1373,12 +1341,9 @@ WRLINUX_SUPPORTED_RECIPES = " \
     turbostat \
     tzdata \
     u-boot \
-    u-boot-imx \
     u-boot-s32 \
     u-boot-tools \
     u-boot-uenv \
-    u-boot-zynq-scr \
-    u-boot-zynq-uenv \
     ucarp \
     udev-extraconf \
     udisks2 \
@@ -1406,7 +1371,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     valgrind \
     vblade \
     vboxguestdrivers \
-    vcu-firmware \
     vdso-test \
     vim \
     vim-tiny \
@@ -1537,7 +1501,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     xfsprogs \
     xfwm4 \
     xhost \
-    xilinx-mcs \
     xinetd \
     xinit \
     xinput \
@@ -1562,7 +1525,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     xtrans \
     xuser-account \
     xvinfo \
-    xvisor \
     xwininfo \
     xz \
     yaffs2-utils \
@@ -1984,6 +1946,7 @@ WRLINUX_ALL_RECIPES = " \
     eject \
     elfutils \
     ell \
+    emacs \
     emlog \
     enca \
     enchant2 \
@@ -3942,6 +3905,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-argh \
     python3-arpeggio \
     python3-arrow \
+    python3-asciitree \
     python3-asn1crypto \
     python3-astor \
     python3-astroid \
@@ -3993,6 +3957,8 @@ WRLINUX_ALL_RECIPES = " \
     python3-cheroot \
     python3-cherrypy \
     python3-click \
+    python3-click-repl \
+    python3-click-spinner \
     python3-cliff \
     python3-cmd2 \
     python3-colorama \
@@ -4012,6 +3978,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-cryptography-vectors \
     python3-cson \
     python3-cssselect \
+    python3-custom-inherit \
     python3-cycler \
     python3-cython \
     python3-dasbus \
@@ -4113,6 +4080,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-googleapis-common-protos \
     python3-graphviz \
     python3-greenlet \
+    python3-greenstalk \
     python3-grpc-google-iam-v1 \
     python3-grpcio \
     python3-grpcio-tools \
@@ -4228,6 +4196,8 @@ WRLINUX_ALL_RECIPES = " \
     python3-networkx \
     python3-newrelic \
     python3-nmap \
+    python3-nocasedict \
+    python3-nocaselist \
     python3-nose \
     python3-nose-exclude \
     python3-ntplib \
@@ -4332,6 +4302,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-pycryptodomex \
     python3-pycurl \
     python3-pydbus \
+    python3-pydicti \
     python3-pydocumentdb \
     python3-pyelftools \
     python3-pyephem \
@@ -4389,6 +4360,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-pyudev \
     python3-pyusb \
     python3-pywbem \
+    python3-pywbemtools \
     python3-pyyaml \
     python3-pyzmq \
     python3-qrcode \
@@ -4575,6 +4547,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-xstatic-term.js \
     python3-xstatic-tv4 \
     python3-xxhash \
+    python3-yamlloader \
     python3-yappi \
     python3-yarl \
     python3-zake \
@@ -4998,7 +4971,6 @@ WRLINUX_ALL_RECIPES = " \
     tzinfo \
     tzinfo-data \
     u-boot \
-    u-boot-imx \
     u-boot-s32 \
     u-boot-tools \
     u-boot-uenv \
