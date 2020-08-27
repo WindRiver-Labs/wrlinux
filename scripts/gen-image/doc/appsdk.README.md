@@ -101,6 +101,49 @@ optional arguments:
   --no-clean            Do not cleanup generated rootfs in workdir
 
 $ appsdk genimage input.yaml
+appsdk - INFO: Deploy Directory: path-to-outdir/deploy
++---------------------+--------------------------------------------------------+
+|        Type         |                          Name                          |
++=====================+========================================================+
+| Yaml File Sample    | yaml_example/package_management.yaml                   |
+|                     | yaml_example/vboxguestdrivers.yaml                     |
+|                     | yaml_example/xfce_desktop.yaml                         |
++---------------------+--------------------------------------------------------+
+| Image Yaml File     | wrlinux-image-small-bcm-2xxx-rpi4.yaml                 |
++---------------------+--------------------------------------------------------+
+| Ostree Repo         | ostree_repo                                            |
++---------------------+--------------------------------------------------------+
+| WIC Image           | wrlinux-image-small-bcm-2xxx-rpi4.wic -> wrlinux-      |
+|                     | image-small-bcm-2xxx-rpi4-20200827102509.rootfs.wic    |
++---------------------+--------------------------------------------------------+
+| WIC Image Doc       | wrlinux-image-small-bcm-2xxx-rpi4.wic.README.md        |
++---------------------+--------------------------------------------------------+
+| WIC Image           | wrlinux-image-small-bcm-2xxx-rpi4.qemuboot.conf ->     |
+| Qemu Conf           | wrlinux-image-small-bcm-2xxx-                          |
+|                     | rpi4-20200827102509.qemuboot.conf                      |
++---------------------+--------------------------------------------------------+
+| VDI Image           | wrlinux-image-small-bcm-2xxx-rpi4.wic.vdi -> wrlinux-  |
+|                     | image-small-bcm-2xxx-                                  |
+|                     | rpi4-20200827102509.rootfs.wic.vdi                     |
++---------------------+--------------------------------------------------------+
+| VMDK Image          | wrlinux-image-small-bcm-2xxx-rpi4.wic.vmdk -> wrlinux- |
+|                     | image-small-bcm-2xxx-                                  |
+|                     | rpi4-20200827102509.rootfs.wic.vmdk                    |
++---------------------+--------------------------------------------------------+
+| Ustart Image        | wrlinux-image-small-bcm-2xxx-rpi4.ustart.img.gz ->     |
+|                     | wrlinux-image-small-bcm-2xxx-                          |
+|                     | rpi4-20200827102509.ustart.img.gz                      |
++---------------------+--------------------------------------------------------+
+| Ustart Image Doc    | wrlinux-image-small-bcm-2xxx-                          |
+|                     | rpi4.ustart.img.gz.README.md                           |
++---------------------+--------------------------------------------------------+
+| Container Image     | wrlinux-image-small-bcm-2xxx-rpi4.container.tar.bz2 -> |
+|                     | wrlinux-image-small-bcm-2xxx-                          |
+|                     | rpi4-20200827102509.container.rootfs.tar.bz2           |
++---------------------+--------------------------------------------------------+
+| Container Image Doc | wrlinux-image-small-bcm-2xxx-                          |
+|                     | rpi4.container.tar.bz2.README.md                       |
++---------------------+--------------------------------------------------------+
 
 It supports multiple input yaml files, which collects packages
 from multiple input yaml files as many as possible, but for other
