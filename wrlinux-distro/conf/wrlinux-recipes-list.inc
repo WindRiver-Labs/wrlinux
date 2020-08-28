@@ -677,6 +677,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     linux-libc-headers \
     linux-yocto \
     linux-yocto-dev \
+    linux-yocto-rt \
     lksctp-tools \
     llvm \
     llvm-project-source-11.0.0 \
@@ -1155,6 +1156,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     python3-wrapt \
     python3-zipp \
     python3-zopeinterface \
+    qat17 \
     qemu \
     qemuwrapper-cross \
     qt3d \
