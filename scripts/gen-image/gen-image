@@ -268,6 +268,8 @@ KERNEL_FEATURES_append += "features/nfsd/nfsd-enable.scc"
 KERNEL_MODULE_AUTOLOAD += "nfsd"
 
 SDKMACHINE = "x86_64"
+
+VIRTUAL-RUNTIME_graphical_init_manager = "lxdm"
 """ % (self.machine, self.feed_path_prefix, ' '.join(feed_arch))
 
         with open(self.local_conf, 'a') as f:
