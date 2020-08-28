@@ -47,28 +47,28 @@ recommended after login to the image.
 
 ### On Board
 Under Linux, insert a micro SD card to a USB SD Card Reader.
-Assuming the USB SD Card Reader takes device /dev/sdf, use dd
+Assuming the USB SD Card Reader takes device /dev/sdX, use dd
 to copy the image to it. Before the image can be burned onto
 a micro SD card, it should be un-mounted. Some Linux distros
 may automatically mount when it is plugged in. Using device
-/dev/sdf as an example, find all mounted partitions:
+/dev/sdX as an example, find all mounted partitions:
 
     $ mount | grep sdf
 
 and un-mount those that are mounted, for example:
 
-    $ umount /dev/sdf1
-    $ umount /dev/sdf2
+    $ umount /dev/sdX1
+    $ umount /dev/sdX2
 
 Now burn the image onto the micro SD card:
     For full image
-    $ zcat wrlinux-image-full-bcm-2xxx-rpi4.ustart.img.gz | sudo dd of=/dev/sdf bs=1M status=progress
+    $ zcat wrlinux-image-full-bcm-2xxx-rpi4.ustart.img.gz | sudo dd of=/dev/sdX bs=1M status=progress
 
     Or minimal image
-    $ zcat wrlinux-image-minimal-bcm-2xxx-rpi4.ustart.img.gz | sudo dd of=/dev/sdf bs=1M status=progress
+    $ zcat wrlinux-image-minimal-bcm-2xxx-rpi4.ustart.img.gz | sudo dd of=/dev/sdX bs=1M status=progress
 
     $ sync
-    $ eject /dev/sdf
+    $ eject /dev/sdX
 
 This should give you a bootable micro SD card device. Insert the
 SD card into SD slot on Raspberrypi 4b board, and then power on.

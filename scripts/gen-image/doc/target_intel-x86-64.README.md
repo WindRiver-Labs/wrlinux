@@ -47,27 +47,27 @@ recommended after login to the image.
 
 ### On Board
 Under Linux, insert a USB flash drive.  Assuming the USB flash drive
-takes device /dev/sdf, use dd to copy the image to it.  Before the image
+takes device /dev/sdX, use dd to copy the image to it.  Before the image
 can be burned onto a USB drive, it should be un-mounted. Some Linux distros
 may automatically mount a USB drive when it is plugged in. Using USB device
-/dev/sdf as an example, find all mounted partitions:
+/dev/sdX as an example, find all mounted partitions:
 
     $ mount | grep sdf
 
 and un-mount those that are mounted, for example:
 
-    $ umount /dev/sdf1
-    $ umount /dev/sdf2
+    $ umount /dev/sdX1
+    $ umount /dev/sdX2
 
 Now burn the image onto the USB drive:
     For full image
-    $ zcat image-full-intel-x86-64.ustart.img.gz | sudo dd of=/dev/sdf bs=1M status=progress
+    $ zcat image-full-intel-x86-64.ustart.img.gz | sudo dd of=/dev/sdX bs=1M status=progress
 
     Or minimal image
-    $ zcat wrlinux-image-minimal-intel-x86-64.ustart.img.gz | sudo dd of=/dev/sdf bs=1M status=progress
+    $ zcat wrlinux-image-minimal-intel-x86-64.ustart.img.gz | sudo dd of=/dev/sdX bs=1M status=progress
 
     $ sync
-    $ eject /dev/sdf
+    $ eject /dev/sdX
 
 This should give you a bootable USB flash device.  Insert the device
 into a bootable USB socket on the target, and power on.  This should
