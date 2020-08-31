@@ -483,6 +483,8 @@ IMAGE_ENABLE_CONTAINER = "1"
         feed_archs = self.feed_archs_dict[self.machine]
         existed_archs = os.listdir(rpm_dir)
         for e in existed_archs:
+            if e.startswith('.pkgdata.tar.bz2'):
+                continue
             if not e in feed_archs:
                 e_path = os.path.join(rpm_dir, e)
                 logger.info('Removing unneeded data: %s' % e_path)
