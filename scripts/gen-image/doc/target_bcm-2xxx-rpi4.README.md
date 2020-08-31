@@ -122,6 +122,10 @@ Add pre-built qemu bootloader qemu-u-boot-bcm-2xxx-rpi4.bin
 Disable graphical output and redirect serial I/Os to console
 `-nographic`
 
+#### Qemu Graphic (XFCE desktop)
+Enable graphical and redirect serial I/Os to console
+`-device virtio-gpu-pci -serial stdio`
+
 ## Install a package
 Because dnf can't upgrade kernel on the ostree image, so run the following
 command to ensure kernel is up to date and reboot, this action is only needed
