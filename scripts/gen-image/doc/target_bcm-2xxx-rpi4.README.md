@@ -86,13 +86,23 @@ Burn the image onto 8G disk image:
     For minimal image
     $ zcat wrlinux-image-minimal-bcm-2xxx-rpi4.ustart.img.gz | dd of=boot-image-qemu.hddimg conv=notrunc
 
-For qemu aarch64:
+For Qemu No Graphic:
 
     $ /usr/bin/qemu-system-aarch64 -machine virt -cpu cortex-a57 \
         -device virtio-net-device,netdev=net0 -netdev user,id=net0 \
         -m 512 \
         -bios qemu-u-boot-bcm-2xxx-rpi4.bin \
         -nographic \
+        -drive id=disk0,file=boot-image-qemu.hddimg,if=none,format=raw -device virtio-blk-device,drive=disk0
+
+Or Qemu Graphic (XFCE desktop):
+
+    $ /usr/bin/qemu-system-aarch64 -machine virt -cpu cortex-a57 \
+        -device virtio-net-device,netdev=net0 -netdev user,id=net0 \
+        -m 512 \
+        -bios qemu-u-boot-bcm-2xxx-rpi4.bin \
+        -device virtio-gpu-pci -serial stdio \
+        -device qemu-xhci -device usb-tablet -device usb-kbd \
         -drive id=disk0,file=boot-image-qemu.hddimg,if=none,format=raw -device virtio-blk-device,drive=disk0
 
 #### Qemu Simulator
@@ -125,6 +135,9 @@ Disable graphical output and redirect serial I/Os to console
 #### Qemu Graphic (XFCE desktop)
 Enable graphical and redirect serial I/Os to console
 `-device virtio-gpu-pci -serial stdio`
+
+Add Mouse and Keyboard
+`-device qemu-xhci -device usb-tablet -device usb-kbd`
 
 ## Install a package
 Because dnf can't upgrade kernel on the ostree image, so run the following
