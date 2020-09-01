@@ -28,7 +28,7 @@ clean()
     echo "Finish"
 }
 
-rpm -qa | grep libevent-testing || cutna "Need to install libevent-testing first." 
+rpm -qa | grep libevent-.*testing || cutna "Need to install libevent-testing first."
 
 cd /opt/cut/bin/libevent/ && sed -i 's/^TEST_DIR=.*/TEST_DIR=.libs/g' test.sh
 if [ $? -ne 0 ]; then
