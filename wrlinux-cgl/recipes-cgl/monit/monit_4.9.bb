@@ -35,6 +35,8 @@ EXTRA_OECONF += "\
                  --with-ssl-incl-dir=${STAGING_INCDIR} \
                  ${@bb.utils.contains('DISTRO_FEATURES', 'pam', '', '--without-pam', d)}"
 
+CFLAGS_append = " -fcommon"
+
 do_install_append() {
 	install -d ${D}${sysconfdir}/init.d/
 	install -m 755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/monit
