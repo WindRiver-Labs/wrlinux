@@ -862,7 +862,6 @@ WRLINUX_SUPPORTED_RECIPES = " \
     packagegroup-core-boot-wrs \
     packagegroup-core-buildessential \
     packagegroup-core-clutter \
-    packagegroup-core-device-devel \
     packagegroup-core-eclipse-debug \
     packagegroup-core-full-cmdline \
     packagegroup-core-nfs \
@@ -1963,6 +1962,7 @@ WRLINUX_ALL_RECIPES = " \
     essential-init \
     etcd \
     ethtool \
+    ettercap \
     eudev \
     evince \
     evolution-data-server \
@@ -2783,6 +2783,7 @@ WRLINUX_ALL_RECIPES = " \
     libupnp \
     liburcu \
     liburi-perl \
+    liburing \
     libusb-compat \
     libusb1 \
     libusbg \
@@ -3020,7 +3021,6 @@ WRLINUX_ALL_RECIPES = " \
     mime-types \
     mimic \
     mingetty \
-    mini-iconv \
     mini-x-session \
     minicom \
     minicoredumper \
@@ -3299,7 +3299,6 @@ WRLINUX_ALL_RECIPES = " \
     packagegroup-core-boot-wrs \
     packagegroup-core-buildessential \
     packagegroup-core-clutter \
-    packagegroup-core-device-devel \
     packagegroup-core-eclipse-debug \
     packagegroup-core-full-cmdline \
     packagegroup-core-nfs \
@@ -3865,16 +3864,8 @@ WRLINUX_ALL_RECIPES = " \
     python-wtforms \
     python-xlrd \
     python-xstatic \
-    python-xstatic-angular \
-    python-xstatic-angular-bootstrap \
-    python-xstatic-angular-cookies \
-    python-xstatic-angular-fileupload \
-    python-xstatic-angular-gettext \
     python-xstatic-angular-irdragndrop \
     python-xstatic-angular-schema-form \
-    python-xstatic-bootstrap-datepicker \
-    python-xstatic-bootstrap-scss \
-    python-xstatic-d3 \
     python-xstatic-font-awesome \
     python-xstatic-hogan \
     python-xstatic-jsencrypt \
@@ -4522,6 +4513,7 @@ WRLINUX_ALL_RECIPES = " \
     python3-xmltodict \
     python3-xmodem \
     python3-xstatic \
+    python3-xstatic-angular \
     python3-xstatic-angular-bootstrap \
     python3-xstatic-angular-cookies \
     python3-xstatic-angular-fileupload \
