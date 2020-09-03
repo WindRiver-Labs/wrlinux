@@ -1,18 +1,28 @@
 #
 # Copyright (C) 2020 Wind River Systems, Inc.
 #
-# Class that checks the externally downloadable 3rd party components.
+# Check and warn for the externally downloadable 3rd party components for
+# the recipes which are in Wind River Linux but not supported.
 #
 # INHERIT += "third-party-dl"
-# THIRD_PARTY_DL_IGNORED_RECIPES += "recipe1 recipe2"
+#
+# No warning for the following types:
+# - WRLINUX_SUPPORTED_RECIPE_pn-<BPN> is None: Not in WRLinux
+# - WRLINUX_SUPPORTED_RECIPE_pn-<BPN> = "1": Supported
+# - WRLINUX_SUPPORTED_RECIPE_pn-<BPN> = "2": Ignored
+#
+# Only warn for:
+# WRLINUX_SUPPORTED_RECIPE_pn-<BPN> = "0": In WRLinux, but not supported.
+
 
 require conf/wrlinux-recipes-list.inc
 
 do_fetch[prefuncs] += "third_party_dl"
 
 THIRD_PARTY_DL_CHECK ??= "1"
-THIRD_PARTY_DL_IGNORED_RECIPES ?= ""
-THIRD_PARTY_DL_MSG ?= "${PN} is not supported by Wind River. Check 'Externally downloadable 3rd party components' in EULA for more information."
+THIRD_PARTY_DL_MSG ?= "${PN} is not supported by Wind River Linux. Check 'Externally downloadable 3rd party components' in EULA for more information. You can set WRLINUX_SUPPORTED_RECIPE_pn-${BPN} = '2' to ignore the warning at your own risk"
+
+third_party_dl[vardeps] += "WRLINUX_SUPPORTED_RECIPE_pn-${@d.getVar('BPN')} WRLINUX_SUPPORTED_RECIPE_pn-${@d.getVar('PN')}"
 
 python third_party_dl() {
     tdc = d.getVar('THIRD_PARTY_DL_CHECK')
@@ -25,11 +35,19 @@ python third_party_dl() {
         return
 
     bpn = d.getVar('BPN')
-    supported_recipes = d.getVar('WRLINUX_SUPPORTED_RECIPES').split()
-    all_recipes = d.getVar('WRLINUX_ALL_RECIPES').split()
-    ignored_recipes = d.getVar('THIRD_PARTY_DL_IGNORED_RECIPES').split()
+    pn = d.getVar('PN')
+    supported = d.getVar('WRLINUX_SUPPORTED_RECIPE_pn-%s' % pn) or d.getVar('WRLINUX_SUPPORTED_RECIPE_pn-%s' % bpn)
+    supported_values = (None, 0, 1)
 
-    if not bpn in (supported_recipes + ignored_recipes) and bpn in all_recipes:
+    # No warning for the following types:
+    # - Not in WRLinux
+    # - Supported
+    # - Ignored
+    if supported in (None, '1', '2'):
+        return
+    # Only warn for the one which is in WRLinux, but not supported
+    elif supported == "0":
         bb.warn(d.getVar('THIRD_PARTY_DL_MSG'))
-        bb.warn('You can set THIRD_PARTY_DL_IGNORED_RECIPES += "%s" to ignore the warning at your own risk' % bpn)
+    else:
+        bb.warn('Unsupported vaule WRLINUX_SUPPORTED_RECIPE: %s, should be %s' % (supported, ' '.join(supported_values)))
 }
