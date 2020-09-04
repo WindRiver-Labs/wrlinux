@@ -652,6 +652,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     linux-yocto \
     linux-yocto-dev \
     linux-yocto-rt \
+    linux-yocto-tiny \
     linuxptp \
     lksctp-tools \
     llvm \
