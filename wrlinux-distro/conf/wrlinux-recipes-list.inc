@@ -558,6 +558,7 @@ WRLINUX_SUPPORTED_RECIPES = " \
     libsemanage \
     libsepol \
     libsigc++-2.0 \
+    libsign \
     libsm \
     libsndfile1 \
     libsocket6-perl \
