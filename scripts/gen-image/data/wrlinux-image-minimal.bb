@@ -13,7 +13,7 @@ CONTAINER_CORE_BOOT ?= " \
 
 TARGET_CORE_BOOT ?= " \
     packagegroup-core-boot \
-    dhcp-client \
+    dhcpcd \
     kernel-module-fuse \
     kernel-module-sch-fq-codel \
     glib-networking \

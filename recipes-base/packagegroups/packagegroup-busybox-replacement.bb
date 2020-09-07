@@ -13,8 +13,8 @@ BUSYBOX_REPLACE_PACKAGES ??= "\
     coreutils \
     cpio \
     debianutils-run-parts \
-    dhcp-client \
-    dhcp-server \
+    dhcpcd \
+    kea \
     diffutils \
     dpkg-start-stop \
     e2fsprogs \

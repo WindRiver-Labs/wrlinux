@@ -16,5 +16,5 @@ PR = "r1"
 ALLOW_EMPTY_${PN} = "1"
 
 RDEPENDS_${PN} = " \
-    dhcp-client \
+    dhcpcd \
     "

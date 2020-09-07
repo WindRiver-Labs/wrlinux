@@ -54,7 +54,7 @@ RDEPENDS_${PN} = "\
 
 # Minimal network environment
 RDEPENDS_${PN}-net = "\
-    dhcp-client \
+    dhcpcd \
     ethtool \
     net-tools \
     rfkill \
