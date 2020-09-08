@@ -15,18 +15,22 @@ $ . <dir>/environment-setup-*-wrs-linux
 
 ## Application SDK Management Tool for CBAS
 $ appsdk -h
-usage: appsdk [-h] [-d] [-q] [--log-dir LOGDIR] {gensdk,checksdk,genrpm,publishrpm,genimage} ...
+usage: appsdk [-h] [-d] [-q] [--log-dir LOGDIR] {gensdk,checksdk,genrpm,publishrpm,genimage,geninitramfs,gencontainer,genyaml,exampleyamls} ...
 
 Application SDK Management Tool for CBAS
 
 positional arguments:
-  {gensdk,checksdk,genrpm,publishrpm,genimage}
+  {gensdk,checksdk,genrpm,publishrpm,genimage,geninitramfs,gencontainer,genyaml,exampleyamls}
                         Subcommands. "appsdk <subcommand> --help" to get more info
     gensdk              Generate a new SDK
     checksdk            Sanity check for SDK
     genrpm              Build RPM package
     publishrpm          Publish RPM package
     genimage            Generate images from package feeds for specified machines
+    geninitramfs        Generate Initramfs from package feeds for specified machines
+    gencontainer        Generate Container Image from package feeds for specified machines
+    genyaml             Generate Yaml file from Input Yamls
+    exampleyamls        Deploy Example Yaml files
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -75,11 +79,64 @@ optional arguments:
   -h, --help            show this help message and exit
   -r REPO, --repo REPO  RPM repo path
 
+### Generate example Yamls
+$ appsdk exampleyamls -h
+usage: appsdk exampleyamls [-h] [-o OUTDIR]
 
-### Generate a image from package feed
+optional arguments:
+  -h, --help            show this help message and exit
+  -o OUTDIR, --outdir OUTDIR
+                        Specify output dir, default is current working directory
+
+$ appsdk exampleyamls
+appsdk - INFO: Deploy Directory: path-to-outdir/deploy/exampleyamls
++-----------+------------------------------------------+
+| Yaml Type |                   Name                   |
++===========+==========================================+
+| Image     | container-base-intel-x86-64.yaml         |
+|           | core-image-minimal-intel-x86-64.yaml     |
+|           | core-image-sato-intel-x86-64.yaml        |
+|           | initramfs-ostree-image-intel-x86-64.yaml |
+|           | wrlinux-image-small-intel-x86-64.yaml    |
+|           |                                          |
++-----------+------------------------------------------+
+| Feature   | feature/package_management.yaml          |
+|           | feature/vboxguestdrivers.yaml            |
+|           | feature/xfce_desktop.yaml                |
+|           |                                          |
++-----------+------------------------------------------+
+appsdk - INFO: Then, run genimage or genyaml with Yaml Files:
+appsdk genimage <Image>.yaml <Feature>.yaml
+Or
+appsdk genyaml <Image>.yaml <Feature>.yaml
+
+Image Yamls:
+- These image Yamls does not list all installed packages, it refers
+  PACKAGE_INSTALL from Yocto (bitbake -e <image>)
+
+- For core-image-minimal, core-image-sato, wrlinux-image-small,
+  the image type is ostree_repo and ustart, they are used by
+  `appsdk genimage' only
+
+- For conainer-base, the image type is container, it is used by
+  `appsdk gencontainer' only
+
+- For initramfs-ostree-image, the image type initramfs, it is used by
+  `appsdk geninitramfs' only
+
+Feature Yamls:
+- Attention: these feature Yamls could not random combination with
+  image Yamls, such as vboxguestdrivers.yaml and xfce_desktop.yaml
+  does not work on initramfs and container image
+
+- To follow WRLinux CD Release, wrlinux-image-small-intel-x86-64.yaml +
+  {package_management.yaml,vboxguestdrivers.yaml,xfce_desktop.yaml}
+  is verified
+
+### Generate ostree repo and wic/vmdk/vdi/ustart image from package feed
 $ appsdk genimage -h
-usage: appsdk genimage [-h] [-o OUTDIR] [-g GPGPATH] [-w WORKDIR] [-t {wic,vmdk,vdi,ostree-repo,container,ustart,all}] [-n NAME]
-                       [-u URL] [-p PKG] [--no-clean]
+usage: appsdk genimage [-h] [-o OUTDIR] [-g GPGPATH] [-w WORKDIR] [-t {wic,vmdk,vdi,ostree-repo,ustart,all}] [-n NAME] [-u URL] [-p PKG] [--pkg-external PKG_EXTERNAL]
+                       [--rootfs-post-script ROOTFS_POST_SCRIPT] [--rootfs-pre-script ROOTFS_PRE_SCRIPT] [--env ENV] [--no-clean]
                        [input [input ...]]
 
 positional arguments:
@@ -93,64 +150,160 @@ optional arguments:
                         Specify gpg homedir, it overrides 'gpg_path' in Yaml, default is /tmp/.cbas_gnupg
   -w WORKDIR, --workdir WORKDIR
                         Specify work dir, default is current working directory
-  -t {wic,vmdk,vdi,ostree-repo,container,ustart,all}, --type {wic,vmdk,vdi,ostree-repo,container,ustart,all}
-                        Specify image type, it overrides 'image_type' in Yaml, default is all
+  -t {wic,vmdk,vdi,ostree-repo,ustart,all}, --type {wic,vmdk,vdi,ostree-repo,ustart,all}
+                        Specify image type, it overrides 'image_type' in Yaml
   -n NAME, --name NAME  Specify image name, it overrides 'name' in Yaml
   -u URL, --url URL     Specify extra urls of rpm package feeds
   -p PKG, --pkg PKG     Specify extra package to be installed
+  --pkg-external PKG_EXTERNAL
+                        Specify extra external package to be installed
+  --rootfs-post-script ROOTFS_POST_SCRIPT
+                        Specify extra script to run after do_rootfs
+  --rootfs-pre-script ROOTFS_PRE_SCRIPT
+                        Specify extra script to run before do_rootfs
+  --env ENV             Specify extra environment to export before do_rootfs: --env NAME=VALUE
   --no-clean            Do not cleanup generated rootfs in workdir
 
 $ appsdk genimage input.yaml --type all
 appsdk - INFO: Deploy Directory: path-to-outdir/deploy
++------------------+-----------------------------------------------------------+
+|       Type       |                           Name                            |
++==================+===========================================================+
+| Image Yaml File  | wrlinux-image-small-intel-x86-64.yaml                     |
++------------------+-----------------------------------------------------------+
+| Ostree Repo      | ostree_repo                                               |
++------------------+-----------------------------------------------------------+
+| WIC Image        | wrlinux-image-small-intel-x86-64.wic -> wrlinux-image-    |
+|                  | small-intel-x86-64-20200908060827.rootfs.wic              |
++------------------+-----------------------------------------------------------+
+| WIC Image Doc    | wrlinux-image-small-intel-x86-64.wic.README.md            |
++------------------+-----------------------------------------------------------+
+| WIC Image        | wrlinux-image-small-intel-x86-64.qemuboot.conf ->         |
+| Qemu Conf        | wrlinux-image-small-                                      |
+|                  | intel-x86-64-20200908060827.qemuboot.conf                 |
++------------------+-----------------------------------------------------------+
+| VDI Image        | wrlinux-image-small-intel-x86-64.wic.vdi -> wrlinux-      |
+|                  | image-small-intel-x86-64-20200908060827.rootfs.wic.vdi    |
++------------------+-----------------------------------------------------------+
+| VMDK Image       | wrlinux-image-small-intel-x86-64.wic.vmdk -> wrlinux-     |
+|                  | image-small-intel-x86-64-20200908060827.rootfs.wic.vmdk   |
++------------------+-----------------------------------------------------------+
+| Ustart Image     | wrlinux-image-small-intel-x86-64.ustart.img.gz ->         |
+|                  | wrlinux-image-small-                                      |
+|                  | intel-x86-64-20200908060827.ustart.img.gz                 |
++------------------+-----------------------------------------------------------+
+| Ustart Image Doc | wrlinux-image-small-intel-x86-64.ustart.img.gz.README.md  |
++------------------+-----------------------------------------------------------+
+
+If no option --type, it generates ostree repo and ustart image by default
+
+### Generate initramfs image from package feed
+$ appsdk geninitramfs -h
+It is similar with `appsdk genimage -h', the differ is `--type initramfs'
+If image name is `initramfs-ostree-image' (by default), it will replace existed
+initrd used by the generation of wic/ustart image (appsdk genimage)
+
+$ appsdk geninitramfs
+appsdk - INFO: Deploy Directory: path-to-outdir/deploy
++-------+----------------------------------------------------------------------+
+| Image | initramfs-ostree-image-intel-x86-64.cpio.gz -> initramfs-ostree-     |
+|       | image-intel-x86-64-20200908062501.rootfs.cpio.gz                     |
++-------+----------------------------------------------------------------------+
+
+### Generate container image from package feed
+$ appsdk gencontainer -h
+It is similar with `appsdk genimage -h', the differ is `--type container'
+
+$ appsdk gencontainer
+appsdk - INFO: Deploy Directory: path-to-outdir/deploy
 +---------------------+--------------------------------------------------------+
-|        Type         |                          Name                          |
-+=====================+========================================================+
-| Yaml File Sample    | yaml_example/package_management.yaml                   |
-|                     | yaml_example/vboxguestdrivers.yaml                     |
-|                     | yaml_example/xfce_desktop.yaml                         |
+| Container Image     | container-base-intel-x86-64.container.tar.bz2 ->       |
+|                     | container-base-                                        |
+|                     | intel-x86-64-20200908062849.container.rootfs.tar.bz2   |
 +---------------------+--------------------------------------------------------+
-| Image Yaml File     | wrlinux-image-small-intel-x86-64.yaml                 |
-+---------------------+--------------------------------------------------------+
-| Ostree Repo         | ostree_repo                                            |
-+---------------------+--------------------------------------------------------+
-| WIC Image           | wrlinux-image-small-intel-x86-64.wic -> wrlinux-      |
-|                     | image-small-intel-x86-64-20200827102509.rootfs.wic    |
-+---------------------+--------------------------------------------------------+
-| WIC Image Doc       | wrlinux-image-small-intel-x86-64.wic.README.md        |
-+---------------------+--------------------------------------------------------+
-| WIC Image           | wrlinux-image-small-intel-x86-64.qemuboot.conf ->     |
-| Qemu Conf           | wrlinux-image-small-intel-x86                          |
-|                     | -64-20200827102509.qemuboot.conf                      |
-+---------------------+--------------------------------------------------------+
-| VDI Image           | wrlinux-image-small-intel-x86-64.wic.vdi -> wrlinux-  |
-|                     | image-small-intel-x86                                  |
-|                     | -64-20200827102509.rootfs.wic.vdi                     |
-+---------------------+--------------------------------------------------------+
-| VMDK Image          | wrlinux-image-small-intel-x86-64.wic.vmdk -> wrlinux- |
-|                     | image-small-intel-x86                                  |
-|                     | -64-20200827102509.rootfs.wic.vmdk                    |
-+---------------------+--------------------------------------------------------+
-| Ustart Image        | wrlinux-image-small-intel-x86-64.ustart.img.gz ->     |
-|                     | wrlinux-image-small-intel-x86                          |
-|                     | -64-20200827102509.ustart.img.gz                      |
-+---------------------+--------------------------------------------------------+
-| Ustart Image Doc    | wrlinux-image-small-intel-x86                          |
-|                     | -64.ustart.img.gz.README.md                           |
-+---------------------+--------------------------------------------------------+
-| Container Image     | wrlinux-image-small-intel-x86-64.container.tar.bz2 -> |
-|                     | wrlinux-image-small-intel-x86                          |
-|                     | -64-20200827102509.container.rootfs.tar.bz2           |
-+---------------------+--------------------------------------------------------+
-| Container Image Doc | wrlinux-image-small-intel-x86                          |
-|                     | -64.container.tar.bz2.README.md                       |
+| Container Image Doc | container-base-                                        |
+|                     | intel-x86-64.container.tar.bz2.README.md               |
 +---------------------+--------------------------------------------------------+
 
-It supports multiple input yaml files, which collects packages
-from multiple input yaml files as many as possible, but for other
-params, the duplicated is not allowed.
+### Generate/Customize Yaml file
+$ appsdk genyaml -h
+It is similar with `appsdk genimage -h', the differ is `--type {wic,vmdk,vdi,
+ostree-repo,container,initramfs,ustart,all}'
+
+$ appsdk genyaml deploy/exampleyamls/wrlinux-image-small-intel-x86-64.yaml deploy/exampleyamls/feature/xfce_desktop.yaml
+appsdk - INFO: Input YAML File: deploy/exampleyamls/wrlinux-image-small-intel-x86-64.yaml
+appsdk - INFO: Input YAML File: deploy/exampleyamls/feature/xfce_desktop.yaml
+appsdk - INFO: Save Yaml FIle to : path-to-outdir/wrlinux-image-small-intel-x86-64.yaml
+
+Customize order: Default setting < Section in Yaml < Command option
+
+- Section in Yaml overrides default setting
+  If the section in Yaml is missing, use default setting to replace
+
+- Install default packages or not
+  Use include-default-packages section in Yaml, if set 1, install default
+  packages to image; if set 0, the packages section in Yaml overrides default
+  packages. The default include-default-packages is 0.
+
+- Command option overrides section in Yaml
+  The options --gpgpath, --type, --name, override the sections in input.yaml
+
+- Command option append section in Yaml
+  The options --url, --pkg, --pkg-external, --rootfs-post-script,
+  --rootfs-pre-script, --env, append value to the sections in input.yaml.
+  If values are duplicated, only one copy is used.
+
+- Set environment variable for rootfs generation
+  For option --env and section `environments', if the same environment variable
+  is set multiple times (such as NAME=VALUE1, NAME=VALUE2), only the last set
+  (NAME=VALUE2) works
+
+- Customize rootfs by script
+  For option --rootfs-pre-script/--rootfs-post-script and section
+  rootfs-pre-scripts/rootfs-post-scripts which allows you to run a script
+  using the pseudo context to customize rootfs. The `pre' means run script
+  before rootfs generation, the `post' means run script after rootfs
+  generation. Define an environment variable IMAGE_ROOTFS for the location
+  of the rootfs install directory
+
+- Collect packages section from multiple input Yamls
+  The collection is as many as possible, but for the other sections in multiple
+  input Yamls, the duplicated is not allowed
 
 Input yaml format:
-[input yaml sample on intel-86-64 begin]
+[deploy/exampleyamls/wrlinux-image-small-intel-x86-64.yaml begin]
+name: wrlinux-image-small
+machine: intel-x86-64
+image_type:
+- ostree-repo
+- ustart
+- vdi
+- vmdk
+- wic
+package_feeds:
+- http://XXXX/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm/corei7_64
+- http://XXXX/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm/intel_x86_64
+- http://XXXX/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm/noarch
+ostree:
+  OSTREE_CONSOLE: console=ttyS0,115200 console=tty1
+  OSTREE_FDISK_BLM: '2506'
+  OSTREE_FDISK_BSZ: '200'
+  OSTREE_FDISK_FSZ: '32'
+  OSTREE_FDISK_RSZ: '4096'
+  OSTREE_FDISK_VSZ: '0'
+  OSTREE_GRUB_PW_FILE: $OECORE_NATIVE_SYSROOT/usr/share/bootfs/boot_keys/ostree_grub_pw
+  OSTREE_GRUB_USER: root
+  ostree_osname: wrlinux
+  ostree_remote_url: ''
+  ostree_skip_boot_diff: '2'
+  ostree_use_ab: '0'
+wic:
+  OSTREE_FLUX_PART: fluxdata
+  OSTREE_WKS_BOOT_SIZE: ''
+  OSTREE_WKS_EFI_SIZE: --size=32M
+  OSTREE_WKS_FLUX_SIZE: ''
+  OSTREE_WKS_ROOT_SIZE: ''
+remote_pkgdatadir: http://XXXX/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm
 features:
   image_linguas: 'en-us'       # Specifies the list of locales to
                                # install into the image during the
@@ -163,55 +316,41 @@ gpg:
   gpg_path: /tmp/.cbas_gnupg   # Specify gpg homedir, dir length is no
                                # more than 80 chars, make sure the
                                # permission on dir
+  grub:
+    BOOT_GPG_NAME: SecureBootCore
+    BOOT_GPG_PASSPHRASE: SecureCore
+    BOOT_KEYS_DIR: $OECORE_NATIVE_SYSROOT/usr/share/bootfs/boot_keys
   ostree:
     gpg_password: windriver
     gpgid: Wind-River-Linux-Sample
     gpgkey: $OECORE_NATIVE_SYSROOT/usr/share/genimage/rpm_keys/RPM-GPG-PRIVKEY-Wind-River-Linux-Sample
-image_type:
-- ostree-repo # deploy/ostree_repo
-- wic         # deploy/wrlinux-image-small-intel-x86-64.wic
-- container   # deploy/wrlinux-image-small-intel-x86-64.tar.bz2
-- vmdk        # deploy/wrlinux-image-small-intel-x86-64.wic.vmdk
-- vdi         # deploy/wrlinux-image-small-intel-x86-64.wic.vdi
-- ustart      # deploy/wrlinux-image-small-intel-x86-64.ustart.img.gz
-machine: intel-x86-64
-name: wrlinux-image-small  # Image name
-ostree:
-  OSTREE_CONSOLE: console=ttyS0,115200 console=tty1
-  OSTREE_FDISK_BLM: '2506'
-  OSTREE_FDISK_BSZ: '200'
-  OSTREE_FDISK_FSZ: '32'
-  OSTREE_FDISK_RSZ: '4096'
-  OSTREE_FDISK_VSZ: '0'
-  OSTREE_GRUB_PW_FILE: $OECORE_NATIVE_SYSROOT/usr/share/bootfs/boot_keys/ostree_grub_pw
-  OSTREE_GRUB_USER: root
-  ostree_osname: wrlinux
-  ostree_remote_url: http://XXXX/cbas/WRLinux-CD-Images/intel-x86-64/repos/ostree_repo
-  ostree_skip_boot_diff: '2'
-  ostree_use_ab: '0'
-package_feeds:
-- http://XXXX/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm/intel_x86_64
-- http://XXXX/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm/intel_x86_64
-- http://XXXX/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm/noarch
-packages: # A list of packages to be installed on target image
-- pkg1
-- pkg2
-remote_pkgdatadir: http://XXXX/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm
-wic: # Set partition size of wic image
-  OSTREE_FLUX_PART: fluxdata
-  OSTREE_WKS_BOOT_SIZE: '--size=256M' # Allocate 256MB to /boot
-  OSTREE_WKS_EFI_SIZE: --size=32M # Allocate 32MB to /boot/efi,
-                                  # only works on intel-x86-64
-  OSTREE_WKS_FLUX_SIZE: '' # Allocate size to /var
-  OSTREE_WKS_ROOT_SIZE: '' # Allocate size to rootfs
-[input yaml sample on intel-86-64 end]
-
-After first run, there is yaml example in deploy dir:
-
-$ ls deploy/yaml_example/
-package_management.yaml  vboxguestdrivers.yaml  xfce_desktop.yaml
-
-User could manipulate packages through these yaml files.
+packages:
+- ca-certificates
+- glib-networking
+- grub-efi
+- i2c-tools
+- intel-microcode
+- iucode-tool
+- kernel-modules
+- lmsensors
+- os-release
+- ostree
+- ostree-upgrade-mgr
+- packagegroup-busybox-replacement
+- packagegroup-core-boot
+- rtl8723bs-bt
+- run-postinsts
+- systemd
+external-packages: []
+include-default-packages: '0'
+rootfs-pre-scripts:
+- echo "run script before do_rootfs in $IMAGE_ROOTFS"
+rootfs-post-scripts:
+- echo "run script after do_rootfs in $IMAGE_ROOTFS"
+environments:
+- KERNEL_PARAMS="key=value"
+- NO_RECOMMENDATIONS="0"
+[deploy/exampleyamls/wrlinux-image-small-intel-x86-64.yaml end]
 
 ## Use case by simple hello-world example
 
@@ -284,7 +423,8 @@ Here's a simple example of how to use appsdk.
    5a) Modify yaml file
 
        Add 'http://HOST_IP:8888/third_party_repo/' to package_feeds section.
-       Add 'hello' to packages section.
+       Add 'hello' to external-packages section.
+       Set '1' to  include-default-packages section to install default packages
 
        e.g.
        machine: intel-x86-64
@@ -300,11 +440,13 @@ Here's a simple example of how to use appsdk.
        - http://<web-server-url>/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm/intel_x86_64/
        - http://HOST_IP:8888/third_party_repo
        packages:
-       - hello
        - base-files
        - base-passwd
        - bash
        - systemd
+       external-packages:
+       - hello
+       include-default-packages: '1'
 
     5b) appsdk genimage image-with-hello.yaml
         appsdk gensdk -f image-with-hello.yaml
