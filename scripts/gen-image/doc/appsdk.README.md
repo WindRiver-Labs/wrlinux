@@ -243,7 +243,7 @@ Customize order: Default setting < Section in Yaml < Command option
 - Install default packages or not
   Use include-default-packages section in Yaml, if set 1, install default
   packages to image; if set 0, the packages section in Yaml overrides default
-  packages. The default include-default-packages is 0.
+  packages. The default include-default-packages is 1.
 
 - Command option overrides section in Yaml
   The options --gpgpath, --type, --name, override the sections in input.yaml
@@ -424,7 +424,6 @@ Here's a simple example of how to use appsdk.
 
        Add 'http://HOST_IP:8888/third_party_repo/' to package_feeds section.
        Add 'hello' to external-packages section.
-       Set '1' to  include-default-packages section to install default packages
 
        e.g.
        machine: intel-x86-64
@@ -446,7 +445,6 @@ Here's a simple example of how to use appsdk.
        - systemd
        external-packages:
        - hello
-       include-default-packages: '1'
 
     5b) appsdk genimage image-with-hello.yaml
         appsdk gensdk -f image-with-hello.yaml
