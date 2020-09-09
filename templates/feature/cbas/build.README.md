@@ -27,14 +27,14 @@ ENDOF
 #### Create rpm repository
 $ bitbake world && bitbake package-index
 
-$ ls tmp/deploy/rpm/*/repodata/repomd.xml -1
+$ ls tmp-glibc/deploy/rpm/*/repodata/repomd.xml -1
 tmp-glibc/deploy/rpm/corei7_64/repodata/repomd.xml
 tmp-glibc/deploy/rpm/intel_x86_64/repodata/repomd.xml
 tmp-glibc/deploy/rpm/noarch/repodata/repomd.xml
 
 Or
 
-$ ls tmp/deploy/rpm/*/repodata/repomd.xml -1
+$ ls tmp-glibc/deploy/rpm/*/repodata/repomd.xml -1
 tmp-glibc/deploy/rpm/cortexa72/repodata/repomd.xml
 tmp-glibc/deploy/rpm/bcm_2xxx_rpi4/repodata/repomd.xml
 tmp-glibc/deploy/rpm/noarch/repodata/repomd.xml
