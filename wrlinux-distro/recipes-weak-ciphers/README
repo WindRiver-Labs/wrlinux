@@ -4,7 +4,7 @@ recipes-weak-ciphers
 openssl provides a lot of ciphers and some of them have been deemed to be
 weak. In recipes-weak-ciphers, openssl checks when distro feature
 'openssl-no-weak-ciphers' exists and then disable the weak ciphers which
-include 'des ec ecdh ecdsa md2 mdc2' right now.
+include 'des ecdh md2 mdc2' right now.
 
 The other bbapends in recipes-weak-ciphers are to fix build errors when weak
 ciphers in openssl are disabled.
