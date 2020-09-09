@@ -149,10 +149,20 @@ The images are locked by default, so need unlock firstly:
     $ ostree admin unlock --hotfix
 
 To install a package
-$ dnf install <package>
+    $ dnf install <package>
 
 To remove a package
-$ dnf remove <package>
+    $ dnf remove <package>
+
+### Install Graphical Desktop (XFCE) to minimal image
+Here are the steps to install XFCE on minimal image:
+    $ ostree admin unlock --hotfix
+    $ dnf install -y packagegroup-xfce-base \
+                     packagegroup-core-x11-base \
+                     gsettings-desktop-schemas \
+                     wr-themes
+    $ systemctl set-default graphical.target
+    $ reboot
 
 ## Build the images from sources
 $ mkdir wrlinux-cd
