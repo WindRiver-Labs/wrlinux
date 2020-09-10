@@ -266,9 +266,18 @@ Customize order: Default setting < Section in Yaml < Command option
   generation. Define an environment variable IMAGE_ROOTFS for the location
   of the rootfs install directory
 
-- Collect packages section from multiple input Yamls
-  The collection is as many as possible, but for the other sections in multiple
-  input Yamls, the duplicated is not allowed
+
+- Collect the following sections from multiple Yamls, the duplication
+  is allowed:
+
+  - packages
+  - external-packages
+  - environments
+  - rootfs-pre-scripts
+  - rootfs-post-scripts
+
+  But duplication is not allowed for other sections such as section name,
+  machine and so on.
 
 Input yaml format:
 [exampleyamls/wrlinux-image-small-intel-x86-64.yaml begin]
