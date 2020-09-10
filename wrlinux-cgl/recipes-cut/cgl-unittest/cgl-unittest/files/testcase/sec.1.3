@@ -29,9 +29,9 @@ id -Z | awk -F: '{print $2}' | grep sysadm_r
 if [ $? -eq 0 ]; then
     load_policy && cutfail
 else
-    newrole -r sysadm_r --  -c "/usr/sbin/load_policy" && cutfail
+    newrole -r sysadm_r --  -c "/sbin/load_policy" && cutfail
 fi
 
-newrole -r secadm_r --  -c "/usr/sbin/load_policy" || cutfail
+newrole -r secadm_r --  -c "/sbin/load_policy" || cutfail
 
 cutpass
