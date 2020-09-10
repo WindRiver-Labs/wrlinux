@@ -89,7 +89,7 @@ optional arguments:
                         Specify output dir, default is current working directory
 
 $ appsdk exampleyamls
-appsdk - INFO: Deploy Directory: path-to-outdir/deploy/exampleyamls
+appsdk - INFO: Deploy Directory: path-to-outdir/exampleyamls
 +-----------+------------------------------------------+
 | Yaml Type |                   Name                   |
 +===========+==========================================+
@@ -230,9 +230,9 @@ $ appsdk genyaml -h
 It is similar with `appsdk genimage -h', the differ is `--type {wic,vmdk,vdi,
 ostree-repo,container,initramfs,ustart,all}'
 
-$ appsdk genyaml deploy/exampleyamls/wrlinux-image-small-intel-x86-64.yaml deploy/exampleyamls/feature/xfce_desktop.yaml
-appsdk - INFO: Input YAML File: deploy/exampleyamls/wrlinux-image-small-intel-x86-64.yaml
-appsdk - INFO: Input YAML File: deploy/exampleyamls/feature/xfce_desktop.yaml
+$ appsdk genyaml exampleyamls/wrlinux-image-small-intel-x86-64.yaml exampleyamls/feature/xfce_desktop.yaml
+appsdk - INFO: Input YAML File: exampleyamls/wrlinux-image-small-intel-x86-64.yaml
+appsdk - INFO: Input YAML File: exampleyamls/feature/xfce_desktop.yaml
 appsdk - INFO: Save Yaml FIle to : path-to-outdir/wrlinux-image-small-intel-x86-64.yaml
 
 Customize order: Default setting < Section in Yaml < Command option
@@ -271,7 +271,7 @@ Customize order: Default setting < Section in Yaml < Command option
   input Yamls, the duplicated is not allowed
 
 Input yaml format:
-[deploy/exampleyamls/wrlinux-image-small-intel-x86-64.yaml begin]
+[exampleyamls/wrlinux-image-small-intel-x86-64.yaml begin]
 name: wrlinux-image-small
 machine: intel-x86-64
 image_type:
@@ -350,7 +350,7 @@ rootfs-post-scripts:
 environments:
 - KERNEL_PARAMS="key=value"
 - NO_RECOMMENDATIONS="0"
-[deploy/exampleyamls/wrlinux-image-small-intel-x86-64.yaml end]
+[exampleyamls/wrlinux-image-small-intel-x86-64.yaml end]
 
 ## Use case by simple hello-world example
 
