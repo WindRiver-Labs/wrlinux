@@ -410,7 +410,7 @@ Here's a simple example of how to use appsdk.
 4. Use the RPM package on target
 
    4a) Setup RPM repo
-       echo > /etc/yum.repos.d/test.repo <<EOF
+       cat > /etc/yum.repos.d/test.repo <<EOF
        [appsdk-test-repo]
        name=appsdk test repo
        baseurl=http://HOST_IP:8888/third_party_repo/
