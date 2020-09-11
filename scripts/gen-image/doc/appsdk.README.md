@@ -417,11 +417,13 @@ Here's a simple example of how to use appsdk.
        gpgcheck=0
        EOF
 
-   4b) Install hello package
+   4b) Enter development mode, get a writable filesystem
+       ostree admin unlock --hotfix
 
+   4c) Install hello package
        dnf install hello
 
-   4c) Run hello program
+   4d) Run hello program
 
        e.g.
        root@intel-x86-64:~# hello
@@ -434,29 +436,21 @@ Here's a simple example of how to use appsdk.
        Add 'http://HOST_IP:8888/third_party_repo/' to package_feeds section.
        Add 'hello' to external-packages section.
 
-       e.g.
-       machine: intel-x86-64
-       name: custom-image
-       image_type:
-       - ostree-repo
-       - wic
-       - container
-       - ustart
+       e.g.1 Manually edit image-with-hello-intel-x86-64.yaml
+       name: image-with-hello
        package_feeds:
        - http://<web-server-url>/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm/noarch/
        - http://<web-server-url>/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm/corei7_64/
        - http://<web-server-url>/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm/intel_x86_64/
        - http://HOST_IP:8888/third_party_repo
-       packages:
-       - base-files
-       - base-passwd
-       - bash
-       - systemd
        external-packages:
        - hello
 
-    5b) appsdk genimage image-with-hello.yaml
-        appsdk gensdk -f image-with-hello.yaml
+       e.g.2 Run genyaml to generate image-with-hello-intel-x86-64.yaml
+       genyaml --url http://HOST_IP:8888/third_party_repo --pkg-external hello --name image-with-hello
+
+    5b) appsdk genimage --type all image-with-hello-intel-x86-64.yaml
+        appsdk gensdk -f image-with-hello-intel-x86-64.yaml
 
 
 Check environment-setup-*-wrs-linux for the exported variables.
