@@ -26,6 +26,7 @@ Network Install options:
  -u <url>     url to use for net install insturl=
  -d <device>  device to use for net install instdev=
  -a <args>    Additional kernel boot argument for the install
+ -k <args>    Additional kernel boot argument to installed image
 
 Image Creation Options:
  -B         Skip build of the bootfs directory and use what ever is in there
