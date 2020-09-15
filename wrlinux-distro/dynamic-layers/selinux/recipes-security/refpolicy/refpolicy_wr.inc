@@ -54,6 +54,8 @@ SRC_URI += "\
         file://0045-policy-modules-system-udev-set-label-of-udevadm-to-u.patch \
         file://0046-policy-modules-system-systemd-allow-systemd_resolved.patch \
         file://0047-policy-modules-system-modutils-allow-mod_t-to-access.patch \
+        file://0048-policy-modules-system-sysnet-allow-dhcpc_t-to-create.patch \
+        file://0049-policy-modules-system-systemd-allow-systemd_resolved.patch \
         "
 
 OSTREE_POLICY_PATCHES = "\

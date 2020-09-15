@@ -1,0 +1,41 @@
+From 78e2b5f9972fdf00a4fc7cd553c86200dd63c2ca Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 15 Sep 2020 11:01:32 +0800
+Subject: [PATCH] policy/modules/system/systemd: allow systemd_resolved_t to
+ send and recevie messages from dhcpc over dbus
+
+Fixes:
+avc:  denied  { send_msg } for msgtype=method_call
+interface=org.freedesktop.resolve1.Manager member=RevertLink
+dest=org.freedesktop.resolve1 spid=340 tpid=345
+scontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:systemd_resolved_t:s0-s15:c0.c1023
+tclass=dbus permissive=0
+avc:  denied  { send_msg } for msgtype=method_return dest=:1.6 spid=345
+tpid=340 scontext=system_u:system_r:systemd_resolved_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023 tclass=dbus
+permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/systemd.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 4aea047b5..ec5343236 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -1122,6 +1122,8 @@ mls_file_read_to_clearance(systemd_resolved_t)
+ systemd_log_parse_environment(systemd_resolved_t)
+ systemd_read_networkd_runtime(systemd_resolved_t)
+ 
++sysnet_dbus_chat_dhcpc(systemd_resolved_t)
++
+ optional_policy(`
+ 	dbus_connect_system_bus(systemd_resolved_t)
+ 	dbus_system_bus_client(systemd_resolved_t)
+-- 
+2.17.1
+
