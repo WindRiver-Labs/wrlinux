@@ -3,8 +3,8 @@ OpenSSL No Weak Ciphers
 OpenSSL contains some weak ciphers. This template disables some of them with
 below configuration of openssl:
 
-EXTRA_OECONF_class-target +="no-des no-md2 no-ecdh no-mdc2 "
-EXTRA_OECONF_class-nativesdk +="no-md2 no-ecdh no-mdc2 "
+EXTRA_OECONF_class-target +="no-des no-md2 no-mdc2 "
+EXTRA_OECONF_class-nativesdk +="no-md2 no-mdc2 "
 
 Important notes
 ===============
