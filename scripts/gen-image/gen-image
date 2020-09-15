@@ -116,6 +116,7 @@ class GenImage(object):
             'bcm-2xxx-rpi4': ['cortexa72', 'bcm_2xxx_rpi4', 'noarch'],
         }
 
+        self.data_dir = os.path.join(os.path.dirname(sys.argv[0]), 'data')
 
         parser = argparse.ArgumentParser(
             description="Gen images for specified machine",
@@ -129,8 +130,8 @@ class GenImage(object):
             default=False,
             help='Only generate sources for IP review', action="store_true")
         parser.add_argument('-b', '--pr-database',
-            default=None,
-            help='Specify PR database to use', action="store")
+            default=os.path.join(self.data_dir, 'prserv.sqlite3'),
+            help='Specify PR database to use, no database will be used if specified no', action="store")
         parser.add_argument('-o', '--outdir',
             default=None,
             help='Specify the output dir', action="store")
@@ -163,7 +164,6 @@ class GenImage(object):
         self.image_full = 'wrlinux-image-full'
 
         self.doc_dir = os.path.join(os.path.dirname(sys.argv[0]), 'doc')
-        self.data_dir = os.path.join(os.path.dirname(sys.argv[0]), 'data')
 
         self.local_layer = os.path.join(self.project, 'layers/local')
 
@@ -208,16 +208,19 @@ class GenImage(object):
         if not os.path.exists(self.outdir):
             os.makedirs(self.outdir)
 
-        self.pr_db = os.path.join(self.builddir, 'cache/prserv.sqlite3')
+        self.cache_dir = os.path.join(self.builddir, 'cache')
+        if not os.path.exists(self.cache_dir):
+            os.makedirs(self.cache_dir)
+        self.pr_db = os.path.join(self.cache_dir, 'prserv.sqlite3')
         self.pr_log = os.path.join(self.builddir, 'cache/prserv.log')
-        if self.args.pr_database:
+        if self.args.pr_database and os.path.exists(self.args.pr_database):
             if not self.args.pr_database.endswith('.sqlite3'):
                 raise Exception('Invalid PR databse file: %s' % self.args.pr_database)
-            logger.info('Using %s as pr database' % self.pr_db)
+            logger.info('Using %s as pr database' % self.args.pr_database)
             shutil.copy(self.args.pr_database, self.pr_db)
-            pr_log = self.args.pr_database.replace('.sqlite3', '.log')
-            if os.path.exists(pr_log):
-                shutil.copy(pr_log, self.pr_log)
+        elif self.args.pr_database in ('no', 'No', 'NO') and os.path.exists(self.pr_db):
+            logger.info('Removing %s' % self.pr_db)
+            os.remove(self.pr_db)
 
         self.repos_dir = os.path.join(self.outdir, self.machine, 'repos')
 
@@ -292,7 +295,7 @@ VIRTUAL-RUNTIME_graphical_init_manager = "lxdm"
 
     def mv_to_old(self, src_name):
         src = os.path.join(self.outdir, src_name)
-        old_dir = os.path.join(self.outdir, 'old')
+        old_dir = os.path.join(self.outdir, '../old')
         dst = os.path.join(old_dir, '%s.%s' % (src_name, self.today))
         if not os.path.exists(old_dir):
             os.makedirs(old_dir)
@@ -509,7 +512,7 @@ IMAGE_ENABLE_CONTAINER = "1"
         logger.info('The local.conf is saved to %s' % local_conf_machine)
 
         # Save prserver
-        pr_dir = os.path.join(self.outdir, 'prserv')
+        pr_dir = os.path.join(self.outdir, '../prserv')
         self.mv_to_old('prserv')
         os.makedirs(pr_dir)
         shutil.copy(self.pr_db, pr_dir)
