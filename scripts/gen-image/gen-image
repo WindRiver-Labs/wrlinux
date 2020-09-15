@@ -194,19 +194,18 @@ class GenImage(object):
                 raise Exception('Failed to find %s' % self.local_conf)
 
         if self.args.product == 'lincd':
-            self.handoff = 'WRLinux-CD-Images'
+            self.handoff_name = 'WRLinux-CD-Images'
         else:
-            self.handoff = self.args.product
+            self.handoff_name = self.args.product
 
         if self.args.outdir:
-            self.outdir = self.args.outdir
+            self.outdir = self.self.args.outdir
         else:
-            self.outdir = os.path.join(self.builddir, 'outdir', self.handoff)
+            self.outdir = os.path.join(self.builddir, 'outdir')
 
-        self.mv_to_old(self.machine)
+        self.handoff_dir = os.path.join(self.builddir, 'outdir', self.handoff_name)
 
-        if not os.path.exists(self.outdir):
-            os.makedirs(self.outdir)
+        self.repos_dir = os.path.join(self.handoff_dir, self.machine, 'repos')
 
         self.cache_dir = os.path.join(self.builddir, 'cache')
         if not os.path.exists(self.cache_dir):
@@ -222,15 +221,18 @@ class GenImage(object):
             logger.info('Removing %s' % self.pr_db)
             os.remove(self.pr_db)
 
-        self.repos_dir = os.path.join(self.outdir, self.machine, 'repos')
-
     def prepare(self):
+        self.mv_to_old(self.machine)
+
+        if not os.path.exists(self.handoff_dir):
+            os.makedirs(self.handoff_dir)
+
         shutil.copyfile(self.local_conf_orig, self.local_conf)
 
         # Common config
         feed_arch = self.feed_archs_dict[self.machine]
 
-        self.feed_path_prefix = os.path.join(self.handoff, self.machine)
+        self.feed_path_prefix = os.path.join(self.handoff_name, self.machine)
         common_conf ="""
 
 ### Added by gen-image
@@ -294,8 +296,8 @@ VIRTUAL-RUNTIME_graphical_init_manager = "lxdm"
             raise Exception('PACKAGE_FEED_URIS is not defined. check README.md on how to define it')
 
     def mv_to_old(self, src_name):
-        src = os.path.join(self.outdir, src_name)
-        old_dir = os.path.join(self.outdir, '../old')
+        src = os.path.join(self.handoff_dir, src_name)
+        old_dir = os.path.join(self.outdir, 'old')
         dst = os.path.join(old_dir, '%s.%s' % (src_name, self.today))
         if not os.path.exists(old_dir):
             os.makedirs(old_dir)
@@ -326,7 +328,7 @@ VIRTUAL-RUNTIME_graphical_init_manager = "lxdm"
         # - container-full
         # - target-minimal
         # - target-full
-        dst_dir = os.path.join(self.outdir, subdir)
+        dst_dir = os.path.join(self.handoff_dir, subdir)
         dst_dir_minimal = '%s-minimal-%s' % (dst_dir, self.machine)
         dst_dir_full = '%s-full-%s' % (dst_dir, self.machine)
         dst_dir_sdk = '%s-%s' % (dst_dir, self.machine)
@@ -512,7 +514,7 @@ IMAGE_ENABLE_CONTAINER = "1"
         logger.info('The local.conf is saved to %s' % local_conf_machine)
 
         # Save prserver
-        pr_dir = os.path.join(self.outdir, '../prserv')
+        pr_dir = os.path.join(self.outdir, 'prserv')
         self.mv_to_old('prserv')
         os.makedirs(pr_dir)
         shutil.copy(self.pr_db, pr_dir)
@@ -524,7 +526,7 @@ IMAGE_ENABLE_CONTAINER = "1"
         # - sdk/*.sh
         tgts = ("container-*/*.tar.bz2", "target-*/*.img.gz", "target-*/ovmf.qcow2", "sdk/*.sh")
         sha256files = []
-        file_prefix = os.path.join(self.outdir, self.machine)
+        file_prefix = os.path.join(self.handoff_dir, self.machine)
         for tgt in tgts:
             fmt = os.path.join(file_prefix, tgt)
             for f in glob.glob(fmt):
