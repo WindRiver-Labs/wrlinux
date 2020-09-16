@@ -106,12 +106,12 @@ class GenImage(object):
     """
 
     def __init__(self):
-        supported_machines = [
+        self.supported_machines = [
             'intel-x86-64',
             'bcm-2xxx-rpi4',
         ]
 
-        self.feed_archs_dict= {
+        self.feed_archs_dict = {
             'intel-x86-64': ['corei7_64', 'intel_x86_64', 'noarch'],
             'bcm-2xxx-rpi4': ['cortexa72', 'bcm_2xxx_rpi4', 'noarch'],
         }
@@ -122,9 +122,8 @@ class GenImage(object):
             description="Gen images for specified machine",
             epilog="Use %(prog)s --help to get help")
         parser.add_argument('-m', '--machine',
-            choices=supported_machines,
-            default=None,
-            required=True,
+            choices=self.supported_machines,
+            default='',
             help='Specify machine')
         parser.add_argument('-r', '--ip-review',
             default=False,
@@ -135,6 +134,9 @@ class GenImage(object):
         parser.add_argument('-o', '--outdir',
             default=None,
             help='Specify the output dir', action="store")
+        parser.add_argument('-u', '--upload-url',
+            default=None,
+            help='Specify the url to upload the files, which uses rsync to upload the files', action="store")
         parser.add_argument('-p', '--product', choices=['lincd'], required=False,
             default='lincd',
             help='Specify the product', action="store")
@@ -167,31 +169,8 @@ class GenImage(object):
 
         self.local_layer = os.path.join(self.project, 'layers/local')
 
-        recipes_dst_dir = os.path.join(self.local_layer, 'recipes-images/images')
-        recipe_src_minimal = os.path.join(self.data_dir, '%s.bb' % self.image_minimal)
-        recipe_src_full = os.path.join(self.data_dir, '%s.bb' % self.image_full)
-        recipe_src_inc = os.path.join(self.data_dir, 'dnf-blacklist-systemd.inc')
-
-        if not os.path.exists(recipes_dst_dir):
-            logger.info('Creating %s' % recipes_dst_dir)
-            os.makedirs(recipes_dst_dir)
-
-        logger.info('Copying full and minimal recipes to %s' % recipes_dst_dir)
-        logger.info('You can remove them manually if not needed any more')
-        for i in (recipe_src_minimal, recipe_src_full, recipe_src_inc):
-            shutil.copy(i, recipes_dst_dir)
-
         self.local_conf = os.path.join(self.builddir, 'conf/local.conf')
         self.local_conf_orig = '%s.orig' % self.local_conf
-        if os.path.exists(self.local_conf_orig):
-            logger.info('Found conf/local.conf.orig, use it as local.conf')
-            shutil.copyfile(self.local_conf_orig, self.local_conf)
-        else:
-            if os.path.exists(self.local_conf):
-                logger.info('No local.conf.orig found, saving conf/local.conf to local.conf.orig')
-                shutil.copyfile(self.local_conf, self.local_conf_orig)
-            else:
-                raise Exception('Failed to find %s' % self.local_conf)
 
         if self.args.product == 'lincd':
             self.handoff_name = 'WRLinux-CD-Images'
@@ -210,8 +189,39 @@ class GenImage(object):
         self.cache_dir = os.path.join(self.builddir, 'cache')
         if not os.path.exists(self.cache_dir):
             os.makedirs(self.cache_dir)
+
         self.pr_db = os.path.join(self.cache_dir, 'prserv.sqlite3')
         self.pr_log = os.path.join(self.builddir, 'cache/prserv.log')
+        self.pr_dir = os.path.join(self.outdir, 'prserv')
+
+    def prepare(self):
+
+        if not self.machine:
+            raise Exception("Specify -m/--machine or -u/--upload, see --help for more info")
+
+        recipes_dst_dir = os.path.join(self.local_layer, 'recipes-images/images')
+        recipe_src_minimal = os.path.join(self.data_dir, '%s.bb' % self.image_minimal)
+        recipe_src_full = os.path.join(self.data_dir, '%s.bb' % self.image_full)
+        recipe_src_inc = os.path.join(self.data_dir, 'dnf-blacklist-systemd.inc')
+
+        if not os.path.exists(recipes_dst_dir):
+            logger.info('Creating %s' % recipes_dst_dir)
+            os.makedirs(recipes_dst_dir)
+
+        logger.info('Copying full and minimal recipes to %s' % recipes_dst_dir)
+        logger.info('You can remove them manually if not needed any more')
+        for i in (recipe_src_minimal, recipe_src_full, recipe_src_inc):
+            shutil.copy(i, recipes_dst_dir)
+        if os.path.exists(self.local_conf_orig):
+            logger.info('Found conf/local.conf.orig, use it as local.conf')
+            shutil.copyfile(self.local_conf_orig, self.local_conf)
+        else:
+            if os.path.exists(self.local_conf):
+                logger.info('No local.conf.orig found, saving conf/local.conf to local.conf.orig')
+                shutil.copyfile(self.local_conf, self.local_conf_orig)
+            else:
+                raise Exception('Failed to find %s' % self.local_conf)
+
         if self.args.pr_database and os.path.exists(self.args.pr_database):
             if not self.args.pr_database.endswith('.sqlite3'):
                 raise Exception('Invalid PR databse file: %s' % self.args.pr_database)
@@ -221,7 +231,6 @@ class GenImage(object):
             logger.info('Removing %s' % self.pr_db)
             os.remove(self.pr_db)
 
-    def prepare(self):
         self.mv_to_old(self.machine)
 
         if not os.path.exists(self.handoff_dir):
@@ -298,7 +307,7 @@ VIRTUAL-RUNTIME_graphical_init_manager = "lxdm"
     def mv_to_old(self, src_name):
         src = os.path.join(self.handoff_dir, src_name)
         old_dir = os.path.join(self.outdir, 'old')
-        dst = os.path.join(old_dir, '%s.%s' % (src_name, self.today))
+        dst = os.path.join(old_dir, '%s.%s' % (os.path.basename(src), self.today))
         if not os.path.exists(old_dir):
             os.makedirs(old_dir)
         if os.path.exists(src):
@@ -514,11 +523,10 @@ IMAGE_ENABLE_CONTAINER = "1"
         logger.info('The local.conf is saved to %s' % local_conf_machine)
 
         # Save prserver
-        pr_dir = os.path.join(self.outdir, 'prserv')
-        self.mv_to_old('prserv')
-        os.makedirs(pr_dir)
-        shutil.copy(self.pr_db, pr_dir)
-        shutil.copy(self.pr_log, pr_dir)
+        self.mv_to_old('../prserv')
+        os.makedirs(self.pr_dir)
+        shutil.copy(self.pr_db, self.pr_dir)
+        shutil.copy(self.pr_log, self.pr_dir)
 
         # Generate sha256 for the following files
         # - container/*.tar.bz2
@@ -572,22 +580,71 @@ COPYLEFT_LICENSE_EXCLUDE = ""
 
         src_dir = os.path.join(self.tmpdir, 'deploy/sources')
         logger.info('Deploying sources-%s' % self.machine)
-        dst_dir = os.path.join(self.outdir, 'sources-%s' % self.machine)
+        dst_dir = os.path.join(self.handoff_dir, 'sources-%s' % self.machine)
         self.mv_to_old('sources-%s' % self.machine)
         shutil.copytree(src_dir, dst_dir)
 
+    def do_upload(self):
+        logger.info('Preparing upload files...')
+        self.local_upload_dir = os.path.join(self.outdir, 'upload')
+        date = time.strftime("%Y-%m-%d")
+        self.local_upload_dir_date = os.path.join(self.local_upload_dir, date)
+        if os.path.exists(self.local_upload_dir):
+            self.mv_to_old('../upload')
+
+        os.makedirs(self.local_upload_dir)
+
+        dst_dir_container = os.path.join(self.local_upload_dir_date, 'containers')
+        if not os.path.exists(dst_dir_container):
+            os.makedirs(dst_dir_container)
+
+        for m in self.supported_machines:
+            file_prefix = os.path.join(self.handoff_dir, m)
+            if not os.path.exists(file_prefix):
+                continue
+            dst_dir_tgt = os.path.join(self.local_upload_dir_date, self.handoff_name, m)
+            if not os.path.exists(dst_dir_tgt):
+                os.makedirs(dst_dir_tgt)
+            for d in os.listdir(file_prefix):
+                d_path = os.path.join(file_prefix, d)
+                if d.endswith('.tar.bz2'):
+                    shutil.copy(d_path, dst_dir_tgt)
+                elif d == 'repos':
+                    shutil.copytree(d_path, os.path.join(dst_dir_tgt, d))
+                elif d.startswith('container-'):
+                    shutil.copytree(d_path, os.path.join(dst_dir_container, d))
+
+        # Create a symlink to latest dir
+        os.symlink(date, os.path.join(self.local_upload_dir, 'latest'))
+
+        if os.path.exists(self.pr_dir):
+            shutil.copytree(self.pr_dir, os.path.join(self.local_upload_dir_date, 'prserv'))
+
+        logger.info('Done. Files are prepared in %s' % self.local_upload_dir)
+
+        # Run rsync to remote url. Note, the slash '/' in cmd is very
+        # important, otherwise, rsync would sync upload itself, but not the
+        # files inside it.
+        cmd = 'rsync -avz %s/ %s' % (self.local_upload_dir, self.args.upload_url)
+        logger.info('Running %s' % cmd)
+        subprocess.check_call(cmd, shell=True)
+
 def main():
     gen = GenImage()
-    gen.prepare()
-    if gen.args.ip_review:
-        gen.ip_review()
+
+    if gen.args.upload_url:
+        gen.do_upload()
     else:
-        gen.gen_ostree()
-        gen.gen_container()
-        gen.gen_feeds()
-        gen.gen_sdk()
-        gen.gen_cbas()
-    gen.post()
+        gen.prepare()
+        if gen.args.ip_review:
+            gen.ip_review()
+        else:
+            gen.gen_ostree()
+            gen.gen_container()
+            gen.gen_feeds()
+            gen.gen_sdk()
+            gen.gen_cbas()
+            gen.post()
 
 if __name__ == "__main__":
     try:
