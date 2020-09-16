@@ -178,7 +178,7 @@ class GenImage(object):
             self.handoff_name = self.args.product
 
         if self.args.outdir:
-            self.outdir = self.self.args.outdir
+            self.outdir = self.args.outdir
         else:
             self.outdir = os.path.join(self.builddir, 'outdir')
 
