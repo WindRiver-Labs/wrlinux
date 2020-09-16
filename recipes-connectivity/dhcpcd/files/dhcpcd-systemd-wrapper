@@ -35,5 +35,5 @@ else
 fi
 
 if test "x$interfaces" != "x"; then
-    /usr/sbin/dhcpcd --nobackground -q -f /etc/dhcpcd.conf $interfaces
+    /usr/sbin/dhcpcd --nobackground -L -q -f /etc/dhcpcd.conf $interfaces
 fi
