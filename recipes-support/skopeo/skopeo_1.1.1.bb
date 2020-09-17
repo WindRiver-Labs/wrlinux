@@ -51,4 +51,7 @@ do_install() {
 
 INSANE_SKIP_${PN} += "ldflags"
 
+inherit features_check
+REQUIRED_DISTRO_FEATURES = "cbas"
+
 BBCLASSEXTEND = "native nativesdk"
