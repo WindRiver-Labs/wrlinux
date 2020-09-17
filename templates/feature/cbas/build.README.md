@@ -10,6 +10,7 @@ bcm-2xxx-rpi4
 ## Way 1: Step by step
 ### Setup project
 $ setup.sh --machines=[intel-x86-64|bcm-2xxx-rpi4] --dl-layers \
+    --distro=wrlinux-graphics \
     --templates feature/ostree feature/cbas --layers wr-ostree
 
 ### Source a build
