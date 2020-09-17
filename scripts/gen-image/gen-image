@@ -523,7 +523,7 @@ IMAGE_ENABLE_CONTAINER = "1"
         logger.info('The local.conf is saved to %s' % local_conf_machine)
 
         # Save prserver
-        self.mv_to_old('../prserv')
+        self.mv_to_old('prserv')
         os.makedirs(self.pr_dir)
         shutil.copy(self.pr_db, self.pr_dir)
         shutil.copy(self.pr_log, self.pr_dir)
@@ -590,7 +590,7 @@ COPYLEFT_LICENSE_EXCLUDE = ""
         date = time.strftime("%Y-%m-%d")
         self.local_upload_dir_date = os.path.join(self.local_upload_dir, date)
         if os.path.exists(self.local_upload_dir):
-            self.mv_to_old('../upload')
+            self.mv_to_old('upload')
 
         os.makedirs(self.local_upload_dir)
 
