@@ -382,6 +382,7 @@ Here's a simple example of how to use appsdk.
 2. Generate RPM package
 
    2a) Create yaml file for hello as below.
+   """
    name: hello
    version: '2.10'
    release: r0
@@ -396,6 +397,25 @@ Here's a simple example of how to use appsdk.
      #!/bin/sh
      echo "This is the post install script of hello program"
      echo "It only prints some message."
+   """
+
+   Note that user could also specify directories and files like below.
+   e.g.
+   """
+   dirs:
+   - /usr (0755, root, root)
+   - /usr/local (0755, root, root)
+   - /usr/local/bin (0755, root, root)
+
+   files:
+   - /usr/local/bin/hello (0755, root, root)
+   """
+   The path is a must, the permission and owner part is optional.
+   For example, we could just use '- /usr' instead of the full
+   '- /usr (0755, root, root)'.
+
+   By default, genrpm packages all files, but user could use 'dirs' and 'files'
+   to select the directories and files they want to package.
 
    2b) appsdk genrpm -f hello.yaml -i /path/to/install-hello
 
