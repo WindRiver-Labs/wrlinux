@@ -1,0 +1,105 @@
+From 4847ad27e066657ba3c9568023af6b7fb342c388 Mon Sep 17 00:00:00 2001
+From: Haiqing Bai <Haiqing.Bai@windriver.com>
+Date: Thu, 17 Sep 2020 09:26:52 +0000
+Subject: [PATCH] Replace all g++ to CXX for cross compiling
+
+Upstream-Status: cross compiling specific
+
+Signed-off-by: Haiqing Bai <Haiqing.Bai@windriver.com>
+---
+ daemon/client/Debug/makefile  | 2 +-
+ daemon/client/Debug/subdir.mk | 2 +-
+ daemon/daemon/Debug/makefile  | 4 ++--
+ daemon/daemon/Debug/subdir.mk | 2 +-
+ daemon/daemon/test/Makefile   | 7 +++----
+ 5 files changed, 8 insertions(+), 9 deletions(-)
+
+diff --git a/daemon/client/Debug/makefile b/daemon/client/Debug/makefile
+index c4537f5..c0fdff1 100644
+--- a/daemon/client/Debug/makefile
++++ b/daemon/client/Debug/makefile
+@@ -43,7 +43,7 @@ all: client
+ client: $(OBJS) $(USER_OBJS)
+ 	@echo 'Building target: $@'
+ 	@echo 'Invoking: GCC C++ Linker'
+-	g++ -o "client" $(OBJS) $(USER_OBJS) $(LIBS)
++	${CXX} $(LDFLAGS) -o "client" $(OBJS) $(USER_OBJS) $(LIBS)
+ 	@echo 'Finished building target: $@'
+ 	@echo ' '
+ 
+diff --git a/daemon/client/Debug/subdir.mk b/daemon/client/Debug/subdir.mk
+index 70765bc..8509d2d 100644
+--- a/daemon/client/Debug/subdir.mk
++++ b/daemon/client/Debug/subdir.mk
+@@ -20,7 +20,7 @@ CPP_DEPS += \
+ %.o: ../%.cpp
+ 	@echo 'Building file: $<'
+ 	@echo 'Invoking: GCC C++ Compiler'
+-	g++ -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
++	${CXX} -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+ 	@echo 'Finished building: $<'
+ 	@echo ' '
+ 
+diff --git a/daemon/daemon/Debug/makefile b/daemon/daemon/Debug/makefile
+index a2e72f3..75d8c06 100644
+--- a/daemon/daemon/Debug/makefile
++++ b/daemon/daemon/Debug/makefile
+@@ -48,7 +48,7 @@ endif
+ daemon: pre-build $(OBJS)
+ 	@echo 'Building target: $@'
+ 	@echo 'Invoking: GCC C++ Linker'
+-	g++  -o "daemon" $(OBJS) $(USER_OBJS) $(LIBS)
++	${CXX} $(LDFLAGS) -o "daemon" $(OBJS) $(USER_OBJS) $(LIBS)
+ 	@echo 'Finished building target: $@'
+ 	@echo ' '
+ 
+@@ -61,7 +61,7 @@ pre-build: $(USER_OBJS)
+ 
+ %.o: ../../../%.cpp
+ 	-@echo 'Build PCM'
+-	-g++ ${CXXFLAGS} -c $< -o $@ -std=c++11
++	-${CXX} ${CXXFLAGS} -c $< -o $@ -std=c++11
+ 	-@echo ' '
+ 
+ .PHONY: all clean dependents
+diff --git a/daemon/daemon/Debug/subdir.mk b/daemon/daemon/Debug/subdir.mk
+index cbb149d..18d0c80 100644
+--- a/daemon/daemon/Debug/subdir.mk
++++ b/daemon/daemon/Debug/subdir.mk
+@@ -22,7 +22,7 @@ CPP_DEPS += \
+ %.o: ../%.cpp
+ 	@echo 'Building file: $<'
+ 	@echo 'Invoking: GCC C++ Compiler'
+-	g++ -O0 -g3 -Wall -c -fmessage-length=0 -Wno-unknown-pragmas -std=c++11 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
++	${CXX} -O0 -g3 -Wall -c -fmessage-length=0 -Wno-unknown-pragmas -std=c++11 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+ 	@echo 'Finished building: $<'
+ 	@echo ' '
+ 
+diff --git a/daemon/daemon/test/Makefile b/daemon/daemon/test/Makefile
+index 22596a9..ea66c6d 100644
+--- a/daemon/daemon/test/Makefile
++++ b/daemon/daemon/test/Makefile
+@@ -1,4 +1,3 @@
+-CC=g++
+ CFLAGS=-c -Wall -std=c++11
+ LDFLAGS=
+ SOURCES=main.cpp
+@@ -9,11 +8,11 @@ RM=rm
+ all: $(SOURCES) $(EXECUTABLE)
+ 	
+ $(EXECUTABLE): $(OBJECTS)
+-	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
++	$(CXX) $(LDFLAGS) $(OBJECTS) -o $@
+ 
+ .cpp.o:
+-	$(CC) $(CFLAGS) $< -o $@
++	$(CXX) $(CFLAGS) $< -o $@
+ 
+ clean:
+ 	-$(RM) $(OBJECTS) $(EXECUTABLE)
+-	-@echo ' '
+\ No newline at end of file
++	-@echo ' '
+-- 
+2.23.0
+
