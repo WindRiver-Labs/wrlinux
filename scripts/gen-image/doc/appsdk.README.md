@@ -199,7 +199,7 @@ If no option --type, it generates ostree repo and ustart image by default
 
 ### Generate initramfs image from package feed
 $ appsdk geninitramfs -h
-It is similar with `appsdk genimage -h', the differ is `--type initramfs'
+It is similar with `appsdk genimage -h', the differ is no -t/--type option
 If image name is `initramfs-ostree-image' (by default), it will replace existed
 initrd used by the generation of wic/ustart image (appsdk genimage)
 
@@ -212,7 +212,8 @@ appsdk - INFO: Deploy Directory: path-to-outdir/deploy
 
 ### Generate container image from package feed
 $ appsdk gencontainer -h
-It is similar with `appsdk genimage -h', the differ is `--type container'
+It is similar with `appsdk genimage -h', the differ is no -t/--type and
+-g/--gpg-path options
 
 $ appsdk gencontainer
 appsdk - INFO: Deploy Directory: path-to-outdir/deploy
