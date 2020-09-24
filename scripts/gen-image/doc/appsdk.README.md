@@ -135,8 +135,8 @@ Feature Yamls:
 
 ### Generate ostree repo and wic/vmdk/vdi/ustart image from package feed
 $ appsdk genimage -h
-usage: appsdk genimage [-h] [-o OUTDIR] [-g GPGPATH] [-w WORKDIR] [-t {wic,vmdk,vdi,ostree-repo,ustart,all}] [-n NAME] [-u URL] [-p PKG] [--pkg-external PKG_EXTERNAL]
-                       [--rootfs-post-script ROOTFS_POST_SCRIPT] [--rootfs-pre-script ROOTFS_PRE_SCRIPT] [--env ENV] [--no-clean]
+usage: appsdk genimage [-h] [-t {wic,vmdk,vdi,ostree-repo,ustart,all}] [-o OUTDIR] [-w WORKDIR] [-n NAME] [-u URL] [-p PKG] [--pkg-external PKG_EXTERNAL]
+                       [--rootfs-post-script ROOTFS_POST_SCRIPT] [--rootfs-pre-script ROOTFS_PRE_SCRIPT] [--env ENV] [--no-clean] [--no-validate] [-g GPGPATH]
                        [input [input ...]]
 
 positional arguments:
@@ -144,14 +144,12 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  -o OUTDIR, --outdir OUTDIR
-                        Specify output dir, default is current working directory
-  -g GPGPATH, --gpgpath GPGPATH
-                        Specify gpg homedir, it overrides 'gpg_path' in Yaml, default is /tmp/.cbas_gnupg
-  -w WORKDIR, --workdir WORKDIR
-                        Specify work dir, default is current working directory
   -t {wic,vmdk,vdi,ostree-repo,ustart,all}, --type {wic,vmdk,vdi,ostree-repo,ustart,all}
                         Specify image type, it overrides 'image_type' in Yaml
+  -o OUTDIR, --outdir OUTDIR
+                        Specify output dir, default is current working directory
+  -w WORKDIR, --workdir WORKDIR
+                        Specify work dir, default is current working directory
   -n NAME, --name NAME  Specify image name, it overrides 'name' in Yaml
   -u URL, --url URL     Specify extra urls of rpm package feeds
   -p PKG, --pkg PKG     Specify extra package to be installed
@@ -163,6 +161,9 @@ optional arguments:
                         Specify extra script to run before do_rootfs
   --env ENV             Specify extra environment to export before do_rootfs: --env NAME=VALUE
   --no-clean            Do not cleanup generated rootfs in workdir
+  --no-validate         Do not validate parameters in Input yaml files
+  -g GPGPATH, --gpgpath GPGPATH
+                        Specify gpg homedir, it overrides 'gpg_path' in Yaml, default is /tmp/.cbas_gnupg
 
 $ appsdk genimage input.yaml --type all
 appsdk - INFO: Deploy Directory: path-to-outdir/deploy
