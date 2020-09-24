@@ -1,0 +1,109 @@
+From 7d83e9e2674dc758a8bdeb00ced28b671bce7d71 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 24 Sep 2020 14:05:52 +0800
+Subject: [PATCH] policy/modules/system/sysnetwork: support priviledge
+ separation for dhcpcd
+
+Fixes:
+
+avc:  denied  { sys_chroot } for  pid=332 comm="dhcpcd" capability=18
+scontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023 tclass=capability
+permissive=0
+
+avc:  denied  { setgid } for  pid=332 comm="dhcpcd" capability=6
+scontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023 tclass=capability
+permissive=0
+
+avc:  denied  { setuid } for  pid=332 comm="dhcpcd" capability=7
+scontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023 tclass=capability
+permissive=0
+
+avc:  denied  { setrlimit } for  pid=332 comm="dhcpcd"
+scontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023 tclass=process
+permissive=0
+
+avc:  denied  { create } for  pid=330 comm="dhcpcd"
+scontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023
+tclass=netlink_kobject_uevent_socket permissive=0
+
+avc:  denied  { setopt } for  pid=330 comm="dhcpcd"
+scontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023
+tclass=netlink_kobject_uevent_socket permissive=0
+
+avc:  denied  { bind } for  pid=330 comm="dhcpcd"
+scontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023
+tclass=netlink_kobject_uevent_socket permissive=0
+
+avc:  denied  { getattr } for  pid=330 comm="dhcpcd"
+scontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023
+tclass=netlink_kobject_uevent_socket permissive=0
+
+avc:  denied  { read } for  pid=330 comm="dhcpcd" name="n1" dev="tmpfs"
+ino=15616 scontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:udev_runtime_t:s0 tclass=file permissive=0
+
+avc:  denied  { open } for  pid=330 comm="dhcpcd"
+path="/run/udev/data/n1" dev="tmpfs" ino=15616
+scontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:udev_runtime_t:s0 tclass=file permissive=0
+
+avc:  denied  { getattr } for  pid=330 comm="dhcpcd"
+path="/run/udev/data/n1" dev="tmpfs" ino=15616
+scontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:udev_runtime_t:s0 tclass=file permissive=0
+
+avc:  denied  { connectto } for  pid=1600 comm="dhcpcd"
+path="/run/dhcpcd/unpriv.sock"
+scontext=root:sysadm_r:dhcpc_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023
+tclass=unix_stream_socket permissive=0
+
+avc:  denied  { kill } for  pid=314 comm="dhcpcd" capability=5
+scontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:dhcpc_t:s0-s15:c0.c1023 tclass=capability
+permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/sysnetwork.te | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/policy/modules/system/sysnetwork.te b/policy/modules/system/sysnetwork.te
+index a44366320..5cc23cd92 100644
+--- a/policy/modules/system/sysnetwork.te
++++ b/policy/modules/system/sysnetwork.te
+@@ -63,6 +63,12 @@ allow dhcpc_t self:netlink_generic_socket create_socket_perms;
+ allow dhcpc_t self:netlink_route_socket create_netlink_socket_perms;
+ allow dhcpc_t self:rawip_socket create_socket_perms;
+ 
++allow dhcpc_t self:capability { setgid setuid sys_chroot kill };
++allow dhcpc_t self:netlink_kobject_uevent_socket create_socket_perms;
++allow dhcpc_t self:process setrlimit;
++allow dhcpc_t self:unix_stream_socket connectto;
++udev_read_runtime_files(dhcpc_t)
++
+ allow dhcpc_t dhcp_etc_t:dir list_dir_perms;
+ read_lnk_files_pattern(dhcpc_t, dhcp_etc_t, dhcp_etc_t)
+ exec_files_pattern(dhcpc_t, dhcp_etc_t, dhcp_etc_t)
+@@ -78,7 +84,7 @@ create_dirs_pattern(dhcpc_t, dhcpc_runtime_t, dhcpc_runtime_t)
+ files_runtime_filetrans(dhcpc_t, dhcpc_runtime_t, { file dir })
+ 
+ # create socket file
+-allow dhcpc_t self:unix_dgram_socket sendto;
++allow dhcpc_t self:unix_dgram_socket { create_socket_perms sendto };
+ manage_sock_files_pattern(dhcpc_t, dhcpc_runtime_t, dhcpc_runtime_t)
+ 
+ # Allow read/write to /etc/resolv.conf and /etc/ntp.conf. Note that any files
+-- 
+2.17.1
+

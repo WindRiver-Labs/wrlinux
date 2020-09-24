@@ -56,6 +56,7 @@ SRC_URI += "\
         file://0047-policy-modules-system-modutils-allow-mod_t-to-access.patch \
         file://0048-policy-modules-system-sysnet-allow-dhcpc_t-to-create.patch \
         file://0049-policy-modules-system-systemd-allow-systemd_resolved.patch \
+        file://0050-policy-modules-system-sysnetwork-support-priviledge-.patch \
         "
 
 OSTREE_POLICY_PATCHES = "\
