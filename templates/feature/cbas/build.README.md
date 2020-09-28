@@ -20,8 +20,6 @@ $ . ./oe-init-build-env
 cat << ENDOF >> conf/local.conf
 PACKAGE_FEED_BASE_PATHS = "rpm"
 PACKAGE_FEED_URIS = "http://<web-server-url>/cbas"
-PACKAGE_FEED_ARCHS_intel-x86-64 = "corei7_64 intel_x86_64 noarch"
-PACKAGE_FEED_ARCHS_bcm-2xxx-rpi4 = "cortexa72 bcm_2xxx_rpi4 noarch"
 ENDOF
 
 ### Build
