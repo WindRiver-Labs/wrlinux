@@ -1,0 +1,39 @@
+From 8f833cdb4b437b7c9c85fc5b9c8a79951ab6ede0 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 8 Oct 2020 21:58:41 +0800
+Subject: [PATCH] set nativepython3 as python interpreter
+
+Upstream-Status: Inappropriate [wrlinux specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ scripts/lib/wic/plugins/imager/direct.py | 2 +-
+ scripts/wic                              | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/lib/wic/plugins/imager/direct.py b/scripts/lib/wic/plugins/imager/direct.py
+index 5ffeafcf8b..84721d9bf5 100644
+--- a/scripts/lib/wic/plugins/imager/direct.py
++++ b/scripts/lib/wic/plugins/imager/direct.py
+@@ -205,7 +205,7 @@ class DirectPlugin(ImagerPlugin):
+         # Generate .bmap
+         if self.bmap:
+             logger.debug("Generating bmap file for %s", disk_name)
+-            python = os.path.join(self.native_sysroot, 'usr/bin/python3')
++            python = os.path.join(self.native_sysroot, 'usr/bin/nativepython3')
+             bmaptool = os.path.join(self.native_sysroot, 'usr/bin/bmaptool')
+             exec_native_cmd("%s %s create %s -o %s.bmap" % \
+                             (python, bmaptool, full_path, full_path), self.native_sysroot)
+diff --git a/scripts/wic b/scripts/wic
+index 98fabda73b..d83efcbb71 100755
+--- a/scripts/wic
++++ b/scripts/wic
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python3
++#!/usr/bin/env nativepython3
+ #
+ # Copyright (c) 2013, Intel Corporation.
+ #
+-- 
+2.18.2
+
