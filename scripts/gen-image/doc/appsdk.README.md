@@ -218,18 +218,18 @@ It is similar with `appsdk genimage -h', the differ is no -t/--type and
 
 $ appsdk gencontainer
 appsdk - INFO: Deploy Directory: path-to-outdir/deploy
-+-----------------------+------------------------------------------------------+
-| Container Image       | container-base-intel-x86-64.container.tar.bz2 ->     |
-|                       | container-base-                                      |
-|                       | intel-x86-64-20200916075511.container.rootfs.tar.bz2 |
-+-----------------------+------------------------------------------------------+
-| OCI Image Tarball     | container-base-intel-x86-64.container.rootfs-oci-    |
-|                       | latest-x86-64-linux.oci-image.tar                    |
-+-----------------------+------------------------------------------------------+
-| OCI Image Extract Dir | container-base-intel-x86-64.container.rootfs-oci     |
-+-----------------------+------------------------------------------------------+
-| Container Image Doc   | container-base-intel-x86-64.container.README.md      |
-+-----------------------+------------------------------------------------------+
++------------------------+-----------------------------------------------------+
+| Docker Image           | container-base-intel-x86-64.docker-image.tar.bz2 -> |
+|                        | container-base-intel-x86-64-20201012135125.docker-  |
+|                        | image.tar.bz2                                       |
++------------------------+-----------------------------------------------------+
+| OCI Image Rootfs       | container-base-intel-x86-64.rootfs-oci              |
++------------------------+-----------------------------------------------------+
+| Container Image Doc    | container-base-intel-x86-64.container.README.md     |
++------------------------+-----------------------------------------------------+
+| Yaml file for genimage | container-base-intel-x86-64.startup-container.yaml  |
+| to load and run        |                                                     |
++------------------------+-----------------------------------------------------+
 
 ### Generate/Customize Yaml file
 $ appsdk genyaml -h
