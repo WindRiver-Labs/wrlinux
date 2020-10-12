@@ -1,0 +1,17 @@
+[Unit]
+Description=Load and Run docker image
+DefaultDependencies=no
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/load-docker-images
+ExecStartPost=/usr/libexec/run-docker-images
+ExecStartPost=/usr/libexec/auto-start-containers
+ExecStartPost=/usr/bin/systemctl --no-reload disable load-docker-images.service
+RemainAfterExit=yes
+TimeoutSec=0
+
+[Install]
+WantedBy=multi-user.target
