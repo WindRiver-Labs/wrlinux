@@ -21,28 +21,8 @@ $ setup.sh --machines=[intel-x86-64|bcm-2xxx-rpi4] --dl-layers \
 ### Source a build
 $ . ./oe-init-build-env
 
-### Create rpm repository
-$ bitbake world && bitbake package-index
-
-$ ls tmp-glibc/deploy/rpm/*/repodata/repomd.xml -1
-tmp-glibc/deploy/rpm/corei7_64/repodata/repomd.xml
-tmp-glibc/deploy/rpm/intel_x86_64/repodata/repomd.xml
-tmp-glibc/deploy/rpm/noarch/repodata/repomd.xml
-
-Or
-
-$ ls tmp-glibc/deploy/rpm/*/repodata/repomd.xml -1
-tmp-glibc/deploy/rpm/cortexa72/repodata/repomd.xml
-tmp-glibc/deploy/rpm/bcm_2xxx_rpi4/repodata/repomd.xml
-tmp-glibc/deploy/rpm/noarch/repodata/repomd.xml
-
-Above ls only list required repodata
-
-### Build appsdk-native
-$ bitbake appsdk-native
-
-### Create build sysroot
-$ bitbake build-sysroots
+### Build
+$ bitbake world appsdk-native && bitbake package-index build-sysroots
 
 ## Run appsdk
 $ tmp-glibc/sysroots/x86_64/usr/bin/appsdk -h
