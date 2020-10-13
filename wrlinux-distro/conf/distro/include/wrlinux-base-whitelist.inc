@@ -117,8 +117,3 @@ PACKAGECONFIG_remove_pn-nmap = "zenmap"
 PNWHITELIST_selinux += " \
     audit \
 "
-
-PNWHITELIST_scanners-layer += " \
-    openscap \
-    scap-security-guide \
-"
