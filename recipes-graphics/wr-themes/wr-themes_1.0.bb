@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 Wind River Systems, Inc.
+# Copyright (C) 2015 - 2020 Wind River Systems, Inc.
 #
 
 SUMMARY = "Wind River Linux Desktop Themes"
@@ -8,31 +8,45 @@ DESCRIPTION = "This not a full theme for desktop environment, only includes \
 "
 HOMEPAGE = "http://www.windriver.com"
 SECTION = "x11"
-LICENSE = "windriver"
+LICENSE = "MIT & CC-BY-ND-3.0"
 LICENSE_FLAGS = "commercial_windriver"
-LIC_FILES_CHKSUM = "file://COPYING;md5=eb3421117285c0b7ccbe9fbc5f1f37d7"
+LIC_FILES_CHKSUM = "file://CC-BY-ND-3.0;md5=009338acda935b3c3a3255af957e6c14 \
+                    file://MIT;md5=0835ade698e0bcf8506ecda2f7b4f302 \
+                   "
 
-SRC_URI = "file://wallpapers \
-           file://lxdm-theme \
-           file://COPYING \
+# Unpack directly to S.
+#
+SRC_URI = "file://wallpapers;subdir=${BP} \
+           file://lxdm-theme;subdir=${BP} \
+           file://COPYING;subdir=${BP} \
 "
-
-S = "${WORKDIR}"
 
 # We have two theme for now: gray and blue,
 # there maybe more in the future.
+#
 DEFAULT_WALLPAPER ?= "gray"
 
 inherit features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
+# Replace the default do_unpack to also unpack licenses.
+#
+python do_unpack () {
+    import shutil
+    bb.build.exec_func('base_do_unpack', d)
+    ldir = d.getVar('COMMON_LICENSE_DIR')
+    sdir = d.getVar('S')
+    shutil.copy(ldir+'/CC-BY-ND-3.0',sdir)
+    shutil.copy(ldir+'/MIT',sdir)
+}
+
 do_install() {
 	install -d ${D}${datadir}/backgrounds/Windriver/
-	install -m 0644 ${WORKDIR}/wallpapers/* ${D}/${datadir}/backgrounds/Windriver/
+	install -m 0644 ${S}/wallpapers/* ${D}/${datadir}/backgrounds/Windriver/
 
 	install -d ${D}${datadir}/lxdm/themes/Windriver/
-	install -m 0644 ${WORKDIR}/lxdm-theme/* ${D}${datadir}/lxdm/themes/Windriver/
+	install -m 0644 ${S}/lxdm-theme/* ${D}${datadir}/lxdm/themes/Windriver/
 	sed -i "s/%DEFAULT_BACKGROUND%/windriver-login-${DEFAULT_WALLPAPER}.png/" \
 		${D}${datadir}/lxdm/themes/Windriver/gtkrc
        sed -i "s/%DEFAULT_BACKGROUND%/windriver-login-${DEFAULT_WALLPAPER}.png/" \
