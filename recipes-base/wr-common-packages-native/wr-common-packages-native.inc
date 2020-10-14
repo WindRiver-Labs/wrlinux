@@ -14,8 +14,8 @@ DEPENDS = "\
     bc-native \
     binutils-native \
     bison-native \
-    bjam-native \
     bmap-tools-native \
+    boost-build-native \
     btrfs-tools-native \
     bzip2-native \
     cairo-native \
