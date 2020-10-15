@@ -35,3 +35,6 @@ do_install () {
 }
 
 FILES_${PN} += "${systemd_unitdir}/system /var/docker-images"
+
+inherit features_check
+REQUIRED_DISTRO_FEATURES = "cbas"
