@@ -607,12 +607,14 @@ COPYLEFT_LICENSE_EXCLUDE = ""
                 os.makedirs(dst_dir_tgt)
             for d in os.listdir(file_prefix):
                 d_path = os.path.join(file_prefix, d)
-                if d.endswith('.tar.bz2'):
+                if d.startswith('cbas-'):
+                    continue
+                elif d.startswith('container-'):
+                    shutil.copytree(d_path, os.path.join(dst_dir_container, d))
+                elif d.endswith('.tar.bz2'):
                     shutil.copy(d_path, dst_dir_tgt)
                 elif d == 'repos':
                     shutil.copytree(d_path, os.path.join(dst_dir_tgt, d))
-                elif d.startswith('container-'):
-                    shutil.copytree(d_path, os.path.join(dst_dir_container, d))
 
         # Create a symlink to latest dir
         os.symlink(date, os.path.join(self.local_upload_dir, 'latest'))
