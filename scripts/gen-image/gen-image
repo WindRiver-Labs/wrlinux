@@ -590,7 +590,7 @@ COPYLEFT_LICENSE_EXCLUDE = ""
         date = time.strftime("%Y-%m-%d")
         self.local_upload_dir_date = os.path.join(self.local_upload_dir, date)
         if os.path.exists(self.local_upload_dir):
-            self.mv_to_old('upload')
+            self.mv_to_old('../upload')
 
         os.makedirs(self.local_upload_dir)
 
