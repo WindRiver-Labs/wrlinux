@@ -16,7 +16,7 @@ bcm-2xxx-rpi4
 ### Setup project
 $ setup.sh --machines=[intel-x86-64|bcm-2xxx-rpi4] --dl-layers \
     --distro=wrlinux-graphics \
-    --templates feature/ostree feature/cbas --layers wr-ostree
+    --templates feature/ostree feature/cbas feature/docker --layers wr-ostree
 
 ### Source a build
 $ . ./oe-init-build-env
