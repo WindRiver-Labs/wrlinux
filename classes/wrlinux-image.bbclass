@@ -57,3 +57,9 @@ python do_image_info() {
 
 addtask image_info
 do_image_info[nostamp] = "1"
+
+python () {
+    if oe.types.boolean(d.getVar('FORCE_PASSWD_EXPIRE')):
+        for user in d.getVar('FORCE_EXPIRED_USERS').split():
+            d.appendVar('EXTRA_USERS_PARAMS', f' passwd-expire {user};')
+}
