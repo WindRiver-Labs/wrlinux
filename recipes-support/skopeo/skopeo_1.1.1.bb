@@ -40,14 +40,25 @@ do_compile() {
 }
 
 do_install() {
-	install -d ${D}/${sbindir}
+	install -d ${D}/${bindir}
 	install -d ${D}/${sysconfdir}/containers
-	install ${S}/src/${GO_IMPORT}/skopeo ${D}/${sbindir}/
+	install ${S}/src/${GO_IMPORT}/skopeo ${D}/${bindir}/
 	install ${S}/src/${GO_IMPORT}/default-policy.json ${D}/${sysconfdir}/containers/policy.json
 
 	install ${WORKDIR}/storage.conf ${D}/${sysconfdir}/containers/storage.conf
 	install ${WORKDIR}/registries.conf ${D}/${sysconfdir}/containers/registries.conf
 }
+
+do_install_append_class-native() {
+    create_cmdline_wrapper ${D}/${bindir}/skopeo \
+        --policy ${sysconfdir}/containers/policy.json
+}
+
+do_install_append_class-nativesdk() {
+    create_cmdline_wrapper ${D}/${bindir}/skopeo \
+        --policy ${sysconfdir}/containers/policy.json
+}
+
 
 INSANE_SKIP_${PN} += "ldflags"
 
