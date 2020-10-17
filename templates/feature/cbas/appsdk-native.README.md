@@ -1,9 +1,12 @@
 # Wind River Linux App SDK for CBAS - Run appsdk in build
 Compare with appsdk in SDK:
 
-- The appsdk in the build uses local pacakge feed of the same build.
-So it does not need to setup rpm repo on http server, and does not
-need to set PACKAGE_FEED_URIS, PACKAGE_FEED_URIS
+- The appsdk in the build uses local package feed of the same build.
+
+- If set PACKAGE_FEED_URIS and PACKAGE_FEED_URIS, the remote package
+feed will be saved as target yum repo. It will not be used by appsdk
+to generate image, but be used by dnf at target run time. Please make
+sure the remote package feed is available on web server
 
 - The appsdk in the build does not provide subcommand gensdk and
 checksdk
