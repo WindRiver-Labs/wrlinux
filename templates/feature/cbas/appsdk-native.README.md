@@ -22,6 +22,10 @@ $ setup.sh --machines=[intel-x86-64|bcm-2xxx-rpi4] --dl-layers \
 $ . ./oe-init-build-env
 
 ### Build
+#### Build with minimal rpms
+$ bitbake appsdk-native && bitbake package-index build-sysroots
+
+#### Build with full rpms
 $ bitbake world appsdk-native && bitbake package-index build-sysroots
 
 ## Run appsdk
