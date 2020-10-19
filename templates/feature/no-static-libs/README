@@ -1,0 +1,15 @@
+This template enables DISABLE_STATIC option, which prevents static
+libraries from being built and installed. The no-static-libs.inc 
+sets the default and additional overrides as needed.
+
+To use, add
+
+--templates feature/no-static-libs
+
+as a setup option.
+
+
+#@TYPE: Wrtemplate
+#@NAME: no-static-libs
+#@DESCRIPTION: Enable DISABLE_STATIC option via no-static-libs.inc
+
