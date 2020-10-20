@@ -275,7 +275,7 @@ INHERIT += "rm_work"
 GPG_PATH ?= "${TOPDIR}/.gnupg"
 OSTREE_USE_AB = "0"
 
-WRTEMPLATE = "feature/docker feature/kubernetes feature/ostree feature/cbas"
+WRTEMPLATE = "feature/docker feature/kubernetes feature/ostree feature/cbas feature/ntp"
 WRTEMPLATE_append_intel-x86-64 = " feature/intel-openvino"
 
 KERNEL_FEATURES_append += "features/nfsd/nfsd-enable.scc"
