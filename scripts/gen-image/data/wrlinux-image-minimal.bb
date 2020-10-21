@@ -49,8 +49,6 @@ IMAGE_INSTALL_append_bcm-2xxx-rpi4 = " ${@bb.utils.contains('OSTREE_BOOTLOADER',
 
 IMAGE_FEATURES += "package-management"
 
-require dnf-blacklist-systemd.inc
-
 inherit wrlinux-image
 inherit extrausers
 

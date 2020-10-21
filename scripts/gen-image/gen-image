@@ -202,7 +202,6 @@ class GenImage(object):
         recipes_dst_dir = os.path.join(self.local_layer, 'recipes-images/images')
         recipe_src_minimal = os.path.join(self.data_dir, '%s.bb' % self.image_minimal)
         recipe_src_full = os.path.join(self.data_dir, '%s.bb' % self.image_full)
-        recipe_src_inc = os.path.join(self.data_dir, 'dnf-blacklist-systemd.inc')
 
         if not os.path.exists(recipes_dst_dir):
             logger.info('Creating %s' % recipes_dst_dir)
@@ -210,7 +209,7 @@ class GenImage(object):
 
         logger.info('Copying full and minimal recipes to %s' % recipes_dst_dir)
         logger.info('You can remove them manually if not needed any more')
-        for i in (recipe_src_minimal, recipe_src_full, recipe_src_inc):
+        for i in (recipe_src_minimal, recipe_src_full):
             shutil.copy(i, recipes_dst_dir)
         if os.path.exists(self.local_conf_orig):
             logger.info('Found conf/local.conf.orig, use it as local.conf')

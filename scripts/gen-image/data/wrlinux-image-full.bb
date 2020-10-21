@@ -69,8 +69,6 @@ python () {
 
 IMAGE_FEATURES += "package-management"
 
-require dnf-blacklist-systemd.inc
-
 inherit wrlinux-image
 inherit extrausers
 
