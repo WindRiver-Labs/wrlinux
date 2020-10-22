@@ -1,4 +1,4 @@
-From 226ce3d104f9be48c5ec70794639dade0662d0ab Mon Sep 17 00:00:00 2001
+From 32cb9a8326b579678dec55ed571e27e682d0abd5 Mon Sep 17 00:00:00 2001
 From: Mark Asselstine <mark.asselstine@windriver.com>
 Date: Fri, 26 Feb 2016 15:45:30 +0000
 Subject: [PATCH] udev rules: add kvm rule
@@ -11,31 +11,32 @@ security since it avoids having to be root to make use of kvm.
 Signed-off-by: Vu Tran <vu.tran@windriver.com>
 Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+Update fuzzy patch.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  rules.d/99-kvm.rules | 1 +
  rules.d/meson.build  | 1 +
  2 files changed, 2 insertions(+)
- create mode 100644 rules/99-kvm.rules
+ create mode 100644 rules.d/99-kvm.rules
 
-diff --git a/rules/99-kvm.rules b/rules/99-kvm.rules
+diff --git a/rules.d/99-kvm.rules b/rules.d/99-kvm.rules
 new file mode 100644
-index 0000000..c2f7317
+index 0000000000..c2f7317aac
 --- /dev/null
 +++ b/rules.d/99-kvm.rules
 @@ -0,0 +1 @@
 +KERNEL=="kvm", GROUP="kvm", MODE="0660"
-diff --git a/rules/meson.build b/rules/meson.build
-index e253b9f..6c74b73 100644
+diff --git a/rules.d/meson.build b/rules.d/meson.build
+index b4640ab9d4..8387996d62 100644
 --- a/rules.d/meson.build
 +++ b/rules.d/meson.build
-@@ -23,6 +23,7 @@ rules = files('''
+@@ -22,6 +22,7 @@ rules = files('''
+         75-probe_mtd.rules
          78-sound-card.rules
-         80-drivers.rules
          80-net-setup-link.rules
 +        99-kvm.rules
  '''.split())
  
- install_data(rules,
--- 
-2.7.4
-
+ if conf.get('HAVE_KMOD') == 1
