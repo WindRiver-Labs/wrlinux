@@ -15,6 +15,7 @@ TARGET_IMAGE_INSTALL ?= " \
     kernel-modules \
     packagegroup-core-boot \
     packagegroup-xfce-base \
+    xfce4-screenshooter \
     lxdm \
     wr-themes \
     gsettings-desktop-schemas \
