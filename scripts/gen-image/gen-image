@@ -445,7 +445,7 @@ OSTREE_FDISK_RSZ = "4096"
             self.do_build(target=image)
 
             # Regenerate wic image to support disk resize
-            cmd = "%s/layers/wr-ostree/scripts/bootfs.sh -L -b %s -s 0 -a instdate=BUILD_DATE" % (self.project, image)
+            cmd = "%s/layers/wr-ostree/scripts/bootfs.sh -L -b %s -s 0 -a 'instdate=BUILD_DATE instw=60'" % (self.project, image)
             if self.machine == "bcm-2xxx-rpi4":
                 cmd += " -d /dev/mmcblk0,/dev/sda,/dev/vda"
             run_cmd(cmd, logger)
