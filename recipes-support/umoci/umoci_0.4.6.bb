@@ -23,4 +23,4 @@ INSANE_SKIP_${PN} += "already-stripped"
 INSANE_SKIP_${PN}-dev = "file-rdeps"
 
 inherit features_check
-REQUIRED_DISTRO_FEATURES = "cbas"
+REQUIRED_DISTRO_FEATURES = "lat"

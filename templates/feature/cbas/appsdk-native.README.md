@@ -1,4 +1,4 @@
-# Wind River Linux App SDK for CBAS - Run appsdk in build
+# Using the Wind River Linux Assembly Tool - Run appsdk from build dir
 Compare with appsdk in SDK:
 
 - The appsdk in the build uses local package feed of the same build.
@@ -19,7 +19,7 @@ bcm-2xxx-rpi4
 ### Setup project
 $ setup.sh --machines=[intel-x86-64|bcm-2xxx-rpi4] --dl-layers \
     --distro=wrlinux-graphics \
-    --templates feature/ostree feature/cbas feature/docker --layers wr-ostree
+    --templates feature/ostree feature/lat feature/docker --layers wr-ostree
 
 ### Source a build
 $ . ./oe-init-build-env

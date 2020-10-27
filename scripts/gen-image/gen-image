@@ -279,7 +279,7 @@ INHERIT += "rm_work"
 GPG_PATH ?= "${TOPDIR}/.gnupg"
 OSTREE_USE_AB = "0"
 
-WRTEMPLATE = "feature/docker feature/kubernetes feature/ostree feature/cbas feature/ntp"
+WRTEMPLATE = "feature/docker feature/kubernetes feature/ostree feature/lat feature/ntp"
 WRTEMPLATE_append_intel-x86-64 = " feature/intel-openvino"
 
 KERNEL_FEATURES_append += "features/nfsd/nfsd-enable.scc"
@@ -349,7 +349,7 @@ VIRTUAL-RUNTIME_graphical_init_manager = "lxdm"
         if self.image_minimal in ' '.join(files):
             copy_twice = True
         for f in files:
-            if subdir.endswith('/sdk') or subdir.endswith('/cbas'):
+            if subdir.endswith('/sdk') or subdir.endswith('/lat'):
                 do_copy(f, dst_dir_sdk)
             elif self.image_minimal in f:
                 do_copy(f, dst_dir_minimal)
@@ -380,11 +380,11 @@ VIRTUAL-RUNTIME_graphical_init_manager = "lxdm"
 
         self.do_deploy('%s/sdk' % self.machine, deploy_files)
 
-    def gen_cbas(self):
-        logger.info('Generating base reference container for CBAS...')
+    def gen_lat(self):
+        logger.info('Generating base reference container for Linux Assembly Tool...')
         self.do_build('container-base')
 
-        logger.info('Generating app sdk for CBAS...')
+        logger.info('Generating app sdk for Linux Assembly Tool...')
         self.do_build('container-base -cpopulate_sdk')
 
         deploy_files = self.get_deploy_files(type='tar.bz2', ovmf=False, uboot=False, images=['container-base'])
@@ -398,7 +398,7 @@ VIRTUAL-RUNTIME_graphical_init_manager = "lxdm"
             deploy_files.append(files[0])
 
         deploy_files.append(os.path.join(self.doc_dir, 'appsdk.README.md'))
-        self.do_deploy('%s/cbas' % self.machine, deploy_files)
+        self.do_deploy('%s/lat' % self.machine, deploy_files)
 
     def get_deploy_files(self, type='wic', ovmf=True, uboot=True, images=[]):
         deploy_dir = os.path.join(self.tmpdir, 'deploy/images/%s' % self.machine)
@@ -560,7 +560,7 @@ IMAGE_ENABLE_CONTAINER = "1"
 
         # Create tarballs for target minimal/full and sdk directories
         for d in os.listdir(file_prefix):
-            if ('-minimal-' in d or '-full-' in d or 'sdk-' in d or 'cbas-' in d) and not d.startswith('container-'):
+            if ('-minimal-' in d or '-full-' in d or 'sdk-' in d or 'lat-' in d) and not d.startswith('container-'):
                 cmd = 'tar --numeric-owner -cjvf %s.tar.bz2 %s' % (d, d)
                 logger.debug('Running %s' % cmd)
                 subprocess.check_output(cmd, shell=True, cwd=file_prefix)
@@ -609,7 +609,7 @@ COPYLEFT_LICENSE_EXCLUDE = ""
                 os.makedirs(dst_dir_tgt)
             for d in os.listdir(file_prefix):
                 d_path = os.path.join(file_prefix, d)
-                if d.startswith('cbas-'):
+                if d.startswith('lat-'):
                     continue
                 elif d.startswith('container-'):
                     shutil.copytree(d_path, os.path.join(dst_dir_container, d))
@@ -647,7 +647,7 @@ def main():
             gen.gen_container()
             gen.gen_feeds()
             gen.gen_sdk()
-            gen.gen_cbas()
+            gen.gen_lat()
             gen.post()
 
 if __name__ == "__main__":

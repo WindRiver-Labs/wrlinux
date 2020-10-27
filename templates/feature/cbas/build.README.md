@@ -1,17 +1,17 @@
-# Wind River Linux App SDK for CBAS - How to build
+# How to build the Wind River Linux Assembly Tool
 Provide two ways to build
-- Way 1 - Step by step for each machine;
-- Way 2 - Reuse binary distribution build by a script gen-image
+- Method 1 - Step by step for each machine;
+- Method 2 - Reuse binary distribution build by a script gen-image
 
 ## Supported machine
 intel-x86-64
 bcm-2xxx-rpi4
 
-## Way 1: Step by step
+## Method 1: Step by step
 ### Setup project
 $ setup.sh --machines=[intel-x86-64|bcm-2xxx-rpi4] --dl-layers \
     --distro=wrlinux-graphics \
-    --templates feature/ostree feature/cbas --layers wr-ostree
+    --templates feature/ostree feature/lat --layers wr-ostree
 
 ### Source a build
 $ . ./oe-init-build-env
@@ -19,7 +19,7 @@ $ . ./oe-init-build-env
 ### Set local.conf
 cat << ENDOF >> conf/local.conf
 PACKAGE_FEED_BASE_PATHS = "rpm"
-PACKAGE_FEED_URIS = "http://<web-server-url>/cbas"
+PACKAGE_FEED_URIS = "http://<web-server-url>/lat"
 ENDOF
 
 ### Build
@@ -52,27 +52,27 @@ $ ls tmp-glibc/deploy/sdk/wrlinux-graphics-*-container-base-sdk.sh
 Setup a web server (such as httpd, apache2), and create a symlink
 to deploy dir
 
-$ ln -snf path-to-build/tmp-glibc/deploy /var/www/html/cbas
+$ ln -snf path-to-build/tmp-glibc/deploy /var/www/html/lat
 
-Then http://<web-server-url>/cbas is accessible
+Then http://<web-server-url>/lat is accessible
 
 ### Base reference container
-wget http://<web-server-url>/cbas/images/intel-x86-64/container-base-intel-x86-64.tar.bz2
+wget http://<web-server-url>/lat/images/intel-x86-64/container-base-intel-x86-64.tar.bz2
 
 Or
 
-wget http://<web-server-url>/cbas/images/bcm-2xxx-rpi4/container-base-bcm-2xxx-rpi4.tar.bz2
+wget http://<web-server-url>/lat/images/bcm-2xxx-rpi4/container-base-bcm-2xxx-rpi4.tar.bz2
 
 ### App SDK
-wget http://<web-server-url>/cbas/sdk/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-intel_x86_64-container-base-sdk.sh
+wget http://<web-server-url>/lat/sdk/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-intel_x86_64-container-base-sdk.sh
 
 Or
 
-wget http://<web-server-url>/cbas/sdk/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-bcm_2xxx_rpi4-container-base-sdk.sh
+wget http://<web-server-url>/lat/sdk/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-bcm_2xxx_rpi4-container-base-sdk.sh
 
-## Way 2: Reuse binary distribution build
+## Method 2: Reuse binary distribution build
 ### Setup project
-$ setup.sh --dl-layers --templates feature/ostree feature/cbas \
+$ setup.sh --dl-layers --templates feature/ostree feature/lat \
     --layers wr-ostree
 
 ### Source a build
@@ -80,7 +80,7 @@ $ . ./oe-init-build-env
 
 ### Set local.conf
 cat << ENDOF >> conf/local.conf
-PACKAGE_FEED_URIS = "http://<web-server-url>/cbas"
+PACKAGE_FEED_URIS = "http://<web-server-url>/lat"
 ENDOF
 
 ### Build
@@ -91,23 +91,23 @@ ENDOF
 Setup a web server (such as httpd, apache2), and create a symlink
 to outdir
 
-$ ln -snf path-to-build/outdir /var/www/html/cbas
+$ ln -snf path-to-build/outdir /var/www/html/lat
 
-Then http://<web-server-url>/cbas is accessible
+Then http://<web-server-url>/lat is accessible
 
 ### Base reference container
-wget http://<web-server-url>/cbas/WRLinux-CD-Images/intel-x86-64/cbas-intel-x86-64/container-base-intel-x86-64.tar.bz2
+wget http://<web-server-url>/lat/WRLinux-CD-Images/intel-x86-64/lat-intel-x86-64/container-base-intel-x86-64.tar.bz2
 
 And
 
-wget http://<web-server-url>/cbas/WRLinux-CD-Images/bcm-2xxx-rpi4/cbas-bcm-2xxx-rpi4/container-base-bcm-2xxx-rpi4.tar.bz2
+wget http://<web-server-url>/lat/WRLinux-CD-Images/bcm-2xxx-rpi4/lat-bcm-2xxx-rpi4/container-base-bcm-2xxx-rpi4.tar.bz2
 
 ### App SDK
-wget http://<web-server-url>/cbas/WRLinux-CD-Images/intel-x86-64/cbas-intel-x86-64/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-intel_x86_64-container-base-sdk.sh
+wget http://<web-server-url>/lat/WRLinux-CD-Images/intel-x86-64/lat-intel-x86-64/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-intel_x86_64-container-base-sdk.sh
 
 And
 
-wget http://<web-server-url>/cbas/WRLinux-CD-Images/bcm-2xxx-rpi4/cbas-bcm-2xxx-rpi4/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-bcm_2xxx_rpi4-container-base-sdk.sh
+wget http://<web-server-url>/lat/WRLinux-CD-Images/bcm-2xxx-rpi4/lat-bcm-2xxx-rpi4/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-bcm_2xxx_rpi4-container-base-sdk.sh
 
 ## License
 The sdk is provided under the GPL-2.0 license.

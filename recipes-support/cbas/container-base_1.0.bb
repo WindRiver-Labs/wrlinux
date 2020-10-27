@@ -1,7 +1,7 @@
 #
 # Copyright (C) 2020 Wind River Systems, Inc.
 #
-DESCRIPTION = "Provides container base app sdk for CBAS."
+DESCRIPTION = "Provides container base app sdk for Wind River Linux Assembly Tool."
 
 LICENSE = "MIT"
 
@@ -136,7 +136,7 @@ python () {
 IMAGE_FEATURES += "package-management"
 
 inherit wrlinux-image features_check
-REQUIRED_DISTRO_FEATURES = "ostree cbas"
+REQUIRED_DISTRO_FEATURES = "ostree lat"
 
 # Make sure the existence of ostree initramfs image
 do_populate_sdk[depends] += "initramfs-ostree-image:do_image_complete"

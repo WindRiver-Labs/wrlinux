@@ -1,4 +1,4 @@
-# Wind River Linux App SDK for CBAS
+# Wind River Linux Assembly Tool appsdk information
 
 ## Supported host
 X86-64
@@ -13,11 +13,11 @@ $ ./wrlinux-*-container-base-sdk.sh -y -d <dir>
 $ cd <workdir>
 $ . <dir>/environment-setup-*-wrs-linux
 
-## Application SDK Management Tool for CBAS
+## Wind River Linux Assembly Tool appsdk usage
 $ appsdk -h
 usage: appsdk [-h] [-d] [-q] [--log-dir LOGDIR] {gensdk,checksdk,genrpm,publishrpm,genimage,geninitramfs,gencontainer,genyaml,exampleyamls} ...
 
-Application SDK Management Tool for CBAS
+Wind River Linux Assembly Tool
 
 positional arguments:
   {gensdk,checksdk,genrpm,publishrpm,genimage,geninitramfs,gencontainer,genyaml,exampleyamls}
@@ -163,7 +163,7 @@ optional arguments:
   --no-clean            Do not cleanup generated rootfs in workdir
   --no-validate         Do not validate parameters in Input yaml files
   -g GPGPATH, --gpgpath GPGPATH
-                        Specify gpg homedir, it overrides 'gpg_path' in Yaml, default is /tmp/.cbas_gnupg
+                        Specify gpg homedir, it overrides 'gpg_path' in Yaml, default is /tmp/.lat_gnupg
 
 $ appsdk genimage input.yaml --type all
 appsdk - INFO: Deploy Directory: path-to-outdir/deploy
@@ -296,9 +296,9 @@ image_type:
 - vmdk
 - wic
 package_feeds:
-- http://XXXX/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm/corei7_64
-- http://XXXX/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm/intel_x86_64
-- http://XXXX/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm/noarch
+- http://XXXX/lat/WRLinux-CD-Images/intel-x86-64/repos/rpm/corei7_64
+- http://XXXX/lat/WRLinux-CD-Images/intel-x86-64/repos/rpm/intel_x86_64
+- http://XXXX/lat/WRLinux-CD-Images/intel-x86-64/repos/rpm/noarch
 ostree:
   OSTREE_CONSOLE: console=ttyS0,115200 console=tty1
   OSTREE_FDISK_BLM: '2506'
@@ -318,7 +318,7 @@ wic:
   OSTREE_WKS_EFI_SIZE: --size=32M
   OSTREE_WKS_FLUX_SIZE: ''
   OSTREE_WKS_ROOT_SIZE: ''
-remote_pkgdatadir: http://XXXX/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm
+remote_pkgdatadir: http://XXXX/lat/WRLinux-CD-Images/intel-x86-64/repos/rpm
 features:
   image_linguas: 'en-us'       # Specifies the list of locales to
                                # install into the image during the
@@ -328,7 +328,7 @@ features:
                                    # installed packages
                                    # e.g. *-src, *-dev, *-dbg
 gpg:
-  gpg_path: /tmp/.cbas_gnupg   # Specify gpg homedir, dir length is no
+  gpg_path: /tmp/.lat_gnupg   # Specify gpg homedir, dir length is no
                                # more than 80 chars, make sure the
                                # permission on dir
   grub:
@@ -465,9 +465,9 @@ Here's a simple example of how to use appsdk.
        e.g.1 Manually edit image-with-hello-intel-x86-64.yaml
        name: image-with-hello
        package_feeds:
-       - http://<web-server-url>/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm/noarch/
-       - http://<web-server-url>/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm/corei7_64/
-       - http://<web-server-url>/cbas/WRLinux-CD-Images/intel-x86-64/repos/rpm/intel_x86_64/
+       - http://<web-server-url>/lat/WRLinux-CD-Images/intel-x86-64/repos/rpm/noarch/
+       - http://<web-server-url>/lat/WRLinux-CD-Images/intel-x86-64/repos/rpm/corei7_64/
+       - http://<web-server-url>/lat/WRLinux-CD-Images/intel-x86-64/repos/rpm/intel_x86_64/
        - http://HOST_IP:8888/third_party_repo
        external-packages:
        - hello

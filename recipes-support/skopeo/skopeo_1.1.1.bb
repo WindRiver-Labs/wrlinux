@@ -63,6 +63,6 @@ do_install_append_class-nativesdk() {
 INSANE_SKIP_${PN} += "ldflags"
 
 inherit features_check
-REQUIRED_DISTRO_FEATURES = "cbas"
+REQUIRED_DISTRO_FEATURES = "lat"
 
 BBCLASSEXTEND = "native nativesdk"
