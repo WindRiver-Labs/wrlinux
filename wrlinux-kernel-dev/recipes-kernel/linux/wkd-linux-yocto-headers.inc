@@ -23,28 +23,24 @@ do_install_append() {
 			# remove export artifacts
 			find ${D}${KERNEL_ALT_HEADER_DIR} -name .install -exec rm {} \;
 			find ${D}${KERNEL_ALT_HEADER_DIR} -name ..install.cmd -exec rm {} \;
+
+			for f in ${KERNEL_INSTALL_HEADER}; do
+				src_file="${S}/include/$f"
+				dest_path="${D}${KERNEL_ALT_HEADER_DIR}/include/$f"
+
+				if [ -a ${src_file} ]; then
+					install -d ${dest_path%/*}
+					cp -Rn $src_file ${dest_path%/*}
+					echo $f >> ${D}${KERNEL_ALT_HEADER_DIR}/kernel_install_header.manifest
+				else
+					echo "WARNING: header file/directory not found: $f"
+				fi
+			done
 		else
 			# This configuration is NOT allowed!
 			echo "ERROR: KERNEL_ALT_HEADER_DIR may not be '/usr', as this conflicts with the system headers"
 			exit 1
 		fi
-	fi
-}
-
-do_install_kernel_headers_append() {
-	if [ -n "${KERNEL_ALT_HEADER_DIR}" -a "${KERNEL_ALT_HEADER_DIR}" != "${exec_prefix}" ]; then
-		for f in ${KERNEL_INSTALL_HEADER}; do
-		src_file="${S}/include/$f"
-		dest_path="${D}${KERNEL_ALT_HEADER_DIR}/include/$f"
-
-		if [ -a ${src_file} ]; then
-			install -d ${dest_path%/*}
-				cp -Rn $src_file ${dest_path%/*}
-				echo $f >> ${D}${KERNEL_ALT_HEADER_DIR}/kernel_install_header.manifest
-			else
-				echo "WARNING: header file/directory not found: $f"
-			fi
-		done
 	fi
 }
 
