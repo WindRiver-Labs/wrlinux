@@ -10,9 +10,9 @@ do_install_append () {
     install -d ${D}${sysconfdir}/default
     echo 'INTERFACES="eth0"' > ${D}${sysconfdir}/default/dhcpcd
 
-    install -d ${D}${sbindir}
-    install -m 0755 ${WORKDIR}/dhcpcd-systemd-wrapper ${D}${sbindir}/dhcpcd-systemd-wrapper
+    install -d ${D}${base_sbindir}
+    install -m 0755 ${WORKDIR}/dhcpcd-systemd-wrapper ${D}${base_sbindir}/dhcpcd-systemd-wrapper
 
     sed -i -e 's,@SYSCONFDIR@,${sysconfdir},g' ${D}${systemd_unitdir}/system/dhcpcd.service
-    sed -i -e 's,@SBINDIR@,${sbindir},g' ${D}${systemd_unitdir}/system/dhcpcd.service
+    sed -i -e 's,@SBINDIR@,${base_sbindir},g' ${D}${systemd_unitdir}/system/dhcpcd.service
 }
