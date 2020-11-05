@@ -55,6 +55,7 @@ DEPENDS = "\
     gettext-minimal-native \
     gettext-native \
     glib-2.0-native \
+    glslang-native \
     gmp-native \
     gnu-config-native \
     gobject-introspection-native \
@@ -173,8 +174,10 @@ DEPENDS = "\
     readline-native \
     rpm-native \
     rsync-native \
+    shaderc-native \
     shadow-native \
     shared-mime-info-native \
+    spirv-tools-native \
     sqlite3-native \
     squashfs-tools-native \
     swig-native \
