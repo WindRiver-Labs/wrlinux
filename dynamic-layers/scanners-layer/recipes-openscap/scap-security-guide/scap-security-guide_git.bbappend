@@ -125,6 +125,9 @@ SRC_URI = "git://github.com/OpenSCAP/scap-security-guide.git \
             file://0121-Rule-file_permissions_unauthorized_suid-update-check.patch \
             file://0122-Fix-XML-parsing-of-the-remediation-functions-file.patch \
             file://0123-Fixed-the-broken-fix-when-greedy-regex-ate-the-whole.patch \
+            file://0124-fix-deprecated-instance-of-element.getchildren.patch \
+            file://0125-fix-deprecated-getiterator-function.patch \
+            file://0126-fix-remaining-getchildren-and-getiterator-functions.patch \
            "
 PV = "0.1.45+git${SRCPV}"
 
