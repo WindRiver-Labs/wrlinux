@@ -74,5 +74,5 @@ do_deploy_sstate () {
     fi
 }
 
-do_deploy_sstate[deptask] += "do_populate_lic do_package_qa do_populate_sysroot"
+do_deploy_sstate[deptask] += "do_populate_lic do_package_qa do_populate_sysroot do_deploy"
 addtask deploy_sstate
