@@ -77,6 +77,7 @@ DEPENDS = "\
     ldconfig-native \
     libarchive-native \
     libassuan-native \
+    libcap-native \
     libcap-ng-native \
     libcheck-native \
     libcomps-native \
@@ -86,6 +87,7 @@ DEPENDS = "\
     libepoxy-native \
     libffi-native \
     libfontenc-native \
+    libgcrypt-native \
     libgpg-error-native \
     libice-native \
     libjpeg-turbo-native \
