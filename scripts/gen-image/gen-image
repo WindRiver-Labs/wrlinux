@@ -623,6 +623,25 @@ COPYLEFT_LICENSE_EXCLUDE = ""
                 elif d == 'repos':
                     shutil.copytree(d_path, os.path.join(dst_dir_tgt, d))
 
+            # Save config info
+            logfile = 'tmp-%s-glibc/log/cooker/%s/console-latest.log' % (m, m)
+            config_out = os.path.join(self.local_upload_dir_date, 'config_%s' % m)
+            newlines = []
+            with open(logfile, 'r') as f:
+                for line in f.readlines():
+                    if line.startswith('Build Configuration:'):
+                        newlines.append(line)
+                        continue
+                    if line.startswith('--------------------'):
+                        break
+                    if newlines:
+                        newlines.append(line)
+            if newlines:
+                with open(config_out, 'w') as f:
+                    f.write(''.join(newlines))
+            else:
+                logger.warning('Failed to find config info from %s' % logfile)
+
         # Create a symlink to latest dir
         os.symlink(date, os.path.join(self.local_upload_dir, 'latest'))
 
