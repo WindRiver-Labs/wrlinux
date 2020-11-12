@@ -26,34 +26,9 @@ $ $CC <src>.c
 Use $CONFIGURE_FLAGS if you need run configure:
 $ ./configure $CONFIGURE_FLAGS
 
-## Build the images from sources
-$ mkdir wrlinux-cd
-$ cd wrlinux-cd
-$ git clone -b WRLINUX_CI https://distro.windriver.com/sources/wrlinux/linux-cd/base/WRLinux-CD-Core/wrlinux-x/
-$ cd wrlinux-x
-$ git checkout <tag>
-$ cd ../
-$ ./wrlinux-x/setup.sh --all-layers --dl-layers
-
-There might be extra sources which are required to build the images or sdk:
-https://distro.windriver.com/release/wrlinux/linux-cd/base/WRLinux-CD-Images/extra-sources/<tag>
-
-Download the patches and apply them to related repos if there are any.
-
-$ . environment-setup-x86_64-wrlinuxsdk-linux
-$ . oe-init-build-env
-$ ../layers/wrlinux/scripts/gen-image/gen-image -m <machine>
-The sdk is in outdir/WRLinux-CD-Images/intel-x86-64/sdk
-
 ## Sources
 Source code required to build the sdk is provided here:
-https://distro.windriver.com/sources/wrlinux/linux-cd/base/WRLinux-CD-Core/
-
-To get a package's source:
-$ . environment-setup-x86_64-wrlinuxsdk-linux
-$ . oe-init-build-env
-$ bitbake <package> -cfetch
-
+https://distro.windriver.com/release/wrlinux/linux-cd/base/WRLinux-CD-Images/sources
 
 ## License
 The sdk is provided under the GPL-2.0 license.

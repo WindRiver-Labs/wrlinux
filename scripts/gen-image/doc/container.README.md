@@ -63,47 +63,9 @@ from accessing /dev/ecryptfs.
 In general, a container may depend on some features or devices in the host
 system. How to formally handle such dependencies is to be discussed.
 
-## Build the images from sources
-```console
-$ mkdir wrlinux-cd
-$ cd wrlinux-cd
-$ git clone -b WRLINUX_CI https://distro.windriver.com/sources/wrlinux/linux-cd/base/WRLinux-CD-Core/wrlinux-x/
-$ cd wrlinux-x
-$ git checkout <tag>
-$ cd ../
-$ ./wrlinux-x/setup.sh --all-layers --dl-layers
-
-There might be extra sources which are required to build the images or sdk:
-https://distro.windriver.com/release/wrlinux/linux-cd/base/WRLinux-CD-Images/extra-sources/<tag>
-
-Download the patches and apply them to related repos if there are any.
-
-$ . environment-setup-x86_64-wrlinuxsdk-linux
-$ . oe-init-build-env
-$ ../layers/wrlinux/scripts/gen-image/gen-image -m <machine>
-```
-The output files are in outdir/WRLinux-CD-Images/<machine>
-The machine is  intel-x86-64 or bcm-2xxx-rpi4 according to the archs.
-
 ## Sources
 Source code required to build the image is provided here:
-https://distro.windriver.com/sources/wrlinux/linux-cd/base/WRLinux-CD-Core/
-
-To get a package's source:
-```console
-$ . environment-setup-x86_64-wrlinuxsdk-linux
-$ . oe-init-build-env
-$ bitbake <package> -cfetch
-```
-To get all sources of the image:
-```console
-    $ bitbake <image> --runall=fetch
-```
-
-The sources will be in DL_DIR, and way to get DL_DIR:
-```console
-    $ bitbake -e | grep '^DL_DIR'
-```
+https://distro.windriver.com/release/wrlinux/linux-cd/base/WRLinux-CD-Images/sources
 
 ## License
 The images are provided under the GPL-2.0 license.
