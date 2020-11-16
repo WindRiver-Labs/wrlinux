@@ -161,5 +161,6 @@ SANITY_TESTED_DISTROS ?= " \
             fedora-32 \n \
             opensuseleap-15.0 \n \
             rhel-8.0 \n \
+            rhel-8.2 \n \
             sled-15 \n \
             "
