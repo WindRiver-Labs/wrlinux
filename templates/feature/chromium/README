@@ -1,0 +1,9 @@
+This template adds the chromium web browser.
+
+To use this template, add the following to your setup line:
+
+    --templates feature/chromium
+
+#@TYPE: Wrtemplate
+#@NAME: chromium
+#@DESCRIPTION: Add chromium to the image
