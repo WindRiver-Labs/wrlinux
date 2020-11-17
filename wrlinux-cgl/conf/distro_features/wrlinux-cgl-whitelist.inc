@@ -51,12 +51,14 @@ PNWHITELIST_META_NETWORKING = " \
     ipvsadm \
     iscsi-initiator-utils \
     libldb \
+    libmaxminddb \
     libtdb \
     libtevent \
     lksctp-tools \
+    ndpi \
     netkit-rsh \
     netkit-telnet \
-    ntop \
+    ntopng \
     ntp \
     openhpi \
     openipmi \
@@ -88,10 +90,12 @@ PNWHITELIST_META_OE = " \
     ipmitool \
     libnet \
     libqb \
+    libsodium \
     postgresql \
     pps-tools \
     smartmontools \
     zabbix \
+    zeromq \
     zstd \
 "
 
