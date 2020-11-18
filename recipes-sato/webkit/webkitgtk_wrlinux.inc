@@ -7,3 +7,4 @@ DEBUG_OPTIMIZATION_append_mips = " -O1"
 DEBUG_OPTIMIZATION_append_aarch64 = " -O1"
 # Blow up linking/relocating error.
 PROFILING_OPTIMIZATION_remove_powerpc = "-fno-omit-frame-pointer"
+PROFILING_OPTIMIZATION_remove_x86 = "-fno-omit-frame-pointer"
