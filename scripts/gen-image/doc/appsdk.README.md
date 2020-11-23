@@ -90,21 +90,33 @@ optional arguments:
 
 $ appsdk exampleyamls
 appsdk - INFO: Deploy Directory: path-to-outdir/exampleyamls
-+-----------+------------------------------------------+
-| Yaml Type |                   Name                   |
-+===========+==========================================+
-| Image     | container-base-intel-x86-64.yaml         |
-|           | core-image-minimal-intel-x86-64.yaml     |
-|           | core-image-sato-intel-x86-64.yaml        |
-|           | initramfs-ostree-image-intel-x86-64.yaml |
-|           | wrlinux-image-small-intel-x86-64.yaml    |
-|           |                                          |
-+-----------+------------------------------------------+
-| Feature   | feature/package_management.yaml          |
-|           | feature/vboxguestdrivers.yaml            |
-|           | feature/xfce_desktop.yaml                |
-|           |                                          |
-+-----------+------------------------------------------+
++-------------------+------------------------------------------+
+|     Yaml Type     |                   Name                   |
++===================+==========================================+
+| Image             | container-base-intel-x86-64.yaml         |
+|                   | core-image-minimal-intel-x86-64.yaml     |
+|                   | core-image-sato-intel-x86-64.yaml        |
+|                   | initramfs-ostree-image-intel-x86-64.yaml |
+|                   | wrlinux-image-small-intel-x86-64.yaml    |
+|                   |                                          |
++-------------------+------------------------------------------+
+| Feature           | feature/debug-tweaks.yaml                |
+|                   | feature/package_management.yaml          |
+|                   | feature/set_root_password.yaml           |
+|                   | feature/startup-container.yaml           |
+|                   | feature/vboxguestdrivers.yaml            |
+|                   | feature/xfce_desktop.yaml                |
+|                   |                                          |
++-------------------+------------------------------------------+
+| System Definition | sysdef/add-system-user.yaml              |
+|  Yamls            | sysdef/add-user-home.yaml                |
+|                   | sysdef/contains-container-base.yaml      |
+|                   | sysdef/set-dns.yaml                      |
+|                   | sysdef/set-hostname.yaml                 |
+|                   | sysdef/set-ntp.yaml                      |
+|                   | sysdef/update-containers.yaml            |
+|                   |                                          |
++-------------------+------------------------------------------+
 appsdk - INFO: Then, run genimage or genyaml with Yaml Files:
 appsdk genimage <Image>.yaml <Feature>.yaml
 Or
@@ -164,7 +176,8 @@ optional arguments:
   --no-validate         Do not validate parameters in Input yaml files
   -g GPGPATH, --gpgpath GPGPATH
                         Specify gpg homedir, it overrides 'gpg_path' in Yaml, default is /tmp/.lat_gnupg
-
+  --ostree-remote-url OSTREE_REMOTE_URL
+                        Specify ostree remote url, it overrides 'ostree_remote_url' in Yaml, default is None
 $ appsdk genimage input.yaml --type all
 appsdk - INFO: Deploy Directory: path-to-outdir/deploy
 +------------------+-----------------------------------------------------------+
@@ -252,7 +265,8 @@ Customize order: Default setting < Section in Yaml < Command option
   packages. The default include-default-packages is 1.
 
 - Command option overrides section in Yaml
-  The options --gpgpath, --type, --name, override the sections in input.yaml
+  The options --gpgpath, --type, --name, --ostree-remote-url, override the
+  sections in input.yaml
 
 - Command option append section in Yaml
   The options --url, --pkg, --pkg-external, --rootfs-post-script,
@@ -480,6 +494,363 @@ Here's a simple example of how to use appsdk.
 
 
 Check environment-setup-*-wrs-linux for the exported variables.
+
+## System Definition
+### Abstract
+The goal of the System Definition is to provide a way to define and
+implement system configuration changes that goes beyond those
+configurations shipped in individual software packages. These can
+include, but are not limited to:
+ * System configurations, such as hostname and IP
+ * Containers images and configurations
+ * User accounts and configurations
+ * Vendor data
+ * Cloud data
+
+### Limitation
+Only apply system definition on ustart/wic/vmdk/vdi image (generated
+by appsdk genimage), the initramfs image and container image do not
+support it
+
+### YAML
+#### YAML Design
+* The current Linux Assembly Tool YAML schema should be enhanced
+  with a 'system' top level list tag. List elements can be 'run_once',
+  'run_on_upgrade', 'run_always', 'files' and 'contains'.
+
+* The 'system: files' tag should be a list of 'file' elements.
+
+* The 'system: files: file' tag should each define a mode, source
+  and destination.
+
+* The 'system: run_once' tag should be a list of script file sources.
+  Each of these will be copied to a location in /etc where system
+  definition tools will run them once after installation.
+
+* The 'system: run_on_upgrade' tag should be a list of script file
+  sources. Each of these will be copied to a location in /etc where
+  system definition tools will run them once after installation, and
+  once after each upgrade. In order to track script updates there will
+  be a new directory in /etc for each upgrade containing the copies of
+  the scripts included in that upgrade bundle.
+
+* The 'system: run_always' tag should be a list of script file
+  sources. Each of these will be copied to a location in /etc where
+  system definition tools will run each script on each reboot.
+
+* The 'system: contains' tag should be a list of system YAML files
+  and acts as an include for other system specification files. In
+  this way we can define a nesting of systems. For example this
+  would allow us to define a Xen top level system along with the
+  contained VMs. We will only support one level of nesting, so a
+  contained YAML can not definie a 'contains' of its own. The
+  'contains' tag will only be valid for image types (`ustart',
+  `wic', `vmdk' and `vdi'), for example a 'container' image must not
+  use the 'contains' tag, and should throw an ERROR.
+
+#### YAML Example
+Run `appsdk exampleyamls' to get a set of pre-canned scripts are made
+available as part of the Linux Assembly Tool with the ability to add
+new ones as time and need demands.
+
+$ tree exampleyamls/sysdef/
+exampleyamls/sysdef/
+|-- add-system-user.yaml
+|-- add-user-home.yaml
+|-- contains-container-base.yaml
+|-- files
+|   |-- docker_daemon.jason
+|   |-- sudoers_sudo
+|   `-- windriver_dns.conf
+|-- run_always.d
+|   `-- 10_start_containers.sh
+|-- run_on_upgrade.d
+|   |-- 10_update_containers.sh
+|   `-- containers.dat
+|-- run_once.d
+|   |-- 10_add_system_user.sh
+|   |-- 20_add_user_home.sh
+|   |-- 30_set_hostname.sh
+|   `-- 40_set_ntp.sh
+|-- set-dns.yaml
+|-- set-hostname.yaml
+|-- set-ntp.yaml
+`-- update-containers.yaml
+
+The first set of scripts includes:
+  * the script that adds a new user to the system
+    See exampleyamls/sysdef/add-system-user.yaml
+
+  * the script that adds a new user and home directory
+    See exampleyamls/sysdef/add-user-home.yaml
+
+  * the script that sets the hostname based on an system attribute such
+    as the MAC address
+    See exampleyamls/sysdef/set-hostname.yaml
+
+  * a set of the scripts that pulls listed containers (from containers.dat)
+    from a public registrey and runs them. This should replace the
+    existing 'include-container-images' functionality.
+    See exampleyamls/sysdef/update-containers.yaml
+
+  * the script that set the DNS resolver to a given IP
+    See exampleyamls/sysdef/set-dns.yaml
+
+  * the script that updates the address of the ntp server
+    See exampleyamls/sysdef/set-ntp.yaml
+
+  * The yaml that generates an image which contains a sub container image,
+    a nest build will be run ahead of the main build
+    See contains-container-base.yaml
+
+The customer should refer these yamls and scripts to manipulate
+their own, take exampleyamls/sysdef/add-system-user.yaml for example,
+the yaml inclues a run_once script exampleyamls/sysdef/run_once.d/10_add_system_user.sh,
+in which it calls `useradd' at target first boot to ceate a system user
+with username `system-user' and password `123456'. Customer could
+create their own user and password base on the example
+
+### Runtime Tool: sysdef.sh
+A new tool `sysdef.sh' is written to implement the runtime functionality
+of the System Definition.
+
+      $ sysdef.sh -h
+      usage: sysdef.sh [-f] [-v] |run-once|run-on-upgrade|run-always [script1] [script2] [...]
+           sysdef.sh [-f] [-v] run-all
+           sysdef.sh [-v] list
+               -f: ignore stamp, force to run
+               -v: verbose
+
+- In order to run sysdef.sh automatically when included in an image,
+  a systemd service `sysdef.service' ensures the sysdef.sh be run at
+  a suitable time during boot. Maximum 3 times rerun if the service
+  failed.
+
+      $ systemctl status sysdef.service
+      * sysdef.service - A tool to implement the runtime functionality of the System Definition.
+           Loaded: loaded (/usr/lib/systemd/system/sysdef.service; enabled; vendor preset: disabled)
+           Active: active (exited) since Mon 2020-11-23 07:53:30 UTC; 1h 8min ago
+          Process: 329 ExecStart=/usr/bin/sysdef.sh run-all (code=exited, status=0/SUCCESS)
+         Main PID: 329 (code=exited, status=0/SUCCESS)
+
+- Log (/var/log/syslog) is captured for the tool and each of the scripts
+  it runs.
+
+      $ grep sysdef /var/log/syslog
+      2020-11-23T07:52:54.216341+00:00 intel-x86-64 sysdef.sh[329]: Start run-once 10_add_system_user.sh
+      2020-11-23T07:52:54.220970+00:00 intel-x86-64 sysdef.sh[329]: Run run-once 10_add_system_user.sh success
+      2020-11-23T07:52:54.222146+00:00 intel-x86-64 sysdef.sh[329]: Start run-once 20_add_user_home.sh
+      ...
+
+- It handles failures gracefully. If a single script fails the remaining
+  scripts should still be run.
+
+- It makes use of stamp files to prevent run once scripts from being
+  run multiple times. The scripts in each type (run_once/run_always/
+  run_on_upgrade)) are in alphanumeric order, allowing the user to
+  specify the order in which scripts are run.
+
+      /etc/sysdef/
+        run_once.d/
+            10_add_system_user.sh
+            10_add_system_user.sh.stamp
+            20_add_user_home.sh
+            20_add_user_home.sh.stamp
+            30_set_hostname.sh
+            30_set_hostname.sh.stamp
+            40_set_ntp.sh
+            40_set_ntp.sh.stamp
+        run_always.d/
+            10_start_containers.sh
+        run_on_upgrade.d/
+            15082020025600//
+                10_update_containers.sh
+                10_update_containers.sh.stamp
+                containers.dat
+            20201123074928/
+                10_update_containers.sh
+                10_update_containers.sh.stamp
+                containers.dat
+
+- Support to run manually, it provides options `-f' to ignore the
+  stamp files (not by default though).
+
+  List all scripts in run:
+      $ sysdef.sh list
+      run-once
+          10_add_system_user.sh
+          10_add_system_user.sh.stamp
+          20_add_user_home.sh
+          20_add_user_home.sh.stamp
+          30_set_hostname.sh
+          30_set_hostname.sh.stamp
+          40_set_ntp.sh
+          40_set_ntp.sh.stamp
+      run-on-upgrade(20201123074928)
+          10_update_containers.sh
+          10_update_containers.sh.stamp
+          containers.dat
+      run-always
+          10_start_containers.sh
+
+  Rerun all sysdef scripts manually:
+      $ sysdef.sh -f run-all
+      Start run-once 10_add_system_user.sh
+      useradd: user 'system-user' already exists
+      Run run-once 10_add_system_user.sh failed
+      ...
+
+  Rerun specific sysdef scripts manually:
+      $ sysdef.sh -f run-on-upgrade 10_update_containers.sh
+      Start run-on-upgrade(20201123074928) 10_update_containers.sh
+      ...
+      Run run-on-upgrade(20201123074928) 10_update_containers.sh success
+
+### Support Long Lived Containers with docker
+
+#### Long Live Containers Functions
+- Load docker image by docker load
+- Import filesystem tarball by docker import
+- Pull docker image from registry
+- Run multiple containers from one image
+- Run container with user define docker run option
+- Run container with user define docker command
+- Start container automatically while system boot
+- Stop container gracefully while system shutdown
+- Update containers while system upgrade
+
+#### Long Live Containers Implement
+Provides two scripts and one data file in exampleyamls
+
+    exampleyamls/sysdef/run_always.d
+        10_start_containers.sh
+    exampleyamls/sysdef/run_on_upgrade.d
+        containers.dat
+        10_update_containers.sh
+
+Each line in containers.dat records how to load/import/pull and run a container
+The format of line is:
+The `<container-name>' is mandatory, it is the name of container (docker run --name <container-name> XXX);
+If `load=<docker-image-tarball>' is set, use `docker load' to add image tarball;
+If `import=<fs-tarball>' is set, use `docker import' to add filesystem tarball;
+If no `load=<docker-image-tarball>' and no `import=<fs-tarball>', use `docker pull' to add image;
+The `image=<container-image-name>' is optional, if not set, use `<container-name>' by default;
+The `run-opt=<docker-run-opt>' is optional, if not set, use `-itd' by default (docker run -itd XXX);
+The `run-cmd=<docker-run-cmd>' is optional, if not set, default is empty
+Examples:
+  ubuntu
+    ->        docker pull ubuntu
+    ->        docker run --name ubuntu ubuntu
+    ->        systemctl start start-container@ubuntu.service
+
+  ubuntu-bash image=ubuntu run-opt="-p 2224:22 -it" run-cmd=/bin/bash
+    ->        docker pull ubuntu
+    ->        docker run -p 2224:22 -it -d --name ubuntu-bash ubuntu /bin/bash
+    ->        systemctl start start-container@ubuntu-bash.service
+
+  wrlinux-image-full import=/var/docker-images/wrlinux-image-full-intel-x86-64.tar.bz2 run-cmd=/bin/sh
+    ->        docker import /var/docker-images/wrlinux-image-full-intel-x86-64.tar.bz2 wrlinux-image-full
+    ->        docker run -itd --name wrlinux-image-full wrlinux-image-full /bin/sh
+    ->        systemctl start start-container@wrlinux-image-full.service
+
+  container-base load=/var/docker-images/container-base-intel-x86-64.docker-image.tar.bz2
+    ->        docker load -i /var/docker-images/container-base-intel-x86-64.docker-image.tar.bz2
+    ->        docker run -itd --name container-base
+    ->        systemctl start start-container@container-base.service
+
+#### Long Live Containers Work Flow
+Usually the following Steps are required for customer
+1) Run `appsdk exampleyamls' to prepare yamls and scripts
+
+2) If use docker to load image or import filesystem tarball, make these
+files be available on host or web server. If use docker to pull image,
+this step is ignored
+
+3) Manipulate Yaml file:
+- Set image type with "ustart" or "wic" to avoid the yaml was incorrectly
+  parsed by geninitramfs or gencontainer
+
+- Use "packages" tag to install dependency packages `startup-container'
+  and `docker'
+
+- If use docker to load image or import filesystem tarball, make use of
+  "system:file" tag or "rootfs-post-scripts" tag to copy files to target
+  rootfs. If use docker to pull image, this step is ignored
+
+- Use "system:run_always" tag and "system:run_on_upgrade" tag to install
+  scripts 10_start_containers.sh and 10_update_containers.sh from exampleyamls
+  to target rootfs
+
+- Use "rootfs-post-scripts" tag to add settings as described above to
+  containers.dat, one line for one container
+
+4) Use 3)'s yaml file as input, run `appsdk genimage' to generate image
+
+#### Long Live Containers Examples
+An example from exampleyamls/sysdef/update-containers.yaml which pulls
+ubuntu image from public registry, and run two containers from the
+ubuntu image, one with default option and command, one with user
+define option and command.
+
+  # - At a boot after upgrade, pulls listed containers (from containers.dat)
+  #   from a public registrey and runs them.
+  # - At each boot, start listed containers (from containers.dat)
+  # - Two containers in containers.dat: hello-world and ubuntu
+  # - Add a docker_daemon.jason to set private insecure registries of Wind River
+  image_type:
+  - ostree-repo
+  - ustart
+  packages:
+  - startup-container
+  - docker
+  rootfs-post-scripts:
+  - echo "ubuntu" >> $IMAGE_ROOTFS/etc/sysdef/run_on_upgrade.d/containers.dat
+  - echo "ubuntu-bash image=ubuntu run-opt="-p 2224:22 -it" run-cmd=/bin/bash" >> $IMAGE_ROOTFS/etc/sysdef/run_on_upgrade.d/containers.dat
+  system:
+  - run_on_upgrade:
+    - exampleyamls/sysdef/run_on_upgrade.d/10_update_containers.sh
+  - run_always:
+    - exampleyamls/sysdef/run_always.d/10_start_containers.sh
+  - files:
+    - file:
+        src: exampleyamls/sysdef/files/docker_daemon.jason
+        dst: /etc/docker/daemon.json
+        mode: 644
+    - file:
+        src: exampleyamls/sysdef/run_on_upgrade.d/containers.dat
+        dst: /etc/sysdef/run_on_upgrade.d/
+        mode: 644
+
+
+An example from exampleyamls/feature/startup-container.yaml, there are
+three images, one is a docker image which was generated by `appsdk
+gencontainer', it will be used by docker load; one is a filesystem
+tarball which is downloaded from web server, it will be used by docker
+import; one is a docker image which is downloaded from private regristry
+by command `skopeo copy', it will be used by docker load
+
+  packages:
+  - startup-container
+  - docker
+  rootfs-post-scripts:
+  - echo "container-base load=/var/docker-images/container-base-intel-x86-64.docker-image.tar.bz2 image=container-base-intel-x86-64"  >> $IMAGE_ROOTFS/etc/sysdef/run_on_upgrade.d/containers.dat
+  - echo "ubuntu-tar load=/var/docker-images/ubuntu.docker-image.tar.bz2" >> $IMAGE_ROOTFS/etc/sysdef/run_on_upgrade.d/containers.dat
+  - echo "wrlinux-image-full import=/var/docker-images/wrlinux-image-full-intel-x86-64.tar.bz2 run-cmd=/bin/sh" >> $IMAGE_ROOTFS/etc/sysdef/run_on_upgrade.d/containers.dat
+  - skopeo copy --src-tls-verify=false --insecure-policy docker://pek-lpdfs01:5000/ubuntu docker-archive:$IMAGE_ROOTFS/var/docker-images/ubuntu.docker-image.tar.bz2:ubuntu-tar
+  system:
+  - run_on_upgrade:
+    - exampleyamls/sysdef/run_on_upgrade.d/10_update_containers.sh
+  - run_always:
+    - exampleyamls/sysdef/run_always.d/10_start_containers.sh
+  - files:
+    - file:
+        src: deploy/container-base-intel-x86-64.docker-image.tar.bz2
+        dst: /var/docker-images/
+        mode: 644
+    - file:
+        src: http://pek-lpgtest7302.wrs.com/buildarea1/SharedImage/LINCD_STD_BINARY/intel-x86-64/latest/WRLinux-CD-Images/intel-x86-64/container-full-intel-x86-64/wrlinux-image-full-intel-x86-64.tar.bz2
+        dst: /var/docker-images/
+        mode: 644
 
 ## License
 The sdk is provided under the GPL-2.0 license.
