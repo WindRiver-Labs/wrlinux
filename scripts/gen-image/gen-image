@@ -522,7 +522,7 @@ IMAGE_ENABLE_CONTAINER = "1"
 
     def post(self):
         with open(self.local_conf, 'a') as f:
-            f.write('#### Done by gen-image')
+            f.write('#### Done by gen-image\n')
 
         # Save local.conf
         local_conf_machine = '%s.%s' % (self.local_conf, self.machine)
@@ -580,10 +580,21 @@ COPYLEFT_LICENSE_EXCLUDE = ""
         logger.info('Generating sources for IP review')
         # The docker won't be built in a world build since it is started with "virtual/".
         # The "bitbake world docker --runall=deploy_archives" doesn't work, so build world.
-        self.do_build('world docker %s %s' % (self.image_minimal, self.image_full), conf=ip_conf)
+        self.do_build('world docker %s %s --runall=deploy_archives' % (self.image_minimal, self.image_full), conf=ip_conf)
 
         # And sdk
-        self.do_build('%s -cpopulate_sdk' % self.image_full)
+        # The "bitbake wrlinux-image-full --runall=deploy_archives -cpopulate_sdk"
+        # doesn't work, so we figure out the list and build them one by one
+        self.do_build('%s -cpopulate_sdk -g' % self.image_full)
+        recipes = []
+        with open('pn-buildlist') as f:
+            for line in f.readlines():
+                line = line.strip()
+                # Only native sdk recipes are needed since others have already been built
+                if line.startswith('nativesdk-') and line != 'nativesdk-libgcc-initial':
+                    recipes.append(line)
+
+        self.do_build('%s -cdeploy_archives' % ' '.join(recipes))
 
         src_dir = os.path.join(self.tmpdir, 'deploy/sources')
         logger.info('Deploying sources-%s' % self.machine)
