@@ -36,7 +36,13 @@ python third_party_dl() {
 
     bpn = d.getVar('BPN')
     pn = d.getVar('PN')
-    supported = d.getVar('WRLINUX_SUPPORTED_RECIPE_pn-%s' % pn) or d.getVar('WRLINUX_SUPPORTED_RECIPE_pn-%s' % bpn)
+    support_detail = d.getVar('WRLINUX_SUPPORTED_RECIPE_pn-%s' % pn) or d.getVar('WRLINUX_SUPPORTED_RECIPE_pn-%s' % bpn)
+    if support_detail and '#' in support_detail:
+        supported = support_detail.split("#")[0].strip()
+    elif support_detail:
+        supported = support_detail.strip()
+    else:
+        supported = None
     supported_values = (None, 0, 1)
 
     # No warning for the following types:
