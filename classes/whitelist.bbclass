@@ -135,6 +135,14 @@ python whitelist_noprovider_handler() {
 
         return ' '.join(bb.utils.explode_deps(depends))
 
+    def get_templates(support_detail):
+        pw_template = []
+        if support_detail and '#' in support_detail:
+            supported = support_detail.split("#")[0].strip()
+            if supported and supported == '1':
+                pw_template += support_detail.split("#")[1].strip().split()
+        return pw_template
+
     # This is only a helper, so catch all possible errors, don't break
     # anything when there are unexpected errors.
     try:
@@ -142,6 +150,9 @@ python whitelist_noprovider_handler() {
         depends = get_depends(bbfile, d)
 
         add_lines = []
+        pw_templates = []
+        support_detail = d.getVar('WRLINUX_SUPPORTED_RECIPE_pn-%s' % pn)
+        pw_templates += get_templates(support_detail)
         checked = set(d.getVar('ASSUME_PROVIDED').split())
         next = set(depends.split())
         counter = 0
@@ -160,6 +171,9 @@ python whitelist_noprovider_handler() {
                     add_line = skipreason.split(key_msg)[1].strip()
                     if not add_line in add_lines:
                         add_lines.append(add_line)
+                        pw_recipe = add_line.split("+=")[1].strip()
+                        support_detail = d.getVar('WRLINUX_SUPPORTED_RECIPE_pn-%s' % pw_recipe)
+                        pw_templates += get_templates(support_detail)
                     new.add(dep)
                     depends = get_depends(bbfile, d)
                     if depends:
@@ -174,10 +188,17 @@ python whitelist_noprovider_handler() {
         if not msg_suffix in add_lines:
             add_lines.append(msg_suffix)
         add_lines.sort()
+        pw_templates.sort()
         addon = d.getVar('PNWHITELIST_REASON_ADDON')
         if addon:
             add_lines.append('\n%s' % addon)
-        e._reasons = [msg_prefix] + add_lines
+        if pw_templates:
+            template_message = "\nOr consider using one of the following template(s):"
+            for temp in pw_templates:
+                template_message += "\nWRTEMPLATE += \"%s\"" % temp
+            e._reasons = [msg_prefix] + add_lines + [template_message]
+        else:
+            e._reasons = [msg_prefix] + add_lines
     except Exception as esc:
         bb.error('whitelist_noprovider_handler() failed: %s' % esc)
 }
