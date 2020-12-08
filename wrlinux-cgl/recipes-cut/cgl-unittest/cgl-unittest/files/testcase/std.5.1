@@ -10,8 +10,7 @@
 #    /ipsec_cut_config.sh
 # 2. generate ipsec configuration both on local target and remote
 #    target
-# 3. stop racoon service and restart strongswan service both on
-#    local target and remote target
+# 3. restart strongswan service both on local target and remote target
 # 4. establish the ipsec link and ping from local to remote and
 #    check if generate some ESP packets.
 
@@ -59,22 +58,22 @@ autossh $CLIENT_IP
 # genarate ipsec config
 cd /opt/cut/ipsec-strongswan
 sh confGen.sh
-cp ipsec.conf ipsec.secrets /etc
+cp swanctl-lcl.conf /etc/swanctl/conf.d/
 
 which systemctl
 if [ $? -eq 0 ]; then
-	systemctl restart strongswan-starter || cuterr "Failed to restart strongswan on local target"
+	systemctl restart strongswan || cuterr "Failed to restart strongswan on local target"
 else
-	service restart strongswan-started || cuterr "Failed to restart strongswan on local target"
+	service restart strongswan || cuterr "Failed to restart strongswan on local target"
 fi
 
-scp /opt/cut/ipsec-strongswan/ipsec.* root@$CLIENT_IP:/etc || 
+scp /opt/cut/ipsec-strongswan/swanctl-rmt.conf root@$CLIENT_IP:/etc/swanctl/conf.d/ ||
 	cuterr "Failed to customize ipsec configuration on remote target"
 
-ssh root@$CLIENT_IP -- "which systemctl && systemctl restart strongswan-starter || service restart strongswan-started" \
+ssh root@$CLIENT_IP -- "which systemctl && systemctl restart strongswan || service restart strongswan" \
 	cuterr "Failed to restart strongswan on remote target"
 
 # establish the link
-ipsec up toRemote
+swanctl --initiate --child host-host
 
 sh /opt/cut/scripts/ipsec.sh
