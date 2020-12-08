@@ -777,6 +777,17 @@ COPYLEFT_LICENSE_EXCLUDE = ""
 
         write_set_to_file(pf_set, 'recipes-list-src')
 
+    def is_ci_branch(self):
+        try:
+            g = git.cmd.Git(self.data_dir)
+            head_name = g.rev_parse('--symbolic-full-name', 'm/master')
+            if head_name.endswith('/WRLINUX_CI'):
+                return True
+        except Exception as e:
+            logger.debug('Failed to check ci branch: %s' % e)
+
+        return False
+
 def main():
     gen = GenImage()
 
@@ -794,6 +805,10 @@ def main():
             gen.gen_feeds()
             gen.gen_sdk()
             gen.gen_lat()
+            # Gen ip sources for WRLINUX_CI branch
+            if gen.is_ci_branch:
+                gen.ip_review()
+
             gen.post()
 
 if __name__ == "__main__":
