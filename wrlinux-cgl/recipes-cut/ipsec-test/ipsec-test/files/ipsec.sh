@@ -38,7 +38,7 @@ then
 	cutfail
 fi
 
-ipsec up toRemote
+swanctl --initiate --child host-host
 if [ $? -ne 0 ]
 then
 	echo "****************************************" 

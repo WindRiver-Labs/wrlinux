@@ -7,7 +7,7 @@ IPSEC_CUT_MODE="skip"
 #IPSEC_CUT_MODE="run"
 
 # set these as appropriate before generating the target
-# certificates and ipsec.conf
+# certificates and swanctl.conf
 #
 lclIP=192.168.7.2
 lclName="local"

@@ -1,38 +1,77 @@
 #!/bin/sh
 
-# Generate ipsec.conf for both targets
+# Generate swanctl.conf for both targets
 
 # source target info
 #
 . /opt/cut/ipsec-strongswan/ipsec_cut_config.sh
 
-cat > ipsec.conf << EOF
-# /etc/ipsec.conf - strongSwan IPsec configuration file
+cat > swanctl-lcl.conf << EOF
+connections {
 
-config setup
+   host-host {
+      local_addrs  = ${lclIP}
+      remote_addrs = ${rmtIP}
 
-conn %default
-	ikelifetime=60m
-	keylife=20m
-	rekeymargin=3m
-	keyingtries=1
-	keyexchange=ikev2
-	authby=secret
-	
-conn toRemote
-	left=${lclIP}
-	#leftcert=${lclName}Cert.der
-	leftfirewall=yes
-	right=${rmtIP}
-	#rightcert=${rmtName}Cert.der
-	auto=add
+      local {
+         auth = psk
+         id = ${lclIP}
+      }
+      remote {
+         auth = psk
+         id = ${rmtIP}
+      }
+      children {
+         host-host {
+            esp_proposals = aes128gcm128-x25519
+            mode = tunnel
+         }
+      }
+      version = 2
+      mobike = no
+      proposals = aes128-sha256-x25519
+   }
+}
 
-conn fromLocal
-	left=${rmtIP}
-	#leftcert=${rmtName}Cert.der
-	leftfirewall=yes
-	right=%any
-	#rightcert=${lclName}Cert.der
-	rightsubnet=${lclIP}/32
-	auto=add
+secrets {
+      ike-host-host {
+         id = ${rmtIP}
+         secret = 0sv+NkxY9LLZvwj4qCC2o/gGrWDF2d21jL
+    }
+}
+EOF
+
+cat > swanctl-rmt.conf << EOF
+connections {
+
+   host-host {
+      local_addrs  = ${rmtIP}
+      remote_addrs = ${lclIP}
+
+      local {
+         auth = psk
+         id = ${rmtIP}
+      }
+      remote {
+         auth = psk
+         id = ${lclIP}
+      }
+      children {
+         host-host {
+            esp_proposals = aes128gcm128-x25519
+            mode = tunnel
+         }
+      }
+      version = 2
+      mobike = no
+      proposals = aes128-sha256-x25519
+   }
+}
+
+secrets {
+      ike-host-host {
+         id = ${lclIP}
+         secret = 0sv+NkxY9LLZvwj4qCC2o/gGrWDF2d21jL
+    }
+}
 EOF

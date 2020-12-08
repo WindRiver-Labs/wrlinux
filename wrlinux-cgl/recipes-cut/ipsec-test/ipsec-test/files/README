@@ -39,31 +39,25 @@ Login, then
 lcl> cd /opt/cut/ipsec-strongswan
 lcl> vi ipsec_cut_config.sh         # set IP addresses, etc
 lcl> sh confGen.sh
-lcl> cp ipsec.conf ipsec.secrets /etc
+lcl> cp swanctl-lcl.conf /etc/swanctl/conf.d/
 
-lcl> systemctl stop racoon
-lcl> systemctl stop iked       # this service is for racoon2 and should not exist
-lcl> systemctl stop spmd       # this service is for racoon2 and should not exist
 lcl> systemctl restart strongswan
 
 Remote Setup
 ------------
 
-The remote target must have strongswan installed.  Using scp, copy ipsec.conf
-and ipsec.secrets from the local target to /root on the remote target.  Login,
+The remote target must have strongswan installed.  Using scp, copy swanctl-rmt.conf
+from the local target to /root on the remote target.  Login,
 then
 
-rmt> cp ipsec.conf ipsec.secrets /etc
+rmt> cp swanctl-rmt.conf /etc/swanctl/conf.d/
 
-rmt> systemctl stop racoon
-rmt> systemctl stop iked
-rmt> systemctl stop spmd
 rmt> systemctl restart strongswan
 
 Run The Test
 ------------
 
-lcl> ipsec up toRemote    # optional -- this will tell you if the link is established
+lcl> swanctl --initiate --child host-host
 lcl> cd /top/cut
 lcl> ./cgl_test -e ipsec.sh
 

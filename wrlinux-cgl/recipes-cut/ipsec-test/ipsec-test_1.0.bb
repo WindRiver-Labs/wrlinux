@@ -15,7 +15,6 @@ SRC_URI = "\
 	file://files/myCertgen.sh \
 	file://files/strongswanCertgen.sh \
 	file://files/confGen.sh \
-	file://files/ipsec.secrets \
 	file://files/README \
 	"
 
