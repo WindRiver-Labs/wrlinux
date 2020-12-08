@@ -601,6 +601,9 @@ COPYLEFT_LICENSE_EXCLUDE = ""
         dst_dir = os.path.join(self.handoff_dir, 'sources-%s' % self.machine)
         self.mv_to_old('sources-%s' % self.machine)
         shutil.copytree(src_dir, dst_dir)
+        cmd = 'rsync -a --exclude "*-native-*" %s/*/* %s' % (src_dir, dst_dir)
+        logger.info('Running %s' % cmd)
+        subprocess.check_call(cmd, shell=True)
 
     def do_upload(self):
         logger.info('Preparing upload files...')
@@ -612,59 +615,76 @@ COPYLEFT_LICENSE_EXCLUDE = ""
 
         os.makedirs(self.local_upload_dir)
 
+        local_handoff_dir = os.path.join(self.local_upload_dir_date, self.handoff_name)
+        if not os.path.exists(local_handoff_dir):
+            os.makedirs(local_handoff_dir)
+
         dst_dir_container = os.path.join(self.local_upload_dir_date, 'containers')
-        if not os.path.exists(dst_dir_container):
-            os.makedirs(dst_dir_container)
-
+        local_sources = os.path.join(local_handoff_dir, 'sources')
         for m in self.supported_machines:
-            file_prefix = os.path.join(self.handoff_dir, m)
-            if not os.path.exists(file_prefix):
-                continue
-            dst_dir_tgt = os.path.join(self.local_upload_dir_date, self.handoff_name, m)
-            if not os.path.exists(dst_dir_tgt):
-                os.makedirs(dst_dir_tgt)
-            for d in os.listdir(file_prefix):
-                d_path = os.path.join(file_prefix, d)
-                if d.startswith('lat-'):
-                    continue
-                elif d.startswith('container-'):
-                    shutil.copytree(d_path, os.path.join(dst_dir_container, d))
-                elif d.endswith('.tar.bz2'):
-                    shutil.copy(d_path, dst_dir_tgt)
-                elif d == 'repos':
-                    shutil.copytree(d_path, os.path.join(dst_dir_tgt, d))
+            file_prefix_src = os.path.join(self.handoff_dir, 'sources-%s' % m)
+            if os.path.exists(file_prefix_src):
+                cmd = 'rsync -a %s/* %s' % (file_prefix_src, local_sources)
+                logger.info('Running %s' % cmd)
+                subprocess.check_call(cmd, shell=True)
 
-            # Save config info
-            logfile = 'tmp-%s-glibc/log/cooker/%s/console-latest.log' % (m, m)
-            config_out = os.path.join(self.local_upload_dir_date, 'config_%s' % m)
-            newlines = []
-            with open(logfile, 'r') as f:
-                for line in f.readlines():
-                    if line.startswith('Build Configuration:'):
-                        newlines.append(line)
+            file_prefix = os.path.join(self.handoff_dir, m)
+            if os.path.exists(file_prefix):
+                dst_dir_tgt = os.path.join(local_handoff_dir, m)
+                for d in os.listdir(file_prefix):
+                    d_path = os.path.join(file_prefix, d)
+                    if d.startswith('lat-'):
                         continue
-                    if line.startswith('--------------------'):
-                        break
-                    if newlines:
-                        newlines.append(line)
-            if newlines:
-                with open(config_out, 'w') as f:
-                    f.write(''.join(newlines))
+                    elif d.startswith('container-'):
+                        shutil.copytree(d_path, os.path.join(dst_dir_container, d))
+                    elif d.endswith('.tar.bz2'):
+                        shutil.copy(d_path, dst_dir_tgt)
+                    elif d == 'repos':
+                        shutil.copytree(d_path, os.path.join(dst_dir_tgt, d))
+
+                # Save config info
+                logfile = 'tmp-%s-glibc/log/cooker/%s/console-latest.log' % (m, m)
+                config_out = os.path.join(self.local_upload_dir_date, 'config_%s' % m)
+                newlines = []
+                with open(logfile, 'r') as f:
+                    for line in f.readlines():
+                        if line.startswith('Build Configuration:'):
+                            newlines.append(line)
+                            continue
+                        if line.startswith('--------------------'):
+                            break
+                        if newlines:
+                            newlines.append(line)
+                if newlines:
+                    with open(config_out, 'w') as f:
+                        f.write(''.join(newlines))
+                else:
+                    logger.warning('Failed to find config info from %s' % logfile)
+
+        # Archive the sources
+        if os.path.exists(local_sources):
+            logger.info('Creating tarballs in %s...' % local_sources)
+            if shutil.which('pigz'):
+                logger.info('Using pigz...')
+                tar_opt = '-I pigz -cf'
             else:
-                logger.warning('Failed to find config info from %s' % logfile)
+                tar_opt = '-czf'
+            for i in os.listdir(local_sources):
+                cmd = 'tar --numeric-owner --remove-files %s %s.tar.gz %s' % (tar_opt, i, i)
+                subprocess.check_call(cmd, shell=True, cwd=local_sources)
 
         # Create a symlink to latest dir
         os.symlink(date, os.path.join(self.local_upload_dir, 'latest'))
 
         if os.path.exists(self.pr_dir):
-            shutil.copytree(self.pr_dir, os.path.join(self.local_upload_dir_date, 'prserv'))
+            shutil.copytree(self.pr_dir, os.path.join(local_handoff_dir, 'prserv'))
 
         logger.info('Done. Files are prepared in %s' % self.local_upload_dir)
 
         # Run rsync to remote url. Note, the slash '/' in cmd is very
         # important, otherwise, rsync would sync upload itself, but not the
         # files inside it.
-        cmd = 'rsync -avz %s/ %s' % (self.local_upload_dir, self.args.upload_url)
+        cmd = 'rsync -az %s/ %s' % (self.local_upload_dir, self.args.upload_url)
         logger.info('Running %s' % cmd)
         subprocess.check_call(cmd, shell=True)
 
