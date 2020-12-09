@@ -171,9 +171,6 @@ python whitelist_noprovider_handler() {
                     add_line = skipreason.split(key_msg)[1].strip()
                     if not add_line in add_lines:
                         add_lines.append(add_line)
-                        pw_recipe = add_line.split("+=")[1].strip()
-                        support_detail = d.getVar('WRLINUX_SUPPORTED_RECIPE_pn-%s' % pw_recipe)
-                        pw_templates += get_templates(support_detail)
                     new.add(dep)
                     depends = get_depends(bbfile, d)
                     if depends:
