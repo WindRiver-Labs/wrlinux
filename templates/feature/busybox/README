@@ -1,4 +1,4 @@
-This feature installs busybox rather than packagegroup-busybox-replacement, so
+This feature installs busybox rather than packagegroup-core-base-utils, so
 that the image size will be smaller.
 
 To use, add

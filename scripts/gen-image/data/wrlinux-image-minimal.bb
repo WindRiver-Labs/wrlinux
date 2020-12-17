@@ -30,10 +30,11 @@ IMAGE_INSTALL = "\
     ca-certificates \
 "
 
-# - No packagegroup-busybox-replacement since it is busybox based.
+# - No packagegroup-core-base-utils which corresponds to busybox
+#   function since it is busybox based.
 # - The ostree are not needed for container image.
 IMAGE_INSTALL_remove = "\
-    packagegroup-busybox-replacement \
+    packagegroup-core-base-utils \
     ${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', 'ostree ostree-upgrade-mgr linux-firmware', '', d)} \
 "
 

@@ -1715,7 +1715,6 @@ WRLINUX_SUPPORTED_RECIPE_pn-packagegroup-anaconda-support ?= "1 #feature/install
 WRLINUX_SUPPORTED_RECIPE_pn-packagegroup-base ?= "1 "
 WRLINUX_SUPPORTED_RECIPE_pn-packagegroup-basic ?= "0 "
 WRLINUX_SUPPORTED_RECIPE_pn-packagegroup-boot ?= "0 "
-WRLINUX_SUPPORTED_RECIPE_pn-packagegroup-busybox-replacement ?= "1 "
 WRLINUX_SUPPORTED_RECIPE_pn-packagegroup-cgl ?= "0 "
 WRLINUX_SUPPORTED_RECIPE_pn-packagegroup-cgl-applications ?= "0 "
 WRLINUX_SUPPORTED_RECIPE_pn-packagegroup-cgl-kernel ?= "0 "

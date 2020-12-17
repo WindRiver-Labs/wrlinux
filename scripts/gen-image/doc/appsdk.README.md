@@ -365,7 +365,7 @@ packages:
 - os-release
 - ostree
 - ostree-upgrade-mgr
-- packagegroup-busybox-replacement
+- packagegroup-core-base-utils 
 - packagegroup-core-boot
 - rtl8723bs-bt
 - run-postinsts
