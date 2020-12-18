@@ -7,13 +7,18 @@ X86-64
 Check sdk.host.manifest and sdk.target.manifest
 
 ## Install the SDK to <dir>
+```
 $ ./wrlinux-*-container-base-sdk.sh -y -d <dir>
+```
 
 ## Enable SDK
+```
 $ cd <workdir>
 $ . <dir>/environment-setup-*-wrs-linux
+```
 
 ## Wind River Linux Assembly Tool appsdk usage
+```
 $ appsdk -h
 usage: appsdk [-h] [-d] [-q] [--log-dir LOGDIR] {gensdk,checksdk,genrpm,publishrpm,genimage,geninitramfs,gencontainer,genyaml,exampleyamls} ...
 
@@ -39,8 +44,10 @@ optional arguments:
   --log-dir LOGDIR      Specify dir to save debug messages as log.appsdk regardless of the logging level
 
 Use appsdk <subcommand> --help to get help
+```
 
 ### Generate a new SDK
+```
 $ appsdk gensdk -h
 usage: appsdk gensdk [-h] [-f FILE] [-o OUTPUT]
 
@@ -51,11 +58,15 @@ optional arguments:
                         The path of the generated SDK. Default to deploy/AppSDK.sh in current directory
 
 $ appsdk gensdk -f input.yaml
+```
 
 ### Sanity check for SDK
+```
 $ appsdk checksdk
+```
 
 ### Build RPM package
+```
 appsdk genrpm -h
 usage: appsdk genrpm [-h] -f FILE -i INSTALLDIR [-o OUTPUTDIR] [--pkgarch PKGARCH]
 
@@ -67,8 +78,10 @@ optional arguments:
   -o OUTPUTDIR, --outputdir OUTPUTDIR
                         Output directory to hold the generated RPM package
   --pkgarch PKGARCH     package arch about the generated RPM package
+```
 
 ### Publish RPM package
+```
 appsdk publishrpm -h
 usage: appsdk publishrpm [-h] -r REPO [rpms [rpms ...]]
 
@@ -78,8 +91,10 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -r REPO, --repo REPO  RPM repo path
+```
 
 ### Generate example Yamls
+```
 $ appsdk exampleyamls -h
 usage: appsdk exampleyamls [-h] [-o OUTDIR]
 
@@ -121,22 +136,25 @@ appsdk - INFO: Then, run genimage or genyaml with Yaml Files:
 appsdk genimage <Image>.yaml <Feature>.yaml
 Or
 appsdk genyaml <Image>.yaml <Feature>.yaml
+```
 
 Image Yamls:
+
 - These image Yamls does not list all installed packages, it refers
   PACKAGE_INSTALL from Yocto (bitbake -e <image>)
 
 - For core-image-minimal, core-image-sato, wrlinux-image-small,
   the image type is ostree_repo and ustart, they are used by
-  `appsdk genimage' only
+  'appsdk genimage' only
 
 - For conainer-base, the image type is container, it is used by
-  `appsdk gencontainer' only
+  'appsdk gencontainer' only
 
 - For initramfs-ostree-image, the image type initramfs, it is used by
-  `appsdk geninitramfs' only
+  'appsdk geninitramfs' only
 
 Feature Yamls:
+
 - Attention: these feature Yamls could not random combination with
   image Yamls, such as vboxguestdrivers.yaml and xfce_desktop.yaml
   does not work on initramfs and container image
@@ -145,7 +163,9 @@ Feature Yamls:
   {package_management.yaml,vboxguestdrivers.yaml,xfce_desktop.yaml}
   is verified
 
+
 ### Generate ostree repo and wic/vmdk/vdi/ustart image from package feed
+```
 $ appsdk genimage -h
 usage: appsdk genimage [-h] [-t {wic,vmdk,vdi,ostree-repo,ustart,all}] [-o OUTDIR] [-w WORKDIR] [-n NAME] [-u URL] [-p PKG] [--pkg-external PKG_EXTERNAL]
                        [--rootfs-post-script ROOTFS_POST_SCRIPT] [--rootfs-pre-script ROOTFS_PRE_SCRIPT] [--env ENV] [--no-clean] [--no-validate] [-g GPGPATH]
@@ -178,6 +198,8 @@ optional arguments:
                         Specify gpg homedir, it overrides 'gpg_path' in Yaml, default is /tmp/.lat_gnupg
   --ostree-remote-url OSTREE_REMOTE_URL
                         Specify ostree remote url, it overrides 'ostree_remote_url' in Yaml, default is None
+```
+```
 $ appsdk genimage input.yaml --type all
 appsdk - INFO: Deploy Directory: path-to-outdir/deploy
 +------------------+-----------------------------------------------------------+
@@ -208,13 +230,14 @@ appsdk - INFO: Deploy Directory: path-to-outdir/deploy
 +------------------+-----------------------------------------------------------+
 | Ustart Image Doc | wrlinux-image-small-intel-x86-64.ustart.img.gz.README.md  |
 +------------------+-----------------------------------------------------------+
-
+```
 If no option --type, it generates ostree repo and ustart image by default
 
 ### Generate initramfs image from package feed
+```
 $ appsdk geninitramfs -h
-It is similar with `appsdk genimage -h', the differ is no -t/--type option
-If image name is `initramfs-ostree-image' (by default), it will replace existed
+It is similar with 'appsdk genimage -h', the differ is no -t/--type option
+If image name is 'initramfs-ostree-image' (by default), it will replace existed
 initrd used by the generation of wic/ustart image (appsdk genimage)
 
 $ appsdk geninitramfs
@@ -223,10 +246,12 @@ appsdk - INFO: Deploy Directory: path-to-outdir/deploy
 | Image | initramfs-ostree-image-intel-x86-64.cpio.gz -> initramfs-ostree-     |
 |       | image-intel-x86-64-20200908062501.rootfs.cpio.gz                     |
 +-------+----------------------------------------------------------------------+
+```
 
 ### Generate container image from package feed
+```
 $ appsdk gencontainer -h
-It is similar with `appsdk genimage -h', the differ is no -t/--type and
+It is similar with 'appsdk genimage -h', the differ is no -t/--type and
 -g/--gpg-path options
 
 $ appsdk gencontainer
@@ -243,16 +268,19 @@ appsdk - INFO: Deploy Directory: path-to-outdir/deploy
 | Yaml file for genimage | container-base-intel-x86-64.startup-container.yaml  |
 | to load and run        |                                                     |
 +------------------------+-----------------------------------------------------+
+```
 
 ### Generate/Customize Yaml file
+```
 $ appsdk genyaml -h
-It is similar with `appsdk genimage -h', the differ is `--type {wic,vmdk,vdi,
-ostree-repo,container,initramfs,ustart,all}'
-
+```
+It is similar with 'appsdk genimage -h', the differ is '--type {wic,vmdk,vdi, ostree-repo,container,initramfs,ustart,all}'
+```
 $ appsdk genyaml exampleyamls/wrlinux-image-small-intel-x86-64.yaml exampleyamls/feature/xfce_desktop.yaml
 appsdk - INFO: Input YAML File: exampleyamls/wrlinux-image-small-intel-x86-64.yaml
 appsdk - INFO: Input YAML File: exampleyamls/feature/xfce_desktop.yaml
 appsdk - INFO: Save Yaml FIle to : path-to-outdir/wrlinux-image-small-intel-x86-64.yaml
+```
 
 Customize order: Default setting < Section in Yaml < Command option
 
@@ -274,22 +302,21 @@ Customize order: Default setting < Section in Yaml < Command option
   If values are duplicated, only one copy is used.
 
 - Set environment variable for rootfs generation
-  For option --env and section `environments', if the same environment variable
+  For option --env and section 'environments', if the same environment variable
   is set multiple times (such as NAME=VALUE1, NAME=VALUE2), only the last set
   (NAME=VALUE2) works
 
 - Customize rootfs by script
   For option --rootfs-pre-script/--rootfs-post-script and section
   rootfs-pre-scripts/rootfs-post-scripts which allows you to run a script
-  using the pseudo context to customize rootfs. The `pre' means run script
-  before rootfs generation, the `post' means run script after rootfs
+  using the pseudo context to customize rootfs. The 'pre' means run script
+  before rootfs generation, the 'post' means run script after rootfs
   generation. Define an environment variable IMAGE_ROOTFS for the location
   of the rootfs install directory
 
-
 - Collect the following sections from multiple Yamls, the duplication
   is allowed:
-
+  
   - packages
   - external-packages
   - environments
@@ -300,7 +327,7 @@ Customize order: Default setting < Section in Yaml < Command option
   machine and so on.
 
 Input yaml format:
-[exampleyamls/wrlinux-image-small-intel-x86-64.yaml begin]
+```
 name: wrlinux-image-small
 machine: intel-x86-64
 image_type:
@@ -379,12 +406,12 @@ rootfs-post-scripts:
 environments:
 - KERNEL_PARAMS="key=value"
 - NO_RECOMMENDATIONS="0"
-[exampleyamls/wrlinux-image-small-intel-x86-64.yaml end]
+```
 
 ## Use case by simple hello-world example
 
 Here's a simple example of how to use appsdk.
-
+```
 1. Download source and build.
 
    e.g.
@@ -469,7 +496,7 @@ Here's a simple example of how to use appsdk.
        root@intel-x86-64:~# hello
        Hello, world!
 
-5. Use the RPM package as input as `appsdk genimage` and `appsdk gensdk`
+5. Use the RPM package as input of 'appsdk genimage' and 'appsdk gensdk`
 
    5a) Modify yaml file
 
@@ -492,7 +519,7 @@ Here's a simple example of how to use appsdk.
     5b) appsdk genimage --type all image-with-hello-intel-x86-64.yaml
         appsdk gensdk -f image-with-hello-intel-x86-64.yaml
 
-
+```
 Check environment-setup-*-wrs-linux for the exported variables.
 
 ## System Definition
@@ -544,15 +571,15 @@ support it
   would allow us to define a Xen top level system along with the
   contained VMs. We will only support one level of nesting, so a
   contained YAML can not definie a 'contains' of its own. The
-  'contains' tag will only be valid for image types (`ustart',
-  `wic', `vmdk' and `vdi'), for example a 'container' image must not
+  'contains' tag will only be valid for image types ('ustart',
+  'wic', 'vmdk' and 'vdi'), for example a 'container' image must not
   use the 'contains' tag, and should throw an ERROR.
 
 #### YAML Example
-Run `appsdk exampleyamls' to get a set of pre-canned scripts are made
+Run 'appsdk exampleyamls' to get a set of pre-canned scripts are made
 available as part of the Linux Assembly Tool with the ability to add
 new ones as time and need demands.
-
+```
 $ tree exampleyamls/sysdef/
 exampleyamls/sysdef/
 |-- add-system-user.yaml
@@ -563,7 +590,7 @@ exampleyamls/sysdef/
 |   |-- sudoers_sudo
 |   `-- windriver_dns.conf
 |-- run_always.d
-|   `-- 10_start_containers.sh
+|   '-- 10_start_containers.sh
 |-- run_on_upgrade.d
 |   |-- 10_update_containers.sh
 |   `-- containers.dat
@@ -576,8 +603,10 @@ exampleyamls/sysdef/
 |-- set-hostname.yaml
 |-- set-ntp.yaml
 `-- update-containers.yaml
+```
 
 The first set of scripts includes:
+
   * the script that adds a new user to the system
     See exampleyamls/sysdef/add-system-user.yaml
 
@@ -606,41 +635,44 @@ The first set of scripts includes:
 The customer should refer these yamls and scripts to manipulate
 their own, take exampleyamls/sysdef/add-system-user.yaml for example,
 the yaml inclues a run_once script exampleyamls/sysdef/run_once.d/10_add_system_user.sh,
-in which it calls `useradd' at target first boot to ceate a system user
-with username `system-user' and password `123456'. Customer could
+in which it calls 'useradd' at target first boot to ceate a system user
+with username 'system-user' and password '123456'. Customer could
 create their own user and password base on the example
 
 ### Runtime Tool: sysdef.sh
-A new tool `sysdef.sh' is written to implement the runtime functionality
+A new tool 'sysdef.sh' is written to implement the runtime functionality
 of the System Definition.
-
+```
       $ sysdef.sh -h
       usage: sysdef.sh [-f] [-v] |run-once|run-on-upgrade|run-always [script1] [script2] [...]
            sysdef.sh [-f] [-v] run-all
            sysdef.sh [-v] list
                -f: ignore stamp, force to run
                -v: verbose
+```
 
 - In order to run sysdef.sh automatically when included in an image,
-  a systemd service `sysdef.service' ensures the sysdef.sh be run at
+  a systemd service 'sysdef.service' ensures the sysdef.sh be run at
   a suitable time during boot. Maximum 3 times rerun if the service
   failed.
-
+```
       $ systemctl status sysdef.service
       * sysdef.service - A tool to implement the runtime functionality of the System Definition.
            Loaded: loaded (/usr/lib/systemd/system/sysdef.service; enabled; vendor preset: disabled)
            Active: active (exited) since Mon 2020-11-23 07:53:30 UTC; 1h 8min ago
           Process: 329 ExecStart=/usr/bin/sysdef.sh run-all (code=exited, status=0/SUCCESS)
          Main PID: 329 (code=exited, status=0/SUCCESS)
+```
 
 - Log (/var/log/syslog) is captured for the tool and each of the scripts
   it runs.
-
+```
       $ grep sysdef /var/log/syslog
       2020-11-23T07:52:54.216341+00:00 intel-x86-64 sysdef.sh[329]: Start run-once 10_add_system_user.sh
       2020-11-23T07:52:54.220970+00:00 intel-x86-64 sysdef.sh[329]: Run run-once 10_add_system_user.sh success
       2020-11-23T07:52:54.222146+00:00 intel-x86-64 sysdef.sh[329]: Start run-once 20_add_user_home.sh
       ...
+```
 
 - It handles failures gracefully. If a single script fails the remaining
   scripts should still be run.
@@ -649,7 +681,7 @@ of the System Definition.
   run multiple times. The scripts in each type (run_once/run_always/
   run_on_upgrade)) are in alphanumeric order, allowing the user to
   specify the order in which scripts are run.
-
+```
       /etc/sysdef/
         run_once.d/
             10_add_system_user.sh
@@ -671,11 +703,13 @@ of the System Definition.
                 10_update_containers.sh
                 10_update_containers.sh.stamp
                 containers.dat
+```
 
-- Support to run manually, it provides options `-f' to ignore the
+- Support to run manually, it provides options '-f' to ignore the
   stamp files (not by default though).
 
   List all scripts in run:
+```
       $ sysdef.sh list
       run-once
           10_add_system_user.sh
@@ -692,19 +726,24 @@ of the System Definition.
           containers.dat
       run-always
           10_start_containers.sh
+```
 
   Rerun all sysdef scripts manually:
+```
       $ sysdef.sh -f run-all
       Start run-once 10_add_system_user.sh
       useradd: user 'system-user' already exists
       Run run-once 10_add_system_user.sh failed
       ...
+```
 
   Rerun specific sysdef scripts manually:
+```
       $ sysdef.sh -f run-on-upgrade 10_update_containers.sh
       Start run-on-upgrade(20201123074928) 10_update_containers.sh
       ...
       Run run-on-upgrade(20201123074928) 10_update_containers.sh success
+```
 
 ### Support Long Lived Containers with docker
 
@@ -728,15 +767,17 @@ Provides two scripts and one data file in exampleyamls
         containers.dat
         10_update_containers.sh
 
+
 Each line in containers.dat records how to load/import/pull and run a container
 The format of line is:
-The `<container-name>' is mandatory, it is the name of container (docker run --name <container-name> XXX);
-If `load=<docker-image-tarball>' is set, use `docker load' to add image tarball;
-If `import=<fs-tarball>' is set, use `docker import' to add filesystem tarball;
-If no `load=<docker-image-tarball>' and no `import=<fs-tarball>', use `docker pull' to add image;
-The `image=<container-image-name>' is optional, if not set, use `<container-name>' by default;
-The `run-opt=<docker-run-opt>' is optional, if not set, use `-itd' by default (docker run -itd XXX);
-The `run-cmd=<docker-run-cmd>' is optional, if not set, default is empty
+```
+The '<container-name>' is mandatory, it is the name of container (docker run --name <container-name> XXX);
+If 'load=<docker-image-tarball>' is set, use 'docker load' to add image tarball;
+If 'import=<fs-tarball>' is set, use 'docker import' to add filesystem tarball;
+If no 'load=<docker-image-tarball>' and no 'import=<fs-tarball>', use 'docker pull' to add image;
+The 'image=<container-image-name>' is optional, if not set, use '<container-name>' by default;
+The 'run-opt=<docker-run-opt>' is optional, if not set, use '-itd' by default (docker run -itd XXX);
+The 'run-cmd=<docker-run-cmd>' is optional, if not set, default is empty
 Examples:
   ubuntu
     ->        docker pull ubuntu
@@ -757,10 +798,11 @@ Examples:
     ->        docker load -i /var/docker-images/container-base-intel-x86-64.docker-image.tar.bz2
     ->        docker run -itd --name container-base
     ->        systemctl start start-container@container-base.service
+```
 
 #### Long Live Containers Work Flow
 Usually the following Steps are required for customer
-1) Run `appsdk exampleyamls' to prepare yamls and scripts
+1) Run 'appsdk exampleyamls' to prepare yamls and scripts
 
 2) If use docker to load image or import filesystem tarball, make these
 files be available on host or web server. If use docker to pull image,
@@ -770,8 +812,8 @@ this step is ignored
 - Set image type with "ustart" or "wic" to avoid the yaml was incorrectly
   parsed by geninitramfs or gencontainer
 
-- Use "packages" tag to install dependency packages `startup-container'
-  and `docker'
+- Use "packages" tag to install dependency packages 'startup-container'
+  and 'docker'
 
 - If use docker to load image or import filesystem tarball, make use of
   "system:file" tag or "rootfs-post-scripts" tag to copy files to target
@@ -784,14 +826,14 @@ this step is ignored
 - Use "rootfs-post-scripts" tag to add settings as described above to
   containers.dat, one line for one container
 
-4) Use 3)'s yaml file as input, run `appsdk genimage' to generate image
+4) Use 3)'s yaml file as input, run 'appsdk genimage' to generate image
 
 #### Long Live Containers Examples
 An example from exampleyamls/sysdef/update-containers.yaml which pulls
 ubuntu image from public registry, and run two containers from the
 ubuntu image, one with default option and command, one with user
 define option and command.
-
+```
   # - At a boot after upgrade, pulls listed containers (from containers.dat)
   #   from a public registrey and runs them.
   # - At each boot, start listed containers (from containers.dat)
@@ -820,15 +862,15 @@ define option and command.
         src: exampleyamls/sysdef/run_on_upgrade.d/containers.dat
         dst: /etc/sysdef/run_on_upgrade.d/
         mode: 644
-
+```
 
 An example from exampleyamls/feature/startup-container.yaml, there are
-three images, one is a docker image which was generated by `appsdk
+three images, one is a docker image which was generated by 'appsdk
 gencontainer', it will be used by docker load; one is a filesystem
 tarball which is downloaded from web server, it will be used by docker
 import; one is a docker image which is downloaded from private regristry
-by command `skopeo copy', it will be used by docker load
-
+by command 'skopeo copy', it will be used by docker load
+```
   packages:
   - startup-container
   - docker
@@ -851,6 +893,7 @@ by command `skopeo copy', it will be used by docker load
         src: http://pek-lpgtest7302.wrs.com/buildarea1/SharedImage/LINCD_STD_BINARY/intel-x86-64/latest/WRLinux-CD-Images/intel-x86-64/container-full-intel-x86-64/wrlinux-image-full-intel-x86-64.tar.bz2
         dst: /var/docker-images/
         mode: 644
+```
 
 ## License
 The sdk is provided under the GPL-2.0 license.
