@@ -130,6 +130,16 @@ python whitelist_noprovider_handler() {
                             depends += ' ' + items[3]
                         if num >= 5 and items[4]:
                             depends += ' ' + items[4]
+
+            # Handle Inter-Task Dependencies
+            tasks = filter(lambda k: localdata.getVarFlag(k, "task"), d.keys())
+            for task in tasks:
+                taskVar = localdata.getVarFlags(task, False)
+                if 'depends' in taskVar and ':' in taskVar["depends"]:
+                    items = taskVar["depends"].split(':')[0]
+                    if '${PV}' in items:
+                        items = items.replace('${PV}', localdata.getVar('PV'))
+                    depends += ' ' + items
         else:
             bb.warn('bbfile is empty')
 
