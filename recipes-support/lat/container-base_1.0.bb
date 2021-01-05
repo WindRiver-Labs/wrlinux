@@ -119,7 +119,7 @@ IMAGE_INSTALL_remove = "\
     ostree ostree-upgrade-mgr \
     kubernetes \
     docker \
-    virtual/containerd \
+    ${@bb.utils.contains('PACKAGE_CLASSES','package_deb','containerd-opencontainers','virtual/containerd',d)} \
     python3-docker-compose \
 "
 
