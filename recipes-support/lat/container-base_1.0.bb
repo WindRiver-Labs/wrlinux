@@ -44,12 +44,16 @@ copy_pkgdata() {
     )
 }
 
-do_copy_pkgdata_to_rpm_repo() {
-    copy_pkgdata ${DEPLOY_DIR_RPM}
-    mv ${DEPLOY_DIR_RPM}/pkgdata.tar.bz2 ${DEPLOY_DIR_RPM}/.pkgdata.tar.bz2
-    mv ${DEPLOY_DIR_RPM}/pkgdata.tar.bz2.sha256sum ${DEPLOY_DIR_RPM}/.pkgdata.tar.bz2.sha256sum
+do_copy_pkgdata_to_deploy_repo() {
+    for class in ${PACKAGE_CLASSES}; do
+        class=${class/package_/}
+        deploydir=${DEPLOY_DIR}/$class
+        copy_pkgdata $deploydir
+        mv $deploydir/pkgdata.tar.bz2 $deploydir/.pkgdata.tar.bz2
+        mv $deploydir/pkgdata.tar.bz2.sha256sum $deploydir/.pkgdata.tar.bz2.sha256sum
+    done
 }
-addtask copy_pkgdata_to_rpm_repo
+addtask copy_pkgdata_to_deploy_repo
 
 POPULATE_SDK_PRE_TARGET_COMMAND += "copy_ostree_initramfs_to_sdk;"
 copy_ostree_initramfs_to_sdk() {
