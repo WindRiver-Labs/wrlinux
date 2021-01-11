@@ -9,7 +9,7 @@
 # 1. check the kprobes related kernel configuration
 # 2. dynamically load the kprobe test module which
 #    defines the "symbol_name" field of struct kprobe
-#    as do_fork
+#    as kernel_clone
 # 3. check the registered probes if exists on the system,
 #    pass if the probe is inserted successfully
 
@@ -45,6 +45,6 @@ modprobe kprobe_example || cuterr "Failed to load the kprobe test module"
 
 num2=`cat /sys/kernel/debug/kprobes/list | wc -l`
 if [ $num2 -gt $num1 ]; then
-	cat /sys/kernel/debug/kprobes/list | grep do_fork  && cutpass
+	cat /sys/kernel/debug/kprobes/list | grep kernel_clone  && cutpass
 fi
 cuterr "Failed to register kprobes"
