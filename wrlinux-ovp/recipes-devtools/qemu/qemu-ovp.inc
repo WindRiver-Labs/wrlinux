@@ -13,7 +13,6 @@ CFLAGS_append += "-I${STAGING_INCDIR}/glib-2.0 -I${STAGING_LIBDIR}/glib-2.0/incl
 # carry over cpu affinity patches from 1.3.0
 SRC_URI += " \
         file://qemu-kvm-drop-cross-from-pkg-config.patch \
-        file://0001-qemu-kvm-Add-options-to-pin-and-prioritize-vcpus.patch \
 "
 
 PACKAGECONFIG[spice] = "--enable-spice,--disable-spice,spice,"
