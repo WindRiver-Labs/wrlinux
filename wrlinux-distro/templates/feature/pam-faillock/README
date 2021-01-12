@@ -1,14 +1,14 @@
-pam-tally2
+pam-faillock
 ==========
 
-The pam_tally2 PAM module maintains a count of attempted accesses, can reset
+The pam_faillock PAM module maintains a count of attempted accesses, can reset
 count on success, can deny access if too many attempts fail.
 
-Template pam-tally2 enable pam_tally2 PAM module by default.
+Template pam-faillock enable pam_faillock PAM module by default.
 
 Notes
 ==========
-* pam-tally2 doesn't work well with 'ssh_allow_empty_password' which is
+* pam-faillock doesn't work well with 'ssh_allow_empty_password' which is
   added by IMAGE_FEATURES 'allow-empty-password' or 'debug-tweaks':
 
   When a user with non-empty password tries to login with ssh, it will be

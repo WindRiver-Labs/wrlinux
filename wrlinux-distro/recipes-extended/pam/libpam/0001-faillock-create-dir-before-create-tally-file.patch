@@ -1,0 +1,36 @@
+From 8cd5b41d2ba1a47e3d954a56bbe9b3af6b4663d8 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Tue, 12 Jan 2021 10:44:55 +0800
+Subject: [PATCH] faillock: create dir before create tally file
+
+Upstream-Status: Submitted [https://github.com/linux-pam/linux-pam/pull/319]
+
+the default tallydir is "/var/run/faillock", and usually,
+/var/run is mounted on tempfs. so faillock maybe not existed.
+When we set flag to O_CREAT, and hope to create tallyfile,
+but since the dir is not existed, open function will failed,
+and faillock not works well. so fixed by when we want to create
+tallyfile, and the dir is not existed, create it first.
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ modules/pam_faillock/faillock.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/modules/pam_faillock/faillock.c b/modules/pam_faillock/faillock.c
+index 4ea94cb..1be6f3c 100644
+--- a/modules/pam_faillock/faillock.c
++++ b/modules/pam_faillock/faillock.c
+@@ -74,6 +74,9 @@ open_tally (const char *dir, const char *user, uid_t uid, int create)
+ 
+ 	if (create) {
+ 		flags |= O_CREAT;
++		if (access(dir, 0) != 0) {
++			mkdir(dir, 0755);
++		}
+ 	}
+ 
+ 	fd = open(path, flags, 0660);
+-- 
+2.17.1
+

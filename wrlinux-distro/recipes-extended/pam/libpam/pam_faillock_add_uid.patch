@@ -1,0 +1,103 @@
+From 355f2b0bc7c42fb92b4b0abd1bc51e21c634acef Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Mon, 11 Jan 2021 15:40:21 +0800
+Subject: [PATCH] Support accept uid as argument
+
+Upstream-Status: Pending
+
+Add options '--uid' for command pam_faillock to accept uid as argument.
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ modules/pam_faillock/main.c               | 35 +++++++++++++++++--
+ 1 file changed, 32 insertions(+), 3 deletions(-)
+
+diff --git a/modules/pam_faillock/main.c b/modules/pam_faillock/main.c
+index d549537..ca4801a 100644
+--- a/modules/pam_faillock/main.c
++++ b/modules/pam_faillock/main.c
+@@ -57,6 +57,7 @@ struct options {
+ 	unsigned int reset;
+ 	const char *dir;
+ 	const char *user;
++	int  uid;
+ 	const char *progname;
+ };
+ 
+@@ -64,10 +65,12 @@ static int
+ args_parse(int argc, char **argv, struct options *opts)
+ {
+ 	int i;
++	int cline_user = 0;
+ 	memset(opts, 0, sizeof(*opts));
+ 
+ 	opts->dir = FAILLOCK_DEFAULT_TALLYDIR;
+ 	opts->progname = argv[0];
++	opts->uid = -1;
+ 
+ 	for (i = 1; i < argc; ++i) {
+ 
+@@ -86,6 +89,21 @@ args_parse(int argc, char **argv, struct options *opts)
+ 				return -1;
+ 			}
+ 		        opts->user = argv[i];
++			cline_user++;
++		}
++		else if (strcmp(argv[i], "--uid") == 0) {
++			++i;
++			if(i >= argc || strlen(argv[i]) == 0) {
++				fprintf(stderr, "%s: No user id supplied.\n", argv[0]);
++				return -1;
++			}
++			int tmp = atoi(argv[i]);
++			if (tmp < 0) {
++				fprintf(stderr, "%s: Invalid user id supplied.\n", argv[0]);
++				return -1;
++			}
++			opts->uid = tmp;
++			cline_user++;
+ 		}
+ 		else if (strcmp(argv[i], "--reset") == 0) {
+ 			opts->reset = 1;
+@@ -95,14 +113,19 @@ args_parse(int argc, char **argv, struct options *opts)
+ 			return -1;
+ 		}
+ 	}
++	if (cline_user > 1) {
++		fprintf(stderr, "Error, both user and userid options specified!\n");
++		return -1;
++	}
+ 	return 0;
+ }
+ 
+ static void
+ usage(const char *progname)
+ {
+-	fprintf(stderr, _("Usage: %s [--dir /path/to/tally-directory] [--user username] [--reset]\n"),
++	fprintf(stderr, _("Usage: %s [--dir /path/to/tally-directory] [--user username] [--uid userid] [--reset]\n"),
+ 		progname);
++	fprintf(stderr, "\tIf specifying a user, only specify username or uid, not both\n");
+ }
+ 
+ static int
+@@ -224,9 +247,15 @@ main (int argc, char *argv[])
+ 		return 1;
+ 	}
+ 
+-	if (opts.user == NULL) {
++	if (opts.user == NULL && opts.uid == -1) {
+ 		return do_allusers(&opts);
+ 	}
+ 
+-	return do_user(&opts, opts.user);
++	if (opts.user != NULL) {
++		return do_user(&opts, opts.user);
++	}
++	else {
++		struct passwd *pwd = getpwuid(opts.uid);
++		return do_user(&opts, pwd->pw_name);
++	}
+ }
+-- 
+2.17.1
+
