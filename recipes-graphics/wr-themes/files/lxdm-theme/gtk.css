@@ -17,6 +17,12 @@
 	color: #ffffff;
 }
 
+#info {
+	font: Sans 14;
+	font-style: italic;
+	color: #FF0000;
+}
+
 #bottom_pane label,
 #bottom_pane GtkLabel {
 	font: Sans 12;
