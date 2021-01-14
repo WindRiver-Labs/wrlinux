@@ -22,10 +22,10 @@ TOOLCHAIN_TARGET_TASK_append = " qemuwrapper-cross"
 POPULATE_SDK_PRE_TARGET_COMMAND += "copy_pkgdata_to_sdk;"
 copy_pkgdata_to_sdk() {
     install -d ${SDK_OUTPUT}${SDKPATHNATIVE}${datadir}/pkgdata
-    if [ -e ${DEPLOY_DIR_RPM}/.pkgdata.tar.bz2 -a -e ${DEPLOY_DIR_RPM}/.pkgdata.tar.bz2.sha256sum ]; then
-        cp ${DEPLOY_DIR_RPM}/.pkgdata.tar.bz2 \
+    if [ -e ${DEPLOY_DIR}/${IMAGE_PKGTYPE}/.pkgdata.tar.bz2 -a -e ${DEPLOY_DIR}/${IMAGE_PKGTYPE}/.pkgdata.tar.bz2.sha256sum ]; then
+        cp ${DEPLOY_DIR}/${IMAGE_PKGTYPE}/.pkgdata.tar.bz2 \
             ${SDK_OUTPUT}${SDKPATHNATIVE}${datadir}/pkgdata/pkgdata.tar.bz2
-        cp ${DEPLOY_DIR_RPM}/.pkgdata.tar.bz2.sha256sum \
+        cp ${DEPLOY_DIR}/${IMAGE_PKGTYPE}/.pkgdata.tar.bz2.sha256sum \
             ${SDK_OUTPUT}${SDKPATHNATIVE}${datadir}/pkgdata/pkgdata.tar.bz2.sha256sum
     fi
 
