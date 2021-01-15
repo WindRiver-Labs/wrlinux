@@ -10,6 +10,8 @@ WRTEMPLATE_IMAGE = "0"
 
 NO_RECOMMENDATIONS = "1"
 
+SDKIMAGE_LINGUAS = ""
+
 # Implementation of Full Image generator with Application SDK
 TOOLCHAIN_HOST_TASK_append = " \
     nativesdk-wic \
