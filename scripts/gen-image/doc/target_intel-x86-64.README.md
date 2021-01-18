@@ -36,6 +36,10 @@ specified branch configured in /sysroot/ostree/repo/config.
   -F   Local Factory reset, uses -b -e -f -r -s
   -U   Factory upgrade reset, uses -b -e -f -s
 
+NOTE: On target, run ostree_upgrade.sh to update the image rather than
+'ostree pull'. Use "ostree remote add wrlinux xxx" to add remote repo
+if not present.
+
 ## Supported BSPs
 - intel-x86-64
 - qemux86-64
