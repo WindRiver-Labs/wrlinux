@@ -12,9 +12,6 @@ Notes
   added by IMAGE_FEATURES 'allow-empty-password' or 'debug-tweaks':
 
   When a user with non-empty password tries to login with ssh, it will be
-  treated as a failed attempt before entering password and the login will
-  be denied for n seconds according to the lock_time setting:
-
-  "lock_time=n   Always deny for n seconds after failed attempt."
+  treated as a failed attempt before entering password.
 
   So add a banner message with suggestion for the user.
