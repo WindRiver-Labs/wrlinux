@@ -104,8 +104,8 @@ For qemu x86_64 without KVM:
         -cpu Nehalem \
         -drive if=pflash,format=qcow2,file=ovmf.qcow2
 
-#### Qemu Simulator
-/usr/bin/qemu-system-x86_64
+#### Qemu Simulator (require 2.11 or higher)
+qemu-system-x86_64
 
 #### Qemu Networking
 Create a SLiRP user network

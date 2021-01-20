@@ -109,8 +109,8 @@ Or Qemu Graphic (XFCE desktop):
         -device qemu-xhci -device usb-tablet -device usb-kbd \
         -drive id=disk0,file=boot-image-qemu.hddimg,if=none,format=raw -device virtio-blk-device,drive=disk0
 
-#### Qemu Simulator
-/usr/bin/qemu-system-aarch64
+#### Qemu Simulator (require 2.11 or higher)
+qemu-system-aarch64
 
 #### Qemu Networking
 Create a SLiRP user network
