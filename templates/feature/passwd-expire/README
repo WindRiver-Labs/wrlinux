@@ -1,8 +1,9 @@
 feature/passwd-expire
 ---------------------
 
-It provides a mechanism to force users to update their passwords when next
-serial login by template feature/passwd-expire.
+It provides a mechanism by template feature/passwd-expire to force users to
+update their passwords when next time serial or graphical login. For graphical
+login, it only support display manager 'lxdm' for now.
 
 Introduce 2 variables:
 * FORCE_PASSWD_EXPIRE:
@@ -11,9 +12,9 @@ Introduce 2 variables:
 * FORCE_EXPIRED_USERS:
   It works with EXTRA_USERS_PARAMS which is from extrausers.bbclass. Users set
   in FORCE_EXPIRED_USERS will be promted to update the passwords when next time
-  serial login.
+  serial or graphical login.
 
 
 #@TYPE: Wrtemplate
 #@NAME: passwd-expire
-#@DESCRIPTION: Force users to update passwords when next time serial login
+#@DESCRIPTION: Force users to update passwords when next time serial or graphical login
