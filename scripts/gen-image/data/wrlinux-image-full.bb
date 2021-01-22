@@ -41,6 +41,26 @@ CONTAINER_IMAGE_REMOVE ?= "\
     openvino-model-optimizer-dev \
     open-model-zoo \
     open-model-zoo-staticdev \
+    linux-firmware-bcm43455 \
+    linux-firmware-bcm43430 \
+    u-boot-uenv \
+    i2c-tools \
+    alsa-utils \
+    pm-utils \
+    kernel-devicetree \
+    kernel-image-image \
+    kernel-module-brcmfmac \
+    kernel-module-btbcm \
+    kernel-module-bnep \
+    kernel-module-hci-uart \
+    kernel-module-snd-bcm2835 \
+    kernel-module-spi-bcm2835 \
+    kernel-module-i2c-bcm2835 \
+    kernel-module-bcm2835-v4l2 \
+    kernel-module-vc4 \
+    kernel-module-v3d \
+    kernel-module-bcm2835-gpiomem \
+    boot-config u-boot \
 "
 
 # No k8s by default
