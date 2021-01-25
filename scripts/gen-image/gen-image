@@ -283,7 +283,12 @@ INHERIT += "rm_work"
 GPG_PATH ?= "${TOPDIR}/.gnupg"
 OSTREE_USE_AB = "0"
 
-WRTEMPLATE = "feature/docker feature/kubernetes feature/ostree feature/lat feature/ntp feature/python-tkinter"
+# For feature/passwd-expire
+FORCE_EXPIRED_USERS = 'root'
+
+WRTEMPLATE = "feature/docker feature/kubernetes feature/ostree feature/lat feature/ntp \\
+    feature/python-tkinter feature/passwd-expire \\
+"
 WRTEMPLATE_append_intel-x86-64 = " feature/intel-openvino"
 
 KERNEL_FEATURES_append += "features/nfsd/nfsd-enable.scc"
