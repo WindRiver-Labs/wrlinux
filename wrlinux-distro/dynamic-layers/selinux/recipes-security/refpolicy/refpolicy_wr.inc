@@ -57,6 +57,9 @@ SRC_URI += "\
         file://0048-policy-modules-system-sysnet-allow-dhcpc_t-to-create.patch \
         file://0049-policy-modules-system-systemd-allow-systemd_resolved.patch \
         file://0050-policy-modules-system-sysnetwork-support-priviledge-.patch \
+        file://0051-policy-modules-system-systemd-allow-systemd_resolved.patch \
+        file://0052-policy-modules-system-ipsec-allow-ipsec_mgmt_t-to-li.patch \
+        file://0053-selinux-add-selinux_use_status_page-and-deprecate-se.patch \
         "
 
 OSTREE_POLICY_PATCHES = "\
