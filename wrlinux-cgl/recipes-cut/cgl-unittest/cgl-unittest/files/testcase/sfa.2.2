@@ -45,6 +45,6 @@ modprobe kprobe_example || cuterr "Failed to load the kprobe test module"
 
 num2=`cat /sys/kernel/debug/kprobes/list | wc -l`
 if [ $num2 -gt $num1 ]; then
-	cat /sys/kernel/debug/kprobes/list | grep kernel_clone  && cutpass
+	cat /sys/kernel/debug/kprobes/list | grep "kernel_clone\|do_fork"  && cutpass
 fi
 cuterr "Failed to register kprobes"
