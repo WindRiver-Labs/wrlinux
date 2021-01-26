@@ -813,7 +813,7 @@ def main():
             gen.gen_sdk()
             gen.gen_lat()
             # Gen ip sources for WRLINUX_CI branch
-            if gen.is_ci_branch:
+            if gen.is_ci_branch():
                 gen.ip_review()
 
             gen.post()
