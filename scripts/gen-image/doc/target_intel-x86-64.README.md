@@ -90,7 +90,7 @@ Burn the image onto 8G disk image:
 
 For qemu x86_64 with KVM:
 
-    $ /usr/bin/qemu-system-x86_64 -net nic -net user -m 512 \
+    $ qemu-system-x86_64 -net nic -net user -m 512 \
         -drive if=none,id=hd,file=boot-image-qemu.hddimg,format=raw \
         -device virtio-scsi-pci,id=scsi -device scsi-hd,drive=hd \
         -cpu kvm64 -enable-kvm \
@@ -98,7 +98,7 @@ For qemu x86_64 with KVM:
 
 For qemu x86_64 without KVM:
 
-    $ /usr/bin/qemu-system-x86_64 -net nic -net user -m 512 \
+    $ qemu-system-x86_64 -net nic -net user -m 512 \
         -drive if=none,id=hd,file=boot-image-qemu.hddimg,format=raw \
         -device virtio-scsi-pci,id=scsi -device scsi-hd,drive=hd \
         -cpu Nehalem \

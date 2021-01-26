@@ -92,7 +92,7 @@ Burn the image onto 8G disk image:
 
 For Qemu No Graphic:
 
-    $ /usr/bin/qemu-system-aarch64 -machine virt -cpu cortex-a57 \
+    $ qemu-system-aarch64 -machine virt -cpu cortex-a57 \
         -device virtio-net-device,netdev=net0 -netdev user,id=net0 \
         -m 512 \
         -bios qemu-u-boot-bcm-2xxx-rpi4.bin \
@@ -101,7 +101,7 @@ For Qemu No Graphic:
 
 Or Qemu Graphic (XFCE desktop):
 
-    $ /usr/bin/qemu-system-aarch64 -machine virt -cpu cortex-a57 \
+    $ qemu-system-aarch64 -machine virt -cpu cortex-a57 \
         -device virtio-net-device,netdev=net0 -netdev user,id=net0 \
         -m 512 \
         -bios qemu-u-boot-bcm-2xxx-rpi4.bin \
