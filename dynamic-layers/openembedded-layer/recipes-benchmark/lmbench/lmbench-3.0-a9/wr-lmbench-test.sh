@@ -148,6 +148,20 @@ do
   lat_pipe >> $log_file 2>&1
 done
 
+## Named pipe latency
+echo "Named pipe latency"
+done_percent=0
+current_percent=0
+log_file="$LOGDIR/fifo_latency"
+SYNC_MAX=1
+
+while :
+do
+  echo_process
+  [ $? -eq 0 ] || break
+  lat_fifo -P $SYNC_MAX >> $log_file 2>&1
+done
+
 ## AF_UNIX latency
 echo "AF_UNIX sock stream latency"
 done_percent=0
@@ -161,6 +175,21 @@ do
   lat_unix >> $log_file 2>&1
 done
 
+## simple UNIX connection latency
+echo "simple UNIX connection latency"
+done_percent=0
+current_percent=0
+log_file="$LOGDIR/unix_connect_latency"
+SYNC_MAX=1
+
+lat_unix_connect -s
+while :
+do
+  echo_process
+  [ $? -eq 0 ] || break
+  lat_unix_connect -P $SYNC_MAX >> $log_file 2>&1
+done
+lat_unix_connect -S
 
 ## Pipe Bandwidth
 echo "Bandwidth pipe -P 1 -M 100m"
@@ -582,6 +611,53 @@ do
   [ $? -eq 0 ] || break
   bw_file_rd -P $SYNC_MAX ${FILE_SIZE}m open2close $FILE >> $log_file 2>&1
   drop_caches
+done
+
+##== File locking ==
+echo "File locking"
+done_percent=0
+current_percent=0
+log_file="$LOGDIR/file_locking"
+SYNC_MAX=1
+
+while :
+do
+  echo_process
+  [ $? -eq 0 ] || break
+  lat_fcntl -P $SYNC_MAX >> $log_file 2>&1
+done
+
+##== HTTP transaction latency ==
+echo "HTTP transaction latency"
+done_percent=0
+current_percent=0
+log_file="$LOGDIR/http_transaction_latency"
+
+if [ ! -d /usr/share/lmbench/webpage-lm ]
+then (cd /usr/share/lmbench && tar xf webpage-lm.tar && cd -)
+  sync
+  sleep 1
+fi
+
+while :
+do
+  echo_process
+  [ $? -eq 0 ] || break
+  lat_http 127.0.0.1 < /usr/share/lmbench/webpage-lm/URLS >> $log_file 2>&1
+done
+
+##== Semaphore ==
+echo "Semaphore latency"
+done_percent=0
+current_percent=0
+log_file="$LOGDIR/semaphore_latency"
+SYNC_MAX=1
+
+while :
+do
+  echo_process
+  [ $? -eq 0 ] || break
+  lat_sem -P $SYNC_MAX >> $log_file 2>&1
 done
 
 ##Test end

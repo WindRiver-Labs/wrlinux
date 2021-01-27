@@ -1,7 +1,7 @@
 #!/bin/bash
 ## Process test lmbench logs to save result for each case in seperate log.
 
-: ${1:?"Uage: `basename $0` original_log_directory [new_dir_to_save_dealt_logs]"}
+: ${1:?"Usage: `basename $0` original_log_directory [new_dir_to_save_dealt_logs]"}
 orig_log_dir=$(readlink -f $1)
 [ ! -d "$orig_log_dir" ] && { echo "No such directory: $orig_log_dir"; exit 1; }
 
@@ -129,6 +129,15 @@ for i in `ls ${orig_log_dir} | grep -v sysinfo`; do
 		cat $log | awk '{print $1 "   us"}' > 100K_file_create_latency.log
 		cat $log | awk '{print $2 "   us"}' > 100K_file_delete_latency.log
 		;;
+	fifo_latency)
+		cat $log | awk '{print $3 "   us"}' > fifo_latency.log
+		;;
+	file_locking)
+		cat $log | awk '{print $4 "   us"}' > file_locking.log
+		;;
+	http_transaction_latency)
+		cat $log | awk '{print $8 "   us"}' > http_transaction_latency.log
+		;;
 	memory_load_latency)
 		cat $log | sed -n '/^512/p' | awk '{print $2 "   us"}' > memory_load_latency.log
 		;;
@@ -215,6 +224,9 @@ for i in `ls ${orig_log_dir} | grep -v sysinfo`; do
 	select_tcp_latency)
 		cat $log | awk '{print $6 "   us"}' > select_tcp_latency.log
 		;;
+	semaphore_latency)
+		cat $log | awk '{print $3 "   us"}' > semaphore_latency.log
+		;;
 	sig_hand_latency)
 		cat $log | sed -n '/installation/p' | awk '{print $4 "   us"}' > sig_installation.log
 		cat $log | sed -n '/overhead/p' | awk '{print $4 "   us"}' > sig_catch.log
@@ -236,6 +248,9 @@ for i in `ls ${orig_log_dir} | grep -v sysinfo`; do
 		;;
 	udp_latency)
 		cat $log | awk '{print $5 "   us"}' > udp_latency.log
+		;;
+	unix_connect_latency)
+		cat $log | awk '{print $4 "   us"}' > unix_connect_latency.log
 		;;
 	unix_sock_latency)
 		cat $log | awk '{print $5 "   us"}' > unix_sock_latency.log

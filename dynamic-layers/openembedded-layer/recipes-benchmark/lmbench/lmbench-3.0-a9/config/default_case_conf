@@ -25,6 +25,9 @@ tcp_connect_latency:Local Communication Latencies:4
 rpc_latency_udp:Local Communication Latencies:5
 rpc_latency_tcp:Local Communication Latencies:6
 memory_load_latency:Local Communication Latencies:7
+fifo_latency:Local Communication Latencies:8
+unix_connect_latency:Local Communication Latencies:9
+http_transaction_latency:Local Communication Latencies:10
 
 10K_file_create_latency:File create/delete latencies:0
 10K_file_delete_latency:File create/delete latencies:1
@@ -36,6 +39,8 @@ mmap_latency:Mmap latency:0
 pagefaults_latency:Other File/VM system latencies:0
 select_file_latency:Other File/VM system latencies:1
 select_tcp_latency:Other File/VM system latencies:2
+file_locking:Other File/VM system latencies:3
+semaphore_latency:Other File/VM system latencies:4
 
 pipe_bandwidth:Local Communication bandwidths:0
 unix_bandwidth:Local Communication bandwidths:1
@@ -69,4 +74,3 @@ double_add:Basic double operations:0
 double_mul:Basic double operations:1
 double_div:Basic double operations:2
 double_bogomflops:Basic double operations:3
-
