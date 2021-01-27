@@ -1,6 +1,6 @@
-From 3b2b17b13607c3fff891df1b818db22af9ca6b4d Mon Sep 17 00:00:00 2001
-From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Sun, 28 Jun 2020 23:43:19 -0700
+From 533abc4c87023979c61d68719fa87d23c8be3da4 Mon Sep 17 00:00:00 2001
+From: He Zhe <zhe.he@windriver.com>
+Date: Mon, 25 Jan 2021 14:41:55 +0800
 Subject: [PATCH] qemu-kvm: Add options to pin and prioritize vcpus
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
@@ -21,21 +21,24 @@ Signed-off-by: Hongzhi.Song <hongzhi.song@windriver.com>
 
 Rebase to 5.0.0
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
----
- softmmu/cpus.c                | 146 ++++++++++++++++++++++++++++++++++++++++++
- include/sysemu/cpus.h |   1 +
- qemu-options.hx       |   7 ++
- softmmu/vl.c          |   3 +
- 4 files changed, 157 insertions(+)
 
-diff --git a/cpus.c b/cpus.c
-index ef441bdf..8f0c63ee 100644
---- a/softmmu/cpus.c
-+++ b/softmmu/cpus.c
-@@ -1215,6 +1215,150 @@ static void qemu_wait_io_event(CPUState *cpu)
-     qemu_wait_io_event_common(cpu);
- }
+Rebase to v5.2.0
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ accel/kvm/kvm-cpus.c  | 144 ++++++++++++++++++++++++++++++++++++++++++
+ include/sysemu/cpus.h |   2 +
+ qemu-options.hx       |   7 ++
+ softmmu/vl.c          |   5 ++
+ 4 files changed, 158 insertions(+)
+
+diff --git a/accel/kvm/kvm-cpus.c b/accel/kvm/kvm-cpus.c
+index d809b1e74c..461ff7913f 100644
+--- a/accel/kvm/kvm-cpus.c
++++ b/accel/kvm/kvm-cpus.c
+@@ -23,6 +23,148 @@
+ #include "qapi/error.h"
  
+ #include "kvm-cpus.h"
 +#include <sched.h>
 +
 +static cpu_set_t vcpu_affinity[1024];
@@ -178,37 +181,36 @@ index ef441bdf..8f0c63ee 100644
 +    fprintf(stderr, "vcpu %d: affinity %llx prio %d\n", cpuid,
 +	    *((unsigned long long*) &vcpu_affinity[cpuid]), vcpu_priority[cpuid]);
 +}
-+
-+
- static void *qemu_kvm_cpu_thread_fn(void *arg)
- {
-     CPUState *cpu = arg;
-@@ -1236,6 +1380,8 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
  
+ static void *kvm_vcpu_thread_fn(void *arg)
+ {
+@@ -40,6 +182,8 @@ static void *kvm_vcpu_thread_fn(void *arg)
+     r = kvm_init_vcpu(cpu, &error_fatal);
      kvm_init_cpu_signals(cpu);
  
 +    qemu_kvm_vcpu_sched_init(cpu);
 +
      /* signal CPU creation */
-     cpu->created = true;
-     qemu_cond_signal(&qemu_cpu_cond);
+     cpu_thread_signal_created(cpu);
+     qemu_guest_random_seed_thread_part2(cpu->random_seed);
 diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
-index 3c1da6a0..108882d8 100644
+index e8156728c6..fd53abbd30 100644
 --- a/include/sysemu/cpus.h
 +++ b/include/sysemu/cpus.h
-@@ -30,6 +30,7 @@ void cpu_synchronize_all_post_init(void);
+@@ -62,6 +62,8 @@ void cpu_synchronize_all_post_reset(void);
+ void cpu_synchronize_all_post_init(void);
  void cpu_synchronize_all_pre_loadvm(void);
  
- void qtest_clock_warp(int64_t dest);
 +void vcpu_parse(const char *optarg);
- 
++
  #ifndef CONFIG_USER_ONLY
  /* vl.c */
+ /* *-user doesn't have configurable SMP topology */
 diff --git a/qemu-options.hx b/qemu-options.hx
-index 292d4e7c..1a692e1b 100644
+index 104632ea34..beead7b5a8 100644
 --- a/qemu-options.hx
 +++ b/qemu-options.hx
-@@ -904,6 +904,13 @@ DEFHEADING()
+@@ -906,6 +906,13 @@ DEFHEADING()
  
  DEFHEADING(Block device options:)
  
@@ -223,19 +225,21 @@ index 292d4e7c..1a692e1b 100644
      "-fda/-fdb file  use 'file' as floppy disk 0/1 image\n", QEMU_ARCH_ALL)
  DEF("fdb", HAS_ARG, QEMU_OPTION_fdb, "", QEMU_ARCH_ALL)
 diff --git a/softmmu/vl.c b/softmmu/vl.c
-index 32c00478..75190f9c 100644
+index e6e0ad5a92..8c7612e823 100644
 --- a/softmmu/vl.c
 +++ b/softmmu/vl.c
-@@ -3514,6 +3514,9 @@ void qemu_init(int argc, char **argv, char **envp)
+@@ -3553,6 +3553,11 @@ void qemu_init(int argc, char **argv, char **envp)
                      exit(1);
                  }
                  break;
 +            case QEMU_OPTION_vcpu:
++#ifdef CONFIG_KVM
 +                vcpu_parse(optarg);
++#endif
 +                break;
              case QEMU_OPTION_vnc:
                  vnc_parse(optarg, &error_fatal);
                  break;
 -- 
-2.21.0
+2.17.1
 
