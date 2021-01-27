@@ -55,11 +55,8 @@ inherit extrausers
 
 NO_RECOMMENDATIONS = "1"
 
-python () {
-    if not bb.utils.to_boolean(d.getVar('IMAGE_ENABLE_CONTAINER')):
-        # Set root password to root
-        d.setVar('EXTRA_USERS_PARAMS', 'usermod -P root root;')
-}
+# Set root password to root
+EXTRA_USERS_PARAMS += "usermod -P root root;"
 
 # Remove debug-tweaks
 EXTRA_IMAGE_FEATURES = ""
