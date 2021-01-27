@@ -84,7 +84,7 @@ check_kgdbts()
 	echo kgdbts=V1F100 > /sys/module/kgdbts/parameters/kgdbts
 
 	# check the test result
-	dmesg | tail | grep do_fork |grep 100 && cutpass || cutfail
+	dmesg | tail | grep "do_fork\|kernel_clone" |grep 100 && cutpass || cutfail
 }
 
 if [ -r /proc/config.gz ];then
