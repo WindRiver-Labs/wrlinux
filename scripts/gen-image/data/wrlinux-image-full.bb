@@ -14,10 +14,6 @@ CONTAINER_CORE_BOOT ?= " \
 TARGET_IMAGE_INSTALL ?= " \
     kernel-modules \
     packagegroup-core-boot \
-    packagegroup-xfce-base \
-    xfce4-screenshooter \
-    lxdm \
-    wr-themes \
     gsettings-desktop-schemas \
 "
 
@@ -61,6 +57,8 @@ CONTAINER_IMAGE_REMOVE ?= "\
     kernel-module-v3d \
     kernel-module-bcm2835-gpiomem \
     boot-config u-boot \
+    wr-themes \
+    packagegroup-xfce-extended \
 "
 
 # No k8s by default
@@ -95,4 +93,6 @@ inherit wrlinux-image
 inherit extrausers
 
 # Remove debug-tweaks
-EXTRA_IMAGE_FEATURES = ""
+EXTRA_IMAGE_FEATURES_remove = "debug-tweaks"
+# Remove x11-base for container image
+EXTRA_IMAGE_FEATURES_remove = "${@['', 'x11-base'][bb.utils.to_boolean(d.getVar('IMAGE_ENABLE_CONTAINER') or '0')]}"

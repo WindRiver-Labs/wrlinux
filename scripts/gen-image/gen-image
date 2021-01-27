@@ -287,7 +287,7 @@ OSTREE_USE_AB = "0"
 FORCE_EXPIRED_USERS = 'root'
 
 WRTEMPLATE = "feature/docker feature/kubernetes feature/ostree feature/lat feature/ntp \\
-    feature/python-tkinter feature/passwd-expire \\
+    feature/python-tkinter feature/passwd-expire feature/xfce \\
 "
 WRTEMPLATE_append_intel-x86-64 = " feature/intel-openvino"
 

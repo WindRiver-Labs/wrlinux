@@ -58,5 +58,5 @@ NO_RECOMMENDATIONS = "1"
 # Set root password to root
 EXTRA_USERS_PARAMS += "usermod -P root root;"
 
-# Remove debug-tweaks
-EXTRA_IMAGE_FEATURES = ""
+# Remove debug-tweaks and x11-base
+EXTRA_IMAGE_FEATURES_remove = "debug-tweaks x11-base"
