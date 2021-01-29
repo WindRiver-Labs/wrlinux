@@ -36,6 +36,7 @@ IMAGE_INSTALL = "\
 IMAGE_INSTALL_remove = "\
     packagegroup-core-base-utils \
     ${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', 'ostree ostree-upgrade-mgr linux-firmware', '', d)} \
+    ${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', 'u-boot u-boot-uenv boot-config', '', d)} \
 "
 
 # Only need tar.bz2 for container image
