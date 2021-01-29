@@ -16,7 +16,7 @@ The images are built from Wind River Linux CD release, which support docker, kub
     Arch: x86_64 (corei7_64)
     Package Manager: dnf
     glibc: 2.31
-    Features: docker kubernetes openvino xfce
+    Features: docker kubernetes xfce
 
 ### rpi4
     Arch: aarch64 (cortexa72)
@@ -31,7 +31,7 @@ large image via package manager dnf.
 
 ### wrlinux-image-full
 A full functional image that boots to a console, no busybox installed but other
-common tools such as coreutils, and openvino is installed by default.
+common tools such as coreutils, and is installed by default.
 
 ## Install a package
     $ dnf install <package>

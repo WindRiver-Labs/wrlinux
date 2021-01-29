@@ -289,7 +289,6 @@ FORCE_EXPIRED_USERS = 'root'
 WRTEMPLATE = "feature/docker feature/kubernetes feature/ostree feature/lat feature/ntp \\
     feature/python-tkinter feature/passwd-expire feature/xfce \\
 "
-WRTEMPLATE_append_intel-x86-64 = " feature/intel-openvino"
 
 KERNEL_FEATURES_append += "features/nfsd/nfsd-enable.scc"
 KERNEL_MODULE_AUTOLOAD += "nfsd"

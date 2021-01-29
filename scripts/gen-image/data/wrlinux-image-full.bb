@@ -29,14 +29,6 @@ CONTAINER_IMAGE_REMOVE ?= "\
     docker \
     virtual/containerd \
     python3-docker-compose \
-    openvino-inference-engine \
-    openvino-inference-engine-samples \
-    openvino-inference-engine-vpu-firmware \
-    openvino-inference-engine-dev \
-    openvino-model-optimizer \
-    openvino-model-optimizer-dev \
-    open-model-zoo \
-    open-model-zoo-staticdev \
     linux-firmware-bcm43455 \
     linux-firmware-bcm43430 \
     u-boot-uenv \
