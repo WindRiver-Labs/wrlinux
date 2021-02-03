@@ -604,7 +604,6 @@ COPYLEFT_LICENSE_EXCLUDE = ""
         logger.info('Deploying sources-%s' % self.machine)
         dst_dir = os.path.join(self.handoff_dir, 'sources-%s' % self.machine)
         self.mv_to_old('sources-%s' % self.machine)
-        shutil.copytree(src_dir, dst_dir)
         cmd = 'rsync -a --exclude "*-native-*" %s/*/* %s' % (src_dir, dst_dir)
         logger.info('Running %s' % cmd)
         subprocess.check_call(cmd, shell=True)
