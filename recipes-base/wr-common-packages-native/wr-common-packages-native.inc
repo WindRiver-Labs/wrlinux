@@ -179,6 +179,7 @@ DEPENDS = "\
     shaderc-native \
     shadow-native \
     shared-mime-info-native \
+    spirv-headers-native \
     spirv-tools-native \
     sqlite3-native \
     squashfs-tools-native \
