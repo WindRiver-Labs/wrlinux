@@ -38,12 +38,16 @@ MACHINE_EXTRA_RRECOMMENDS += " \
  
 NON_MULTILIB_RECIPES_append = " \
    openvino-inference-engine \
+   open-model-zoo \
    openvino-model-optimizer"
  
 PNWHITELIST_intel += " \
    openvino-inference-engine \
+   open-model-zoo \
    openvino-model-optimizer"
 PNWHITELIST_openembedded-layer += "opencv"
+
+IMAGE_INSTALL += "open-model-zoo"
 
 
 Some demos in OpenVINO need graphic support, it can work well with the
