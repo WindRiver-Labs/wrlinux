@@ -60,6 +60,10 @@ SRC_URI += "\
         file://0051-policy-modules-system-systemd-allow-systemd_resolved.patch \
         file://0052-policy-modules-system-ipsec-allow-ipsec_mgmt_t-to-li.patch \
         file://0053-selinux-add-selinux_use_status_page-and-deprecate-se.patch \
+        file://0054-policy-modules-services-ssh-allow-ssh_keygen_t-to-re.patch \
+        file://0055-policy-modules-system-systemd-support-systemd-user.patch \
+        file://0056-policy-modules-system-systemd-make-systemd_backlight.patch \
+        file://0057-policy-modules-system-sysnetwork-allow-dhcpc_t-to-re.patch \
         "
 
 OSTREE_POLICY_PATCHES = "\

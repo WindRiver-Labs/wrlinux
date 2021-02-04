@@ -1,0 +1,206 @@
+From 99b85536e7403490b1545e5ecef61d7983221536 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 4 Feb 2021 10:48:54 +0800
+Subject: [PATCH] policy/modules/system/systemd: support systemd --user
+
+Fixes:
+$ systemctl status user@0.service
+* user@0.service - User Manager for UID 0
+     Loaded: loaded (/lib/systemd/system/user@.service; static)
+     Active: failed (Result: exit-code) since Thu 2021-02-04 02:57:32 UTC; 11s ago
+     Docs: man:user@.service(5)
+     Process: 1502 ExecStart=/lib/systemd/systemd --user (code=exited, status=1/FAILURE)
+     Main PID: 1502 (code=exited, status=1/FAILURE)
+
+Feb 04 02:57:32 intel-x86-64 systemd[1]: Starting User Manager for UID 0...
+Feb 04 02:57:32 intel-x86-64 systemd[1502]: selinux_status_open() failed to open the status page, using the netlink fallback.
+Feb 04 02:57:32 intel-x86-64 systemd[1502]: Failed to initialize SELinux labeling handle: Permission denied
+Feb 04 02:57:32 intel-x86-64 systemd[1]: user@0.service: Main process exited, code=exited, status=1/FAILURE
+Feb 04 02:57:32 intel-x86-64 systemd[1]: user@0.service: Failed with result 'exit-code'.
+Feb 04 02:57:32 intel-x86-64 systemd[1]: Failed to start User Manager for UID 0.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/roles/sysadm.te      |  2 +
+ policy/modules/system/locallogin.te |  1 +
+ policy/modules/system/logging.te    |  6 ++-
+ policy/modules/system/systemd.if    | 82 ++++++++++++++++++++++++++++-
+ 4 files changed, 89 insertions(+), 2 deletions(-)
+
+diff --git a/policy/modules/roles/sysadm.te b/policy/modules/roles/sysadm.te
+index fb2b78b1c..4514bc8b6 100644
+--- a/policy/modules/roles/sysadm.te
++++ b/policy/modules/roles/sysadm.te
+@@ -101,6 +101,8 @@ ifdef(`init_systemd',`
+ 	mount_watch_runtime_dirs(sysadm_t)
+ 	systemd_filetrans_passwd_runtime_dirs(sysadm_t)
+ 	allow sysadm_t systemd_passwd_runtime_t:dir watch;
++
++	systemd_sysadm_user(sysadm_t)
+ ')
+ 
+ tunable_policy(`allow_ptrace',`
+diff --git a/policy/modules/system/locallogin.te b/policy/modules/system/locallogin.te
+index f629b0040..4675d0abb 100644
+--- a/policy/modules/system/locallogin.te
++++ b/policy/modules/system/locallogin.te
+@@ -59,6 +59,7 @@ kernel_read_system_state(local_login_t)
+ kernel_read_kernel_sysctls(local_login_t)
+ kernel_search_key(local_login_t)
+ kernel_link_key(local_login_t)
++kernel_getattr_proc(local_login_t)
+ 
+ corecmd_list_bin(local_login_t)
+ # cjp: these are probably not needed:
+diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
+index ae1fb7500..1df972a2a 100644
+--- a/policy/modules/system/logging.te
++++ b/policy/modules/system/logging.te
+@@ -117,6 +117,7 @@ files_read_etc_files(auditctl_t)
+ kernel_read_kernel_sysctls(auditctl_t)
+ kernel_read_proc_symlinks(auditctl_t)
+ kernel_setsched(auditctl_t)
++kernel_getattr_proc(auditctl_t)
+ 
+ domain_read_all_domains_state(auditctl_t)
+ domain_use_interactive_fds(auditctl_t)
+@@ -538,7 +539,7 @@ ifdef(`init_systemd',`
+ 	# for systemd-journal
+ 	allow syslogd_t self:netlink_audit_socket connected_socket_perms;
+ 	allow syslogd_t self:capability2 audit_read;
+-	allow syslogd_t self:capability { chown setgid setuid sys_ptrace };
++	allow syslogd_t self:capability { chown setgid setuid sys_ptrace dac_read_search };
+ 	allow syslogd_t self:netlink_audit_socket { getattr getopt read setopt write nlmsg_write };
+ 
+ 	# remove /run/log/journal when switching to permanent storage
+@@ -572,6 +573,9 @@ ifdef(`init_systemd',`
+ 	udev_read_runtime_files(syslogd_t)
+ 
+ 	userdom_list_user_tmp(syslogd_t)
++
++	userdom_search_user_runtime(syslogd_t)
++	systemd_search_user_runtime(syslogd_t)
+ ')
+ 
+ ifdef(`distro_gentoo',`
+diff --git a/policy/modules/system/systemd.if b/policy/modules/system/systemd.if
+index c63b43625..38e04f596 100644
+--- a/policy/modules/system/systemd.if
++++ b/policy/modules/system/systemd.if
+@@ -25,6 +25,7 @@ template(`systemd_role_template',`
+ 		attribute systemd_user_session_type, systemd_log_parse_env_type;
+ 		type systemd_user_runtime_t, systemd_user_runtime_notify_t;
+ 		type systemd_run_exec_t, systemd_analyze_exec_t;
++		type session_dbusd_runtime_t, systemd_user_runtime_dir_t;
+ 	')
+ 
+ 	#################################
+@@ -50,12 +51,45 @@ template(`systemd_role_template',`
+ 
+ 	allow $3 systemd_user_runtime_notify_t:sock_file { manage_sock_file_perms relabel_sock_file_perms };
+ 
++	allow $1_systemd_t systemd_user_runtime_t:dir { manage_dir_perms relabel_dir_perms };
++	allow $1_systemd_t systemd_user_runtime_t:file { manage_file_perms relabel_file_perms };
++	allow $1_systemd_t systemd_user_runtime_t:lnk_file { manage_lnk_file_perms relabel_lnk_file_perms };
++	allow $1_systemd_t systemd_user_runtime_t:fifo_file { manage_fifo_file_perms relabel_fifo_file_perms };
++	allow $1_systemd_t systemd_user_runtime_t:sock_file { manage_sock_file_perms relabel_sock_file_perms };
++	allow $1_systemd_t systemd_user_runtime_t:blk_file { manage_blk_file_perms relabel_blk_file_perms };
++	allow $1_systemd_t systemd_user_runtime_t:chr_file { manage_chr_file_perms relabel_chr_file_perms };
++	allow $1_systemd_t systemd_user_runtime_notify_t:sock_file { manage_sock_file_perms relabel_sock_file_perms };
++	allow $1_systemd_t session_dbusd_runtime_t:sock_file { manage_sock_file_perms relabel_sock_file_perms };
++	allow $1_systemd_t self:netlink_kobject_uevent_socket getopt;
++	allow $1_systemd_t self:process setrlimit;
++
++	kernel_getattr_proc($1_systemd_t)
++	fs_watch_cgroup_files($1_systemd_t)
++	files_watch_etc_dirs($1_systemd_t)
++
++	userdom_search_user_home_dirs($1_systemd_t)
++	allow $1_systemd_t $3:dir search_dir_perms;
++	allow $1_systemd_t $3:file read_file_perms;
++
++	allow $3 $1_systemd_t:unix_stream_socket { getattr read write };
++
++	allow systemd_user_runtime_dir_t systemd_user_runtime_t:dir { manage_dir_perms relabel_dir_perms };
++	allow systemd_user_runtime_dir_t systemd_user_runtime_t:file { manage_file_perms relabel_file_perms };
++	allow systemd_user_runtime_dir_t systemd_user_runtime_t:lnk_file { manage_lnk_file_perms relabel_lnk_file_perms };
++	allow systemd_user_runtime_dir_t systemd_user_runtime_t:fifo_file { manage_fifo_file_perms relabel_fifo_file_perms };
++	allow systemd_user_runtime_dir_t systemd_user_runtime_t:sock_file { manage_sock_file_perms relabel_sock_file_perms };
++	allow systemd_user_runtime_dir_t systemd_user_runtime_t:blk_file { manage_blk_file_perms relabel_blk_file_perms };
++	allow systemd_user_runtime_dir_t systemd_user_runtime_t:chr_file { manage_chr_file_perms relabel_chr_file_perms };
++	allow systemd_user_runtime_dir_t systemd_user_runtime_notify_t:sock_file { manage_sock_file_perms relabel_sock_file_perms };
++	allow systemd_user_runtime_dir_t session_dbusd_runtime_t:sock_file { manage_sock_file_perms relabel_sock_file_perms };
++
+ 	# This domain is per-role because of the below transitions.
+ 	# See the sytemd --user section of systemd.te for the
+ 	# remainder of the rules.
+-	allow $1_systemd_t $3:process { setsched rlimitinh };
++	allow $1_systemd_t $3:process { setsched rlimitinh noatsecure siginh };
+ 	corecmd_shell_domtrans($1_systemd_t, $3)
+ 	corecmd_bin_domtrans($1_systemd_t, $3)
++	allow $1_systemd_t self:process signal;
+ 
+ 	# Allow using file descriptors for user environment generators
+ 	allow $3 $1_systemd_t:fd use;
+@@ -66,6 +100,14 @@ template(`systemd_role_template',`
+ 	can_exec($3, { systemd_run_exec_t systemd_analyze_exec_t })
+ 
+ 	dbus_system_bus_client($1_systemd_t)
++
++	selinux_use_status_page($1_systemd_t)
++
++	seutil_read_file_contexts($1_systemd_t)
++	seutil_search_default_contexts($1_systemd_t)
++
++	mls_file_read_all_levels($1_systemd_t)
++	mls_file_write_all_levels($1_systemd_t)
+ ')
+ 
+ ######################################
+@@ -1236,3 +1278,41 @@ interface(`systemd_run_sysusers', `
+ 	systemd_domtrans_sysusers($1)
+ 	roleattribute $2 systemd_sysusers_roles;
+ ')
++
++#########################################
++## <summary>
++##	sysadm user for systemd --user
++## </summary>
++## <param name="role">
++##	<summary>
++##  Role allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_sysadm_user',`
++	gen_require(`
++		type sysadm_systemd_t;
++	')
++
++	allow sysadm_systemd_t self:capability { mknod sys_admin };
++	allow $1 sysadm_systemd_t:system reload;
++')
++
++#######################################
++## <summary>
++##  Search systemd users runtime directories.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`systemd_search_user_runtime',`
++	gen_require(`
++		type systemd_user_runtime_t;
++	')
++
++	allow $1 systemd_user_runtime_t:dir search_dir_perms;
++	allow $1 systemd_user_runtime_t:lnk_file read_lnk_file_perms;
++')
+-- 
+2.17.1
+

@@ -1,0 +1,34 @@
+From c31a2a4f1ab33099d5739b8d55f7bbbe00521cb4 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 29 Jan 2021 10:32:00 +0800
+Subject: [PATCH] policy/modules/services/ssh: allow ssh_keygen_t to read
+ proc_t
+
+Fixes:
+avc:  denied  { read } for  pid=353 comm="ssh-keygen" name="filesystems"
+dev="proc" ino=4026532078 scontext=system_u:system_r:ssh_keygen_t
+tcontext=system_u:object_r:proc_t tclass=file permissive=0
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/ssh.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/services/ssh.te b/policy/modules/services/ssh.te
+index db62eaa18..44661048d 100644
+--- a/policy/modules/services/ssh.te
++++ b/policy/modules/services/ssh.te
+@@ -330,6 +330,8 @@ allow ssh_keygen_t self:process { sigchld sigkill sigstop signull signal };
+ 
+ allow ssh_keygen_t self:unix_stream_socket create_stream_socket_perms;
+ 
++allow ssh_keygen_t proc_t:file read_file_perms;
++
+ allow ssh_keygen_t sshd_key_t:file manage_file_perms;
+ files_etc_filetrans(ssh_keygen_t, sshd_key_t, file)
+ 
+-- 
+2.17.1
+
