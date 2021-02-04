@@ -80,6 +80,7 @@ OSTREE_POLICY_PATCHES = "\
         file://wr-policy-modules-system-systemd-allow-systemd_generato.patch \
         file://wr-policy-modules-system-userdomain-allow-domain-read-h.patch \
         file://wr-policy-modules-system-systemd-allow-systemd_tmpfiles.patch \
+        file://wr-policy-modules-admin-ostree-fix-ostree-unlock.patch \
         "
 
 SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', 'ostree', '${OSTREE_POLICY_PATCHES}', '', d)}"

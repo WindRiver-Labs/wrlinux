@@ -1,0 +1,43 @@
+From ef0eab1e27b228369a7239fc2bb34aa94d85fa1f Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 4 Feb 2021 16:01:41 +0800
+Subject: [PATCH] policy/modules/admin/ostree: fix ostree unlock
+
+Fixes:
+$ ostree admin unlock
+ostree: mount: Permission denied
+error: Failed overlayfs mount: Child process exited with code 1
+
+avc:  denied  { mounton } for  pid=802 comm="ostree" path="/usr"
+dev="sdb3" ino=1307 scontext=root:sysadm_r:ostree_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:usr_t:s0 tclass=dir permissive=0
+
+avc:  denied  { mount } for  pid=802 comm="ostree" name="/"
+dev="overlay" ino=31101 scontext=root:sysadm_r:ostree_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:fs_t:s0 tclass=filesystem permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/admin/ostree.te | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/policy/modules/admin/ostree.te b/policy/modules/admin/ostree.te
+index b9d2bb774..ae21bf7b6 100644
+--- a/policy/modules/admin/ostree.te
++++ b/policy/modules/admin/ostree.te
+@@ -80,6 +80,10 @@ files_map_non_auth_files(ostree_t)
+ fs_getattr_all_dirs(ostree_t)
+ fs_getattr_all_fs(ostree_t)
+ 
++fs_remount_dos_fs(ostree_t)
++fs_mount_xattr_fs(ostree_t)
++files_mounton_all_mountpoints(ostree_t)
++
+ sysnet_dns_name_resolve(ostree_t);
+ 
+ mls_file_read_all_levels(ostree_t)
+-- 
+2.17.1
+
