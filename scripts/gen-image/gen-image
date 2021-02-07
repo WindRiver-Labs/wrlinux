@@ -24,6 +24,7 @@ import shutil
 import glob
 import time
 import hashlib
+import git
 
 logger = logging.getLogger('gen-image')
 
@@ -790,7 +791,7 @@ COPYLEFT_LICENSE_EXCLUDE = ""
             if head_name.endswith('/WRLINUX_CI'):
                 return True
         except Exception as e:
-            logger.debug('Failed to check ci branch: %s' % e)
+            logger.error('Failed to check ci branch: %s' % e)
 
         return False
 
