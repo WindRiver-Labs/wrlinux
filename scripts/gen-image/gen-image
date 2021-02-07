@@ -568,11 +568,12 @@ IMAGE_ENABLE_CONTAINER = "1"
             logger.warning("The checksum is not generated since no files are found!")
 
         # Create tarballs for target minimal/full and sdk directories
-        for d in os.listdir(file_prefix):
-            if ('-minimal-' in d or '-full-' in d or 'sdk-' in d or 'lat-' in d) and not d.startswith('container-'):
-                cmd = 'tar --numeric-owner -cjvf %s.tar.bz2 %s' % (d, d)
-                logger.debug('Running %s' % cmd)
-                subprocess.check_output(cmd, shell=True, cwd=file_prefix)
+        if os.path.exists(file_prefix):
+            for d in os.listdir(file_prefix):
+                if ('-minimal-' in d or '-full-' in d or 'sdk-' in d or 'lat-' in d) and not d.startswith('container-'):
+                    cmd = 'tar --numeric-owner -cjvf %s.tar.bz2 %s' % (d, d)
+                    logger.debug('Running %s' % cmd)
+                    subprocess.check_output(cmd, shell=True, cwd=file_prefix)
 
     def ip_review(self):
         ip_conf = """
