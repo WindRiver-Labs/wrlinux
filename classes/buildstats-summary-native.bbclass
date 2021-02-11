@@ -11,7 +11,6 @@ python buildstats_summary () {
     built = collections.defaultdict(lambda: [set(), set(), set(), set()])
     for pf in os.listdir(bsdir):
         taskdir = os.path.join(bsdir, pf)
-        bb.note(taskdir)
         if not os.path.isdir(taskdir):
             continue
 
