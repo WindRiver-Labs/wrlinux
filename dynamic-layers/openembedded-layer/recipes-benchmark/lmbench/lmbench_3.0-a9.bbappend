@@ -6,7 +6,6 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${P}:"
 
 SRC_URI += "file://lmbench-3.0-a9_wr_integration.patch \
             file://wr-lmbench-test.sh \
-            file://upload-rth.sh \
             file://dealt_log.sh \
             file://README \
             file://generate_report.sh \
@@ -24,7 +23,6 @@ inherit update-alternatives
 do_install_append () {
 	install -d ${D}/${WR_LMBENCH}
 	install -m 0755 ${WORKDIR}/wr-lmbench-test.sh ${D}/${WR_LMBENCH}
-	install -m 0755 ${WORKDIR}/upload-rth.sh ${D}/${WR_LMBENCH}
 	install -m 0755 ${WORKDIR}/dealt_log.sh ${D}/${WR_LMBENCH}
 	install -m 0755 ${WORKDIR}/generate_report.sh ${D}/${WR_LMBENCH}
 	install -m 0664 ${WORKDIR}/README ${D}/${WR_LMBENCH}/
