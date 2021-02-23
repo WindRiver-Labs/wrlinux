@@ -49,9 +49,15 @@ file_read_bandwidth:Local Communication bandwidths:3
 file_open2close_bandwidth:Local Communication bandwidths:4
 mmap_read_bandwidth:Local Communication bandwidths:5
 mmap_open2close_bandwidth:Local Communication bandwidths:6
-memory_bcopy_bandwidth:Local Communication bandwidths:7
-memory_read_bandwidth:Local Communication bandwidths:8
-memory_write_bandwidth:Local Communication bandwidths:9
+memory_bzero_bandwidth:Local Communication bandwidths:7
+memory_bcopy_bandwidth:Local Communication bandwidths:8
+memory_read_bandwidth:Local Communication bandwidths:9
+memory_write_bandwidth:Local Communication bandwidths:10
+memory_read_write_bandwidth:Local Communication bandwidths:11
+memory_copy_bandwidth:Local Communication bandwidths:12
+memory_full_read_bandwidth:Local Communication bandwidths:13
+memory_full_write_bandwidth:Local Communication bandwidths:14
+memory_full_copy_bandwidth:Local Communication bandwidths:15
 
 integer_add:Basic integer operations:0
 integer_bit:Basic integer operations:1

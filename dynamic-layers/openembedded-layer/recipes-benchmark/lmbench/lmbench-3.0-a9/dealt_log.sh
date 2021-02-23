@@ -100,6 +100,9 @@ for i in `ls ${orig_log_dir} | grep -v sysinfo`; do
   ((log_amount++))
 
   case $i in 
+	memory_bzero_bandwidth)
+		cat $log | awk '{print $2 "   MB/sec"}' > memory_bzero_bandwidth.log
+		;;
 	bw_memory_bcopy|memory_bcopy_bandwidth)
 		cat $log | awk '{print $2 "   MB/sec"}' > memory_bcopy_bandwidth.log
 		;;
@@ -146,11 +149,25 @@ for i in `ls ${orig_log_dir} | grep -v sysinfo`; do
 		;;
 	memory_write_bandwidth)
 		cat $log | awk '{print $2 "   MB/sec"}' > memory_write_bandwidth.log
-		;; 
+		;;
+	memory_read_write_bandwidth)
+		cat $log | awk '{print $2 "   MB/sec"}' > memory_read_write_bandwidth.log
+		;;
+	memory_copy_bandwidth)
+		cat $log | awk '{print $2 "   MB/sec"}' > memory_copy_bandwidth.log
+		;;
+	memory_full_read_bandwidth)
+		cat $log | awk '{print $2 "   MB/sec"}' > memory_full_read_bandwidth.log
+		;;
+	memory_full_write_bandwidth)
+		cat $log | awk '{print $2 "   MB/sec"}' > memory_full_write_bandwidth.log
+		;;
+	memory_full_copy_bandwidth)
+		cat $log | awk '{print $2 "   MB/sec"}' > memory_full_copy_bandwidth.log
+		;;
 	mmap_latency)
 		cat $log | awk '{print $2 "   us"}' > mmap_latency.log
-		;;	
-		
+		;;
 	mmap_open2close_bandwidth)
 		cat $log | awk '{print $2 "   MB/sec"}' > mmap_open2close_bandwidth.log
 		;;

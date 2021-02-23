@@ -1,5 +1,5 @@
 #!/bin/bash
-##Rum LMBench test suite
+##Run LMBench test suite
 TEST_ROOT=$(readlink -f `dirname $0`)
 source ${TEST_ROOT}/scripts/utility.sh
 
@@ -496,9 +496,21 @@ do
 done
 
 ##==Memory related test cases==
-echo "bcopy libc"
+echo "bczero libc"
 SYNC_MAX=1
 HALF=`expr $MB / 2`
+done_percent=0
+current_percent=0
+log_file="$LOGDIR/memory_bzero_bandwidth"
+
+while :
+do
+  echo_process
+  [ $? -eq 0 ] || break
+  bw_mem -P $SYNC_MAX ${HALF}m bzero >> $log_file 2>&1
+done
+
+echo "bcopy libc"
 done_percent=0
 current_percent=0
 log_file="$LOGDIR/memory_bcopy_bandwidth"
@@ -558,7 +570,7 @@ while :
 do
   echo_process
   [ $? -eq 0 ] || break
-  bw_mem -P $SYNC_MAX ${MB}m frd >> $log_file 2>&1
+  bw_mem -P $SYNC_MAX ${MB}m rd >> $log_file 2>&1
 done
 
 echo "Memory write bandwidth"
@@ -570,14 +582,73 @@ while :
 do
   echo_process
   [ $? -eq 0 ] || break
+  bw_mem -P $SYNC_MAX ${MB}m wr >> $log_file 2>&1
+done
+
+echo "Memory read write bandwidth"
+done_percent=0
+current_percent=0
+log_file="$LOGDIR/memory_read_write_bandwidth"
+
+while :
+do
+  echo_process
+  [ $? -eq 0 ] || break
+  bw_mem -P $SYNC_MAX ${MB}m rdwr >> $log_file 2>&1
+done
+
+echo "Memory copy bandwidth"
+done_percent=0
+current_percent=0
+log_file="$LOGDIR/memory_copy_bandwidth"
+
+while :
+do
+  echo_process
+  [ $? -eq 0 ] || break
+  bw_mem -P $SYNC_MAX ${MB}m cp >> $log_file 2>&1
+done
+
+echo "Memory full read bandwidth"
+done_percent=0
+current_percent=0
+log_file="$LOGDIR/memory_full_read_bandwidth"
+
+while :
+do
+  echo_process
+  [ $? -eq 0 ] || break
+  bw_mem -P $SYNC_MAX ${MB}m frd >> $log_file 2>&1
+done
+
+echo "Memory full write bandwidth"
+done_percent=0
+current_percent=0
+log_file="$LOGDIR/memory_full_write_bandwidth"
+
+while :
+do
+  echo_process
+  [ $? -eq 0 ] || break
   bw_mem -P $SYNC_MAX ${MB}m fwr >> $log_file 2>&1
+done
+
+echo "Memory full copy bandwidth"
+done_percent=0
+current_percent=0
+log_file="$LOGDIR/memory_full_copy_bandwidth"
+
+while :
+do
+  echo_process
+  [ $? -eq 0 ] || break
+  bw_mem -P $SYNC_MAX ${MB}m fcp >> $log_file 2>&1
 done
 
 echo "Memory load latency"
 done_percent=0
 current_percent=0
 log_file="$LOGDIR/memory_load_latency"
-
 
 while :
 do
