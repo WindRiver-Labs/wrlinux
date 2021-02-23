@@ -8,7 +8,7 @@ int main( int argc, char* argv[] )
     int fd;
     char buf[25];
     printf("pid is %d\n", getpid());
-    if((fd = open("/tmp/tempfile", O_WRONLY|O_CREAT|O_TRUNC)) < 0)
+    if((fd = open("/tmp/tempfile", O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)) < 0)
     {
         printf("Failed to open the file\n");
         return 1;
