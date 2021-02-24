@@ -4,7 +4,7 @@ Test steps:
 ===========
 [On build server]
 1) $ setup.sh \
---machines=qemux86-64 --kernel=standard --templates=feature/test --distro=wrlinux
+--machines=qemux86-64 --templates=feature/test --distro=wrlinux
 
 $ bitbake wrlinux-image-std
 
