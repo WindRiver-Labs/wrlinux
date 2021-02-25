@@ -13,3 +13,6 @@ require linux-windriver-handlers.inc
 
 # Allow production of customer userspace headers
 require wkd-linux-yocto-headers.inc
+
+# Ensure `make scripts prepare` succeed inside SDK
+EXTRA_KERNEL_SRC_URI += "file://0001-linux-yocto-dev-add-support-for-build-under-SDK.patch"

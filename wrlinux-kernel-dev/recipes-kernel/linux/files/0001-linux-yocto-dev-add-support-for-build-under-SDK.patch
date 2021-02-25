@@ -1,0 +1,60 @@
+From cd7c94d947e7505df0cc43fdb184792897fe8399 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Thu, 25 Feb 2021 14:49:47 +0800
+Subject: [PATCH] linux-yocto-dev: add support for build under SDK
+
+Upstream-Status: Inappropriate [WRLinux Specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ Makefile         | 13 ++++++++++++-
+ scripts/Makefile |  2 +-
+ 2 files changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 7a2e3bd23077..fd7bf1abe1cd 100644
+--- a/Makefile
++++ b/Makefile
+@@ -286,6 +286,17 @@ ifneq ($(filter $(no-sync-config-targets), $(MAKECMDGOALS)),)
+ 	endif
+ endif
+ 
++ifneq ($(SDKTARGETSYSROOT),)
++        ifneq ($(filter scripts prepare, $(MAKECMDGOALS)),)
++		PKG_CONFIG_SYSROOT_DIR = 
++		PKG_CONFIG_PATH = $(OECORE_NATIVE_SYSROOT)/usr/lib/pkgconfig:$(OECORE_NATIVE_SYSROOT)/usr/share/pkgconfig
++		export PKG_CONFIG_SYSROOT_DIR
++		export PKG_CONFIG_PATH
++$(info Changed PKG_CONFIG_SYSROOT_DIR to '$(PKG_CONFIG_SYSROOT_DIR)')
++$(info Changed PKG_CONFIG_PATH to '$(PKG_CONFIG_PATH)')
++        endif
++endif
++
+ ifneq ($(KBUILD_EXTMOD),)
+ 	may-sync-config :=
+ endif
+@@ -1067,7 +1078,7 @@ mod_sign_cmd = true
+ endif
+ export mod_sign_cmd
+ 
+-HOST_LIBELF_LIBS = $(shell pkg-config libelf --libs 2>/dev/null || echo -lelf)
++HOST_LIBELF_LIBS = $(shell export PKG_CONFIG_PATH=$(PKG_CONFIG_PATH); export PKG_CONFIG_SYSROOT_DIR=$(PKG_CONFIG_SYSROOT_DIR); pkg-config libelf --libs 2>/dev/null || echo -lelf)
+ 
+ has_libelf = $(call try-run,\
+                echo "int main() {}" | $(HOSTCC) -xc -o /dev/null $(HOST_LIBELF_LIBS) -,1,0)
+diff --git a/scripts/Makefile b/scripts/Makefile
+index c36106bce80e..93ccb526b547 100644
+--- a/scripts/Makefile
++++ b/scripts/Makefile
+@@ -20,7 +20,7 @@ HOSTCFLAGS_asn1_compiler.o = -I$(srctree)/include
+ HOSTCFLAGS_sign-file.o = $(CRYPTO_CFLAGS)
+ HOSTLDLIBS_sign-file = $(CRYPTO_LIBS)
+ HOSTCFLAGS_extract-cert.o = $(CRYPTO_CFLAGS)
+-HOSTLDLIBS_extract-cert = $(CRYPTO_LIBS)
++HOSTLDLIBS_extract-cert = $(CRYPTO_LIBS) -lpthread
+ 
+ ifdef CONFIG_UNWINDER_ORC
+ ifeq ($(ARCH),x86_64)
+-- 
+2.17.1
+
