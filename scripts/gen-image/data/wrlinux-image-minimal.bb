@@ -17,6 +17,7 @@ TARGET_CORE_BOOT ?= " \
     kernel-module-fuse \
     kernel-module-sch-fq-codel \
     glib-networking \
+    systemd-extra-utils \
 "
 
 # Control the installed packages strictly
