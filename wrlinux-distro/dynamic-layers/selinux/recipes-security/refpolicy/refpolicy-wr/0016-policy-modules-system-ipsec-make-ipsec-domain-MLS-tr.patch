@@ -1,0 +1,53 @@
+From 88373a4a6b171f345371cfcf224ae7765b266e68 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 3 Jul 2020 09:07:29 +0800
+Subject: [PATCH] policy/modules/system/ipsec: make ipsec domain MLS trusted
+ for reading from files up to its clearance
+
+* Allow ipsec_supervisor_t to search /run/systemd/journal
+* Allow ipsec_t to search /run/systemd/journal
+
+Fixes:
+avc:  denied  { search } for  pid=277 comm="starter" name="journal"
+dev="tmpfs" ino=10990
+scontext=system_u:system_r:ipsec_supervisor_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:syslogd_runtime_t:s15:c0.c1023 tclass=dir
+permissive=0
+
+avc:  denied  { search } for  pid=288 comm="charon" name="journal"
+dev="tmpfs" ino=10990 scontext=system_u:system_r:ipsec_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:syslogd_runtime_t:s15:c0.c1023 tclass=dir
+permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/ipsec.te | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/policy/modules/system/ipsec.te b/policy/modules/system/ipsec.te
+index 842fb7731..f1edeb1ad 100644
+--- a/policy/modules/system/ipsec.te
++++ b/policy/modules/system/ipsec.te
+@@ -186,6 +186,8 @@ sysnet_domtrans_ifconfig(ipsec_t)
+ userdom_dontaudit_use_unpriv_user_fds(ipsec_t)
+ userdom_dontaudit_search_user_home_dirs(ipsec_t)
+ 
++mls_file_read_to_clearance(ipsec_t)
++
+ optional_policy(`
+ 	seutil_sigchld_newrole(ipsec_t)
+ ')
+@@ -497,6 +499,8 @@ logging_send_syslog_msg(ipsec_supervisor_t)
+ 
+ miscfiles_read_localization(ipsec_supervisor_t)
+ 
++mls_file_read_to_clearance(ipsec_supervisor_t)
++
+ optional_policy(`
+ 	modutils_domtrans(ipsec_supervisor_t)
+ ')
+-- 
+2.17.1
+

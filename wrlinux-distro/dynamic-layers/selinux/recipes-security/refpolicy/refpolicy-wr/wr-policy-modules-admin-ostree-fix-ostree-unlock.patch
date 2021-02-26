@@ -1,4 +1,4 @@
-From ef0eab1e27b228369a7239fc2bb34aa94d85fa1f Mon Sep 17 00:00:00 2001
+From 2e3dd31eb8cf0df04bff14fbe471bd8c8f1cc19d Mon Sep 17 00:00:00 2001
 From: Yi Zhao <yi.zhao@windriver.com>
 Date: Thu, 4 Feb 2021 16:01:41 +0800
 Subject: [PATCH] policy/modules/admin/ostree: fix ostree unlock

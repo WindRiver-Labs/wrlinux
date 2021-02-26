@@ -1,4 +1,4 @@
-From ed82d604058c628467bac790524d26b20c8202ad Mon Sep 17 00:00:00 2001
+From a8f0bc7dbdf1fae7c889b3b0a73624e7ad1e4d4b Mon Sep 17 00:00:00 2001
 From: Liwei Song <liwei.song@windriver.com>
 Date: Thu, 9 Jan 2020 02:21:51 +0000
 Subject: [PATCH] Add ostree policy
@@ -11,9 +11,9 @@ Signed-off-by: Liwei Song <liwei.song@windriver.com>
 ---
  policy/modules/admin/ostree.fc |   3 +
  policy/modules/admin/ostree.if |  49 ++++++++++++++++
- policy/modules/admin/ostree.te | 104 +++++++++++++++++++++++++++++++++
+ policy/modules/admin/ostree.te | 103 +++++++++++++++++++++++++++++++++
  policy/modules/roles/sysadm.te |   4 ++
- 4 files changed, 160 insertions(+)
+ 4 files changed, 159 insertions(+)
  create mode 100644 policy/modules/admin/ostree.fc
  create mode 100644 policy/modules/admin/ostree.if
  create mode 100644 policy/modules/admin/ostree.te
@@ -84,10 +84,10 @@ index 000000000..e781f6fa2
 +')
 diff --git a/policy/modules/admin/ostree.te b/policy/modules/admin/ostree.te
 new file mode 100644
-index 000000000..b9d2bb774
+index 000000000..7a7912a7e
 --- /dev/null
 +++ b/policy/modules/admin/ostree.te
-@@ -0,0 +1,104 @@
+@@ -0,0 +1,103 @@
 +policy_module(ostree, 2019.2)
 +
 +#####################################
@@ -141,7 +141,6 @@ index 000000000..b9d2bb774
 +corenet_all_recvfrom_netlabel(ostree_t)
 +corenet_tcp_sendrecv_generic_if(ostree_t)
 +corenet_tcp_sendrecv_generic_node(ostree_t)
-+corenet_tcp_sendrecv_all_ports(ostree_t)
 +corenet_sendrecv_all_client_packets(ostree_t)
 +corenet_tcp_connect_all_ports(ostree_t)
 +
@@ -193,10 +192,10 @@ index 000000000..b9d2bb774
 +libs_exec_lib_files(ostree_t)
 +libs_run_ldconfig(ostree_t, ostree_roles)
 diff --git a/policy/modules/roles/sysadm.te b/policy/modules/roles/sysadm.te
-index 8daf8f9eb..71b0ae6b9 100644
+index 1f076bcc3..ed04d35ac 100644
 --- a/policy/modules/roles/sysadm.te
 +++ b/policy/modules/roles/sysadm.te
-@@ -1139,6 +1139,10 @@ optional_policy(`
+@@ -1124,6 +1124,10 @@ optional_policy(`
  	tboot_run_txtstat(sysadm_t, sysadm_r)
  ')
  

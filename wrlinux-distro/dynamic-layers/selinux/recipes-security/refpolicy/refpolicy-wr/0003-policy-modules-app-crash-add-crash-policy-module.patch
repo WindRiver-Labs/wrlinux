@@ -1,0 +1,169 @@
+From ee22c59e584f04b94c19df59e2fb6a03ab66381d Mon Sep 17 00:00:00 2001
+From: Xin Ouyang <Xin.Ouyang@windriver.com>
+Date: Sun, 28 Apr 2019 16:21:26 +0800
+Subject: [PATCH] policy/modules/app/crash: add crash policy module
+
+Crash module rules:
+- execute domain trans: crash_exec_t(run in sysadm_t) -> crash_t
+- execute modprobe(insmod_t) with domain trans.
+- execute bin, shell commands without domain trans.
+- files created by crash_t will be labelled to crash_tmp_t in tmp_t dir.
+- allow: load kernel image, core files...
+- allow: read/write /dev/mem, /proc/kcore, to clearance if MLS.
+- allow: Read locale files, /etc files
+
+Upstream-Status: Pending
+
+Signed-off-by: Xin Ouyang <Xin.Ouyang@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/apps/crash.fc   |  1 +
+ policy/modules/apps/crash.if   | 46 +++++++++++++++++++++++++++
+ policy/modules/apps/crash.te   | 58 ++++++++++++++++++++++++++++++++++
+ policy/modules/roles/sysadm.te |  4 +++
+ 4 files changed, 109 insertions(+)
+ create mode 100644 policy/modules/apps/crash.fc
+ create mode 100644 policy/modules/apps/crash.if
+ create mode 100644 policy/modules/apps/crash.te
+
+diff --git a/policy/modules/apps/crash.fc b/policy/modules/apps/crash.fc
+new file mode 100644
+index 000000000..55c66326e
+--- /dev/null
++++ b/policy/modules/apps/crash.fc
+@@ -0,0 +1 @@
++/usr/bin/crash.*	--	gen_context(system_u:object_r:crash_exec_t,s0)
+diff --git a/policy/modules/apps/crash.if b/policy/modules/apps/crash.if
+new file mode 100644
+index 000000000..1b548d330
+--- /dev/null
++++ b/policy/modules/apps/crash.if
+@@ -0,0 +1,46 @@
++## <summary>Kernel crash dumping mechanism</summary>
++
++######################################
++## <summary>
++##	Execute crash in the crash domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++#
++interface(`crash_domtrans',`
++	gen_require(`
++		type crash_t, crash_exec_t;
++	')
++
++	corecmd_search_bin($1)
++	domtrans_pattern($1, crash_exec_t, crash_t)
++')
++
++########################################
++## <summary>
++##	Execute crash in the crash domain, and allow the role
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	Role allowed access.
++##	</summary>
++## </param>
++## <rolecap/>
++#
++interface(`crash_run',`
++	gen_require(`
++		type crash_t;
++	')
++
++	role $2 types crash_t;
++
++	crash_domtrans($1)
++')
+diff --git a/policy/modules/apps/crash.te b/policy/modules/apps/crash.te
+new file mode 100644
+index 000000000..59b61c96b
+--- /dev/null
++++ b/policy/modules/apps/crash.te
+@@ -0,0 +1,58 @@
++policy_module(crash, 1.0.0)
++
++#######################################
++#
++# Declarations
++#
++
++type crash_t;
++type crash_exec_t;
++domain_type(crash_t)
++domain_entry_file(crash_t, crash_exec_t)
++
++type crash_tmp_t;
++files_tmp_file(crash_tmp_t)
++
++#####################################
++#
++# crash local policy
++#
++
++allow crash_t self:capability dac_override;
++
++files_read_kernel_img(crash_t)
++
++kernel_read_system_state(crash_t)
++kernel_read_debugfs(crash_t)
++# crash will try rw /proc/kcore, but only to read it
++kernel_read_core_if(crash_t)
++dontaudit crash_t proc_kcore_t:file write;
++
++modutils_domtrans(crash_t)
++
++corecmd_exec_bin(crash_t)
++corecmd_exec_shell(crash_t)
++allow crash_t self:fifo_file rw_fifo_file_perms;
++
++manage_dirs_pattern(crash_t, crash_tmp_t, crash_tmp_t)
++manage_files_pattern(crash_t, crash_tmp_t, crash_tmp_t)
++files_tmp_filetrans(crash_t, crash_tmp_t, { file dir })
++
++# Read locale files
++miscfiles_read_localization(crash_t)
++# Read /etc/terminfo/...
++files_read_etc_files(crash_t)
++
++userdom_read_user_home_content_files(crash_t)
++userdom_list_user_home_dirs(crash_t)
++userdom_use_user_terminals(crash_t)
++domain_use_interactive_fds(crash_t)
++domain_signull_all_domains(crash_t)
++
++# crash will try to read&write /dev/mem, /proc/kcore,
++# which are labeled in high level
++dev_write_raw_memory(crash_t)
++dev_read_raw_memory(crash_t)
++
++mls_file_read_to_clearance(crash_t)
++mls_file_write_to_clearance(crash_t)
+diff --git a/policy/modules/roles/sysadm.te b/policy/modules/roles/sysadm.te
+index aaae73fc3..0b8bdfb43 100644
+--- a/policy/modules/roles/sysadm.te
++++ b/policy/modules/roles/sysadm.te
+@@ -283,6 +283,10 @@ optional_policy(`
+ 	clock_run(sysadm_t, sysadm_r)
+ ')
+ 
++optional_policy(`
++	crash_run(sysadm_t, sysadm_r)
++')
++
+ optional_policy(`
+ 	clockspeed_run_cli(sysadm_t, sysadm_r)
+ ')
+-- 
+2.17.1
+

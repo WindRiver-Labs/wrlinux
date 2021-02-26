@@ -1,4 +1,4 @@
-From f88d8164440fca5a9fe0a4e58ea1db353fe5ee8e Mon Sep 17 00:00:00 2001
+From ce3a5eccf7703023467691f14a7ad5d7043766af Mon Sep 17 00:00:00 2001
 From: Liwei Song <liwei.song@windriver.com>
 Date: Thu, 2 Jan 2020 17:38:13 +0800
 Subject: [PATCH] system/mount.te: allow mount on symlink file
@@ -17,19 +17,19 @@ Signed-off-by: Liwei Song <liwei.song@windriver.com>
  1 file changed, 3 insertions(+)
 
 diff --git a/policy/modules/system/mount.te b/policy/modules/system/mount.te
-index 5bb4fe631..b0b501560 100644
+index 0b426b30e..422d411e3 100644
 --- a/policy/modules/system/mount.te
 +++ b/policy/modules/system/mount.te
-@@ -113,6 +113,9 @@ fs_rw_tmpfs_chr_files(mount_t)
- fs_read_tmpfs_symlinks(mount_t)
- fs_dontaudit_write_tmpfs_dirs(mount_t)
+@@ -98,6 +98,9 @@ files_list_all_mountpoints(mount_t)
+ files_dontaudit_write_all_mountpoints(mount_t)
+ files_dontaudit_setattr_all_mountpoints(mount_t)
  
 +files_read_all_symlinks(mount_t)
 +files_getattr_all_symlinks(mount_t)
 +
- mls_file_read_all_levels(mount_t)
- mls_file_write_all_levels(mount_t)
- 
+ fs_getattr_xattr_fs(mount_t)
+ fs_getattr_tmpfs(mount_t)
+ fs_getattr_rpc_pipefs(mount_t)
 -- 
 2.17.1
 

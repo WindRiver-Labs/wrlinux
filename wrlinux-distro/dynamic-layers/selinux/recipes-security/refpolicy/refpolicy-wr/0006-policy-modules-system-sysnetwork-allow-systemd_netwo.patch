@@ -1,0 +1,36 @@
+From 4706239f399cc2076998b4c6e216c726bcfdb1bd Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Wed, 8 Jul 2020 14:38:55 +0800
+Subject: [PATCH] policy/modules/system/sysnetwork: allow systemd_networkd_t to
+ read link file
+
+Fixes:
+avc:  denied  { read } for  pid=211 comm="systemd-network"
+name="80-wired.network" dev="vda" ino=1477
+scontext=system_u:system_r:systemd_networkd_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:net_conf_t:s0 tclass=lnk_file permissive=0
+
+systemd-networkd[211]: Failed to load /etc/systemd/network/80-wired.network, ignoring: Permission denied
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/sysnetwork.if | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/system/sysnetwork.if b/policy/modules/system/sysnetwork.if
+index fb92a09e6..f74e685d9 100644
+--- a/policy/modules/system/sysnetwork.if
++++ b/policy/modules/system/sysnetwork.if
+@@ -349,6 +349,7 @@ interface(`sysnet_read_config',`
+ 	files_search_runtime($1)
+ 	allow $1 net_conf_t:dir list_dir_perms;
+ 	allow $1 net_conf_t:file read_file_perms;
++	allow $1 net_conf_t:lnk_file read_lnk_file_perms;
+ 
+ 	ifdef(`distro_debian',`
+ 		files_search_runtime($1)
+-- 
+2.17.1
+

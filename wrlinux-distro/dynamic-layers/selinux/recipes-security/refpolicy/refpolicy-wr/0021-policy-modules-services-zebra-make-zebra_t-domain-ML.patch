@@ -1,0 +1,37 @@
+From a3d12fab85363052b3ef800340d0cbafdffb48d4 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 3 Jul 2020 10:22:57 +0800
+Subject: [PATCH] policy/modules/services/zebra: make zebra_t domain MLS
+ trusted for reading from files up to its clearance
+
+* Allow zebra_t to search /run/systemd/journal
+
+Fixes:
+avc:  denied  { search } for  pid=242 comm="zebra" name="journal"
+dev="tmpfs" ino=10990 scontext=system_u:system_r:zebra_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:syslogd_runtime_t:s15:c0.c1023 tclass=dir
+permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/zebra.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/services/zebra.te b/policy/modules/services/zebra.te
+index cbf818bf9..e27e79f72 100644
+--- a/policy/modules/services/zebra.te
++++ b/policy/modules/services/zebra.te
+@@ -117,6 +117,8 @@ sysnet_read_config(zebra_t)
+ userdom_dontaudit_use_unpriv_user_fds(zebra_t)
+ userdom_dontaudit_search_user_home_dirs(zebra_t)
+ 
++mls_file_read_to_clearance(zebra_t)
++
+ tunable_policy(`allow_zebra_write_config',`
+ 	manage_files_pattern(zebra_t, zebra_conf_t, zebra_conf_t)
+ ')
+-- 
+2.17.1
+

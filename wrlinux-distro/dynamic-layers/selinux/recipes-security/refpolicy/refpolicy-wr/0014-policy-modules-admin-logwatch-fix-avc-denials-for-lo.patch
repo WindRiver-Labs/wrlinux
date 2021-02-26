@@ -1,0 +1,66 @@
+From 2dbae7aaa88ccfec64810734f89b0b5c45122fb1 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 3 Jul 2020 16:04:45 +0800
+Subject: [PATCH] policy/modules/admin/logwatch: fix avc denials for logwatch
+
+* Add getsched to logwatch_t process
+* Allow logwatch_t to create logwatch_lock_t dirs
+* Allow logwatch_mail_t to read/write pipe of crond
+
+Fixes:
+avc:  denied  { getsched } for  pid=1012 comm="sort"
+scontext=system_u:system_r:logwatch_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:logwatch_t:s0-s15:c0.c1023 tclass=process
+permissive=0
+
+avc:  denied  { write } for  pid=269 comm="lockfile-create"
+name="logcheck" dev="tmpfs" ino=12709
+scontext=system_u:system_r:logwatch_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:logwatch_lock_t:s0 tclass=dir permissive=0
+
+avc:  denied  { write } for  pid=1470 comm="sendmail"
+path="pipe:[15133]" dev="pipefs" ino=15133
+scontext=system_u:system_r:logwatch_mail_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:crond_t:s0-s15:c0.c1023 tclass=fifo_file
+permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/admin/logwatch.te | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/policy/modules/admin/logwatch.te b/policy/modules/admin/logwatch.te
+index 5d3e7d5a4..2cfc26390 100644
+--- a/policy/modules/admin/logwatch.te
++++ b/policy/modules/admin/logwatch.te
+@@ -38,7 +38,7 @@ role system_r types logwatch_mail_t;
+ #
+ 
+ allow logwatch_t self:capability { dac_override dac_read_search setgid };
+-allow logwatch_t self:process signal;
++allow logwatch_t self:process { signal getsched };
+ allow logwatch_t self:fifo_file rw_fifo_file_perms;
+ allow logwatch_t self:unix_stream_socket { accept listen };
+ 
+@@ -46,6 +46,7 @@ manage_dirs_pattern(logwatch_t, logwatch_cache_t, logwatch_cache_t)
+ manage_files_pattern(logwatch_t, logwatch_cache_t, logwatch_cache_t)
+ 
+ allow logwatch_t logwatch_lock_t:file manage_file_perms;
++manage_files_pattern(logwatch_t, logwatch_lock_t, logwatch_lock_t)
+ files_lock_filetrans(logwatch_t, logwatch_lock_t, file)
+ 
+ manage_dirs_pattern(logwatch_t, logwatch_tmp_t, logwatch_tmp_t)
+@@ -186,6 +187,8 @@ dev_read_rand(logwatch_mail_t)
+ dev_read_urand(logwatch_mail_t)
+ dev_read_sysfs(logwatch_mail_t)
+ 
++cron_rw_pipes(logwatch_mail_t)
++
+ logging_read_all_logs(logwatch_mail_t)
+ 
+ optional_policy(`
+-- 
+2.17.1
+

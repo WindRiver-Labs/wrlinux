@@ -1,4 +1,4 @@
-From 8db1f23f14f08fd9982a27a5aa9ab6ef1dcfa6ea Mon Sep 17 00:00:00 2001
+From 0c21da146610d4084feb143e4f6ae73876d65996 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Tue, 2 Jan 2018 09:34:11 +0000
 Subject: [PATCH] policy/modules/system/userdomain: allow secadm to read
@@ -22,10 +22,10 @@ Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/policy/modules/system/userdomain.if b/policy/modules/system/userdomain.if
-index 5aab9ada7..1b5eb2444 100644
+index 55081d87b..41aadc1e5 100644
 --- a/policy/modules/system/userdomain.if
 +++ b/policy/modules/system/userdomain.if
-@@ -1433,6 +1433,7 @@ template(`userdom_security_admin_template',`
+@@ -1457,6 +1457,7 @@ template(`userdom_security_admin_template',`
  	selinux_set_enforce_mode($1)
  	selinux_set_all_booleans($1)
  	selinux_set_parameters($1)

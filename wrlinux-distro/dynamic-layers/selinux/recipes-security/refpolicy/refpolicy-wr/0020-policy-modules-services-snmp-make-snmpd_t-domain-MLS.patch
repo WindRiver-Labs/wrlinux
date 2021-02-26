@@ -1,0 +1,37 @@
+From d6d680a8c7bd0edb752af28ece0ecc146ec95707 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 3 Jul 2020 10:17:42 +0800
+Subject: [PATCH] policy/modules/services/snmp: make snmpd_t domain MLS trusted
+ for reading from files up to its clearance
+
+Allow snmpd_t to search /run/systemd/journal
+
+Fixes:
+avc:  denied  { search } for  pid=276 comm="snmptrapd" name="journal"
+dev="tmpfs" ino=10990 scontext=system_u:system_r:snmpd_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:syslogd_runtime_t:s15:c0.c1023 tclass=dir
+permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/snmp.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/services/snmp.te b/policy/modules/services/snmp.te
+index 621c627ff..37e103c5e 100644
+--- a/policy/modules/services/snmp.te
++++ b/policy/modules/services/snmp.te
+@@ -116,6 +116,8 @@ seutil_dontaudit_search_config(snmpd_t)
+ userdom_dontaudit_use_unpriv_user_fds(snmpd_t)
+ userdom_dontaudit_search_user_home_dirs(snmpd_t)
+ 
++mls_file_read_to_clearance(snmpd_t)
++
+ optional_policy(`
+ 	amanda_dontaudit_read_dumpdates(snmpd_t)
+ ')
+-- 
+2.17.1
+

@@ -1,0 +1,35 @@
+From dc173c14ded31d8d88e08784e30cc306b5a918e8 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 9 Feb 2021 16:12:18 +0800
+Subject: [PATCH] policy/modules/services/postfix.te: allow postfix_local_t to
+ search logwatch_cache_t
+
+Fixes:
+avc:  denied  { search } for  pid=2421 comm="local" name="logcheck"
+dev="vda" ino=29080
+scontext=system_u:system_r:postfix_local_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:logwatch_cache_t:s0 tclass=dir permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/postfix.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/services/postfix.te b/policy/modules/services/postfix.te
+index ff9a5ed30..34c674bec 100644
+--- a/policy/modules/services/postfix.te
++++ b/policy/modules/services/postfix.te
+@@ -452,6 +452,8 @@ corecmd_exec_bin(postfix_local_t)
+ 
+ logging_dontaudit_search_logs(postfix_local_t)
+ 
++logwatch_search_cache_dir(postfix_local_t)
++
+ mta_delete_spool(postfix_local_t)
+ mta_read_aliases(postfix_local_t)
+ mta_map_aliases(postfix_local_t)
+-- 
+2.17.1
+

@@ -1,4 +1,4 @@
-From d78c706aa1a995562abb6e8e053be251d8170834 Mon Sep 17 00:00:00 2001
+From 28798f2d01b5755bc5954d6772241da9018d9cf6 Mon Sep 17 00:00:00 2001
 From: Liwei Song <liwei.song@windriver.com>
 Date: Fri, 21 Feb 2020 11:23:19 +0800
 Subject: [PATCH] Allow sshd_t and staff_t read symlinks
@@ -30,10 +30,10 @@ Signed-off-by: Liwei Song <liwei.song@windriver.com>
  4 files changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/config/file_contexts.subs_dist b/config/file_contexts.subs_dist
-index b5f8c5355..600d445dc 100644
+index abd929109..1cc3b4cd6 100644
 --- a/config/file_contexts.subs_dist
 +++ b/config/file_contexts.subs_dist
-@@ -44,8 +44,4 @@
+@@ -45,8 +45,4 @@
  /usr/lib/busybox/sbin /usr/sbin
  /usr/lib/busybox/usr /usr
  
@@ -43,7 +43,7 @@ index b5f8c5355..600d445dc 100644
 -
  /usr/etc /etc
 diff --git a/policy/modules/roles/staff.te b/policy/modules/roles/staff.te
-index 6d840a584..55eaddf4b 100644
+index fe7adf424..49a6999f4 100644
 --- a/policy/modules/roles/staff.te
 +++ b/policy/modules/roles/staff.te
 @@ -14,6 +14,7 @@ userdom_unpriv_user_template(staff)
@@ -55,7 +55,7 @@ index 6d840a584..55eaddf4b 100644
  optional_policy(`
  	apache_role(staff_r, staff_t)
 diff --git a/policy/modules/services/ssh.te b/policy/modules/services/ssh.te
-index db62eaa18..b2a7371fe 100644
+index ad0a1b7ad..1bab1a9a3 100644
 --- a/policy/modules/services/ssh.te
 +++ b/policy/modules/services/ssh.te
 @@ -77,6 +77,8 @@ userdom_user_tmpfs_file(ssh_tmpfs_t)

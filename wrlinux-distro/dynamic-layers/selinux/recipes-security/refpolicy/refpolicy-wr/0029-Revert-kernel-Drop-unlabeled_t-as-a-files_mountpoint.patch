@@ -1,0 +1,41 @@
+From 3712f85f66d828ce90d718e90ddb237abc84479e Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 4 Mar 2021 13:46:34 +0800
+Subject: [PATCH] Revert "kernel: Drop unlabeled_t as a files_mountpoint()."
+
+This reverts commit 662d55ed5efbb7aebb1435e4878f62303020ff36.
+
+We encountered the following error when mount disk with MLS type:
+
+root@intel-x86-64:~# ls -lZd /mnt
+drwxr-xr-x. 2 root root system_u:object_r:mnt_t:SystemLow 4096 Mar  1 02:29 /mnt
+root@intel-x86-64:~# mount /dev/sda2 /mnt
+root@intel-x86-64:~# cd /mnt
+sh: cd: /mnt: Not a directory
+root@intel-x86-64:~# ls -lZ / | grep mnt
+ls: cannot access '/mnt': Permission denied
+d??????????   ? ?    ?  0     ?            ? mnt
+root@intel-x86-64:~#
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/kernel/kernel.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/kernel/kernel.te b/policy/modules/kernel/kernel.te
+index fbcf1413f..de4226e2c 100644
+--- a/policy/modules/kernel/kernel.te
++++ b/policy/modules/kernel/kernel.te
+@@ -190,6 +190,7 @@ genfscon proc /sys/dev gen_context(system_u:object_r:sysctl_dev_t,s0)
+ #
+ type unlabeled_t;
+ kernel_rootfs_mountpoint(unlabeled_t)
++files_mountpoint(unlabeled_t)
+ fs_associate(unlabeled_t)
+ sid file gen_context(system_u:object_r:unlabeled_t,s0)
+ sid unlabeled gen_context(system_u:object_r:unlabeled_t,mls_systemhigh)
+-- 
+2.17.1
+

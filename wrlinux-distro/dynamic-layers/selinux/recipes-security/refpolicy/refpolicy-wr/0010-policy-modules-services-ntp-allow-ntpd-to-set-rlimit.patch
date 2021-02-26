@@ -1,0 +1,38 @@
+From f8093ac418353ab90b97cfdd168d077a45230c24 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Wed, 8 Jul 2020 15:02:32 +0800
+Subject: [PATCH] policy/modules/services/ntp: allow ntpd to set rlimit_memlock
+
+Fixes:
+ntpd[249]: Cannot set RLIMIT_MEMLOCK: Operation not permitted
+
+avc:  denied  { sys_resource } for  pid=247 comm="ntpd" capability=24
+scontext=system_u:system_r:ntpd_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:ntpd_t:s0-s15:c0.c1023 tclass=capability
+permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/ntp.te | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/policy/modules/services/ntp.te b/policy/modules/services/ntp.te
+index c8a1f041b..4d281bfbf 100644
+--- a/policy/modules/services/ntp.te
++++ b/policy/modules/services/ntp.te
+@@ -53,8 +53,8 @@ init_system_domain(ntpd_t, ntpdate_exec_t)
+ # Local policy
+ #
+ 
+-allow ntpd_t self:capability { chown dac_override kill setgid setuid sys_time ipc_lock ipc_owner sys_chroot sys_nice };
+-dontaudit ntpd_t self:capability { net_admin sys_tty_config fsetid sys_resource };
++allow ntpd_t self:capability { chown dac_override kill setgid setuid sys_time ipc_lock ipc_owner sys_chroot sys_nice sys_resource };
++dontaudit ntpd_t self:capability { net_admin sys_tty_config fsetid };
+ allow ntpd_t self:process { signal_perms getcap setcap setsched setrlimit };
+ allow ntpd_t self:fifo_file rw_fifo_file_perms;
+ allow ntpd_t self:shm create_shm_perms;
+-- 
+2.17.1
+

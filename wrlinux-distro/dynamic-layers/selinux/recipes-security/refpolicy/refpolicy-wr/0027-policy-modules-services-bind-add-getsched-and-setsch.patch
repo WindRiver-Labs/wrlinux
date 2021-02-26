@@ -1,0 +1,54 @@
+From 92816f7a853a454251212e0b2b24c19f96274b41 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 2 Mar 2021 13:41:55 +0800
+Subject: [PATCH] policy/modules/services/bind: add getsched and setsched perms
+ for named process
+
+Fixes:
+avc: denied { getsched } for pid=406 comm="isc-socket-3"
+scontext=system_u:system_r:named_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:named_t:s0-s15:c0.c1023 tclass=process
+permissive=0
+
+avc: denied { getsched } for pid=1144 comm="isc-worker0000"
+scontext=system_u:system_r:ndc_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:ndc_t:s0-s15:c0.c1023 tclass=process
+permissive=0
+
+avc: denied { setsched } for pid=1144 comm="isc-worker0000"
+scontext=system_u:system_r:ndc_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:ndc_t:s0-s15:c0.c1023 tclass=process
+permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/bind.te | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/policy/modules/services/bind.te b/policy/modules/services/bind.te
+index be1813cb9..91a1c7e99 100644
+--- a/policy/modules/services/bind.te
++++ b/policy/modules/services/bind.te
+@@ -76,7 +76,7 @@ role ndc_roles types ndc_t;
+ 
+ allow named_t self:capability { chown dac_override fowner setgid setuid sys_chroot sys_nice sys_resource };
+ dontaudit named_t self:capability sys_tty_config;
+-allow named_t self:process { setsched getcap setcap setrlimit signal_perms };
++allow named_t self:process { getsched setsched getcap setcap setrlimit signal_perms };
+ allow named_t self:fifo_file rw_fifo_file_perms;
+ allow named_t self:unix_stream_socket { accept listen };
+ allow named_t self:tcp_socket { accept listen };
+@@ -216,7 +216,7 @@ optional_policy(`
+ 
+ allow ndc_t self:capability { dac_override net_admin };
+ allow ndc_t self:capability2 block_suspend;
+-allow ndc_t self:process signal_perms;
++allow ndc_t self:process { getsched setsched signal_perms };
+ allow ndc_t self:fifo_file rw_fifo_file_perms;
+ allow ndc_t self:unix_stream_socket { accept listen };
+ 
+-- 
+2.17.1
+

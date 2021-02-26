@@ -1,0 +1,38 @@
+From ec18b671799d902b8be1c64ba8a97ae831267128 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 3 Jul 2020 16:04:45 +0800
+Subject: [PATCH] policy/modules/admin/logwatch: make logwatch_mail_t domain
+ MLS trusted for reading from files up to its clearance
+
+* Allow logwatch_mail_t to search /run/systemd/journal
+
+Fixes:
+avc:  denied  { search } for  pid=1470 comm="sendmail" name="journal"
+dev="tmpfs" ino=10990
+scontext=system_u:system_r:logwatch_mail_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:syslogd_runtime_t:s15:c0.c1023 tclass=dir
+permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/admin/logwatch.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/admin/logwatch.te b/policy/modules/admin/logwatch.te
+index 2cfc26390..4fdc0447e 100644
+--- a/policy/modules/admin/logwatch.te
++++ b/policy/modules/admin/logwatch.te
+@@ -191,6 +191,8 @@ cron_rw_pipes(logwatch_mail_t)
+ 
+ logging_read_all_logs(logwatch_mail_t)
+ 
++mls_file_read_to_clearance(logwatch_mail_t)
++
+ optional_policy(`
+ 	cron_use_system_job_fds(logwatch_mail_t)
+ 	cron_rw_system_job_pipes(logwatch_mail_t)
+-- 
+2.17.1
+

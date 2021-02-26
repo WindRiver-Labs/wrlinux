@@ -1,4 +1,4 @@
-From 7490e1dbb02fc487415156ff6c6d1e14d570c1e7 Mon Sep 17 00:00:00 2001
+From 533e148c5f59eca3c9dce0a681e1ea08a1345e3f Mon Sep 17 00:00:00 2001
 From: Liwei Song <liwei.song@windriver.com>
 Date: Thu, 2 Jan 2020 17:32:58 +0800
 Subject: [PATCH] files: add lable if /mnt /opt /media is symlinks file
@@ -14,10 +14,10 @@ Signed-off-by: Liwei Song <liwei.song@windriver.com>
  1 file changed, 3 insertions(+)
 
 diff --git a/policy/modules/kernel/files.fc b/policy/modules/kernel/files.fc
-index f69900945..5fff8b92c 100644
+index 677ae96c3..dd89854bc 100644
 --- a/policy/modules/kernel/files.fc
 +++ b/policy/modules/kernel/files.fc
-@@ -116,6 +116,7 @@ HOME_ROOT/lost\+found/.*	<<none>>
+@@ -112,6 +112,7 @@ HOME_ROOT/lost\+found/.*	<<none>>
  #
  # Mount points; do not relabel subdirectories, since
  # we don't want to change any removable media by default.
@@ -25,7 +25,7 @@ index f69900945..5fff8b92c 100644
  /media(/[^/]*)		-l	gen_context(system_u:object_r:mnt_t,s0)
  /media(/[^/]*)?		-d	gen_context(system_u:object_r:mnt_t,s0)
  /media/[^/]*/.*			<<none>>
-@@ -129,6 +130,7 @@ HOME_ROOT/lost\+found/.*	<<none>>
+@@ -125,6 +126,7 @@ HOME_ROOT/lost\+found/.*	<<none>>
  #
  # /mnt
  #
@@ -33,7 +33,7 @@ index f69900945..5fff8b92c 100644
  /mnt(/[^/]*)		-l	gen_context(system_u:object_r:mnt_t,s0)
  /mnt(/[^/]*)?		-d	gen_context(system_u:object_r:mnt_t,s0)
  /mnt/[^/]*/.*			<<none>>
-@@ -142,6 +144,7 @@ HOME_ROOT/lost\+found/.*	<<none>>
+@@ -138,6 +140,7 @@ HOME_ROOT/lost\+found/.*	<<none>>
  # /opt
  #
  /opt			-d	gen_context(system_u:object_r:usr_t,s0)

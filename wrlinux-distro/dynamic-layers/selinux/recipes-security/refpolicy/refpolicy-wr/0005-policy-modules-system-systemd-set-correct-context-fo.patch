@@ -1,0 +1,45 @@
+From 2ba931357a1a0b3efeb22b6b699f215639e78e56 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Wed, 8 Jul 2020 11:24:43 +0800
+Subject: [PATCH] policy/modules/system/systemd: set correct context for
+ systemd-rc-local-generator
+
+Set correct context for /lib/systemd/system-generators/systemd-rc-local-generator
+and /etc/rc.local
+
+Fixes:
+avc:  denied  { execute } for  pid=91 comm="systemd-rc-loca"
+name="rc.local" dev="vda" ino=1063
+scontext=system_u:system_r:systemd_generator_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:etc_t:s0 tclass=file permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/systemd.fc | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/system/systemd.fc b/policy/modules/system/systemd.fc
+index e605e7830..3e4f85398 100644
+--- a/policy/modules/system/systemd.fc
++++ b/policy/modules/system/systemd.fc
+@@ -2,6 +2,7 @@
+ 
+ /etc/systemd/dont-synthesize-nobody	--	gen_context(system_u:object_r:systemd_conf_t,s0)
+ /etc/udev/hwdb\.bin			--	gen_context(system_u:object_r:systemd_hwdb_t,s0)
++/etc/rc\.local				--	gen_context(system_u:object_r:initrc_exec_t,s0)
+ 
+ /run/log/journal(/.*)?				gen_context(system_u:object_r:systemd_journal_t,s0)
+ 
+@@ -21,6 +22,7 @@
+ # Systemd generators
+ /usr/lib/systemd/system-environment-generators/.*				--	gen_context(system_u:object_r:systemd_generator_exec_t,s0)
+ /usr/lib/systemd/system-generators/.*							--	gen_context(system_u:object_r:systemd_generator_exec_t,s0)
++/usr/lib/systemd/system-generators/systemd-rc-local-generator	--	gen_context(system_u:object_r:init_exec_t,s0)
+ /usr/lib/systemd/user-environment-generators/.*					--	gen_context(system_u:object_r:systemd_generator_exec_t,s0)
+ /usr/lib/systemd/user-generators/.*								--	gen_context(system_u:object_r:systemd_generator_exec_t,s0)
+ 
+-- 
+2.17.1
+

@@ -1,4 +1,4 @@
-From a132c3a05173549687fd1f8699437c273a19d9a4 Mon Sep 17 00:00:00 2001
+From 2899e89241faa3589443b6549ced1c856f3c8c2f Mon Sep 17 00:00:00 2001
 From: Yi Zhao <yi.zhao@windriver.com>
 Date: Tue, 4 Aug 2020 10:46:11 +0800
 Subject: [PATCH] file_contexts.subs_dist: set aliases for /var/home and
@@ -15,10 +15,10 @@ Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
  1 file changed, 5 insertions(+)
 
 diff --git a/config/file_contexts.subs_dist b/config/file_contexts.subs_dist
-index 600d445dc..d00c30516 100644
+index 1cc3b4cd6..2d1ea9eda 100644
 --- a/config/file_contexts.subs_dist
 +++ b/config/file_contexts.subs_dist
-@@ -45,3 +45,8 @@
+@@ -46,3 +46,8 @@
  /usr/lib/busybox/usr /usr
  
  /usr/etc /etc

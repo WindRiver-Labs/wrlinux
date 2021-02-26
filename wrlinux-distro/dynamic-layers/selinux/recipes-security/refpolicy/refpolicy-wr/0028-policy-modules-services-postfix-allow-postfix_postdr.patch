@@ -1,0 +1,42 @@
+From efe60847f4935cbe3869b7e6665edca899dc9cb4 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 2 Mar 2021 14:05:50 +0800
+Subject: [PATCH] policy/modules/services/postfix: allow postfix_postdrop_t to
+ read/write to inherited init unix streams
+
+Fixes:
+avc: denied { read write } for pid=1061 comm="postdrop"
+path="socket:[19437]" dev="sockfs" ino=19437
+scontext=system_u:system_r:postfix_postdrop_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:init_t:s0-s15:c0.c1023
+tclass=unix_stream_socket permissive=0
+
+avc: denied { getattr } for pid=1061 comm="postdrop"
+path="socket:[19437]" dev="sockfs" ino=19437
+scontext=system_u:system_r:postfix_postdrop_t:s0-s15:c0.c1023
+tcontext=system_u:system_r:init_t:s0-s15:c0.c1023
+tclass=unix_stream_socket permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/services/postfix.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/services/postfix.te b/policy/modules/services/postfix.te
+index 4b8a58843..c0e822a2b 100644
+--- a/policy/modules/services/postfix.te
++++ b/policy/modules/services/postfix.te
+@@ -646,6 +646,8 @@ manage_files_pattern(postfix_postdrop_t, postfix_spool_maildrop_t, postfix_spool
+ 
+ allow postfix_postdrop_t postfix_local_t:unix_stream_socket { read write };
+ 
++init_rw_inherited_stream_socket(postfix_postdrop_t)
++
+ # for /var/spool/postfix/public/pickup
+ stream_connect_pattern(postfix_postdrop_t, postfix_public_t, postfix_public_t, postfix_master_t)
+ 
+-- 
+2.17.1
+

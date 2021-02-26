@@ -1,4 +1,4 @@
-From 052fe1977eb0618a0b8afda57082c3de81b31ff8 Mon Sep 17 00:00:00 2001
+From 25140b2c27c49f0c995f24f2e61a72714be7933d Mon Sep 17 00:00:00 2001
 From: Liwei Song <liwei.song@windriver.com>
 Date: Thu, 2 Jan 2020 17:39:36 +0800
 Subject: [PATCH] system/locallogin.te: allow login read symlink file
@@ -17,10 +17,10 @@ Signed-off-by: Liwei Song <liwei.song@windriver.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/policy/modules/system/locallogin.te b/policy/modules/system/locallogin.te
-index f629b0040..8d80e877b 100644
+index 109980e79..ee80cdfe7 100644
 --- a/policy/modules/system/locallogin.te
 +++ b/policy/modules/system/locallogin.te
-@@ -103,6 +103,8 @@ files_read_world_readable_sockets(local_login_t)
+@@ -104,6 +104,8 @@ files_read_world_readable_sockets(local_login_t)
  # for when /var/mail is a symlink
  files_read_var_symlinks(local_login_t)
  
