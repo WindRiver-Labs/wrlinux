@@ -13,7 +13,6 @@ SRC_URI += "file://lmbench-3.0-a9_wr_integration.patch \
             file://scripts/utility.sh \
             file://config/default_case_conf \
             file://config/default_group_conf \
-            file://config/template \
 "
 
 WR_LMBENCH ?= "/opt/benchmark/os/wr-lmbench"
