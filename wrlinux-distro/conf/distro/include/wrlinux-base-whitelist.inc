@@ -60,6 +60,7 @@ PNWHITELIST_openembedded-layer += " \
     vlock \
     iperf3 \
     xmlsec1 \
+    libp11 \
 "
 
 PNWHITELIST_perl-layer += " \
