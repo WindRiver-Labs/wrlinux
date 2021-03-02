@@ -4,5 +4,4 @@
 FILESEXTRAPATHS_append := "${THISDIR}/files:"
 
 SRC_URI_append := " file://valgrind-ppc-unequal-cache-line-size.patch \
-                    file://eliminate-test-timeout.patch \
 "
