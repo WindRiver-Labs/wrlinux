@@ -48,7 +48,7 @@ copy_pkgdata() {
 
 do_copy_pkgdata_to_deploy_repo() {
     for class in ${PACKAGE_CLASSES}; do
-        class=${class/package_/}
+        class=`echo $class | sed -e 's/package_//'`
         deploydir=${DEPLOY_DIR}/$class
         copy_pkgdata $deploydir
         mv $deploydir/pkgdata.tar.bz2 $deploydir/.pkgdata.tar.bz2
