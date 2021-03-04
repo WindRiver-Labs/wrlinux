@@ -50,15 +50,11 @@ IMAGE_INSTALL_append_bcm-bcm-2xxx-rpi4 = " ${@bb.utils.contains_any('BBEXTENDCUR
 IMAGE_INSTALL_append_bcm-2xxx-rpi4 = " boot-config"
 IMAGE_INSTALL_append_bcm-2xxx-rpi4 = " ${@bb.utils.contains('OSTREE_BOOTLOADER', 'u-boot', 'u-boot-uenv', '', d)}"
 
-IMAGE_FEATURES += "package-management"
+IMAGE_FEATURES += "package-management empty-root-password"
 
 inherit wrlinux-image
-inherit extrausers
 
 NO_RECOMMENDATIONS = "1"
-
-# Set root password to root
-EXTRA_USERS_PARAMS += "usermod -P root root;"
 
 # Remove debug-tweaks and x11-base
 EXTRA_IMAGE_FEATURES_remove = "debug-tweaks x11-base"

@@ -67,9 +67,6 @@ IMAGE_FSTYPES_remove = " \
 # No recomendations for container image
 NO_RECOMMENDATIONS = "${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', '1', '0', d)}"
 
-# Set root password to root
-EXTRA_USERS_PARAMS += "usermod -P root root;"
-
 # No bsp packages for container
 python () {
     if bb.utils.to_boolean(d.getVar('IMAGE_ENABLE_CONTAINER')):
@@ -79,10 +76,9 @@ python () {
         d.appendVar('IMAGE_FEATURES', ' x11-base')
 }
 
-IMAGE_FEATURES += "package-management"
+IMAGE_FEATURES += "package-management empty-root-password"
 
 inherit wrlinux-image
-inherit extrausers
 
 # Remove debug-tweaks
 EXTRA_IMAGE_FEATURES_remove = "debug-tweaks"
