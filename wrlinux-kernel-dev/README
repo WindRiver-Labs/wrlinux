@@ -58,13 +58,8 @@ Building with the wrlinux-kernel-dev layer
 1. Add this layer and a corresponding BSP layer to your build's
    conf/bblayers.conf file
 
-2. Add ENABLE_KERNEL_DEV = '1' to your conf/local.conf
-   
-3. Add the desired feature templates to your conf/local.conf file
+2. Add the desired feature templates to your conf/local.conf file
    WRTEMPLATE variable.
-
-NOTE: This layer is not indexed and therefor not available using
-Wind River Linux's setup.sh.
 
 NOTE: Wind River doesn't support enabling of external kernel
 features when building with this layer.
@@ -72,7 +67,7 @@ features when building with this layer.
 
 License
 -------
-Copyright (C) 2012-2013,2017 Wind River Systems, Inc.
+Copyright (C) 2012-2021 Wind River Systems, Inc.
 
 Source code included in the tree for individual recipes is under the LICENSE
 stated in the associated recipe (.bb file) unless otherwise stated.

@@ -28,7 +28,6 @@ Usage:
 Add the lines to local.conf to enable it:
 PREFERRED_PROVIDER_linux-libc-headers = "linux-libc-headers-custom"
 PREFERRED_PROVIDER_nativesdk-linux-libc-headers = "nativesdk-linux-libc-headers-custom"
-ENABLE_KERNEL_DEV = '1'
 WRTEMPLATE_append = "feature/kernel-dev"
 
 Add the full path of the layer to bblayers.conf:

@@ -54,13 +54,13 @@
 inherit kernel
 require recipes-kernel/linux/linux-yocto.inc
 
-# Override SRC_URI in a copy of this recipe to point at a different source
-# tree if you do not want to build from Linus' tree.
-SRC_URI = "git://${LAYER_PATH_wrlinux}/git/linux-yocto-dev.git;protocol=file;branch=standard/base;name=machine"
+# The version of the customized kernel should be specified here, for example,
+#SRC_URI = "git://${LAYER_PATH_wrlinux}/git/linux-yocto-dev.git;protocol=file;branch=standard/base;name=machine"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 
-LINUX_VERSION ?= "4.19-rc8"
+# The version of the customized kernel should be specified here, for example,
+#LINUX_VERSION ?= "4.19-rc8"
 LINUX_VERSION_EXTENSION_append = "-custom"
 
 KERNEL_VERSION_SANITY_SKIP="1"

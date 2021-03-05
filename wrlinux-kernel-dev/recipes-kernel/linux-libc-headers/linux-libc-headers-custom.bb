@@ -1,18 +1,20 @@
 #
-# Copyright (C) 2013 - 2018 Wind River Systems, Inc.
+# Copyright (C) 2013 - 2021 Wind River Systems, Inc.
 #
 require recipes-kernel/linux-libc-headers/linux-libc-headers.inc
 
 PROVIDES = "${@bb.utils.contains("KERNEL_HEADER_DIR", "/usr", "linux-libc-headers", "", d)}"
 
-LINUX_VERSION ?= "4.19-rc7"
+# The version of the customized kernel should be specified here, for example,
+# LINUX_VERSION = "4.19-rc7"
 LINUX_VERSION_EXTENSION_append = "-custom"
 
 KBRANCH ?= "standard/base"
 SRCREV_machine = "${AUTOREV}"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
-KSRC_linux_libc_headers_custom ?= "${THISDIR}/../../../git/linux-yocto-dev.git"
+# The location of the customized kernel should be specified here, for example,
+#KSRC_linux_libc_headers_custom = "${THISDIR}/../../../git/linux-yocto-dev.git"
 SRC_URI = "git://${KSRC_linux_libc_headers_custom};protocol=file;branch=${KBRANCH};name=machine"
 
 S = "${WORKDIR}/git"
