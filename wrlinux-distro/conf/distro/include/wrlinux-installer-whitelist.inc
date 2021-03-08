@@ -4,6 +4,7 @@ PNWHITELIST_LAYERS_remove = "meta-anaconda"
 PNWHITELIST_gnome-layer += "\
     keybinder \
     libgnomekbd \
+    libinih \
     libnma \
     libtimezonemap \
     libuser \
