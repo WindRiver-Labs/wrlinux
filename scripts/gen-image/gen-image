@@ -203,8 +203,6 @@ class GenImage(object):
         self.pr_log = os.path.join(self.builddir, 'cache/prserv.log')
         self.pr_dir = os.path.join(self.handoff_dir, 'prserv')
 
-        self.ip_artifacts_src = "/folk/ip_group/legal_notices/wr-linux-cd-10.20/NOTICES/"
-
     def prepare(self):
 
         if not (self.machine or self.args.gen_recipes):
@@ -681,25 +679,6 @@ COPYLEFT_LICENSE_EXCLUDE = ""
             for i in os.listdir(local_sources):
                 cmd = 'tar --numeric-owner --remove-files %s %s.tar.gz %s' % (tar_opt, i, i)
                 subprocess.check_call(cmd, shell=True, cwd=local_sources)
-
-        # Copy ip-compliance-artifacts
-        if self.is_ci_branch() and os.path.exists(self.ip_artifacts_src):
-            logger.info('Handling ip-compliance-artifacts')
-            ip_artifacts_handoff = os.path.join(local_handoff_dir, 'ip-compliance-artifacts')
-            cmd = 'rsync -av %s %s' % (self.ip_artifacts_src, ip_artifacts_handoff)
-            logger.info('Running %s' % cmd)
-            subprocess.check_call(cmd, shell=True)
-
-            # Decompress oss_bom.zip
-            oss_bom_zip = os.path.join(ip_artifacts_handoff, 'WindRiverLinux-CD-10.20_oss_bom.zip')
-            cmd = "unzip -q %s -d OSS_BOM" % oss_bom_zip
-            logger.info('Running %s' % cmd)
-            subprocess.check_call(cmd, shell=True, cwd=ip_artifacts_handoff)
-
-            logger.info('Removing %s' % oss_bom_zip)
-            os.remove(oss_bom_zip)
-        else:
-            logger.warn("Skipped copying ip-compliance-artifacts since %s doesn't exist" % self.ip_artifacts_src)
 
         if os.path.exists(self.pr_dir):
             shutil.copytree(self.pr_dir, os.path.join(local_handoff_dir, 'prserv'))
