@@ -4,7 +4,6 @@ PNWHITELIST_LAYERS_remove = "meta-anaconda"
 PNWHITELIST_gnome-layer += "\
     keybinder \
     libgnomekbd \
-    libinih \
     libnma \
     libtimezonemap \
     libuser \
@@ -46,6 +45,7 @@ PNWHITELIST_filesystems-layer += "\
 # Whitelist for meta-openembedded/meta-oe
 PNWHITELIST_openembedded-layer += "\
     augeas \
+    libinih \
     libpwquality \
     libreport \
     libtar \
