@@ -1,0 +1,32 @@
+From d5e5d5de3a08c94a162e141a4ef5e81d211e2c4b Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Thu, 23 Apr 2020 09:56:32 +0800
+Subject: [PATCH] Add support for build under SDK
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ scripts/Makefile | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/Makefile b/scripts/Makefile
+index 3e86b30..afa6b33 100644
+--- a/scripts/Makefile
++++ b/scripts/Makefile
+@@ -23,8 +23,10 @@ hostprogs-$(CONFIG_SYSTEM_EXTRA_CERTIFICATE) += insert-sys-cert
+ 
+ HOSTCFLAGS_sortextable.o = -I$(srctree)/tools/include
+ HOSTCFLAGS_asn1_compiler.o = -I$(srctree)/include
+-HOSTLDLIBS_sign-file = -lcrypto
+-HOSTLDLIBS_extract-cert = -lcrypto
++LIBCRYPTO_LIBS  := $(shell pkg-config libcrypto --libs 2>/dev/null || echo -lcrypto)
++$(info $(LIBCRYPTO_LIBS))
++HOSTLDLIBS_sign-file = $(LIBCRYPTO_LIBS)
++HOSTLDLIBS_extract-cert = $(LIBCRYPTO_LIBS) -lpthread
+ 
+ always		:= $(hostprogs-y) $(hostprogs-m)
+ 
+-- 
+2.17.1
+
