@@ -3,8 +3,13 @@ OpenSSL No Weak Ciphers
 OpenSSL contains some weak ciphers. This template disables some of them with
 below configuration of openssl:
 
-EXTRA_OECONF_class-target +="no-des no-md2 no-mdc2 "
-EXTRA_OECONF_class-nativesdk +="no-md2 no-mdc2 "
+EXTRA_OECONF += "no-des"
+
+Some deprecated crypto algorithms are disabled by default with the following
+configuration in openembedded-core:
+
+DEPRECATED_CRYPTO_FLAGS = "no-ssl no-idea no-rc5 no-md2 no-camellia no-mdc2 \
+                           no-scrypt no-seed no-siphash no-sm2 no-sm3 no-sm4"
 
 Important notes
 ===============
