@@ -1,0 +1,14 @@
+[Unit]
+Description=ChromiumBrowser
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=wr-kiosk
+ExecStart=@LIBEXECDIR@/wr-chromium-web-kiosk.sh
+
+[Install]
+WantedBy=multi-user.target
