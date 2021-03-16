@@ -27,6 +27,7 @@ DISTROOVERRIDES_append = "${@['', ':'][(d.getVar('DISTRO', True) != '')]}osv-wrl
 LOCALCONF_VERSION = "1"
 
 SDK_NAME = "${DISTRO}-${TCLIBC}-${SDK_ARCH}-${TARGET_ARCH}"
+SDK_PS1 = "${SDK_NAME}${SDK_VENDOR}:\\$ "
 SDKPATH = "/opt/windriver/${DISTRO}/${SDK_VERSION}"
 TCSDKMACH = "${@['', '_${SDK_OS}']['${SDK_OS}' != 'linux']}"
 TOOLCHAIN_OUTPUTNAME = "${DISTRO}-${DISTRO_VERSION}-${TCLIBC}-${SDK_ARCH}${TCSDKMACH}-${MACHINE_ARCH}-${PN}-sdk"
