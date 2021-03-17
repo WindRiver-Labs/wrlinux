@@ -1,0 +1,9 @@
+This template enables kiosk mode in chromium.
+
+To use this template, add the following to your setup line:
+
+    --templates feature/chromium-web-kiosk
+
+#@TYPE: Wrtemplate
+#@NAME: chromium-web-kiosk
+#@DESCRIPTION: Add kiosk mode to chromium
