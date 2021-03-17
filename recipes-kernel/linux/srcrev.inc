@@ -27,7 +27,7 @@ SRCREV_machine_kb-v5.2-standard-bcm-2xxx-rpi ?= "366f76b725af7e49412bce9f5192ce8
 LINUX_VERSION_kb-v5.2-standard-bcm-2xxx-rpi ?= "5.2.60"
 SRCREV_machine_kb-v5.2-standard-beaglebone ?= "3c9f9985c0d9b087d331407411dd7507091e956e"
 LINUX_VERSION_kb-v5.2-standard-beaglebone ?= "5.2.60"
-SRCREV_machine_kb-v5.2-standard-cn96xx ?= "cf6fac5f899fbf972b58fb7afba707a62b164a92"
+SRCREV_machine_kb-v5.2-standard-cn96xx ?= "ce2b8ccf0b7d6a96f5db9dc8d7e50261c0b3801a"
 LINUX_VERSION_kb-v5.2-standard-cn96xx ?= "5.2.60"
 SRCREV_machine_kb-v5.2-standard-edgerouter ?= "72cf6a74454ac89117b3bee04d188d3c5bb5f561"
 LINUX_VERSION_kb-v5.2-standard-edgerouter ?= "5.2.60"
@@ -104,5 +104,5 @@ LINUX_VERSION_kb-v5.2-standard-xlnx-soc ?= "5.2.60"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_5.2 = "yocto-5.2-wr"
-SRCREV_meta_5.2 = "6bd177ef35952228439726a1570bd9dfaee716ad"
+SRCREV_meta_5.2 = "c112dbafb0fd5f74cb137206317512d4473e2bc7"
 LINUX_VERSION_5.2 = "5.2.60"
