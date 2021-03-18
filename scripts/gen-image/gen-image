@@ -385,7 +385,9 @@ class GenImage(object):
         if ovmf:
             deploy_files.append('%s/ovmf.qcow2' % deploy_dir)
         if uboot:
-            deploy_files.append('%s/qemu-u-boot-bcm-2xxx-rpi4.bin' % deploy_dir)
+            if self.machine == "bcm-2xxx-rpi4":
+                qemu_u_boot = os.path.join(deploy_dir, 'qemu-u-boot-bcm-2xxx-rpi4.bin')
+                deploy_files.append(qemu_u_boot)
         for f in deploy_files:
             logger.debug('Deploy file: %s' % f)
             if not os.path.exists(f):
@@ -430,7 +432,11 @@ class GenImage(object):
                 else:
                     deploy_files.add(d_file)
 
-        deploy_files.add(os.path.join(self.doc_dir, 'target_%s.README.md' %  self.machine))
+        readme = os.path.join(self.doc_dir, 'target_%s.README.md' %  self.machine)
+        if os.path.exists(readme):
+            deploy_files.add(os.path.join(self.doc_dir, 'target_%s.README.md' %  self.machine))
+        else:
+            logger.warning('%s: No README' % self.machine)
 
         self.do_deploy('%s/target' % self.machine, deploy_files)
 
