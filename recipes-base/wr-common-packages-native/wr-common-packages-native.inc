@@ -89,6 +89,7 @@ DEPENDS = "\
     libfontenc-native \
     libgcrypt-native \
     libgpg-error-native \
+    libical-native \
     libice-native \
     libjpeg-turbo-native \
     libmodulemd-native \
@@ -194,6 +195,7 @@ DEPENDS = "\
     unzip-native \
     update-rc.d-native \
     util-linux-native \
+    util-linux-uuid-native \
     util-macros-native \
     virglrenderer-native \
     wayland-native \
