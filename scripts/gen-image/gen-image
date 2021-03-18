@@ -248,6 +248,7 @@ class GenImage(object):
             f.write('require %s\n' % self.bin_image_conf)
 
         self.feed_archs = []
+        all_archs = []
         if self.machine:
             output = self.do_build('-e')
 
@@ -257,11 +258,17 @@ class GenImage(object):
                     feed_uris_defined = True
                 if line.startswith('PACKAGE_FEED_ARCHS='):
                     self.feed_archs = line.split('=')[1].replace('"', '').split()
+                if line.startswith('ALL_MULTILIB_PACKAGE_ARCHS='):
+                    all_archs = line.split('=')[1].replace('"', '').split()
                 if line.startswith('TMPDIR='):
                     self.tmpdir = line.split('=')[1].replace('"', '')
 
             if not self.feed_archs:
-                logger.warning("PACKAGE_FEED_ARCHS is not defined")
+                if not all_archs:
+                    raise Exception("Failed to figure out feed_archs")
+                logger.info("PACKAGE_FEED_ARCHS is not defined, set it automatically")
+                for arch in all_archs:
+                    self.feed_archs.append(arch.replace("-", "_"))
 
             if not self.tmpdir:
                 raise Exception("Failed to figure tmpdir!")
