@@ -117,12 +117,8 @@ class GenImage(object):
             'bcm-2xxx-rpi4',
         ]
 
-        self.feed_archs_dict = {
-            'intel-x86-64': ['corei7_64', 'intel_x86_64', 'noarch'],
-            'bcm-2xxx-rpi4': ['cortexa72', 'bcm_2xxx_rpi4', 'noarch'],
-        }
-
         self.data_dir = os.path.join(os.path.dirname(sys.argv[0]), 'data')
+        self.bin_image_conf = os.path.join(os.path.dirname(sys.argv[0]), 'data', 'wrlinux-bin-image.conf')
 
         parser = argparse.ArgumentParser(
             description="Gen images for specified machine",
@@ -247,61 +243,11 @@ class GenImage(object):
 
         shutil.copyfile(self.local_conf_orig, self.local_conf)
 
-        # Common config
-        feed_arch = self.feed_archs_dict.get(self.machine, [])
-
-        self.feed_path_prefix = os.path.join(self.handoff_name, self.machine)
-        common_conf ="""
-
-### Added by gen-image
-
-MACHINE = "%s"
-
-TMPDIR = "${TOPDIR}/tmp-${MACHINE}"
-DL_DIR = "${TOPDIR}/downloads"
-SSTATE_DIR = "${TOPDIR}/sstate-cache"
-
-DISTRO = "wrlinux-graphics"
-PACKAGE_CLASSES = "package_rpm"
-PRSERV_HOST = "localhost:0"
-
-# Disable multilib
-MULTILIBS = ""
-
-# Make /var/log save on persistent storage to make the image work for container
-VOLATILE_DIR = "0"
-
-# Packages repos
-INHERIT += "packagefeed-stability"
-PACKAGE_FEED_BASE_PATHS = "%s/repos/rpm"
-PACKAGE_FEED_ARCHS = "%s"
-
-SSTATE_PRUNE_OBSOLETEWORKDIR = "0"
-
-INHERIT += "rm_work"
-
-# ostree
-GPG_PATH ?= "${TOPDIR}/.gnupg"
-OSTREE_USE_AB = "0"
-
-# For feature/passwd-expire
-FORCE_EXPIRED_USERS = 'root'
-
-WRTEMPLATE = "feature/docker feature/kubernetes feature/ostree feature/lat feature/ntp \\
-    feature/python-tkinter feature/passwd-expire feature/xfce \\
-"
-
-KERNEL_FEATURES_append += "features/nfsd/nfsd-enable.scc"
-KERNEL_MODULE_AUTOLOAD += "nfsd"
-
-SDKMACHINE = "x86_64"
-
-VIRTUAL-RUNTIME_graphical_init_manager = "lxdm"
-""" % (self.machine, self.feed_path_prefix, ' '.join(feed_arch))
-
         with open(self.local_conf, 'a') as f:
-            f.write(common_conf)
+            f.write('\nMACHINE = "%s"\n' % self.machine)
+            f.write('require %s\n' % self.bin_image_conf)
 
+        self.feed_archs = []
         if self.machine:
             output = self.do_build('-e')
 
@@ -309,8 +255,13 @@ VIRTUAL-RUNTIME_graphical_init_manager = "lxdm"
             for line in output.split('\n'):
                 if line.startswith('PACKAGE_FEED_URIS='):
                     feed_uris_defined = True
+                if line.startswith('PACKAGE_FEED_ARCHS='):
+                    self.feed_archs = line.split('=')[1].replace('"', '').split()
                 if line.startswith('TMPDIR='):
                     self.tmpdir = line.split('=')[1].replace('"', '')
+
+            if not self.feed_archs:
+                logger.warning("PACKAGE_FEED_ARCHS is not defined")
 
             if not self.tmpdir:
                 raise Exception("Failed to figure tmpdir!")
@@ -433,15 +384,6 @@ VIRTUAL-RUNTIME_graphical_init_manager = "lxdm"
     def gen_ostree(self):
         logger.info('Generating target image...')
 
-        ostree_conf = """
-# For ostree
-OSTREE_REMOTE_URL = "${PACKAGE_FEED_URIS}/%s/repos/ostree_repo"
-DISTRO_VERSION_pn-grub-efi = "-"
-
-# Size of the Root partition 4GB
-OSTREE_FDISK_RSZ = "4096"
-""" % self.feed_path_prefix
-
         deploy_files = set()
         is_x86 = 'intel' in self.machine or 'x86-64' in self.machine
 
@@ -454,7 +396,7 @@ OSTREE_FDISK_RSZ = "4096"
         else:
             logger.debug("%s doesn't exist" % ostreerepo_dir)
 
-        self.do_build('%s %s -cclean' % (self.image_minimal, self.image_full), conf=ostree_conf)
+        self.do_build('%s %s -cclean' % (self.image_minimal, self.image_full))
 
         for image in (self.image_minimal, self.image_full):
             self.do_build(target=image)
@@ -502,16 +444,15 @@ IMAGE_ENABLE_CONTAINER = "1"
     def gen_feeds(self):
         logger.info('Generating packages feeds...')
         # The docker won't be built in a world build since it is started by virtual.
-        self.do_build('world docker %s %s' % (self.image_minimal, self.image_full))
+        #self.do_build('world docker %s %s' % (self.image_minimal, self.image_full))
 
         # Remove unneeded archs
         rpm_dir = os.path.join(self.tmpdir, 'deploy/rpm')
-        feed_archs = self.feed_archs_dict[self.machine]
         existed_archs = os.listdir(rpm_dir)
         for e in existed_archs:
             if e.startswith('.pkgdata.tar.bz2'):
                 continue
-            if not e in feed_archs:
+            if not e in self.feed_archs:
                 e_path = os.path.join(rpm_dir, e)
                 logger.info('Removing unneeded data: %s' % e_path)
                 shutil.rmtree(e_path)
