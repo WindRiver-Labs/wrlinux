@@ -119,12 +119,12 @@ class GenImage(object):
 
         self.data_dir = os.path.join(os.path.dirname(sys.argv[0]), 'data')
         self.bin_image_conf = os.path.join(os.path.dirname(sys.argv[0]), 'data', 'wrlinux-bin-image.conf')
+        self.container_conf = os.path.join(os.path.dirname(sys.argv[0]), 'data', 'wrlinux-container.conf')
 
         parser = argparse.ArgumentParser(
             description="Gen images for specified machine",
             epilog="Use %(prog)s --help to get help")
         parser.add_argument('-m', '--machine',
-            choices=self.supported_machines,
             default='',
             help='Specify machine')
         parser.add_argument('-r', '--ip-review',
@@ -175,7 +175,6 @@ class GenImage(object):
         self.local_layer = os.path.join(self.project, 'layers/local')
 
         self.local_conf = os.path.join(self.builddir, 'conf/local.conf')
-        self.local_conf_orig = '%s.orig' % self.local_conf
 
         if self.args.product == 'lincd':
             self.handoff_name = 'WRLinux-CD-Images'
@@ -189,8 +188,6 @@ class GenImage(object):
 
         self.handoff_dir = os.path.join(self.outdir, self.handoff_name)
 
-        self.repos_dir = os.path.join(self.handoff_dir, self.machine, 'repos')
-
         self.cache_dir = os.path.join(self.builddir, 'cache')
         if not os.path.exists(self.cache_dir):
             os.makedirs(self.cache_dir)
@@ -201,8 +198,18 @@ class GenImage(object):
 
     def prepare(self):
 
-        if not (self.machine or self.args.gen_recipes):
-            raise Exception("Specify -m/--machine or -u/--upload, see --help for more info")
+        bitbake_e = ''
+        if not self.machine:
+            logger.info('Figuring out machine ...')
+            bitbake_e = self.do_build('-e')
+            for line in bitbake_e.split('\n'):
+                if line.startswith('PKGDATA_DIR='):
+                    self.machine = line.split('=')[1].replace('"', '')
+                    self.machine = os.path.basename(self.machine)
+                    break
+
+        logger.info('Generaing images for %s' % self.machine)
+        self.repos_dir = os.path.join(self.handoff_dir, self.machine, 'repos')
 
         recipes_dst_dir = os.path.join(self.local_layer, 'recipes-images/images')
         recipe_src_minimal = os.path.join(self.data_dir, '%s.bb' % self.image_minimal)
@@ -216,15 +223,6 @@ class GenImage(object):
         logger.info('You can remove them manually if not needed any more')
         for i in (recipe_src_minimal, recipe_src_full):
             shutil.copy(i, recipes_dst_dir)
-        if os.path.exists(self.local_conf_orig):
-            logger.info('Found conf/local.conf.orig, use it as local.conf')
-            shutil.copyfile(self.local_conf_orig, self.local_conf)
-        else:
-            if os.path.exists(self.local_conf):
-                logger.info('No local.conf.orig found, saving conf/local.conf to local.conf.orig')
-                shutil.copyfile(self.local_conf, self.local_conf_orig)
-            else:
-                raise Exception('Failed to find %s' % self.local_conf)
 
         if self.args.pr_database and os.path.exists(self.args.pr_database):
             if not self.args.pr_database.endswith('.sqlite3'):
@@ -241,40 +239,43 @@ class GenImage(object):
         if not os.path.exists(self.handoff_dir):
             os.makedirs(self.handoff_dir)
 
-        shutil.copyfile(self.local_conf_orig, self.local_conf)
-
-        with open(self.local_conf, 'a') as f:
-            f.write('\nMACHINE = "%s"\n' % self.machine)
-            f.write('require %s\n' % self.bin_image_conf)
+        with open(self.local_conf, 'a+') as f:
+            # Only need write MACHIINE when it is not specified
+            if not bitbake_e:
+                f.write('\nMACHINE = "%s"\n' % self.machine)
+            line = 'require %s\n' % self.bin_image_conf
+            f.seek(0)
+            if not line in f.readlines():
+                f.write(line)
 
         self.feed_archs = []
         all_archs = []
-        if self.machine:
-            output = self.do_build('-e')
+        if not bitbake_e:
+            bitbake_e = self.do_build('-e')
 
-            feed_uris_defined = False
-            for line in output.split('\n'):
-                if line.startswith('PACKAGE_FEED_URIS='):
-                    feed_uris_defined = True
-                if line.startswith('PACKAGE_FEED_ARCHS='):
-                    self.feed_archs = line.split('=')[1].replace('"', '').split()
-                if line.startswith('ALL_MULTILIB_PACKAGE_ARCHS='):
-                    all_archs = line.split('=')[1].replace('"', '').split()
-                if line.startswith('TMPDIR='):
-                    self.tmpdir = line.split('=')[1].replace('"', '')
+        feed_uris_defined = False
+        for line in bitbake_e.split('\n'):
+            if line.startswith('PACKAGE_FEED_URIS='):
+                feed_uris_defined = True
+            if line.startswith('PACKAGE_FEED_ARCHS='):
+                self.feed_archs = line.split('=')[1].replace('"', '').split()
+            if line.startswith('ALL_MULTILIB_PACKAGE_ARCHS='):
+                all_archs = line.split('=')[1].replace('"', '').split()
+            if line.startswith('TMPDIR='):
+                self.tmpdir = line.split('=')[1].replace('"', '')
 
-            if not self.feed_archs:
-                if not all_archs:
-                    raise Exception("Failed to figure out feed_archs")
-                logger.info("PACKAGE_FEED_ARCHS is not defined, set it automatically")
-                for arch in all_archs:
-                    self.feed_archs.append(arch.replace("-", "_"))
+        if not self.feed_archs:
+            if not all_archs:
+                raise Exception("Failed to figure out feed_archs")
+            logger.info("PACKAGE_FEED_ARCHS is not defined, set it automatically")
+            for arch in all_archs:
+                self.feed_archs.append(arch.replace("-", "_"))
 
-            if not self.tmpdir:
-                raise Exception("Failed to figure tmpdir!")
+        if not self.tmpdir:
+            raise Exception("Failed to figure tmpdir!")
 
-            if not feed_uris_defined:
-                raise Exception('PACKAGE_FEED_URIS is not defined. check README.md on how to define it')
+        if not feed_uris_defined:
+            raise Exception('PACKAGE_FEED_URIS is not defined. check README.md on how to define it')
 
     def mv_to_old(self, src_name):
         src = os.path.join(self.handoff_dir, src_name)
@@ -436,12 +437,8 @@ class GenImage(object):
     def gen_container(self):
         logger.info('Generating container image...')
 
-        container_conf = """
-# For docker image
-IMAGE_ENABLE_CONTAINER = "1"
-"""
-        self.do_build(target=self.image_minimal, conf=container_conf)
-        self.do_build(target=self.image_full)
+        self.do_build(target='%s -r %s' % (self.image_minimal, self.container_conf))
+        self.do_build(target='%s -r %s' % (self.image_full, self.container_conf))
 
         deploy_files = self.get_deploy_files(type='tar.bz2', ovmf=False, uboot=False)
 
@@ -451,7 +448,7 @@ IMAGE_ENABLE_CONTAINER = "1"
     def gen_feeds(self):
         logger.info('Generating packages feeds...')
         # The docker won't be built in a world build since it is started by virtual.
-        #self.do_build('world docker %s %s' % (self.image_minimal, self.image_full))
+        self.do_build('world docker %s %s' % (self.image_minimal, self.image_full))
 
         # Remove unneeded archs
         rpm_dir = os.path.join(self.tmpdir, 'deploy/rpm')
@@ -503,7 +500,7 @@ IMAGE_ENABLE_CONTAINER = "1"
         if sha256files:
                 for sha256file in sha256files:
                     basename = os.path.basename(sha256file)
-                    logger.info('Generating checksums for %s' % basename)
+                    logger.info('Generating checksum for %s' % basename)
                     with open(sha256file, 'rb') as inf:
                         data = inf.read()
                     m = hashlib.sha256()
