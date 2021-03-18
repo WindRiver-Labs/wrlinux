@@ -351,6 +351,10 @@ class GenImage(object):
 
     def gen_lat(self):
         logger.info('Generating base reference container for Linux Assembly Tool...')
+        if not self.machine in ('intel-x86-64', 'bcm-2xxx-rpi4'):
+            logger.info('Skipping Linux Assembly Tool: Not supported')
+            return
+
         self.do_build('container-base')
 
         logger.info('Generating app sdk for Linux Assembly Tool...')
