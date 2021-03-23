@@ -1,0 +1,6 @@
+This template adds atf-s32g (Arm Trusted Firmware for NXP S32G platform)
+to the filesystem.
+
+To use this template, add the following to your setup line:
+
+    --templates feature/atf-s32g
