@@ -10,6 +10,9 @@ SRC_URI = "file://wr-chromium-web-kiosk.service \
            file://wr-chromium-web-kiosk.sh \
 "
 
+PACKAGECONFIG ??= "vkeyboard"
+PACKAGECONFIG[vkeyboard] = ",,,chrome-virtual-keyboard"
+
 inherit useradd features_check systemd
 
 # system user & group named wr-kiosk
@@ -30,7 +33,7 @@ STARTING-URL ?= ""
 #,Even if it is full-screen
 WINDOW-SIZE ?= "1920,1080"
 # Extensions: commas separated local unpacked URL
-EXTENSIONS ?= ""
+EXTENSIONS ?= "${@bb.utils.contains("PACKAGECONFIG", "vkeyboard", "${datadir}/chrome-virtual-keyboard", "", d)}"
 
 # Allow disabling temporarily --kiosk to do manual preference configuration
 # such as default zoom level, extension preferences, font preferences...
