@@ -17,6 +17,8 @@ S = "${WORKDIR}/git"
 inherit goarch
 inherit pkgconfig
 
+export GO111MODULE="off"
+
 BBCLASSEXTEND = "native nativesdk"
 
 INSANE_SKIP_${PN} += "already-stripped"
