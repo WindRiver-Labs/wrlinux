@@ -25,6 +25,7 @@ import glob
 import time
 import hashlib
 import git
+import socket
 
 logger = logging.getLogger('gen-image')
 
@@ -275,7 +276,16 @@ class GenImage(object):
             raise Exception("Failed to figure tmpdir!")
 
         if not feed_uris_defined:
-            raise Exception('PACKAGE_FEED_URIS is not defined. check README.md on how to define it')
+            port = '9310'
+            hostname = socket.gethostname()
+            uri = 'http://%s:%s/outdir' % (hostname, port)
+            logger.warning('PACKAGE_FEED_URIS is not defined, setting it to %s' % uri)
+
+            with open(self.local_conf, 'a+') as f:
+                line = 'PACKAGE_FEED_URIS = "%s"\n' % uri
+                f.seek(0)
+                if not line in f.readlines():
+                    f.write(line)
 
     def mv_to_old(self, src_name):
         src = os.path.join(self.handoff_dir, src_name)
