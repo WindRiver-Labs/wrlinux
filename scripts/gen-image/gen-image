@@ -220,20 +220,6 @@ class GenImage(object):
         logger.info('Generating images for %s' % self.machine)
         self.repos_dir = os.path.join(self.handoff_dir, self.machine, 'repos')
 
-        if not self.image:
-            recipes_dst_dir = os.path.join(self.local_layer, 'recipes-images/images')
-            recipe_src_minimal = os.path.join(self.data_dir, '%s.bb' % self.image_minimal)
-            recipe_src_full = os.path.join(self.data_dir, '%s.bb' % self.image_full)
-
-            if not os.path.exists(recipes_dst_dir):
-                logger.info('Creating %s' % recipes_dst_dir)
-                os.makedirs(recipes_dst_dir)
-
-            logger.info('Copying full and minimal recipes to %s' % recipes_dst_dir)
-            logger.info('You can remove them manually if not needed any more')
-            for i in (recipe_src_minimal, recipe_src_full):
-                shutil.copy(i, recipes_dst_dir)
-
         if self.args.pr_database and os.path.exists(self.args.pr_database):
             if not self.args.pr_database.endswith('.sqlite3'):
                 raise Exception('Invalid PR databse file: %s' % self.args.pr_database)
@@ -255,9 +241,9 @@ class GenImage(object):
                 f.write('\nMACHINE = "%s"\n' % self.machine)
             line = 'require %s\n' % self.bin_image_conf
             if self.image in (self.image_minimal, self.image_full):
-                logger.info('Writting %s to conf/local.conf' % line)
                 f.seek(0)
                 if not line in f.readlines():
+                    logger.info('Writting %s to conf/local.conf' % line)
                     f.write(line)
 
         self.feed_archs = []

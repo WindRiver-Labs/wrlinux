@@ -1,15 +1,9 @@
 #
-# Copyright (C) 2020 Wind River Systems, Inc.
+# Copyright (C) 2020 - 2021 Wind River Systems, Inc.
 #
 DESCRIPTION = "A full functional image that boots to a console."
 
-LICENSE = "MIT"
-
-CONTAINER_CORE_BOOT ?= " \
-    base-files \
-    base-passwd \
-    ${VIRTUAL-RUNTIME_update-alternatives} \
-"
+require wrlinux-bin-image.inc
 
 TARGET_IMAGE_INSTALL ?= " \
     kernel-modules \
@@ -59,28 +53,11 @@ IMAGE_INSTALL_remove = "\
     kubernetes \
 "
 
-# Only need tar.bz2 for container image
-IMAGE_FSTYPES_remove = " \
-    ${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', 'live wic wic.bmap ostreepush otaimg', '', d)} \
-"
-
 # No recomendations for container image
 NO_RECOMMENDATIONS = "${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', '1', '0', d)}"
 
-# No bsp packages for container
-python () {
-    if bb.utils.to_boolean(d.getVar('IMAGE_ENABLE_CONTAINER')):
-        d.setVar('WRTEMPLATE_CONF_WRIMAGE_MACH', 'wrlnoimage_mach.inc')
-    else:
-        d.appendVar('IMAGE_FEATURES', ' wr-bsps')
-        d.appendVar('IMAGE_FEATURES', ' x11-base')
-}
-
-IMAGE_FEATURES += "package-management empty-root-password"
-
-inherit wrlinux-image
-
 # Remove debug-tweaks
 EXTRA_IMAGE_FEATURES_remove = "debug-tweaks"
+
 # Remove x11-base for container image
 EXTRA_IMAGE_FEATURES_remove = "${@['', 'x11-base'][bb.utils.to_boolean(d.getVar('IMAGE_ENABLE_CONTAINER') or '0')]}"

@@ -1,15 +1,9 @@
 #
-# Copyright (C) 2020 Wind River Systems, Inc.
+# Copyright (C) 2020 - 2021 Wind River Systems, Inc.
 #
 DESCRIPTION = "A busybox based minimal image that boots to a console."
 
-LICENSE = "MIT"
-
-CONTAINER_CORE_BOOT ?= " \
-    base-files \
-    base-passwd \
-    ${VIRTUAL-RUNTIME_update-alternatives} \
-"
+require wrlinux-bin-image.inc
 
 TARGET_CORE_BOOT ?= " \
     packagegroup-core-boot \
@@ -40,19 +34,10 @@ IMAGE_INSTALL_remove = "\
     ${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', 'u-boot u-boot-uenv boot-config', '', d)} \
 "
 
-# Only need tar.bz2 for container image
-IMAGE_FSTYPES_remove = " \
-    ${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', 'live wic wic.bmap ostreepush otaimg', '', d)} \
-"
-
 # For bcm-2xxx-rpi4
 IMAGE_INSTALL_append_bcm-bcm-2xxx-rpi4 = " ${@bb.utils.contains_any('BBEXTENDCURR', 'multilib', '', 'u-boot', d)}"
 IMAGE_INSTALL_append_bcm-2xxx-rpi4 = " boot-config"
 IMAGE_INSTALL_append_bcm-2xxx-rpi4 = " ${@bb.utils.contains('OSTREE_BOOTLOADER', 'u-boot', 'u-boot-uenv', '', d)}"
-
-IMAGE_FEATURES += "package-management empty-root-password"
-
-inherit wrlinux-image
 
 NO_RECOMMENDATIONS = "1"
 
