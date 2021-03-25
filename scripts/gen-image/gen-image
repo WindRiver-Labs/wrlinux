@@ -170,6 +170,14 @@ class GenImage(object):
 
         self.image_minimal = 'wrlinux-image-minimal'
         self.image_full = 'wrlinux-image-full'
+        self.image = os.getenv('IMAGE', '')
+        if self.image:
+            logger.info('Got IMAGE %s from environment vars' % self.image)
+            self.images = [self.image]
+        else:
+            # Default image
+            self.image = self.image_full
+            self.images = [self.image_minimal, self.image_full]
 
         self.doc_dir = os.path.join(os.path.dirname(sys.argv[0]), 'doc')
 
@@ -209,21 +217,22 @@ class GenImage(object):
                     self.machine = os.path.basename(self.machine)
                     break
 
-        logger.info('Generaing images for %s' % self.machine)
+        logger.info('Generating images for %s' % self.machine)
         self.repos_dir = os.path.join(self.handoff_dir, self.machine, 'repos')
 
-        recipes_dst_dir = os.path.join(self.local_layer, 'recipes-images/images')
-        recipe_src_minimal = os.path.join(self.data_dir, '%s.bb' % self.image_minimal)
-        recipe_src_full = os.path.join(self.data_dir, '%s.bb' % self.image_full)
+        if not self.image:
+            recipes_dst_dir = os.path.join(self.local_layer, 'recipes-images/images')
+            recipe_src_minimal = os.path.join(self.data_dir, '%s.bb' % self.image_minimal)
+            recipe_src_full = os.path.join(self.data_dir, '%s.bb' % self.image_full)
 
-        if not os.path.exists(recipes_dst_dir):
-            logger.info('Creating %s' % recipes_dst_dir)
-            os.makedirs(recipes_dst_dir)
+            if not os.path.exists(recipes_dst_dir):
+                logger.info('Creating %s' % recipes_dst_dir)
+                os.makedirs(recipes_dst_dir)
 
-        logger.info('Copying full and minimal recipes to %s' % recipes_dst_dir)
-        logger.info('You can remove them manually if not needed any more')
-        for i in (recipe_src_minimal, recipe_src_full):
-            shutil.copy(i, recipes_dst_dir)
+            logger.info('Copying full and minimal recipes to %s' % recipes_dst_dir)
+            logger.info('You can remove them manually if not needed any more')
+            for i in (recipe_src_minimal, recipe_src_full):
+                shutil.copy(i, recipes_dst_dir)
 
         if self.args.pr_database and os.path.exists(self.args.pr_database):
             if not self.args.pr_database.endswith('.sqlite3'):
@@ -245,9 +254,11 @@ class GenImage(object):
             if not bitbake_e:
                 f.write('\nMACHINE = "%s"\n' % self.machine)
             line = 'require %s\n' % self.bin_image_conf
-            f.seek(0)
-            if not line in f.readlines():
-                f.write(line)
+            if self.image in (self.image_minimal, self.image_full):
+                logger.info('Writting %s to conf/local.conf' % line)
+                f.seek(0)
+                if not line in f.readlines():
+                    f.write(line)
 
         self.feed_archs = []
         all_archs = []
@@ -302,7 +313,7 @@ class GenImage(object):
                 f.write(conf)
 
         if not target:
-            target = self.image_full
+            target = self.image
         output = run_bitbake_cmd(target, logger)
         return output
 
@@ -343,13 +354,13 @@ class GenImage(object):
     def gen_sdk(self):
         logger.info('Generating sdk...')
 
-        self.do_build('%s -cpopulate_sdk' % self.image_full)
+        self.do_build('%s -cpopulate_sdk' % self.image)
         deploy_files = []
 
         deploy_dir = os.path.join(self.tmpdir, 'deploy/sdk')
         suffixes = ['sdk.sh', 'sdk.host.manifest', 'sdk.target.manifest']
         for f in suffixes:
-            wildcard = "%s/*-%s-%s-%s" % (deploy_dir, self.machine.replace('-', '_'), self.image_full, f)
+            wildcard = "%s/*-%s-%s-%s" % (deploy_dir, self.machine.replace('-', '_'), self.image, f)
             files = glob.glob(wildcard)
             if len(files) != 1:
                 raise Exception("Should be only one %s file but found %s: \n%s" % (f, len(files), '\n'.join(files)))
@@ -387,7 +398,7 @@ class GenImage(object):
         deploy_dir = os.path.join(self.tmpdir, 'deploy/images/%s' % self.machine)
         deploy_files = []
         if not images:
-            images = (self.image_minimal, self.image_full)
+            images = self.images
         for image in images:
             prefix = '%s/%s-%s' % (deploy_dir, image, self.machine)
             deploy_files.append('%s.%s' % (prefix, type))
@@ -420,18 +431,18 @@ class GenImage(object):
         else:
             logger.debug("%s doesn't exist" % ostreerepo_dir)
 
-        self.do_build('%s %s -cclean' % (self.image_minimal, self.image_full))
-
-        for image in (self.image_minimal, self.image_full):
+        self.do_build('%s -cclean' % ' '.join(self.images))
+        for image in self.images:
             self.do_build(target=image)
 
             # Regenerate wic image to support disk resize
-            cmd = "%s/layers/wr-ostree/scripts/bootfs.sh -L -b %s -s 0 -a 'instdate=BUILD_DATE instw=60'" % (self.project, image)
-            run_cmd(cmd, logger)
+            if os.path.exists(ostreerepo_dir):
+                cmd = "%s/layers/wr-ostree/scripts/bootfs.sh -L -b %s -s 0 -a 'instdate=BUILD_DATE instw=60'" % (self.project, image)
+                run_cmd(cmd, logger)
 
             new_image = ""
             for d_file in self.get_deploy_files(ovmf=is_x86, uboot=not is_x86, images=[image]):
-                if d_file.endswith(".wic"):
+                if os.path.exists(ostreerepo_dir) and d_file.endswith(".wic"):
                     basename = os.path.basename(d_file)[:-4]
                     new_image = os.path.join(self.builddir, '%s.ustart.img.gz' % basename)
                     new_bmap = os.path.join(self.builddir, '%s.ustart.bmap' % basename)
@@ -452,13 +463,14 @@ class GenImage(object):
 
         logger.info('Deploying %s/repos/ostree_repo...' % self.machine)
         dst_dir = os.path.join(self.repos_dir, 'ostree_repo')
-        shutil.copytree(ostreerepo_dir, dst_dir)
+        if os.path.exists(ostreerepo_dir):
+            shutil.copytree(ostreerepo_dir, dst_dir)
 
     def gen_container(self):
         logger.info('Generating container image...')
 
-        self.do_build(target='%s -r %s' % (self.image_minimal, self.container_conf))
-        self.do_build(target='%s -r %s' % (self.image_full, self.container_conf))
+        for image in self.images:
+            self.do_build(target='%s -r %s' % (image, self.container_conf))
 
         deploy_files = self.get_deploy_files(type='tar.bz2', ovmf=False, uboot=False)
 
@@ -468,7 +480,7 @@ class GenImage(object):
     def gen_feeds(self):
         logger.info('Generating packages feeds...')
         # The docker won't be built in a world build since it is started by virtual.
-        self.do_build('world docker %s %s' % (self.image_minimal, self.image_full))
+        self.do_build('world docker %s' % ' '.join(self.images))
 
         # Remove unneeded archs
         rpm_dir = os.path.join(self.tmpdir, 'deploy/rpm')
@@ -540,6 +552,7 @@ class GenImage(object):
                     cmd = 'tar --numeric-owner -cjvf %s.tar.bz2 %s' % (d, d)
                     logger.debug('Running %s' % cmd)
                     subprocess.check_output(cmd, shell=True, cwd=file_prefix)
+        logger.info('Deploy files: %s' % os.path.join(self.handoff_dir, self.machine))
 
     def ip_review(self):
         ip_conf = """
@@ -551,12 +564,12 @@ COPYLEFT_LICENSE_EXCLUDE = ""
         logger.info('Generating sources for IP review')
         # The docker won't be built in a world build since it is started with "virtual/".
         # The "bitbake world docker --runall=deploy_archives" doesn't work, so build world.
-        self.do_build('world docker %s %s --runall=deploy_archives' % (self.image_minimal, self.image_full), conf=ip_conf)
+        self.do_build('world docker %s %s --runall=deploy_archives' % ' '.join(self.images), conf=ip_conf)
 
         # And sdk
         # The "bitbake wrlinux-image-full --runall=deploy_archives -cpopulate_sdk"
         # doesn't work, so we figure out the list and build them one by one
-        self.do_build('%s -cpopulate_sdk -g' % self.image_full)
+        self.do_build('%s -cpopulate_sdk -g' % self.image)
         recipes = []
         with open('pn-buildlist') as f:
             for line in f.readlines():
@@ -701,7 +714,7 @@ COPYLEFT_LICENSE_EXCLUDE = ""
             logfile = os.path.join('tmp-%s-glibc/log' % machine, 'cooker', machine, 'console-latest.log')
 
             # The docker won't be built in a world build since it is started with "virtual/".
-            self.do_build('-r %s -g world docker %s %s' % (preconf, self.image_minimal, self.image_full), conf='MACHINE="%s"\n' % machine)
+            self.do_build('-r %s -g world docker %s' % (preconf, ' '.join(self.images)), conf='MACHINE="%s"\n' % machine)
 
             with open(logfile, 'r') as f:
                 nonnul_src |= set(f.readlines())
@@ -711,7 +724,7 @@ COPYLEFT_LICENSE_EXCLUDE = ""
 
             # And sdk
             sdk_list = 'task-depends-sdk-%s.dot' % machine
-            self.do_build('%s -g -cpopulate_sdk' % self.image_full)
+            self.do_build('%s -g -cpopulate_sdk' % self.image)
             os.rename('task-depends.dot', sdk_list)
 
             for dot in (world_list, sdk_list):
