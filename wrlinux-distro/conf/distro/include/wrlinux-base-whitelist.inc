@@ -112,9 +112,6 @@ PNWHITELIST_integrity += " \
     ima-evm-utils \
 "
 
-# Workaround for nmap possibly requiring python-pygtk which is not available
-PACKAGECONFIG_remove_pn-nmap = "zenmap"
-
 PNWHITELIST_selinux += " \
     audit \
 "

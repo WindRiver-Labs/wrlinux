@@ -10,6 +10,9 @@ require conf/distro/include/wrlinux-base-whitelist.inc
 # We need this to add multilib support to the built-in QEMU BSPs
 include conf/distro/include/wrlinux-bsp-${MACHINE}.inc
 
+# PACKAGECONFIG settings for WRLinux
+include conf/distro/include/wrlinux-packageconfigs.inc
+
 MAINTAINER = "Wind River <info@windriver.com>"
 
 DISTRO_NAME ?= "${WRLINUX_BRANDING}${WRLINUX_VARIANT} ${WRLINUX_BRANCH}"
@@ -119,10 +122,6 @@ DISTRO_FEATURES_BACKFILL_CONSIDERED += "x11"
 MULTILIBS ?= ""
 MULTILIB_CONF = "${@'conf/multilib.conf' if d.getVar('MULTILIBS') else ''}"
 require ${MULTILIB_CONF}
-
-# we usually use gnutls as the default PACKAGECONFIG of wpa-supplicant, but its sub-packege gnutls-openssl
-# is GPLv3, so need this check to switch to openssl if GLPv3 is blacklisted.
-PACKAGECONFIG_pn-wpa-supplicant ?= "${@bb.utils.contains('INCOMPATIBLE_LICENSE', 'GPLv3', 'openssl', 'gnutls', d)}"
 
 # dnsmasq and named (provided by bind) use the same default port 53:
 # | dnsmasq: failed to create listening socket for port 53: Address already in use
