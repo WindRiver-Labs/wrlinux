@@ -8,3 +8,5 @@ PACKAGECONFIG_remove_pn-nmap = "zenmap"
 PACKAGECONFIG_pn-wpa-supplicant ?= "${@bb.utils.contains('INCOMPATIBLE_LICENSE', 'GPLv3', 'openssl', 'gnutls', d)}"
 
 PACKAGECONFIG_pn-sysstat ?= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} lm-sensors cron"
+
+PACKAGECONFIG_append_pn-mesa-demos = "${@bb.utils.contains('DISTRO_FEATURES', 'weston-demo', ' wayland ', ' ', d)}"
