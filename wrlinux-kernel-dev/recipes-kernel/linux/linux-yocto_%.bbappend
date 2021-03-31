@@ -15,5 +15,4 @@ require linux-windriver-handlers.inc
 require wkd-linux-yocto-headers.inc
 
 # Ensure `make scripts prepare` succeed inside SDK
-EXTRA_KERNEL_SRC_URI += "file://0001-Makefile-support-make-scripts-prepare-inside-SDK.patch \
-                         file://0001-Add-support-for-build-under-SDK.patch"
+EXTRA_KERNEL_SRC_URI += "file://0001-linux-yocto-dev-add-support-for-build-under-SDK.patch"
