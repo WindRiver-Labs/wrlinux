@@ -1,0 +1,31 @@
+From 933baeeb50af88f468db3c5565a83a8605096cb3 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 31 Mar 2021 14:12:48 +0800
+Subject: [PATCH] wic: disable psuedo under root
+
+Build StarlingX image requires root privilege which should disable
+fakeroot/pseudo.
+
+Upstream-Status: Inappropriate [StarlingX specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ scripts/lib/wic/partition.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/scripts/lib/wic/partition.py b/scripts/lib/wic/partition.py
+index a3b8aa06fe..971609f9e1 100644
+--- a/scripts/lib/wic/partition.py
++++ b/scripts/lib/wic/partition.py
+@@ -207,6 +207,8 @@ class Partition():
+         pseudo += "export PSEUDO_PASSWD=%s;" % p_passwd
+         pseudo += "export PSEUDO_NOSYMLINKEXP=%s;" % p_nosymlinkexp
+         pseudo += "%s " % os.environ.get("FAKEROOTCMD")
++        if os.getuid() == 0:
++            pseudo = ""
+ 
+         rootfs = "%s/rootfs_%s.%s.%s" % (cr_workdir, self.label,
+                                          self.lineno, self.fstype)
+-- 
+2.27.0
+
