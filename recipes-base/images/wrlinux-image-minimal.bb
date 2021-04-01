@@ -34,12 +34,14 @@ IMAGE_INSTALL_remove = "\
     ${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', 'u-boot u-boot-uenv boot-config', '', d)} \
 "
 
-# For bcm-2xxx-rpi4
-IMAGE_INSTALL_append_bcm-bcm-2xxx-rpi4 = " ${@bb.utils.contains_any('BBEXTENDCURR', 'multilib', '', 'u-boot', d)}"
-IMAGE_INSTALL_append_bcm-2xxx-rpi4 = " boot-config"
-IMAGE_INSTALL_append_bcm-2xxx-rpi4 = " ${@bb.utils.contains('OSTREE_BOOTLOADER', 'u-boot', 'u-boot-uenv', '', d)}"
+# For ostree
+IMAGE_INSTALL_append = " ${@bb.utils.contains('OSTREE_BOOTLOADER', 'u-boot', 'u-boot-uenv', '', d)}"
 
-IMAGE_INSTALL_append_xilinx-zynqmp = " ${@bb.utils.contains('OSTREE_BOOTLOADER', 'u-boot', 'u-boot-uenv', '', d)}"
+# For bcm-2xxx-rpi4
+IMAGE_INSTALL_append_bcm-2xxx-rpi4 = " boot-config"
+
+# For nxp-s32g2xx
+IMAGE_INSTALL_append_nxp-s32g2xx = " u-boot-s32"
 
 NO_RECOMMENDATIONS = "1"
 
