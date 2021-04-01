@@ -167,3 +167,7 @@ Reference
 ---------
 Documentation/security/self-protection.txt
 https://kernsec.org/wiki/index.php/Kernel_Self_Protection_Project
+
+#@TYPE: Wrtemplate
+#@NAME: kernel-hardening
+#@DESCRIPTION: Kernel Hardening Features
