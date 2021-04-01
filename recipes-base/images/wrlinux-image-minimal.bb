@@ -39,6 +39,8 @@ IMAGE_INSTALL_append_bcm-bcm-2xxx-rpi4 = " ${@bb.utils.contains_any('BBEXTENDCUR
 IMAGE_INSTALL_append_bcm-2xxx-rpi4 = " boot-config"
 IMAGE_INSTALL_append_bcm-2xxx-rpi4 = " ${@bb.utils.contains('OSTREE_BOOTLOADER', 'u-boot', 'u-boot-uenv', '', d)}"
 
+IMAGE_INSTALL_append_xilinx-zynqmp = " ${@bb.utils.contains('OSTREE_BOOTLOADER', 'u-boot', 'u-boot-uenv', '', d)}"
+
 NO_RECOMMENDATIONS = "1"
 
 # Remove debug-tweaks and x11-base
