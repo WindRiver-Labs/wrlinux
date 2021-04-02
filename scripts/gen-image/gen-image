@@ -380,14 +380,15 @@ class GenImage(object):
         deploy_files.append(os.path.join(self.doc_dir, 'appsdk.README.md'))
         self.do_deploy('%s/lat' % self.machine, deploy_files)
 
-    def get_deploy_files(self, type='wic', ovmf=True, uboot=True, images=[]):
+    def get_deploy_files(self, type='', ovmf=True, uboot=True, images=[]):
         deploy_dir = os.path.join(self.tmpdir, 'deploy/images/%s' % self.machine)
         deploy_files = []
         if not images:
             images = self.images
         for image in images:
             prefix = '%s/%s-%s' % (deploy_dir, image, self.machine)
-            deploy_files.append('%s.%s' % (prefix, type))
+            if type:
+                deploy_files.append('%s.%s' % (prefix, type))
             deploy_files.append('%s.manifest' % prefix)
         if ovmf:
             deploy_files.append('%s/ovmf.qcow2' % deploy_dir)
@@ -427,17 +428,18 @@ class GenImage(object):
                 run_cmd(cmd, logger)
 
             new_image = ""
-            for d_file in self.get_deploy_files(ovmf=is_x86, uboot=not is_x86, images=[image]):
-                if os.path.exists(ostreerepo_dir) and d_file.endswith(".wic"):
-                    basename = os.path.basename(d_file)[:-4]
-                    new_image = os.path.join(self.builddir, '%s.ustart.img.gz' % basename)
-                    new_bmap = os.path.join(self.builddir, '%s.ustart.bmap' % basename)
-                    os.rename('ustart.img.gz', new_image)
-                    os.rename('ustart.img.bmap', new_bmap)
-                    deploy_files.add(new_image)
-                    deploy_files.add(new_bmap)
-                else:
-                    deploy_files.add(d_file)
+            deploy_files |= set(self.get_deploy_files(ovmf=is_x86, uboot=not is_x86, images=[image]))
+            basename = '%s-%s' % (image, self.machine)
+            ustart_images = ['ustart.img.bmap']
+            if self.machine == 'nxp-s32g2xx':
+                ustart_images += ['ustart-evb.img.gz', 'ustart-rdb2.img.gz']
+            else:
+                ustart_images.append('ustart.img.gz')
+
+            for f in ustart_images:
+                newf = os.path.join(self.builddir, '%s.%s' % (basename, f))
+                os.rename(f, newf)
+                deploy_files.add(newf)
 
         readme = os.path.join(self.doc_dir, 'target_%s.README.md' %  self.machine)
         if os.path.exists(readme):
@@ -773,9 +775,9 @@ def main():
         else:
             gen.gen_ostree()
             gen.gen_container()
-            gen.gen_feeds()
             gen.gen_sdk()
             gen.gen_lat()
+            gen.gen_feeds()
             # Gen ip sources for WRLINUX_CI branch
             if gen.is_ci_branch():
                 gen.ip_review()
