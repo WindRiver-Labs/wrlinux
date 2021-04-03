@@ -194,8 +194,8 @@ DEPENDS = "\
     unifdef-native \
     unzip-native \
     update-rc.d-native \
+    util-linux-libuuid-native \
     util-linux-native \
-    util-linux-uuid-native \
     util-macros-native \
     virglrenderer-native \
     wayland-native \
