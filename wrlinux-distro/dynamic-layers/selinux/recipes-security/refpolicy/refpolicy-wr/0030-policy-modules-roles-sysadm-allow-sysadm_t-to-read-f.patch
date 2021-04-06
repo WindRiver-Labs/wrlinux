@@ -1,0 +1,35 @@
+From f46a91f462693127a1b7d5dc42f3491f35059ef8 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 4 Aug 2020 14:51:12 +0800
+Subject: [PATCH] policy/modules/roles/sysadm: allow sysadm_t to read
+ fixed_disk_device_t
+
+Fixes:
+avc:  denied  { read } for  pid=1943 comm="lsblk" name="sdb3"
+dev="devtmpfs" ino=261 scontext=root:sysadm_r:sysadm_t:s0-s15:c0.c1023
+tcontext=system_u:object_r:fixed_disk_device_t:s15:c0.c1023
+tclass=blk_file permissive=0
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/roles/sysadm.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/roles/sysadm.te b/policy/modules/roles/sysadm.te
+index 1f076bcc3..6109dc191 100644
+--- a/policy/modules/roles/sysadm.te
++++ b/policy/modules/roles/sysadm.te
+@@ -58,6 +58,8 @@ init_admin(sysadm_t)
+ userdom_manage_user_home_dirs(sysadm_t)
+ userdom_home_filetrans_user_home_dir(sysadm_t)
+ 
++storage_raw_read_fixed_disk(sysadm_t)
++
+ ifdef(`direct_sysadm_daemon',`
+ 	optional_policy(`
+ 		init_run_daemon(sysadm_t, sysadm_r)
+-- 
+2.17.1
+

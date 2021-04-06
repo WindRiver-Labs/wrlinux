@@ -36,6 +36,7 @@ SRC_URI += "\
         file://0027-policy-modules-services-bind-add-getsched-and-setsch.patch \
         file://0028-policy-modules-services-postfix-allow-postfix_postdr.patch \
         file://0029-Revert-kernel-Drop-unlabeled_t-as-a-files_mountpoint.patch \
+        file://0030-policy-modules-roles-sysadm-allow-sysadm_t-to-read-f.patch \
         "
 
 OSTREE_POLICY_PATCHES = "\
