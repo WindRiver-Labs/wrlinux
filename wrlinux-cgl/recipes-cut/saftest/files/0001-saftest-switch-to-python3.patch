@@ -1,0 +1,76 @@
+From 2d6babd9b2db049fbbe26e2705a184b9a64d0355 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Thu, 8 Apr 2021 08:34:38 +0000
+Subject: [PATCH] saftest: switch to python3
+
+Switch to python3 as python3 is EOL.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ utilities/format/one-line.py  | 4 ++--
+ utilities/format/uncomment.py | 4 ++--
+ utilities/format/zero-line.py | 4 ++--
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/utilities/format/one-line.py b/utilities/format/one-line.py
+index e3b9d12..9770b0d 100755
+--- a/utilities/format/one-line.py
++++ b/utilities/format/one-line.py
+@@ -1,4 +1,4 @@
+-#! /usr/bin/python
++#! /usr/bin/python3
+ #
+ # This scripts gruarantee that no continues black lines in source code
+ # Author:       Qun Li <qun.li@intel.com>
+@@ -6,7 +6,7 @@ import sys, os, re
+ 
+ if __name__ == '__main__':
+         if len(sys.argv) != 2:
+-                print "usage: " + sys.argv[0] + " file"
++                print("usage: " + sys.argv[0] + " file")
+                 sys.exit(-1)
+ 
+         old_file = open(sys.argv[1], 'r')
+diff --git a/utilities/format/uncomment.py b/utilities/format/uncomment.py
+index 9ac7202..b820fec 100755
+--- a/utilities/format/uncomment.py
++++ b/utilities/format/uncomment.py
+@@ -1,4 +1,4 @@
+-#! /usr/bin/python
++#! /usr/bin/python3
+ #
+ # This script removes comments for functions such as "Test_Resource" etc.
+ # Author:       Qun Li <qun.li@intel.com>
+@@ -7,7 +7,7 @@ import sys, os, re
+ 
+ if __name__ == '__main__':
+         if len(sys.argv) != 2:
+-                print "usage: " + sys.argv[0] + " file"
++                print("usage: " + sys.argv[0] + " file")
+                 sys.exit(-1)
+ 
+         old_file = open(sys.argv[1], 'r')
+diff --git a/utilities/format/zero-line.py b/utilities/format/zero-line.py
+index 1ac5f9b..e8a8a4f 100755
+--- a/utilities/format/zero-line.py
++++ b/utilities/format/zero-line.py
+@@ -1,4 +1,4 @@
+-#! /usr/bin/python
++#! /usr/bin/python3
+ #
+ # This scripts guarantee that there's no blank line between block comments and function
+ # Author:       Qun Li <qun.li@intel.com>
+@@ -6,7 +6,7 @@ import sys, os, re
+ 
+ if __name__ == '__main__':
+         if len(sys.argv) != 2:
+-                print "usage: " + sys.argv[0] + " file"
++                print("usage: " + sys.argv[0] + " file")
+                 sys.exit(-1)
+ 
+         old_file = open(sys.argv[1], 'r')
+-- 
+2.29.2
+

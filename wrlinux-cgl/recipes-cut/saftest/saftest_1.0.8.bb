@@ -28,6 +28,7 @@ SRC_URI = "\
 	file://makefile-add-ldflags.patch \
 	file://0001-fix-build-failures.patch \
 	file://saHpiDomainTagSet-set-correct-invalid-character.patch \
+	file://0001-saftest-switch-to-python3.patch \
 	"
 
 SRC_URI[md5sum] = "af9da2a206739adfe0536aefab776289"
@@ -138,4 +139,4 @@ FILES_${PN}-dbg += "/opt/saftest/HPI-B.01.01/src/events/saHpiEventGet/manual/.de
 FILES_${PN}-dbg += "/opt/saftest/HPI-B.01.01/src/events/saHpiUnsubscribe/.debug"
 
 # saftest/utilities includes many bash and python scripts
-RDEPENDS_${PN} += "bash python"
+RDEPENDS_${PN} += "bash python3-core"
