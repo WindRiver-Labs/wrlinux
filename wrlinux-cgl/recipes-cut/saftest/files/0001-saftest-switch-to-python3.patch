@@ -3,7 +3,7 @@ From: Mingli Yu <mingli.yu@windriver.com>
 Date: Thu, 8 Apr 2021 08:34:38 +0000
 Subject: [PATCH] saftest: switch to python3
 
-Switch to python3 as python3 is EOL.
+Switch to python3 as python2 is EOL.
 
 Upstream-Status: Pending
 
