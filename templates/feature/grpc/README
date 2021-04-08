@@ -1,0 +1,9 @@
+This template installs grpc to the image.
+
+To use this template, add the following to your setup line:
+
+	--templates feature/grpc
+
+#@TYPE: Wrtemplate
+#@NAME: grpc
+#@DESCRIPTION: Adds grpc to the image
