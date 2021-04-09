@@ -2,7 +2,7 @@ This template adds the chromium web browser.
 
 To use this template, add the following to your setup line:
 
-    --templates feature/chromium
+    --templates feature/chromium --layers meta-browser
 
 #@TYPE: Wrtemplate
 #@NAME: chromium
