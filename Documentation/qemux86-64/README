@@ -125,7 +125,7 @@ partitioned image on a SD card, flash, or a HDD. The wic command
 generates partitioned images from existing OpenEmbedded build artifacts.
 User can refer to the below URL to get more WIC details:
 
-http://www.yoctoproject.org/docs/2.2/mega-manual/mega-manual.html#creating-partitioned-images
+https://docs.yoctoproject.org/singleindex.html#creating-partitioned-images-using-wic
 
 After build the project, user will get a WIC image under the directory
 tmp-glibc/deploy/images/<bsp name>/ ,such as:

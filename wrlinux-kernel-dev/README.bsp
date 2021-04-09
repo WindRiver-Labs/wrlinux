@@ -139,6 +139,6 @@ Notes:
 References:
 ===========
 
-[1] http://www.yoctoproject.org/docs/1.4/kernel-dev/kernel-dev.html
-[2] http://www.yoctoproject.org/docs/current/bsp-guide/bsp-guide.html
+[1] https://docs.yoctoproject.org/kernel-dev/index.html
+[2] https://docs.yoctoproject.org/bsp-guide/index.html
 [3] http://www.windriver.com/support
