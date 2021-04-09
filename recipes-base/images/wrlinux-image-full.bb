@@ -11,7 +11,7 @@ TARGET_IMAGE_INSTALL ?= " \
     gsettings-desktop-schemas \
 "
 
-IMAGE_INSTALL = "\
+IMAGE_INSTALL += "\
     ${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', '${CONTAINER_CORE_BOOT}', '${TARGET_IMAGE_INSTALL}', d)} \
     openssh \
     ca-certificates \
