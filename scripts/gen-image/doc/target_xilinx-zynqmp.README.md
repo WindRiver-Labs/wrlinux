@@ -5,7 +5,6 @@ The images are built from Wind River Linux CD release, which support ostree, doc
 ## Features
 Arch: aarch64 (cortexa53)
 Package Manager: dnf
-glibc: 2.33
 Features: ostree docker kubernetes xfce
 
 ### ostree
@@ -68,20 +67,19 @@ Now burn the image onto the micro SD card:
     $ zcat wrlinux-image-minimal-xilinx-zynqmp.ustart.img.gz | sudo dd of=/dev/sdX bs=1M status=progress
 
     $ sync
-    $ mkdir tmp;sudo mount /dev/sdX1 ./tmp; sudo cp ./BOOT.BIN ./tmp
+
+    NOTE: The following BOOT.BIN is from XILINX, it isn't integrated into
+    WRLinux because of the license issue. It can be downloaded form the website:
+    https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/183304302/2019.2+Release
+    BUT YOU MUST CHECK WITH XILINX ON WHETHER YOU CAN USE IT OR NOT.
+
+    $ mkdir tmp; sudo mount /dev/sdX1 ./tmp; sudo cp ./BOOT.BIN ./tmp
     $ umount /dev/sdX1
     $ eject
 
 This should give you a bootable micro SD card device. Insert the
 SD card into SD slot on zcu102 board, and then power on.
 This should result in a system booted to the u-boot menu.
-
-NOTE:
-* BOOT.BIN is the bootloader for zcu102 board. Because of license issue, it isn't
-integrated into WRLinux.
-
-You can download it from the website:
-https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/183304302/2019.2+Release
 
 This BSP is only validated in following environment. If you use this BSP
 in a different environment it may possibly have some issues.
