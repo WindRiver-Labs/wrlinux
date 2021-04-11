@@ -592,7 +592,9 @@ COPYLEFT_LICENSE_EXCLUDE = ""
 
         dst_dir_container = os.path.join(self.local_upload_dir_date, 'containers')
         local_sources = os.path.join(local_handoff_dir, 'sources')
-        for m in self.supported_machines:
+        for m in os.listdir(self.handoff_dir):
+            if m == 'prserv':
+                continue
             file_prefix_src = os.path.join(self.handoff_dir, 'sources-%s' % m)
             if os.path.exists(file_prefix_src):
                 cmd = 'rsync -a %s/* %s' % (file_prefix_src, local_sources)
