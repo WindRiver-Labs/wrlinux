@@ -57,13 +57,13 @@ avl.21.0:avl.21.1 ccm.3.0
 std.2.0:std.2.1 std.2.2 std.2.3
 4.Update cgl_test.sh
   add these cases name to TESTCASE
-  avl.21.0 std.10.0 cdiag.2.4 std.2.0 avl.3.2 prf.4.2  avl.7.1 smm.3.1 
+  avl.21.0 std.10.0 std.2.0 avl.3.2 prf.4.2  avl.7.1 smm.3.1
   
   add ". ./config.sh" at the head of cgl_test.
 
 5.Add file config.sh to test suite.
 6.Add thest case shell scripts to testcase dir
-  avl.21.0 ccm.3.0.sh std.10.0 std.2.3 avl.21.1 cdiag.2.4 std.2.0
+  avl.21.0 ccm.3.0.sh std.10.0 std.2.3 avl.21.1 std.2.0
   avl.3.2 prf.4.2 std.2.1 avl.7.1 csm.4.0 smm.3.1 std.2.2
 7.Replace resource/pktgen_test.sh with resource/pktgen_eth_test.sh
   pktgen_eth_test.sh is updated by Xiaofeng.Liu

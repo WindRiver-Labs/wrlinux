@@ -7,7 +7,7 @@ SECTION = "apps"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=12f884d2ae1ff87c09e5b7ccc2c4ca7e"
 
-RDEPENDS_${PN} = "ntp ntp-utils ntp-tickadj ltp \
+RDEPENDS_${PN} = "ltp \
                   e2fsprogs e2fsprogs-resize2fs \
                   open-posix-testsuite bash\
 "
@@ -72,7 +72,6 @@ SRC_URI = "\
 	file://files/testcase/std.26.1 \
 	file://files/testcase/std.26.2 \
 	file://files/testcase/avl.21.1 \
-	file://files/testcase/cdiag.2.4 \
 	file://files/testcase/cdiag.2.2 \
 	file://files/testcase/std.8.8 \
 	file://files/testcase/smm.7.3 \

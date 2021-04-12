@@ -30,7 +30,7 @@ KDUMP_CASE="\
 # prepare CGL4 test case 
 CGL4_TESTCASE="\
 	avl.4.1 avl.5.3 avl.6.0 avl.7.1 avl.22.0 avl.23.0 avl.26.0 avl.28.1 \
-	cdiag.2.2 cdiag.2.3 cdiag.2.4 \
+	cdiag.2.2 cdiag.2.3 \
 	prf.1.6 prf.1.7 prf.2.1 prf.2.2 prf.2.3 prf.4.2 prf.7.0 prf.14.0 \
 	sec.1.1 sec.1.2 sec.1.3 sec.1.4 sec.2.1 sec.2.2 sec.3.3 sec.3.4 sec.4.4 \
 	sec.4.1 sec.4.2 sec.4.3 sec.4.6 sec.7.1 sec.9.1 sec.11.1 \
