@@ -41,6 +41,7 @@ PNWHITELIST_networking-layer += " \
 "
 PNWHITELIST_META_NETWORKING = " \
     bridge-utils \
+    chrony \
     corosync \
     kronosnet \
     freediameter \
@@ -59,7 +60,6 @@ PNWHITELIST_META_NETWORKING = " \
     netkit-rsh \
     netkit-telnet \
     ntopng \
-    ntp \
     openhpi \
     openipmi \
     open-isns \

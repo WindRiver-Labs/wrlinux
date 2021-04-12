@@ -18,12 +18,14 @@ PACKAGES = "${PN}"
 
 ALLOW_EMPTY_${PN} = "1"
 
+VIRTUAL-RUNTIME_ntp ?= "chrony"
 RDEPENDS_${PN} = "\
 	geoip \
 	geoip-perl \
 	apache2 \
 	bind \
 	bridge-utils \
+	${VIRTUAL-RUNTIME_ntp} \
 	freeradius \
 	ifenslave \
 	inetutils \
@@ -52,7 +54,6 @@ RDEPENDS_${PN} = "\
 	wpa-supplicant \
 	xinetd \
 	samba \
-	ntp \
 	traceroute \
 	tunctl \
 	"
