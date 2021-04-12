@@ -1,0 +1,6 @@
+This template adds chrony (a versatile implementation of the
+Network Time Protocol) to the filesystem.
+
+To use this template, add the following to your setup line:
+
+    --templates feature/chrony
