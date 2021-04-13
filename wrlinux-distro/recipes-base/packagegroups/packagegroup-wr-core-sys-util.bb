@@ -15,6 +15,9 @@ PR = "r4"
 
 ALLOW_EMPTY_${PN} = "1"
 
+STRACE = "strace"
+STRACE_riscv32 = ""
+
 RDEPENDS_${PN} = " \
     util-linux-fsck \
     e2fsprogs-e2fsck \
@@ -34,7 +37,7 @@ RDEPENDS_${PN} = " \
     quota \
     sdparm \
     setserial \
-    strace \
+    ${STRACE} \
     tcf-agent \
     usbutils \
     watchdog \
