@@ -552,7 +552,7 @@ COPYLEFT_LICENSE_EXCLUDE = ""
         logger.info('Generating sources for IP review')
         # The docker won't be built in a world build since it is started with "virtual/".
         # The "bitbake world docker --runall=deploy_archives" doesn't work, so build world.
-        self.do_build('world docker %s %s --runall=deploy_archives' % ' '.join(self.images), conf=ip_conf)
+        self.do_build('world docker %s --runall=deploy_archives' % ' '.join(self.images), conf=ip_conf)
 
         # And sdk
         # The "bitbake wrlinux-image-full --runall=deploy_archives -cpopulate_sdk"
