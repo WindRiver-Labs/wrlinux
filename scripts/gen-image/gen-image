@@ -367,7 +367,7 @@ class GenImage(object):
         logger.info('Generating app sdk for Linux Assembly Tool...')
         self.do_build('container-base -cpopulate_sdk')
 
-        deploy_files = self.get_deploy_files(type='tar.bz2', ovmf=False, uboot=False, images=['container-base'])
+        deploy_files = self.get_deploy_files(type='tar.bz2', uboot=False, images=['container-base'])
         deploy_dir = os.path.join(self.tmpdir, 'deploy/sdk')
         suffixes = ['sdk.sh', 'sdk.host.manifest', 'sdk.target.manifest']
         for f in suffixes:
@@ -380,7 +380,7 @@ class GenImage(object):
         deploy_files.append(os.path.join(self.doc_dir, 'appsdk.README.md'))
         self.do_deploy('%s/lat' % self.machine, deploy_files)
 
-    def get_deploy_files(self, type='', ovmf=True, uboot=True, images=[]):
+    def get_deploy_files(self, type='', uboot=True, images=[]):
         deploy_dir = os.path.join(self.tmpdir, 'deploy/images/%s' % self.machine)
         deploy_files = []
         if not images:
@@ -390,8 +390,9 @@ class GenImage(object):
             if type:
                 deploy_files.append('%s.%s' % (prefix, type))
             deploy_files.append('%s.manifest' % prefix)
-        if ovmf:
-            deploy_files.append('%s/ovmf.qcow2' % deploy_dir)
+        ovmf = os.path.join(deploy_dir, 'ovmf.qcow2')
+        if os.path.exists(ovmf):
+            deploy_files.append(ovmf)
         if uboot:
             if self.machine == "bcm-2xxx-rpi4":
                 qemu_u_boot = os.path.join(deploy_dir, 'qemu-u-boot-bcm-2xxx-rpi4.bin')
@@ -428,7 +429,7 @@ class GenImage(object):
                 run_cmd(cmd, logger)
 
             new_image = ""
-            deploy_files |= set(self.get_deploy_files(ovmf=is_x86, uboot=not is_x86, images=[image]))
+            deploy_files |= set(self.get_deploy_files(uboot=not is_x86, images=[image]))
             basename = '%s-%s' % (image, self.machine)
             ustart_images = ['ustart.img.bmap']
             if self.machine == 'nxp-s32g2xx':
@@ -460,7 +461,7 @@ class GenImage(object):
         for image in self.images:
             self.do_build(target='%s -r %s' % (image, self.container_conf))
 
-        deploy_files = self.get_deploy_files(type='tar.bz2', ovmf=False, uboot=False)
+        deploy_files = self.get_deploy_files(type='tar.bz2', uboot=False)
 
         deploy_files.append(os.path.join(self.doc_dir, 'container.README.md'))
         self.do_deploy('%s/container' % self.machine, deploy_files)
