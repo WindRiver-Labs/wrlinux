@@ -4,8 +4,6 @@ SRC_URI += "file://dhcpcd.service \
             file://dhcpcd-systemd-wrapper \
            "
 
-SYSTEMD_AUTO_ENABLE_${PN} = "enable"
-
 do_install_append () {
     install -d ${D}${sysconfdir}/default
     echo 'INTERFACES="eth0"' > ${D}${sysconfdir}/default/dhcpcd
