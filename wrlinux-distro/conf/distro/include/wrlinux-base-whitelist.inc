@@ -33,6 +33,7 @@ PNWHITELIST_openembedded-layer += " \
     iotop \
     krb5 \
     lemon-native \
+    libconfig \
     libdbd-mysql-perl \
     libdbi-perl \
     libdev-checklib-perl \
