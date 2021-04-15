@@ -46,4 +46,4 @@ IMAGE_INSTALL_append_nxp-s32g2xx = " u-boot-s32"
 NO_RECOMMENDATIONS = "1"
 
 # Remove debug-tweaks and x11-base
-EXTRA_IMAGE_FEATURES_remove = "debug-tweaks x11-base"
+IMAGE_FEATURES_remove = "debug-tweaks x11-base"
