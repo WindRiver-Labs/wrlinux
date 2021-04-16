@@ -37,7 +37,7 @@ SRCREV_machine_kb-v5.2-standard-intel-sdk-5.4-intel-socfpga ?= "b7f28393234d2b30
 LINUX_VERSION_kb-v5.2-standard-intel-sdk-5.4-intel-socfpga ?= "5.2.60"
 SRCREV_machine_kb-v5.2-standard-intel-socfpga ?= "b4322ac42649c4542b170517dbec6346a60344ad"
 LINUX_VERSION_kb-v5.2-standard-intel-socfpga ?= "5.2.60"
-SRCREV_machine_kb-v5.2-standard-intel-x86 ?= "83161b085fd05abff14c7771c6f44eb9de0a0044"
+SRCREV_machine_kb-v5.2-standard-intel-x86 ?= "d622a577bfedb60220e10cab7eb68471f4eb676e"
 LINUX_VERSION_kb-v5.2-standard-intel-x86 ?= "5.2.60"
 SRCREV_machine_kb-v5.2-standard-mti-malta32 ?= "fd43388a1b22434e189f79cc4de032c118185151"
 LINUX_VERSION_kb-v5.2-standard-mti-malta32 ?= "5.2.60"
@@ -104,5 +104,5 @@ LINUX_VERSION_kb-v5.2-standard-xlnx-soc ?= "5.2.60"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_5.2 = "yocto-5.2-wr"
-SRCREV_meta_5.2 = "e999ad8d93c3449a6afb1c58c471c6fc5af0e254"
+SRCREV_meta_5.2 = "c7bc8e1138e02e5d37a80e89ddc5bbdbde2cc854"
 LINUX_VERSION_5.2 = "5.2.60"
