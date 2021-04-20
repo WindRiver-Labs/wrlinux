@@ -4,15 +4,18 @@ Upstream-Status: Inappropriate [configuration]
 
 Signed-off-by: Joe Slater <jslater@windriver.com>
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+
+refresh patch to libpam-redhat-1.1.4
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
  modules/pam_console/Makefile.am | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/modules/pam_console/Makefile.am b/modules/pam_console/Makefile.am
-index 6b06db7..7131497 100644
+index 5aebea5..aadd692 100644
 --- a/modules/pam_console/Makefile.am
 +++ b/modules/pam_console/Makefile.am
-@@ -53,6 +53,8 @@ configfile.tab.c: configfile.y
+@@ -55,6 +55,8 @@ configfile.tab.c: configfile.y
  	$(YACC) $(BISON_OPTS) -o $@ -p _pc_yy $<
  	sh $(srcdir)/sed-static $@
  
@@ -22,5 +25,5 @@ index 6b06db7..7131497 100644
  	$(LEX) $(FLEX_OPTS) -o$@ -P_pc_yy $<
  	sh $(srcdir)/sed-static $@
 -- 
-1.9.1
+2.17.1
 

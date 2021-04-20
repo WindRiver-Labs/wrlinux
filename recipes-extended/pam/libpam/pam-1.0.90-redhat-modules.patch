@@ -1,3 +1,6 @@
+From 50e564e502378c5b8bfb4e9dccbce23c5496e0f0 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Tue, 20 Apr 2021 14:17:05 +0800
 Subject: [PATCH] build redhad modules
 
 Upstream-Status: Inappropriate [configuration]
@@ -5,38 +8,39 @@ Upstream-Status: Inappropriate [configuration]
 Signed-off-by: Joe Slater <jslater@windriver.com>
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+
+disable module pam_postgresok
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
- configure.ac        | 2 ++
- modules/Makefile.am | 3 +++
- 2 files changed, 5 insertions(+)
+ configure.ac        | 1 +
+ modules/Makefile.am | 2 ++
+ 2 files changed, 3 insertions(+)
 
 diff --git a/configure.ac b/configure.ac
-index 5eade7c..cc8137f 100644
+index 5eade7c..30fc2bb 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -639,6 +639,8 @@ AC_CONFIG_FILES([Makefile libpam/Makefile libpamc/Makefile libpamc/test/Makefile
+@@ -639,6 +639,7 @@ AC_CONFIG_FILES([Makefile libpam/Makefile libpamc/Makefile libpamc/test/Makefile
  	po/Makefile.in \
  	Make.xml.rules \
  	modules/Makefile \
 +	modules/pam_chroot/Makefile modules/pam_console/Makefile \
-+	modules/pam_postgresok/Makefile \
  	modules/pam_access/Makefile \
          modules/pam_debug/Makefile modules/pam_deny/Makefile \
  	modules/pam_echo/Makefile modules/pam_env/Makefile \
 diff --git a/modules/Makefile.am b/modules/Makefile.am
-index 8da4641..215dd48 100644
+index 8da4641..0d5ad66 100644
 --- a/modules/Makefile.am
 +++ b/modules/Makefile.am
-@@ -47,6 +47,9 @@ SUBDIRS := \
+@@ -47,6 +47,8 @@ SUBDIRS := \
  	pam_debug \
  	pam_deny \
  	pam_echo \
 +	pam_chroot \
 +	pam_console \
-+	pam_postgresok \
  	pam_env \
  	pam_exec \
  	pam_faildelay \
 -- 
-2.29.2
+2.17.1
 

@@ -1,4 +1,4 @@
-From 53f0fd76d6eb0ba5149d316647f83d3c56d1f9aa Mon Sep 17 00:00:00 2001
+From 403ed83caa22e98e9966c3aeac0ae368e6c5c27c Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Mon, 9 Dec 2019 18:31:06 -0800
 Subject: [PATCH] drop yylex to static force
@@ -34,18 +34,18 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/modules/pam_console/sed-static b/modules/pam_console/sed-static
-index b9a6fa2..c7a850e 100644
+index f9ba7c1..99fc992 100644
 --- a/modules/pam_console/sed-static
 +++ b/modules/pam_console/sed-static
-@@ -13,7 +13,7 @@ sed '
- /^YY_BUFFER_STATE yy_scan_buffer/s/^/STATIC /
+@@ -14,7 +14,7 @@ sed '
  /^YY_BUFFER_STATE yy_scan_string/s/^/STATIC /
  /^void yy_switch_to_buffer/s/^/STATIC /
+ /^extern int yylex/s/^extern /STATIC /
 -/define YY_DECL int yylex/s/YY_DECL /YY_DECL STATIC /
 +#/define YY_DECL int yylex/s/YY_DECL /YY_DECL STATIC /
  /^int yyparse/s/^/STATIC /
  /^void yyrestart/s/^/STATIC /
  ' < $1 > sedtmp.$$ && mv sedtmp.$$ $1
 -- 
-2.21.0
+2.17.1
 
