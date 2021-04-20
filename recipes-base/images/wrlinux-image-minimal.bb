@@ -48,11 +48,12 @@ NO_RECOMMENDATIONS = "1"
 # Remove debug-tweaks and x11-base
 IMAGE_FEATURES_remove = "debug-tweaks x11-base"
 
-# Enable dhcpcd service
+# Enable dhcpcd service if NetworkManager is not installed.
 ROOTFS_POSTPROCESS_COMMAND += "enable_dhcpcd_service; "
 enable_dhcpcd_service() {
-    if [ -f ${IMAGE_ROOTFS}${systemd_unitdir}/system/dhcpcd.service ]; then
+    if [ ! -e ${IMAGE_ROOTFS}${sbindir}/NetworkManager \
+        -a -f ${IMAGE_ROOTFS}${systemd_unitdir}/system/dhcpcd.service ]; then
         ln -sf ${systemd_unitdir}/system/dhcpcd.service \
-            ${IMAGE_ROOTFS}${sysconfdir}/systemd/system/${SYSTEMD_DEFAULT_TARGET}.wants/dhcpcd.service
+            ${IMAGE_ROOTFS}${sysconfdir}/systemd/system/multi-user.target.wants/dhcpcd.service
     fi
 }

@@ -71,3 +71,13 @@ IMAGE_INSTALL_remove_nxp-s32g2xx = "packagegroup-xfce-extended wr-themes"
 
 IMAGE_FEATURES_remove_xilinx-zynq = "x11-base"
 IMAGE_INSTALL_remove_xilinx-zynq = "packagegroup-xfce-extended wr-themes"
+
+# Enable dhcpcd service if NetworkManager is not installed.
+ROOTFS_POSTPROCESS_COMMAND += "enable_dhcpcd_service; "
+enable_dhcpcd_service() {
+    if [ ! -e ${IMAGE_ROOTFS}${sbindir}/NetworkManager \
+        -a -f ${IMAGE_ROOTFS}${systemd_unitdir}/system/dhcpcd.service ]; then
+        ln -sf ${systemd_unitdir}/system/dhcpcd.service \
+            ${IMAGE_ROOTFS}${sysconfdir}/systemd/system/multi-user.target.wants/dhcpcd.service
+    fi
+}
