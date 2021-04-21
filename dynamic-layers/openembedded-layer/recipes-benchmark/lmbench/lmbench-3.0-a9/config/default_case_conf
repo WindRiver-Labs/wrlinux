@@ -13,7 +13,8 @@ sig_protection_fault:Signal handling:2
 
 proc_exec_latency:Process Creation:0
 proc_fork_latency:Process Creation:1
-proc_shell_latency:Process Creation:2
+proc_procedure_latency:Process Creation:2
+proc_shell_latency:Process Creation:3
 
 ctx_latency:Context Switching:0
 

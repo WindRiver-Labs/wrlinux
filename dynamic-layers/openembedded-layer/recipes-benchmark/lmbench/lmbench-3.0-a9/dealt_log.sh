@@ -228,6 +228,9 @@ for i in `ls ${orig_log_dir} | grep -v sysinfo`; do
 	proc_fork_latency)
 		cat $log | awk '{print $3 "   us"}' > proc_fork_latency.log
 		;;
+	proc_procedure_latency)
+		cat $log | awk '{print $3 "   us"}' > proc_procedure_latency.log
+		;;
 	proc_shell_latency)
 		cat $log | awk '{print $4 "   us"}' > proc_shell_latency.log
 		;;

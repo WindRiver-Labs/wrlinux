@@ -94,6 +94,19 @@ done
 #==Process creation===
 echo "Process creation (us)"
 
+echo "Process procedure"
+done_percent=0
+current_percent=0
+log_file="$LOGDIR/proc_procedure_latency"
+
+while :
+do
+  echo_process
+  [ $? -eq 0 ] || break
+  lat_proc procedure >> $log_file 2>&1
+done
+
+
 echo "Process fork+exit"
 done_percent=0
 current_percent=0
