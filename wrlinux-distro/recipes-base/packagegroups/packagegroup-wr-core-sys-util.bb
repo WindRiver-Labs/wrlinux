@@ -38,7 +38,6 @@ RDEPENDS_${PN} = " \
     sdparm \
     setserial \
     ${STRACE} \
-    tcf-agent \
     usbutils \
     watchdog \
     crda \

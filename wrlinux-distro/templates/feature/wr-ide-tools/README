@@ -1,0 +1,7 @@
+Install tools needed by ide, such as VS Code and Workbench
+
+#@TYPE: Wrtemplate
+#@NAME: wr-ide-tools
+#@DESCRIPTION: Add tcf-agent into image
+
+
