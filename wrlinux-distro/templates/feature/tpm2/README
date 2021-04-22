@@ -43,7 +43,9 @@ ready for use:
    necessary. These passwords are used for the authorization to certain
    TPM 2.0 commands.
 
-     # tpm2_takeownership -o <ownerPasswd> -e <endorsePasswd> -l <lockPasswd>
+     # tpm2_changeauth -c o <ownerPasswd>
+     # tpm2_changeauth -c e <endorsePasswd>
+     # tpm2_changeauth -c l <lockPasswd>
 
 Then, you can use the TPM for a specific need, such as key generation,
 sealing encrypted data, etc.
