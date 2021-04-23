@@ -60,10 +60,10 @@ and un-mount those that are mounted, for example:
 
 Now burn the image onto the micro SD card:
     For full image
-    $ zcat wrlinux-image-full-xilinx-zynq.ustart.img.gz | sudo dd of=/dev/sdX bs=1M status=progress conv=fsync
+    $ zcat wrlinux-image-full-nxp-imx8.ustart.img.gz | sudo dd of=/dev/sdX bs=1M status=progress conv=fsync
 
     Or minimal image
-    $ zcat wrlinux-image-minimal-xilinx-zynq.ustart.img.gz | sudo dd of=/dev/sdX bs=1M status=progress conv=fsync
+    $ zcat wrlinux-image-minimal-nxp-imx8.ustart.img.gz | sudo dd of=/dev/sdX bs=1M status=progress conv=fsync
 
     NOTE: The following imx-boot-imx8qmmek-sd-5-4.bin-flash is from NXP, it
     isn't integrated into WRLinux because of the license issue. You can ask
