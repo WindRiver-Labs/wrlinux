@@ -72,6 +72,12 @@ IMAGE_INSTALL_remove_nxp-s32g2xx = "packagegroup-xfce-extended wr-themes"
 IMAGE_FEATURES_remove_xilinx-zynq = "x11-base"
 IMAGE_INSTALL_remove_xilinx-zynq = "packagegroup-xfce-extended wr-themes"
 
+IMAGE_FEATURES_remove_ti-j72xx = "x11-base"
+IMAGE_INSTALL_remove_ti-j72xx = "packagegroup-xfce-extended wr-themes"
+
+IMAGE_FEATURES_remove_marvell-cn96xx = "x11-base"
+IMAGE_INSTALL_remove_marvell-cn96xx = "packagegroup-xfce-extended wr-themes"
+
 # Enable dhcpcd service if NetworkManager is not installed.
 ROOTFS_POSTPROCESS_COMMAND += "enable_dhcpcd_service; "
 enable_dhcpcd_service() {
