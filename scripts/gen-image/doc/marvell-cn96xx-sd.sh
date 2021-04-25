@@ -43,6 +43,8 @@ if [ "$confirm" != "y" -a "$confirm" != "Y" ]; then
     exit 1
 fi
 
+echo "umount $dev*"
+sudo umount $dev*
 zcat $wrimg | sudo dd of=$dev bs=1M status=progress conv=fsync
 sudo dd if=$uboot of=$dev bs=512 seek=128 skip=128 conv=fsync
 sudo losetup -f -P $uboot

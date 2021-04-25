@@ -444,9 +444,13 @@ class GenImage(object):
 
         readme = os.path.join(self.doc_dir, 'target_%s.README.md' %  self.machine)
         if os.path.exists(readme):
-            deploy_files.add(os.path.join(self.doc_dir, 'target_%s.README.md' %  self.machine))
+            deploy_files.add(readme)
         else:
-            logger.warning('%s: No README' % self.machine)
+            logger.warning('No README: %s' % readme)
+
+        write_sd_sh = os.path.join(self.doc_dir, '%s-sd.sh' %  self.machine)
+        if os.path.exists(write_sd_sh):
+            deploy_files.add(write_sd_sh)
 
         self.do_deploy('%s/target' % self.machine, deploy_files)
 
