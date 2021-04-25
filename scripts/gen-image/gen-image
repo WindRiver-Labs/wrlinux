@@ -596,14 +596,14 @@ COPYLEFT_LICENSE_EXCLUDE = ""
         for m in os.listdir(self.handoff_dir):
             if m == 'prserv':
                 continue
-            file_prefix_src = os.path.join(self.handoff_dir, 'sources-%s' % m)
-            if os.path.exists(file_prefix_src):
-                cmd = 'rsync -a %s/* %s' % (file_prefix_src, local_sources)
-                logger.info('Running %s' % cmd)
-                subprocess.check_call(cmd, shell=True)
-
             file_prefix = os.path.join(self.handoff_dir, m)
             if os.path.exists(file_prefix):
+                if m.startswith('sources-'):
+                    cmd = 'rsync -a %s/* %s' % (file_prefix, local_sources)
+                    logger.info('Running %s' % cmd)
+                    subprocess.check_call(cmd, shell=True)
+                    continue
+
                 dst_dir_tgt = os.path.join(local_handoff_dir, m)
                 if not os.path.exists(dst_dir_tgt):
                     os.makedirs(dst_dir_tgt)
