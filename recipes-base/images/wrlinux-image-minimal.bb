@@ -31,14 +31,11 @@ IMAGE_INSTALL = "\
 IMAGE_INSTALL_remove = "\
     packagegroup-core-base-utils \
     ${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', 'ostree ostree-upgrade-mgr linux-firmware', '', d)} \
-    ${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', 'u-boot u-boot-uenv boot-config', '', d)} \
+    ${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', 'u-boot u-boot-uenv', '', d)} \
 "
 
 # For ostree
 IMAGE_INSTALL_append = " ${@bb.utils.contains('OSTREE_BOOTLOADER', 'u-boot', 'u-boot-uenv', '', d)}"
-
-# For bcm-2xxx-rpi4
-IMAGE_INSTALL_append_bcm-2xxx-rpi4 = " boot-config"
 
 # For nxp-s32g2xx
 IMAGE_INSTALL_append_nxp-s32g2xx = " u-boot-s32"

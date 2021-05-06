@@ -42,7 +42,7 @@ CONTAINER_IMAGE_REMOVE ?= "\
     kernel-module-vc4 \
     kernel-module-v3d \
     kernel-module-bcm2835-gpiomem \
-    boot-config u-boot \
+    u-boot \
     wr-themes \
     packagegroup-xfce-extended \
 "
