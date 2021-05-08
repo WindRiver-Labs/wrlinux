@@ -61,13 +61,6 @@ PNWHITELIST_openembedded-layer += " \
     iperf3 \
     xmlsec1 \
     libp11 \
-    ade \
-    gflags \
-    glog \
-    libeigen \
-    opencv \
-    tbb \
-    v4l-utils \
 "
 
 PNWHITELIST_perl-layer += " \
