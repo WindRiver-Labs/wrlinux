@@ -8,7 +8,6 @@ RDEPENDS_${PN}_append_osv-wrlinux = " \
     dpkg-start-stop \
     fbset \
     kbd \
-    kea \
     netcat \
     ifupdown \
     iputils-ping \
