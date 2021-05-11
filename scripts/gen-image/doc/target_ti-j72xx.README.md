@@ -5,7 +5,7 @@ The images are built from Wind River Linux CD release, which support ostree, doc
 ## Features
 Arch: aarch64 (cortexa72)
 Package Manager: dnf
-Features: ostree docker kubernetes xfce
+Features: ostree docker kubernetes
 
 ### ostree
 OSTree is a system for versioning updates of Linux-based operating
