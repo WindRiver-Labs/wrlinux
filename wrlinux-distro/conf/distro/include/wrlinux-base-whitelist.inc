@@ -60,6 +60,7 @@ PNWHITELIST_openembedded-layer += " \
     vlock \
     iperf3 \
     xmlsec1 \
+    tree \
 "
 
 PNWHITELIST_perl-layer += " \
