@@ -85,6 +85,7 @@ PNWHITELIST_meta-python += " \
     python3-jinja2 \
     python3-markupsafe \
     python3-cython \
+    python3-lxml \
 "
 
 PNWHITELIST_webserver += " \
