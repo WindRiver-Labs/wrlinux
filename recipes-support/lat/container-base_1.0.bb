@@ -101,6 +101,14 @@ copy_qemu_data() {
                 ${SDK_OUTPUT}${SDKPATHNATIVE}${datadir}/qemu_data/qemuboot.conf.in
 }
 
+POPULATE_SDK_PRE_TARGET_COMMAND += "copy_bootfile;"
+copy_bootfile() {
+	if [ -n "${BOOTFILES_DIR_NAME}" -a -d "${DEPLOY_DIR_IMAGE}/${BOOTFILES_DIR_NAME}" ]; then
+	    install -d ${SDK_OUTPUT}${SDKPATHNATIVE}${datadir}/bootfiles
+		cp -rf ${DEPLOY_DIR_IMAGE}/${BOOTFILES_DIR_NAME} ${SDK_OUTPUT}${SDKPATHNATIVE}${datadir}/bootfiles/
+	fi
+}
+
 # Make sure code changes can result in rebuild
 do_populate_sdk[vardeps] += "extract_pkgdata_postinst"
 SDK_POST_INSTALL_COMMAND += "${extract_pkgdata_postinst}"
