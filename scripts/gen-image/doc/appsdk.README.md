@@ -337,9 +337,9 @@ image_type:
 - vmdk
 - wic
 package_feeds:
-- http://XXXX/lat/WRLinux-CD-Images/intel-x86-64/repos/rpm/corei7_64
-- http://XXXX/lat/WRLinux-CD-Images/intel-x86-64/repos/rpm/intel_x86_64
-- http://XXXX/lat/WRLinux-CD-Images/intel-x86-64/repos/rpm/noarch
+- http://XXXX/lat/dist/intel-x86-64/repos/rpm/corei7_64
+- http://XXXX/lat/dist/intel-x86-64/repos/rpm/intel_x86_64
+- http://XXXX/lat/dist/intel-x86-64/repos/rpm/noarch
 ostree:
   OSTREE_CONSOLE: console=ttyS0,115200 console=tty1
   OSTREE_FDISK_BLM: '2506'
@@ -359,7 +359,7 @@ wic:
   OSTREE_WKS_EFI_SIZE: --size=32M
   OSTREE_WKS_FLUX_SIZE: ''
   OSTREE_WKS_ROOT_SIZE: ''
-remote_pkgdatadir: http://XXXX/lat/WRLinux-CD-Images/intel-x86-64/repos/rpm
+remote_pkgdatadir: http://XXXX/lat/dist/intel-x86-64/repos/rpm
 features:
   image_linguas: 'en-us'       # Specifies the list of locales to
                                # install into the image during the
@@ -506,9 +506,9 @@ Here's a simple example of how to use appsdk.
        e.g.1 Manually edit image-with-hello-intel-x86-64.yaml
        name: image-with-hello
        package_feeds:
-       - http://<web-server-url>/lat/WRLinux-CD-Images/intel-x86-64/repos/rpm/noarch/
-       - http://<web-server-url>/lat/WRLinux-CD-Images/intel-x86-64/repos/rpm/corei7_64/
-       - http://<web-server-url>/lat/WRLinux-CD-Images/intel-x86-64/repos/rpm/intel_x86_64/
+       - http://<web-server-url>/lat/dist/intel-x86-64/repos/rpm/noarch/
+       - http://<web-server-url>/lat/dist/intel-x86-64/repos/rpm/corei7_64/
+       - http://<web-server-url>/lat/dist/intel-x86-64/repos/rpm/intel_x86_64/
        - http://HOST_IP:8888/third_party_repo
        external-packages:
        - hello
@@ -890,7 +890,7 @@ by command 'skopeo copy', it will be used by docker load
         dst: /var/docker-images/
         mode: 644
     - file:
-        src: http://pek-lpgtest7302.wrs.com/buildarea1/SharedImage/LINCD_STD_BINARY/intel-x86-64/latest/WRLinux-CD-Images/intel-x86-64/container-full-intel-x86-64/wrlinux-image-full-intel-x86-64.tar.bz2
+        src: http://pek-lpgtest7302.wrs.com/buildarea1/SharedImage/LINCD_STD_BINARY/intel-x86-64/latest/dist/intel-x86-64/container-full-intel-x86-64/wrlinux-image-full-intel-x86-64.tar.bz2
         dst: /var/docker-images/
         mode: 644
 ```

@@ -9,7 +9,7 @@ must be run in a build environment.
 - See gen-image --help for more info
 
 ## Output
-The output files are in outdir/WRLinux-CD-Images/
+The output files are in outdir/dist/
 
 ## conf/local.conf and conf/local.conf.orig
 If it is a fresh build, the tool will copy conf/local.conf to

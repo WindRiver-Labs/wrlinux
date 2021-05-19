@@ -186,7 +186,7 @@ class GenImage(object):
         self.local_conf = os.path.join(self.builddir, 'conf/local.conf')
 
         if self.args.product == 'lincd':
-            self.handoff_name = 'WRLinux-CD-Images'
+            self.handoff_name = 'dist'
         else:
             self.handoff_name = self.args.product
 

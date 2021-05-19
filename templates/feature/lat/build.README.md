@@ -96,18 +96,18 @@ $ ln -snf path-to-build/outdir /var/www/html/lat
 Then http://<web-server-url>/lat is accessible
 
 ### Base reference container
-wget http://<web-server-url>/lat/WRLinux-CD-Images/intel-x86-64/lat-intel-x86-64/container-base-intel-x86-64.tar.bz2
+wget http://<web-server-url>/lat/dist/intel-x86-64/lat-intel-x86-64/container-base-intel-x86-64.tar.bz2
 
 And
 
-wget http://<web-server-url>/lat/WRLinux-CD-Images/bcm-2xxx-rpi4/lat-bcm-2xxx-rpi4/container-base-bcm-2xxx-rpi4.tar.bz2
+wget http://<web-server-url>/lat/dist/bcm-2xxx-rpi4/lat-bcm-2xxx-rpi4/container-base-bcm-2xxx-rpi4.tar.bz2
 
 ### App SDK
-wget http://<web-server-url>/lat/WRLinux-CD-Images/intel-x86-64/lat-intel-x86-64/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-intel_x86_64-container-base-sdk.sh
+wget http://<web-server-url>/lat/dist/intel-x86-64/lat-intel-x86-64/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-intel_x86_64-container-base-sdk.sh
 
 And
 
-wget http://<web-server-url>/lat/WRLinux-CD-Images/bcm-2xxx-rpi4/lat-bcm-2xxx-rpi4/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-bcm_2xxx_rpi4-container-base-sdk.sh
+wget http://<web-server-url>/lat/dist/bcm-2xxx-rpi4/lat-bcm-2xxx-rpi4/wrlinux-graphics-10.2X.XX.X-glibc-x86_64-bcm_2xxx_rpi4-container-base-sdk.sh
 
 ## License
 The sdk is provided under the GPL-2.0 license.
