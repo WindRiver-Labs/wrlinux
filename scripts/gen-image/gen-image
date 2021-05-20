@@ -143,8 +143,8 @@ class GenImage(object):
         parser.add_argument('-u', '--upload-url',
             default=None,
             help='Specify the url to upload the files, which uses rsync to upload the files', action="store")
-        parser.add_argument('-p', '--product', choices=['lincd'], required=False,
-            default='lincd',
+        parser.add_argument('-p', '--product', choices=['lincd', 'lts-21'], required=False,
+            default='lts-21',
             help='Specify the product', action="store")
         parser.add_argument("-d", "--debug",
             help = "Enable debug output",
@@ -186,7 +186,7 @@ class GenImage(object):
         self.local_conf = os.path.join(self.builddir, 'conf/local.conf')
 
         if self.args.product == 'lincd':
-            self.handoff_name = 'dist'
+            self.handoff_name = 'WRLinux-CD-Images'
         else:
             self.handoff_name = self.args.product
 
