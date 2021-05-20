@@ -205,8 +205,6 @@ class GenImage(object):
         self.pr_log = os.path.join(self.builddir, 'cache/prserv.log')
         self.pr_dir = os.path.join(self.handoff_dir, 'prserv')
 
-        self.bsp_supported_boards = ""
-
     def prepare(self):
 
         bitbake_e = ''
@@ -263,11 +261,6 @@ class GenImage(object):
                 all_archs = line.split('=')[1].replace('"', '').split()
             if line.startswith('TMPDIR='):
                 self.tmpdir = line.split('=')[1].replace('"', '')
-            if line.startswith('BSP_SUPPORTED_BOARDS='):
-                self.bsp_supported_boards = line.split('=')[1].replace('"', '')
-
-        if not self.bsp_supported_boards:
-            self.bsp_supported_boards = self.machine
 
         if not self.feed_archs:
             if not all_archs:
@@ -552,18 +545,6 @@ class GenImage(object):
                     cmd = 'tar --numeric-owner -cjvf %s.tar.bz2 %s' % (d, d)
                     logger.debug('Running %s' % cmd)
                     subprocess.check_output(cmd, shell=True, cwd=file_prefix)
-
-        # Create symlinks for supported boards
-        if self.bsp_supported_boards != self.machine:
-            for board in self.bsp_supported_boards.split(','):
-                board = board.strip()
-                if not board:
-                    continue
-                sym = os.path.join(self.handoff_dir, board)
-                if os.path.exists(sym):
-                    os.unlink(sym)
-                os.symlink(self.machine, sym)
-
         logger.info('Deploy files: %s' % os.path.join(self.handoff_dir, self.machine))
 
     def ip_review(self):
