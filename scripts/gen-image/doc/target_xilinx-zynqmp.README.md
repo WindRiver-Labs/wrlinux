@@ -78,7 +78,19 @@ Now burn the image onto the micro SD card:
     $ eject
 
 This should give you a bootable micro SD card device. Insert the
-SD card into SD slot on zcu102 board, and then power on.
+SD card into SD slot on zcu102 board, and then power on, then enter u-boot shell:
+
+    $ setenv mmcdev 0
+    $ setenv mmcpart 1
+    $ setenv fdt_addr 0xE0000
+    $ setenv scriptaddr 0x20000000
+    $ setenv boot_script "/boot.scr"
+    $ setenv boot_a_script "fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} zynqmp-zcu102-rev1.0.dtb;load mmc ${mmcdev}:${mmcpart} ${scriptaddr} ${boot_script}; source ${scriptaddr}"
+    $ setenv mmc_boot "run boot_a_script"
+    $ setenv bootcmd "run mmc_boot"
+    $ saveenv
+
+
 This should result in a system booted to the u-boot menu.
 
 This BSP is only validated in following environment. If you use this BSP
