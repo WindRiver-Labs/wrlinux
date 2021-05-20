@@ -77,8 +77,9 @@ Now burn the image onto the micro SD card:
     $ umount /dev/sdX1
     $ eject
 
-This should give you a bootable micro SD card device. Insert the
-SD card into SD slot on zcu102 board, and then power on, then enter u-boot shell:
+This should give you a bootable micro SD card device. Insert the SD card into
+SD slot on zcu102 board, and then power on, then enter u-boot shell, the image
+should boot, enter the following commands if it doesn't:
 
     $ setenv mmcdev 0
     $ setenv mmcpart 1
@@ -89,6 +90,9 @@ SD card into SD slot on zcu102 board, and then power on, then enter u-boot shell
     $ setenv mmc_boot "run boot_a_script"
     $ setenv bootcmd "run mmc_boot"
     $ saveenv
+
+    # Boot the board
+    $ run bootcmd
 
 
 This should result in a system booted to the u-boot menu.
