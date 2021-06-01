@@ -41,7 +41,10 @@ NOTE: On target, run ostree_upgrade.sh to update the image rather than
 if not present.
 
 ## Supported BSPs
-- intel-x86-64
+- Intel NUC Platform: KabyLake-U Processor, Sunrise Point-LP PCH, (NUC7i5DNK1E)
+- Intel Tiger Lake UP3: 11th Gen Intel(R) Core(TM) processors
+- Intel Ice Lake-SP: 3rd Gen Intel(R) Xeon(R) Scalable processor
+- Intel Snow Ridge: Intel Atom(R) P5362 processor
 - qemux86-64
 
 ## How to install/boot binary image

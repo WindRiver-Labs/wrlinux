@@ -40,7 +40,7 @@ NOTE: On target, run ostree_upgrade.sh to update the image rather than
 if not present.
 
 ## Supported BSPs
-- ti-j72xx
+- TI J721E(DRA829/TDA4xM) EVM: Board: J7X-BASE-CPB rev E3, J721EX-PM2-SOM rev E7
 
 ## How to install/boot binary image
 

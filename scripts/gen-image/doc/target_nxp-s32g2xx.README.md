@@ -40,7 +40,8 @@ NOTE: On target, run ostree_upgrade.sh to update the image rather than
 if not present.
 
 ## Supported BSPs
-- nxp-s32g2xx
+- NXP S32G274A-EVB: S32GRV-PLATEVB (SCH-30081 REV B, 700-30081 REV B), S32G-PROCEVB-S, CPU: NXP S32G274A rev. 1.0.0/1.0.1/2.1.0
+- NXP S32G274A-RDB2: Board: S32G274A-VNP-RDB2 (SCH-47440 REV C1, 700-47440 REV X2), CPU: NXP S32G274A rev. 2.1.0
 
 ## How to install/boot binary image
 

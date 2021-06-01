@@ -41,7 +41,9 @@ NOTE: On target, run ostree_upgrade.sh to update the image rather than
 if not present.
 
 ## Supported BSPs
-- bcm-2xxx-rpi4
+- Raspberry Pi 4 Model B: BCM2711 rev1.1, with 4G DDR memory
+- Raspberry Pi 4 Model B: BCM2711 rev1.2, with 4G DDR memory
+- Raspberry Pi 4 Model B: BCM2711 rev1.4, with 8G DDR memory
 - qemuarm64
 
 ## How to install/boot binary image

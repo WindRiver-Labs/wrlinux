@@ -40,7 +40,7 @@ NOTE: On target, run ostree_upgrade.sh to update the image rather than
 if not present.
 
 ## Supported BSPs
-- xilinx-zynqmp
+- Xilinx ZYNQMP ZCU102 REV 1.0/1.1
 
 ## How to install/boot binary image
 
