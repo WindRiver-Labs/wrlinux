@@ -187,8 +187,8 @@ class GenImage(object):
 
         if self.args.product == 'lincd':
             self.handoff_name = 'WRLinux-CD-Images'
-        else:
-            self.handoff_name = self.args.product
+        elif self.args.product == 'lts-21':
+            self.handoff_name = 'WRLinux-lts-21-Images'
 
         if self.args.outdir:
             self.outdir = self.args.outdir
