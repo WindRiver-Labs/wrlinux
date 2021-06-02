@@ -425,7 +425,7 @@ class GenImage(object):
 
             # Regenerate wic image to support disk resize
             if os.path.exists(ostreerepo_dir):
-                cmd = "%s/layers/wr-ostree/scripts/bootfs.sh -L -b %s -s 512 -a 'instdate=BUILD_DATE instw=60'" % (self.project, image)
+                cmd = "%s/layers/wr-ostree/scripts/bootfs.sh -L -b %s -s 0 -a 'instdate=BUILD_DATE instw=60'" % (self.project, image)
                 run_cmd(cmd, logger)
 
             new_image = ""
