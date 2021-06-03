@@ -3,5 +3,5 @@ feature/firewall
 feature/ids-basic
 feature/rpm-required-sig
 feature/package-management
-feature/pam-tally2
+feature/pam-faillock
 feature/pam-wheel
