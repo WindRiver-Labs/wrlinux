@@ -39,6 +39,11 @@ IMAGE_FSTYPES_remove = " \
 # No bsp packages for container
 python () {
     d.setVar('WRTEMPLATE_CONF_WRIMAGE_MACH', 'wrlnoimage_mach.inc')
+
+    machine = d.getVar('MACHINE')
+    if machine == 'intel-x86-64':
+        d.appendVarFlag('do_populate_sdk', 'depends', ' ovmf:do_deploy')
+
 }
 
 IMAGE_FEATURES += "package-management"
