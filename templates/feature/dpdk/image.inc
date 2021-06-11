@@ -1,1 +1,1 @@
-IMAGE_INSTALL += " dpdk"
+IMAGE_INSTALL += " dpdk dpdk-tools dpdk-module"
