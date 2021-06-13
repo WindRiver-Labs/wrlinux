@@ -55,12 +55,12 @@ inherit kernel
 require recipes-kernel/linux/linux-yocto.inc
 
 # The version of the customized kernel should be specified here, for example,
-#SRC_URI = "git://${LAYER_PATH_wrlinux}/git/linux-yocto-dev.git;protocol=file;branch=standard/base;name=machine"
+SRC_URI = "git://${LAYER_PATH_wrlinux}/git/linux-yocto.git;protocol=file;branch=v5.10/standard/base;name=machine"
 
-LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
+LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 # The version of the customized kernel should be specified here, for example,
-#LINUX_VERSION ?= "4.19-rc8"
+LINUX_VERSION ?= "5.10.25"
 LINUX_VERSION_EXTENSION_append = "-custom"
 
 KERNEL_VERSION_SANITY_SKIP="1"
