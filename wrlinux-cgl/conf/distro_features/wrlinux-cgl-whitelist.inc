@@ -90,12 +90,10 @@ PNWHITELIST_META_OE = " \
     ipmitool \
     libnet \
     libqb \
-    libsodium \
     postgresql \
     pps-tools \
     smartmontools \
     zabbix \
-    zeromq \
     zstd \
 "
 
