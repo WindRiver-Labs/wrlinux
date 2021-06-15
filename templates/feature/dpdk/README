@@ -42,15 +42,15 @@ security policies to ensure this risk is mitigated if needed.
 
 3. DPDK Linuxapp Setup
 ======================
-The build produces a kernel module named igb_uio.ko that must be inserted on
-the target prior to executing DPDK processes:
+A kernel module named vfio_pci.ko that must be inserted on the target prior to
+executing DPDK processes:
 
-	# modprobe igb_uio
+	# modprobe vfio_pci
 
-Bind Intel devices to igb_uio:
+Bind Intel devices to vfio_pci:
 
 	# ifconfig ethX down
-	# /usr/sbin/dpdk-devbind --bind=igb_uio 07:00.0
+	# /usr/bin/dpdk-devbind.py --bind=vfio-pci 07:00.0
 
 NOTE: This test method need two intel ethernet (e1000e/igb/ixgbe) ports,
 please do this step on each port.
@@ -71,7 +71,7 @@ to /proc/sys/vm/nr_hugepages.
 
 The environment can be tested with:
 
-       # /usr/share/dpdk/test/test -c 0xffff -n 1
+       # /usr/bin/dpdk-test -c 0xffff -n 1
 
 Alternatively you may run test with no options to get information on
 available command line options. This will start a RTE shell which you
