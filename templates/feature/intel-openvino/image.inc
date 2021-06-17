@@ -1,0 +1,7 @@
+IMAGE_INSTALL += "openvino-inference-engine"
+IMAGE_INSTALL += "openvino-inference-engine-samples"
+IMAGE_INSTALL += "openvino-inference-engine-vpu-firmware"
+IMAGE_INSTALL += "openvino-inference-engine-dev"
+IMAGE_INSTALL += "openvino-model-optimizer"
+IMAGE_INSTALL += "openvino-model-optimizer-dev"
+IMAGE_INSTALL += "open-model-zoo"
