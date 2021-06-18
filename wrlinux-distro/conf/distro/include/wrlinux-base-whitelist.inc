@@ -23,6 +23,7 @@ PNWHITELIST_networking-layer += " \
     tcpdump \
     crda \
     strongswan \
+    lksctp-tools \
 "
 
 PNWHITELIST_openembedded-layer += " \
