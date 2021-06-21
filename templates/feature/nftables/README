@@ -1,0 +1,7 @@
+This template installs nftables to the filesystem.
+
+To use this template, add the following to your setup line:
+
+    --templates feature/nftables
+
+#@DESCRIPTION: installs nftables to the filesystem
