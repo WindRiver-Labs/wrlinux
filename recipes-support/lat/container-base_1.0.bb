@@ -43,6 +43,8 @@ python () {
     machine = d.getVar('MACHINE')
     if machine == 'intel-x86-64':
         d.appendVarFlag('do_populate_sdk', 'depends', ' ovmf:do_deploy')
+    elif machine == 'bcm-2xxx-rpi4':
+        d.appendVarFlag('do_populate_sdk', 'depends', ' rpi-bootfiles:do_deploy')
 
 }
 
