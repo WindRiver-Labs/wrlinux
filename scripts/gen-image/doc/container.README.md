@@ -65,7 +65,7 @@ system. How to formally handle such dependencies is to be discussed.
 
 ## Sources
 Source code required to build the image is provided here:
-https://distro.windriver.com/wrlinux/lts-21/dist/sources
+https://distro.windriver.com/dist/wrlinux/lts-21/sources
 
 ## License
 The images are provided under the GPL-2.0 license.

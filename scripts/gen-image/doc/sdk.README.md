@@ -28,7 +28,7 @@ $ ./configure $CONFIGURE_FLAGS
 
 ## Sources
 Source code required to build the sdk is provided here:
-https://distro.windriver.com/wrlinux/lts-21/dist/sources
+https://distro.windriver.com/dist/wrlinux/lts-21/sources
 
 ## License
 The sdk is provided under the GPL-2.0 license.
