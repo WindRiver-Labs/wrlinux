@@ -90,6 +90,8 @@ PNWHITELIST_meta-python += " \
     python3-markupsafe \
     python3-cython \
     python3-lxml \
+    python3-pyzmq \
+    python3-spidev \
 "
 
 PNWHITELIST_webserver += " \
