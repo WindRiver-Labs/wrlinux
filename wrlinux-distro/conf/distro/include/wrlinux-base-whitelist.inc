@@ -62,6 +62,8 @@ PNWHITELIST_openembedded-layer += " \
     iperf3 \
     xmlsec1 \
     tree \
+    libsodium \
+    zeromq \
 "
 
 PNWHITELIST_perl-layer += " \
