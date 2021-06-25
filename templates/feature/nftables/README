@@ -1,0 +1,9 @@
+This template adds the nftables packet classification framework.
+
+To use this template, add the following to your setup line:
+
+    --templates feature/nftables
+
+#@TYPE: Wrtemplate
+#@NAME: nftables
+#@DESCRIPTION: Add nftables to the image
