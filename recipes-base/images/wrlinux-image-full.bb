@@ -45,6 +45,14 @@ CONTAINER_IMAGE_REMOVE ?= "\
     u-boot \
     wr-themes \
     packagegroup-xfce-extended \
+    openvino-inference-engine \
+    openvino-inference-engine-samples \
+    openvino-inference-engine-vpu-firmware \
+    openvino-inference-engine-dev \
+    openvino-model-optimizer \
+    openvino-model-optimizer-dev \
+    open-model-zoo \
+    open-model-zoo-staticdev \
 "
 
 # No k8s by default
