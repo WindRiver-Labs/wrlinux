@@ -252,6 +252,7 @@ class GenImage(object):
             bitbake_e = self.do_build('-e')
 
         feed_uris_defined = False
+        self.support_lat = False
         for line in bitbake_e.split('\n'):
             if line.startswith('PACKAGE_FEED_URIS='):
                 feed_uris_defined = True
@@ -261,6 +262,11 @@ class GenImage(object):
                 all_archs = line.split('=')[1].replace('"', '').split()
             if line.startswith('TMPDIR='):
                 self.tmpdir = line.split('=')[1].replace('"', '')
+            if line.startswith('WRTEMPLATE='):
+                self.templates = line.split('=')[1].replace('"', '')
+
+        if 'feature/lat' in self.templates:
+            self.support_lat = True
 
         if not self.feed_archs:
             if not all_archs:
@@ -353,6 +359,8 @@ class GenImage(object):
             deploy_files.append(files[0])
 
         deploy_files.append(os.path.join(self.doc_dir, 'sdk.README.md'))
+        if self.support_lat:
+            deploy_files.append(os.path.join(self.doc_dir, 'appsdk.README.md'))
 
         self.do_deploy('%s/sdk' % self.machine, deploy_files)
 

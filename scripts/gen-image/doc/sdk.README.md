@@ -20,6 +20,10 @@ $ . environment-setup-*-wrs-linux
 
 Check environment-setup-*-wrs-linux for the exported variables.
 
+## feature/lat
+The SDK supports feature/lat if there is an appsdk.README.md, check the file
+for detailed info of lat.
+
 ## Use SDK's compiler
 $ $CC <src>.c
 

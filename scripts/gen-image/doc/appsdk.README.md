@@ -8,7 +8,7 @@ Check sdk.host.manifest and sdk.target.manifest
 
 ## Install the SDK to <dir>
 ```
-$ ./wrlinux-*-container-base-sdk.sh -y -d <dir>
+$ ./wrlinux-*-sdk.sh -y -d <dir>
 ```
 
 ## Enable SDK
