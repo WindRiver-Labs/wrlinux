@@ -81,7 +81,7 @@ if [ -n "$version" ]; then
        vers="${vers}${EXTRAVERSION}"
 
        echo SRCREV_machine_kb-$(echo $branch | sed 's,refs/heads/,,' | sed 's,/,-,g') ?= \"$(git rev-parse $branch)\"
-       echo LINUX_VERSION_kb-$(echo $branch | sed 's,refs/heads/,,' | sed 's,/,-,g') ?= \"${vers}\"
+       echo LINUX_VERSION_kb-$(echo $branch | sed 's,refs/heads/,,' | sed 's,/,-,g') = \"${vers}\"
      done
     )
 fi
@@ -112,6 +112,5 @@ echo "# yocto-kernel-cache entries"
    fi
    echo KERNEL_CACHE_BRANCH_${base_version} = \"${base_branch}\"
    echo SRCREV_meta_${base_version} = \"$(git rev-parse ${base_branch})\"
-   echo LINUX_VERSION_${base_version} = \"$(git show ${base_branch}:kver | sed 's,v,,')\"
  done
 )
