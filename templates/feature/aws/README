@@ -1,0 +1,11 @@
+This template adds aws to the filesystem
+
+To use, add
+
+--templates feature/aws
+
+as a setup option.
+
+#@TYPE: Wrtemplate
+#@NAME: aws
+#@DESCRIPTION: Add aws to the filesystem
