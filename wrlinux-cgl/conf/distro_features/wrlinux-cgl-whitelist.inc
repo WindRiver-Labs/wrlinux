@@ -118,3 +118,8 @@ PNWHITELIST_META_PERL = " \
 PNWHITELIST_virtualization-layer += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'cgl', 'lxc', '', d)} \
 "
+
+# For meta-openstack
+PNWHITELIST_openstack-layer += " \
+    python-pathlib \
+"
