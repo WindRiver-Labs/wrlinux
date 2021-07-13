@@ -16,6 +16,7 @@ PNWHITELIST_networking-layer += " \
     libtalloc \
     libtdb \
     libtevent \
+    lksctp-tools \
     netcat \
     netcat-openbsd \
     postfix \
