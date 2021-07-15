@@ -1,6 +1,6 @@
 # Wind River Linux target images
 
-The images are built from Wind River Linux CD release, which support ostree, docker, kubernetes, xfce and other features in the packages feeds. The images can be highly customized, they can be customized by package manager dnf, or use the script gen-image to rebuild them from source.
+The images are built from Wind River Linux, which support ostree, docker, kubernetes, xfce and other features in the packages feeds. The images can be highly customized, they can be customized by package manager dnf, or use the script gen-image to rebuild them from source.
 
 ## Features
 Arch: aarch64 (cortexa53)

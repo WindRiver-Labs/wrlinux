@@ -1,6 +1,6 @@
 # Wind River Linux container images
 
-The images are built from Wind River Linux CD release, which support docker, kubernetes, xfce and other features in the packages feeds. The images can be highly customized, which can be customized by package manager dnf, or use the script gen-image to rebuild them from source.
+The images are built from Wind River Linux, which support docker, kubernetes, xfce and other features in the packages feeds. The images can be highly customized, which can be customized by package manager dnf, or use the script gen-image to rebuild them from source.
 
 ## Supported BSPs
 ### x86-64
