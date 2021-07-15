@@ -15,6 +15,7 @@ include conf/distro/include/wrlinux-packageconfigs.inc
 
 MAINTAINER = "Wind River <info@windriver.com>"
 
+WRLINUX_VARIANT ??= ""
 DISTRO_NAME ?= "${WRLINUX_BRANDING}${WRLINUX_VARIANT} ${WRLINUX_BRANCH}"
 
 DISTRO_VERSION ?= "${WRLINUX_VERSION}"
