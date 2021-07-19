@@ -1,0 +1,43 @@
+From 53354115b967c8795b88e608b10474f2342c3607 Mon Sep 17 00:00:00 2001
+From: Ovidiu Panait <ovidiu.panait@windriver.com>
+Date: Mon, 19 Jul 2021 17:31:55 +0000
+Subject: [PATCH] require_singleuser_auth: correct systemd-sulogin-shell path
+
+In wrlinux1019, the absolute path to systemd-sulogin-shell is
+/lib/systemd/systemd-sulogin-shell.
+
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
+---
+ .../require_singleuser_auth/bash/wrlinux1019.sh                 | 2 +-
+ .../require_singleuser_auth/oval/wrlinux1019.xml                | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/linux_os/guide/system/accounts/accounts-physical/require_singleuser_auth/bash/wrlinux1019.sh b/linux_os/guide/system/accounts/accounts-physical/require_singleuser_auth/bash/wrlinux1019.sh
+index 2dbb645f5..1e17b7f08 100644
+--- a/linux_os/guide/system/accounts/accounts-physical/require_singleuser_auth/bash/wrlinux1019.sh
++++ b/linux_os/guide/system/accounts/accounts-physical/require_singleuser_auth/bash/wrlinux1019.sh
+@@ -2,7 +2,7 @@
+ 
+ service_file="/lib/systemd/system/rescue.service"
+ 
+-sulogin="/usr/lib/systemd/systemd-sulogin-shell"
++sulogin="/lib/systemd/systemd-sulogin-shell"
+ 
+ if grep "^ExecStart=.*" "$service_file" ; then
+     sed -i "s%^ExecStart=.*%ExecStart=-$sulogin rescue%" "$service_file"
+diff --git a/linux_os/guide/system/accounts/accounts-physical/require_singleuser_auth/oval/wrlinux1019.xml b/linux_os/guide/system/accounts/accounts-physical/require_singleuser_auth/oval/wrlinux1019.xml
+index 717fb64ac..dc634076d 100644
+--- a/linux_os/guide/system/accounts/accounts-physical/require_singleuser_auth/oval/wrlinux1019.xml
++++ b/linux_os/guide/system/accounts/accounts-physical/require_singleuser_auth/oval/wrlinux1019.xml
+@@ -38,7 +38,7 @@
+   </ind:textfilecontent54_test>
+   <ind:textfilecontent54_object id="obj_require_rescue_service" version="1">
+     <ind:filepath>/lib/systemd/system/rescue.service</ind:filepath>
+-    <ind:pattern operation="pattern match">^ExecStart=\-.*/usr/lib/systemd/systemd-sulogin-shell[ ]+rescue</ind:pattern>
++    <ind:pattern operation="pattern match">^ExecStart=\-.*/lib/systemd/systemd-sulogin-shell[ ]+rescue</ind:pattern>
+     <ind:instance datatype="int">1</ind:instance>
+   </ind:textfilecontent54_object>
+ 
+-- 
+2.23.0
+
