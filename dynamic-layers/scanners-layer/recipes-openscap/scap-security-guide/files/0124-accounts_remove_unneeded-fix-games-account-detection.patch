@@ -1,0 +1,71 @@
+From 29b596e288b5108939baf507be2bdaf6287ff59b Mon Sep 17 00:00:00 2001
+From: Ovidiu Panait <ovidiu.panait@windriver.com>
+Date: Tue, 20 Jul 2021 09:36:44 +0000
+Subject: [PATCH] accounts_remove_unneeded: fix games account detection
+
+The test should fail if "games" account is present on the system, but currently
+it does the opposite: it passes if "games" account is present in /etc/passwd.
+Adjust the oval logic to match the intended behavior and also provide a
+remediation script to delete the user if necessary.
+
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
+---
+ .../bash/wrlinux1019.sh                       |  3 +++
+ .../oval/wrlinux1019.xml                      | 19 ++++++-------------
+ 2 files changed, 9 insertions(+), 13 deletions(-)
+ create mode 100644 linux_os/guide/system/accounts/accounts-session/accounts_remove_unneeded/bash/wrlinux1019.sh
+
+diff --git a/linux_os/guide/system/accounts/accounts-session/accounts_remove_unneeded/bash/wrlinux1019.sh b/linux_os/guide/system/accounts/accounts-session/accounts_remove_unneeded/bash/wrlinux1019.sh
+new file mode 100644
+index 000000000..75987787a
+--- /dev/null
++++ b/linux_os/guide/system/accounts/accounts-session/accounts_remove_unneeded/bash/wrlinux1019.sh
+@@ -0,0 +1,3 @@
++# platform = multi_platform_wrlinux
++
++sudo userdel games
+diff --git a/linux_os/guide/system/accounts/accounts-session/accounts_remove_unneeded/oval/wrlinux1019.xml b/linux_os/guide/system/accounts/accounts-session/accounts_remove_unneeded/oval/wrlinux1019.xml
+index 4c5c23269..e2a8f62c5 100644
+--- a/linux_os/guide/system/accounts/accounts-session/accounts_remove_unneeded/oval/wrlinux1019.xml
++++ b/linux_os/guide/system/accounts/accounts-session/accounts_remove_unneeded/oval/wrlinux1019.xml
+@@ -8,31 +8,24 @@
+       <description>The system must not have the unnecessary accounts.</description>
+     </metadata>
+     <criteria operator="AND">
+-      <criterion comment="remove games account" test_ref="remove_games_account" />
++      <!-- check that "games" account is NOT present in /etc/passwd -->
++      <criterion comment="games account exists" test_ref="games_account_exists" negate="true"/>
+     </criteria>
+   </definition>
+ 
+-  <ind:textfilecontent54_test id="remove_games_account"
++  <ind:textfilecontent54_test id="games_account_exists"
+ 	check="none satisfy" check_existence="all_exist"
+-	comment="games account must not be present"
++	comment="check if games account exists"
+ 	version="1"
+ 	>
+-    <ind:object object_ref="object_remove_games_account" />
+-    <ind:state state_ref="state_remove_games_account" />
++    <ind:object object_ref="object_games_account_exists" />
+   </ind:textfilecontent54_test>
+ 
+-  <ind:textfilecontent54_object id="object_remove_games_account" version="1" >
++  <ind:textfilecontent54_object id="object_games_account_exists" version="1" >
+ 	<ind:path>/etc</ind:path>
+ 	<ind:filename>passwd</ind:filename>
+ 	<ind:pattern operation="pattern match">^games:</ind:pattern>
+ 	<ind:instance operation="greater than or equal" datatype="int">1</ind:instance>
+   </ind:textfilecontent54_object>
+ 
+-  <ind:textfilecontent54_state id="state_remove_games_account"
+-	comment="games account must not be present"
+-	version="1"
+-	>
+-    <ind:pattern operation="pattern match">^games:</ind:pattern>
+-  </ind:textfilecontent54_state>
+-
+ </def-group>
+-- 
+2.23.0
+

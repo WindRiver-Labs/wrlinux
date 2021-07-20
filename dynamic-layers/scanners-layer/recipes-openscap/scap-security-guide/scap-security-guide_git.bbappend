@@ -125,6 +125,7 @@ SRC_URI = "git://github.com/OpenSCAP/scap-security-guide.git \
             file://0121-Rule-file_permissions_unauthorized_suid-update-check.patch \
             file://0122-require_singleuser_auth-correct-systemd-sulogin-shel.patch \
             file://0123-draft_stig_wrlinux_disa.profile-change-testcase-for-.patch \
+            file://0124-accounts_remove_unneeded-fix-games-account-detection.patch \
            "
 PV = "0.1.45+git${SRCPV}"
 
