@@ -1,0 +1,32 @@
+From 2937e36a66c072fddd2caf0c975bd0614cf09a13 Mon Sep 17 00:00:00 2001
+From: Ovidiu Panait <ovidiu.panait@windriver.com>
+Date: Wed, 21 Jul 2021 13:06:07 +0000
+Subject: [PATCH] draft_stig_wrlinux_disa.profile: change testcase for
+ openssh-sshd detection
+
+package_openssh-server_installed tescase can only succeed when the package
+manager is set to rpm. In order to avoid a failure on systems configured with
+opkg package manager, switch to package_openssh-sshd_installed testcase which
+searches for sshd binaries in the filesystem.
+
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
+---
+ wrlinux1019/profiles/draft_stig_wrlinux_disa.profile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile b/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
+index 2fb633026..52ffc296a 100644
+--- a/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
++++ b/wrlinux1019/profiles/draft_stig_wrlinux_disa.profile
+@@ -219,7 +219,7 @@ selections:
+     - samhain_build_database
+     - samhain_periodic_cron_checking
+     - samhain_scan_notification
+-    - package_openssh-server_installed
++    - package_openssh-sshd_installed
+     - package_strongswan_installed
+     - postfix_network_listening_disabled
+     - service_ntpdate_disabled
+-- 
+2.23.0
+
