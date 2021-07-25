@@ -94,4 +94,4 @@ LINUX_VERSION_kb-v5.10-standard-xilinx-zynqmp = "5.10.49"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_5.10 = "yocto-5.10"
-SRCREV_meta_5.10 = "dbe03fa9005d388617aca3bcfb1b06ba35d49215"
+SRCREV_meta_5.10 = "26a2a3cf764dde593325b8c08024f5990a5f6f02"
