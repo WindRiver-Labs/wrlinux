@@ -53,12 +53,11 @@ a micro SD card, it should be un-mounted. Some Linux distros
 may automatically mount when it is plugged in. Using device
 /dev/sdX as an example, find all mounted partitions:
 
-    $ mount | grep sdf
+    $ mount | grep sdX
 
 and un-mount those that are mounted, for example:
 
-    $ umount /dev/sdX1
-    $ umount /dev/sdX2
+    $ sudo umount /dev/sdX*
 
 Now burn the image onto the micro SD card:
     For full image
@@ -75,7 +74,7 @@ Now burn the image onto the micro SD card:
     BUT YOU MUST CHECK WITH XILINX ON WHETHER YOU CAN USE IT OR NOT.
 
     $ mkdir tmp; sudo mount /dev/sdX1 ./tmp; sudo cp ./BOOT.BIN ./tmp
-    $ umount /dev/sdX1
+    $ sudo umount /dev/sdX*
     $ eject
 
 This should give you a bootable micro SD card device. Insert the

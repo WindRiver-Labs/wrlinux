@@ -53,12 +53,11 @@ a micro SD card, it should be un-mounted. Some Linux distros
 may automatically mount when it is plugged in. Using device
 /dev/sdX as an example, find all mounted partitions:
 
-    $ mount | grep sdf
+    $ mount | grep sdX
 
 and un-mount those that are mounted, for example:
 
-    $ umount /dev/sdX1
-    $ umount /dev/sdX2
+    $ sudo umount /dev/sdX*
 
 Now burn the image onto the micro SD card:
 

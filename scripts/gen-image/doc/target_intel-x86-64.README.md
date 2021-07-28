@@ -56,12 +56,11 @@ can be burned onto a USB drive, it should be un-mounted. Some Linux distros
 may automatically mount a USB drive when it is plugged in. Using USB device
 /dev/sdX as an example, find all mounted partitions:
 
-    $ mount | grep sdf
+    $ mount | grep sdX
 
 and un-mount those that are mounted, for example:
 
-    $ umount /dev/sdX1
-    $ umount /dev/sdX2
+    $ sudo umount /dev/sdX*
 
 Now burn the image onto the USB drive:
     For full image
