@@ -47,7 +47,7 @@ SRCREV_machine_kb-v5.10-standard-nxp-sdk-5.10-nxp-s32g2xx ?= "20422d60c0a292b41e
 LINUX_VERSION_kb-v5.10-standard-nxp-sdk-5.10-nxp-s32g2xx = "5.10.55"
 SRCREV_machine_kb-v5.10-standard-nxp-sdk-5.10-nxp-soc ?= "a75ff62693c31d18418e76f7ae79e23fb1a6c5a1"
 LINUX_VERSION_kb-v5.10-standard-nxp-sdk-5.10-nxp-soc = "5.10.55"
-SRCREV_machine_kb-v5.10-standard-nxp-sdk-5.4-nxp-imx8 ?= "9d4703b7a87136af0ad47a0de456a3509c471a14"
+SRCREV_machine_kb-v5.10-standard-nxp-sdk-5.4-nxp-imx8 ?= "b31e781f40a73f3e34e5f1924c8ccdd80379e9a5"
 LINUX_VERSION_kb-v5.10-standard-nxp-sdk-5.4-nxp-imx8 = "5.10.55"
 SRCREV_machine_kb-v5.10-standard-nxp-sdk-5.4-nxp-s32g2xx ?= "8743a9547f73ca40d4c7e304251270b417ba2091"
 LINUX_VERSION_kb-v5.10-standard-nxp-sdk-5.4-nxp-s32g2xx = "5.10.55"
@@ -88,4 +88,4 @@ LINUX_VERSION_kb-v5.10-standard-xilinx-zynqmp = "5.10.55"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_5.10 = "yocto-5.10"
-SRCREV_meta_5.10 = "0c461183d295a8e45096b9af71e07e06da7da13c"
+SRCREV_meta_5.10 = "21354be869b17a8fedf281b16019a58abeb13449"
