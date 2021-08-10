@@ -1,0 +1,11 @@
+This template adds azure to the filesystem
+
+To use, add
+
+--templates feature/azure
+
+as a setup option.
+
+#@TYPE: Wrtemplate
+#@NAME: azure
+#@DESCRIPTION: Add azure to the filesystem
