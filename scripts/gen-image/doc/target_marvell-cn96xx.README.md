@@ -67,7 +67,9 @@ Now burn the image onto the micro SD card:
 This should give you a bootable micro SD card device. Insert the SD card into
 SD slot, and then power on, and input the following commands in the u-boot shell:
 
-    $ setenv bootcmd "fatload mmc 0:1 $loadaddr boot.itb; source $loadaddr:script-1; saveenv; boot"
+    $ setenv bootcmd "fatload mmc 0:1 $loadaddr boot.itb; source $loadaddr:script-1;"
+    $ saveenv
+    $ boot
 
 
 You may see the following table before u-boot start:
@@ -83,7 +85,7 @@ You may see the following table before u-boot start:
     S -> B: Enter cn96xx-crb
     N: Enter 9
     W: Save data
-    R: Reboot
+    Q: Return to main menu
 
 This should result in a system booted to login console.
 
