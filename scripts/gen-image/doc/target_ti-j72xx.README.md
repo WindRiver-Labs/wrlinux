@@ -72,8 +72,8 @@ Now burn the image onto the micro SD card:
     webset. BUT YOU MUST CHECK WITH TI ON WHETHER YOU CAN USE IT OR NOT.
     $ wget https://software-dl.ti.com/jacinto7/esd/processor-sdk-linux-jacinto7/07_02_00_07/exports/boot-j7-evm.tar.gz
     $ mkdir boot-j7-evm && tar xzvf boot-j7-evm.tar.gz -C boot-j7-evm
-    $ mkdir ./tmp sudo mount /dev/sdX1 ./tmp
-    $ cp -a boot-j7-evm/* ./tmp
+    $ mkdir -p ./tmp && sudo mount /dev/sdX1 ./tmp
+    $ sudo cp boot-j7-evm/* ./tmp
     $ sudo umount ./tmp
     $ eject /dev/sdX
 
