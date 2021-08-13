@@ -49,7 +49,9 @@ zcat $wrimg | sudo dd of=$dev bs=1M status=progress conv=fsync
 sudo dd if=$uboot of=$dev bs=512 seek=128 skip=128 conv=fsync
 sudo losetup -f -P $uboot
 uboot_dev=`losetup -j $uboot | sed -e '1q' | sed -e 's/:.*//'`
+sudo partprobe $uboot_dev
+sudo partprobe $dev
 mkdir -p uboot_mnt && sudo mount $uboot_dev"p1" ./uboot_mnt
-mkdir -p wrboot && sudo mount /dev/sdc1 ./wrboot && sudo cp -r ./uboot_mnt/* ./wrboot/
+mkdir -p wrboot && sudo mount ${dev}1 ./wrboot && sudo cp -r ./uboot_mnt/* ./wrboot/
 sudo umount $uboot_dev"p1" wrboot; sudo losetup -d $uboot_dev
 rm -fr uboot_mnt wrboot
