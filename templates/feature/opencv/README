@@ -1,0 +1,6 @@
+This template adds opencv (The Open Computer Vision Library)
+to the filesystem.
+
+To use this template, add the following to your setup line:
+
+    --templates feature/opencv
