@@ -83,7 +83,7 @@ SRCREV_machine_kb-v5.2-standard-preempt-rt-nxp-lsdk-20.04-nxp-ls1046 ?= "0f91407
 LINUX_VERSION_kb-v5.2-standard-preempt-rt-nxp-lsdk-20.04-nxp-ls1046 ?= "5.2.60"
 SRCREV_machine_kb-v5.2-standard-preempt-rt-nxp-lsdk-20.04-nxp-lx2xxx ?= "26beb4fa969076b98348ba2562af7e816445541f"
 LINUX_VERSION_kb-v5.2-standard-preempt-rt-nxp-lsdk-20.04-nxp-lx2xxx ?= "5.2.60"
-SRCREV_machine_kb-v5.2-standard-qemuarm64 ?= "82848ff94f4626c9e07330c4c7e38c5f9290e385"
+SRCREV_machine_kb-v5.2-standard-qemuarm64 ?= "53d0bd5b0ec316d36ea8daf227f7faf2786ce81b"
 LINUX_VERSION_kb-v5.2-standard-qemuarm64 ?= "5.2.60"
 SRCREV_machine_kb-v5.2-standard-qemuppc ?= "d06c1799af1ec48cc6af11fe3bb7659d81a770cc"
 LINUX_VERSION_kb-v5.2-standard-qemuppc ?= "5.2.60"
@@ -104,5 +104,5 @@ LINUX_VERSION_kb-v5.2-standard-xlnx-soc ?= "5.2.60"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_5.2 = "yocto-5.2-wr"
-SRCREV_meta_5.2 = "f489f5a33b6a07404c10752c8064e3af0e7c5853"
+SRCREV_meta_5.2 = "81b6a1c267df9114540395654dce99de4fc9ab6d"
 LINUX_VERSION_5.2 = "5.2.60"
