@@ -2,7 +2,7 @@ This template adds aws to the filesystem
 
 To use, add
 
---templates feature/aws
+--templates feature/aws --layers meta-iot-cloud
 
 as a setup option.
 
