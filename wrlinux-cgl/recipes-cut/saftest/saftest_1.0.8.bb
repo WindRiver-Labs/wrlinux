@@ -19,7 +19,7 @@ SECTION = "apps"
 DEPENDS = "openipmi openhpi"
 
 SRC_URI = "\
-	${SOURCEFORGE_MIRROR}/project/saftest/SAF%20HPI%20B.01.01/saftest_HPI-B.01.01_1.0.8/saftest_HPI-B_01_01_1_0_8.tar.gz \
+	file://saftest_HPI-B_01_01_1_0_8.tar.gz \
 	file://saftest_build.patch \
 	file://saftest-fix-testfail-errors.patch \
 	file://clear-random-stack-value.patch \
