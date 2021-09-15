@@ -23,7 +23,6 @@ PNWHITELIST_networking-layer += " \
     tcpdump \
     crda \
     strongswan \
-    lksctp-tools \
 "
 
 PNWHITELIST_openembedded-layer += " \
@@ -61,9 +60,6 @@ PNWHITELIST_openembedded-layer += " \
     vlock \
     iperf3 \
     xmlsec1 \
-    tree \
-    libsodium \
-    zeromq \
 "
 
 PNWHITELIST_perl-layer += " \
@@ -89,9 +85,6 @@ PNWHITELIST_meta-python += " \
     python3-jinja2 \
     python3-markupsafe \
     python3-cython \
-    python3-lxml \
-    python3-pyzmq \
-    python3-spidev \
 "
 
 PNWHITELIST_webserver += " \
