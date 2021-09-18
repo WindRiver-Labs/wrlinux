@@ -68,9 +68,12 @@ Now burn the image onto the micro SD card:
     $ sync
 
     NOTE: The following boot files are from TI, they are not integrated into
-    WRLinux because of the license issue, they can be downloaded from the following
-    webset. BUT YOU MUST CHECK WITH TI ON WHETHER YOU CAN USE IT OR NOT.
-    $ wget https://software-dl.ti.com/jacinto7/esd/processor-sdk-linux-jacinto7/07_02_00_07/exports/boot-j7-evm.tar.gz
+    WRLinux because of the license issue. Follow webset:
+        http://software-dl.ti.com/jacinto7/esd/processor-sdk-linux-jacinto7/latest/index_FDS.html
+    click the boot-j7-evm.tar.gz link to download it, BUT YOU MUST CHECK WITH
+    TI ON WHETHER YOU CAN USE IT OR NOT. Here is an example to download
+    boot-j7-evm.tar.gz with version 08.00.00.08
+    $ wget https://software-dl.ti.com/jacinto7/esd/processor-sdk-linux-jacinto7/08_00_00_08/exports/boot-j7-evm.tar.gz
     $ mkdir boot-j7-evm && tar xzvf boot-j7-evm.tar.gz -C boot-j7-evm
     $ mkdir -p ./tmp && sudo mount /dev/sdX1 ./tmp
     $ sudo cp boot-j7-evm/* ./tmp
