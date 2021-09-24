@@ -15,7 +15,7 @@ print_help() {
     exit 1
 }
 
-if [ $# -ne 3 -o ! -e $dev ]; then
+if [ $# -ne 3 -o ! -e "$dev" ]; then
     print_help
 fi
 
@@ -26,7 +26,7 @@ if [ $? -ne 0 -o ! -e $wrimg ]; then
 fi
 
 if [ ! -e $uboot ]; then
-    echo "The u-boot imaage $uboot doesn't exist"
+    echo "The u-boot image $uboot doesn't exist"
     exit 1
 fi
 
