@@ -52,6 +52,15 @@ uboot_dev=`losetup -j $uboot | sed -e '1q' | sed -e 's/:.*//'`
 sudo partprobe $uboot_dev
 sudo partprobe $dev
 mkdir -p uboot_mnt && sudo mount $uboot_dev"p1" ./uboot_mnt
+if [ "${dev#/dev/mmcblk}" != ${dev} ] ; then
+    dev="${dev}p"
+elif [ "${dev#/dev/nbd}" != ${dev} ] ; then
+    dev="${dev}p"
+elif [ "${dev#/dev/nvme}" != ${dev} ] ; then
+    dev="${dev}p"
+elif [ "${dev#/dev/loop}" != ${dev} ] ; then
+    dev="${dev}p"
+fi
 mkdir -p wrboot && sudo mount ${dev}1 ./wrboot && sudo cp -r ./uboot_mnt/* ./wrboot/
 sudo umount $uboot_dev"p1" wrboot; sudo losetup -d $uboot_dev
 rm -fr uboot_mnt wrboot
