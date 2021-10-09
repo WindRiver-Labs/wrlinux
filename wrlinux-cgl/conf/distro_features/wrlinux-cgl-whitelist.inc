@@ -31,7 +31,6 @@ PNWHITELIST_meta-python += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'cgl', '${PNWHITELIST_META_PYTHON}', '', d)}  \
 "
 PNWHITELIST_META_PYTHON = " \
-    python3-lxml \
     python3-parallax \
 "
 
