@@ -99,10 +99,10 @@ SRCREV_machine_kb-v5.2-standard-tiny-intel-x86 ?= "f1c5eb02c6e6a957d22d86ca26377
 LINUX_VERSION_kb-v5.2-standard-tiny-intel-x86 ?= "5.2.60"
 SRCREV_machine_kb-v5.2-standard-wr-base ?= "523cd5fd1a299b48c89e7dfcc5b30c6856a6d379"
 LINUX_VERSION_kb-v5.2-standard-wr-base ?= "5.2.60"
-SRCREV_machine_kb-v5.2-standard-xlnx-soc ?= "65db9e52317929b1521767578e52cdd68a5ccebe"
+SRCREV_machine_kb-v5.2-standard-xlnx-soc ?= "9de82b0c09f67772c19c14182b0d841cbf37fe1c"
 LINUX_VERSION_kb-v5.2-standard-xlnx-soc ?= "5.2.60"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_5.2 = "yocto-5.2-wr"
-SRCREV_meta_5.2 = "26688ac0ab17210b4b7174d1cb794fcee8ef7f0e"
+SRCREV_meta_5.2 = "d01159654e4b50030b4f8939b86141a12e117708"
 LINUX_VERSION_5.2 = "5.2.60"
