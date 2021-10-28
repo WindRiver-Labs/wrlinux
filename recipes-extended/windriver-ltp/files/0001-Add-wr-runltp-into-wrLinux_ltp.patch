@@ -539,7 +539,7 @@ index 0000000..3037077
 +        fi
 +
 +        echo "mounting ext4 file system on $TMPDIR over loop device for LTP test..."
-+        dd if=/dev/zero of=$TMP_MOUNT_FILE bs=1M count=256 > /dev/null 2>&1 || {
++        dd if=/dev/zero of=$TMP_MOUNT_FILE bs=1M count=1024 > /dev/null 2>&1 || {
 +            echo "Failed to create file $TMP_MOUNT_FILE"
 +            exit $TEST_RETVAL_FAIL
 +        }
