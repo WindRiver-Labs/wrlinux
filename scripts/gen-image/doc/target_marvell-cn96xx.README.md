@@ -44,7 +44,7 @@ if not present.
 
 ## How to install/boot binary image
 
-### On Board
+### On Host PC
 Under Linux, insert a micro SD card to a USB SD Card Reader. Assuming the USB
 SD Card Reader takes device /dev/sdX, use dd to burn the image to it. Before
 the image can be burned onto a micro SD card, it should be un-mounted. Some
@@ -63,6 +63,14 @@ Now burn the image onto the micro SD card:
     NOTE: The octeontx-bootfs-uboot-t96.img is from MARVELL, it isn't
     integrated into WRLinux because of the license issue. You can ask MARVELL for it.
     BUT YOU MUST CHECK WITH MARVELL ON WHETHER YOU CAN USE IT OR NOT.
+
+### On Board
+Specify boot medium, set SW1 on the board to boot from SD0 card
+  +-------+-------+-------+----------------------+
+  | bit 1 | bit 2 | bit 3 |      boot device     |
+  +-------+-------+-------+----------------------+
+  |  on   |  on   |  on   |       SD0 card       |
+  +-------+-------+-------+----------------------+
 
 This should give you a bootable micro SD card device. Insert the SD card into
 SD slot, and then power on, and input the following commands in the u-boot shell:
