@@ -44,7 +44,7 @@ if not present.
 
 ## How to install/boot binary image
 
-### On Board
+### On Host PC
 Under Linux, insert a micro SD card to a USB SD Card Reader.
 Assuming the USB SD Card Reader takes device /dev/sdX, use dd
 to copy the image to it. Before the image can be burned onto
@@ -77,6 +77,14 @@ Now burn the image onto the micro SD card:
     $ cp ./firmware_ls1028ardb_uboot_xspiboot.img ./tmp
     $ sudo umount /dev/sdX*
     $ sudo eject /dev/sdX
+
+### On Board
+Currently, it only supports SPI nor flash as the board bootloader.
+And please set the on-board switch options as following to enable
+boot from SPI nor flash:
+
+    Boot source  SW2[1:8]        SW3[1:8]        SW5[1:8]
+    FSPI NOR     1111_1000       1111_0000       0011_1001
 
 This should give you a bootable micro SD card device. Insert the SD card into
 SD slot on the board, and then power on, then enter u-boot shell, the image
