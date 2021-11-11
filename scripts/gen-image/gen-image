@@ -223,8 +223,16 @@ class GenImage(object):
         if self.args.pr_database and os.path.exists(self.args.pr_database):
             if not self.args.pr_database.endswith('.sqlite3'):
                 raise Exception('Invalid PR databse file: %s' % self.args.pr_database)
-            logger.info('Using %s as pr database' % self.args.pr_database)
-            shutil.copy(self.args.pr_database, self.pr_db)
+            # Compare pr_db's sizes, use the larger one.
+            from_size = os.path.getsize(self.args.pr_database)
+            to_size = 0
+            if os.path.exists(self.pr_db):
+                to_size = os.path.getsize(self.pr_db)
+            if from_size > to_size:
+                logger.info('Using %s as pr database' % self.args.pr_database)
+                shutil.copy(self.args.pr_database, self.pr_db)
+            else:
+                logger.info('Using %s as pr database' % self.pr_db)
         elif self.args.pr_database in ('no', 'No', 'NO') and os.path.exists(self.pr_db):
             logger.info('Removing %s' % self.pr_db)
             os.remove(self.pr_db)
