@@ -121,6 +121,7 @@ class GenImage(object):
         self.data_dir = os.path.join(os.path.dirname(sys.argv[0]), 'data')
         self.bin_image_conf = os.path.join(os.path.dirname(sys.argv[0]), 'data', 'wrlinux-bin-image.conf')
         self.container_conf = os.path.join(os.path.dirname(sys.argv[0]), 'data', 'wrlinux-container.conf')
+        self.ip_conf = os.path.join(self.data_dir, 'wrlinux-ip.conf')
 
         parser = argparse.ArgumentParser(
             description="Gen images for specified machine",
@@ -131,6 +132,9 @@ class GenImage(object):
         parser.add_argument('-r', '--ip-review',
             default=False,
             help='Only generate sources for IP review', action="store_true")
+        parser.add_argument('-i', '--build-images',
+            default=False,
+            help='Generate binary images and repos, this is the default action. -r -i will generate both images and sources', action="store_true")
         parser.add_argument('-g', '--gen-recipes',
             default=False,
             help='Generate recipes list used by the image', action="store_true")
@@ -237,7 +241,7 @@ class GenImage(object):
             logger.info('Removing %s' % self.pr_db)
             os.remove(self.pr_db)
 
-        if self.machine and not self.args.ip_review:
+        if self.args.build_images or (self.machine and not self.args.ip_review):
             self.mv_to_old(self.machine)
 
         if not os.path.exists(self.handoff_dir):
@@ -540,21 +544,16 @@ class GenImage(object):
         logger.info('Deploy files: %s' % os.path.join(self.handoff_dir, self.machine))
 
     def ip_review(self):
-        ip_conf = """
-# For IP review
-WRTEMPLATE += "feature/archiver"
-COPYLEFT_LICENSE_INCLUDE = "*"
-COPYLEFT_LICENSE_EXCLUDE = ""
-"""
         logger.info('Generating sources for IP review')
+        logger.info('Using prefile %s' % self.ip_conf)
         # The docker won't be built in a world build since it is started with "virtual/".
         # The "bitbake world docker --runall=deploy_archives" doesn't work, so build world.
-        self.do_build('world docker %s --runall=deploy_archives' % ' '.join(self.images), conf=ip_conf)
+        self.do_build('world docker %s -r %s --runall=deploy_archives' % (' '.join(self.images), self.ip_conf))
 
         # And sdk
         # The "bitbake wrlinux-image-full --runall=deploy_archives -cpopulate_sdk"
         # doesn't work, so we figure out the list and build them one by one
-        self.do_build('%s -cpopulate_sdk -g' % self.image)
+        self.do_build('%s -r %s -cpopulate_sdk -g' % (self.image, self.ip_conf))
         recipes = []
         with open('pn-buildlist') as f:
             for line in f.readlines():
@@ -563,7 +562,7 @@ COPYLEFT_LICENSE_EXCLUDE = ""
                 if line.startswith('nativesdk-') and line != 'nativesdk-libgcc-initial':
                     recipes.append(line)
 
-        self.do_build('%s -cdeploy_archives' % ' '.join(recipes))
+        self.do_build('%s -r %s  -cdeploy_archives' % (' '.join(recipes), self.ip_conf))
 
         src_dir = os.path.join(self.tmpdir, 'deploy/sources')
         logger.info('Deploying sources-%s' % self.machine)
@@ -758,6 +757,13 @@ COPYLEFT_LICENSE_EXCLUDE = ""
 
         return False
 
+    def gen_images(self):
+        self.gen_ostree()
+        self.gen_container()
+        self.gen_sdk()
+        self.gen_feeds()
+        self.post()
+
 def main():
     gen = GenImage()
 
@@ -765,20 +771,18 @@ def main():
         gen.do_upload()
     else:
         gen.prepare()
-        if gen.args.ip_review:
+        # Generate both images and sources
+        if gen.args.ip_review and gen.args.build_images:
+            gen.gen_images()
+            gen.ip_review()
+        # Generate sources only
+        elif gen.args.ip_review:
             gen.ip_review()
         elif gen.args.gen_recipes:
             gen.gen_recipes()
+        # Generate binary images by default
         else:
-            gen.gen_ostree()
-            gen.gen_container()
-            gen.gen_sdk()
-            gen.gen_feeds()
-            # Gen ip sources for WRLINUX_CI branch
-            if gen.is_ci_branch():
-                gen.ip_review()
-
-            gen.post()
+            gen.gen_images()
 
 if __name__ == "__main__":
     try:
