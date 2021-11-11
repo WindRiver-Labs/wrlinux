@@ -229,7 +229,7 @@ class GenImage(object):
             logger.info('Removing %s' % self.pr_db)
             os.remove(self.pr_db)
 
-        if self.machine:
+        if self.machine and not self.args.ip_review:
             self.mv_to_old(self.machine)
 
         if not os.path.exists(self.handoff_dir):
