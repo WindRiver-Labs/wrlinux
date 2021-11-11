@@ -105,6 +105,9 @@ Here are the steps to install XFCE on minimal image:
 Source code required to build the image is provided here:
 https://distro.windriver.com/dist/wrlinux/lts-21/sources
 
+Open Source Compliance Artifacts:
+https://open.windriver.com/env/Linux/Binary/LTS/21/index.html
+
 ## License
 The image is provided under the GPL-2.0 license.
 

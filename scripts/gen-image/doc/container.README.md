@@ -67,6 +67,9 @@ system. How to formally handle such dependencies is to be discussed.
 Source code required to build the image is provided here:
 https://distro.windriver.com/dist/wrlinux/lts-21/sources
 
+Open Source Compliance Artifacts:
+https://open.windriver.com/env/Linux/Binary/LTS/21/index.html
+
 ## License
 The images are provided under the GPL-2.0 license.
 
