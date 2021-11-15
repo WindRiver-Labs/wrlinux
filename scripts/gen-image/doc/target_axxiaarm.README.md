@@ -121,6 +121,10 @@ Set boot commands:
     $ saveenv
     $ boot
 
+    NOET: The USB Host of AXM5516 is CI13612A EHCI USB 2.0 Host controller,
+    if the USB stick is 2.0, the access of the storage will be very slow.
+    As a workaround, use SanDisk USB 3.x stick will be much faster
+
 ## Install a package
 Because dnf can't upgrade kernel on the ostree image, so run the following
 command to ensure kernel is up to date and reboot, this action is only needed
