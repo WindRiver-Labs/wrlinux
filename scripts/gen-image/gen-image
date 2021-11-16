@@ -374,6 +374,7 @@ class GenImage(object):
         if self.support_lat:
             deploy_files.append(os.path.join(self.doc_dir, 'appsdk.README.md'))
 
+        deploy_files.add(self.get_configinfo_file())
         self.do_deploy('%s/sdk' % self.machine, deploy_files)
 
     def get_deploy_files(self, type='', uboot=True, images=[]):
@@ -399,6 +400,32 @@ class GenImage(object):
                 raise Exception('Failed to find %s' % f)
 
         return deploy_files
+
+    def get_configinfo_file(self):
+        # Save config info
+        config_outdir = os.path.join(self.tmpdir, 'deploy/images/%s' % self.machine)
+        if not os.path.exists(config_outdir):
+            os.makedirs(config_outdir)
+        config_outfile = os.path.join(config_outdir, 'config_%s' % self.machine)
+
+        logger.info('Generating %s' % config_outfile)
+        newlines = []
+        logfile = 'tmp-%s-glibc/log/cooker/%s/console-latest.log' % (self.machine, self.machine)
+        with open(logfile, 'r') as f:
+            for line in f.readlines():
+                if line.startswith('Build Configuration:'):
+                    newlines.append(line)
+                    continue
+                if line.startswith('--------------------'):
+                    break
+                if newlines:
+                    newlines.append(line)
+        if newlines:
+            with open(config_outfile, 'w') as f:
+                f.write(''.join(newlines))
+        else:
+            logger.warning('Failed to find config info from %s' % logfile)
+        return (config_outfile)
 
     def gen_ostree(self):
         logger.info('Generating target image...')
@@ -438,6 +465,8 @@ class GenImage(object):
                 os.rename(f, newf)
                 deploy_files.add(newf)
 
+        deploy_files.add(self.get_configinfo_file())
+
         readme = os.path.join(self.doc_dir, 'target_%s.README.md' %  self.machine)
         if os.path.exists(readme):
             deploy_files.add(readme)
@@ -464,6 +493,7 @@ class GenImage(object):
         deploy_files = self.get_deploy_files(type='tar.bz2', uboot=False)
 
         deploy_files.append(os.path.join(self.doc_dir, 'container.README.md'))
+        deploy_files.add(self.get_configinfo_file())
         self.do_deploy('%s/container' % self.machine, deploy_files)
 
     def gen_feeds(self):
@@ -610,25 +640,6 @@ class GenImage(object):
                         shutil.copy(d_path, dst_dir_tgt)
                     elif d == 'repos':
                         shutil.copytree(d_path, os.path.join(dst_dir_tgt, d))
-
-                # Save config info
-                logfile = 'tmp-%s-glibc/log/cooker/%s/console-latest.log' % (m, m)
-                config_out = os.path.join(self.local_upload_dir_date, 'config_%s' % m)
-                newlines = []
-                with open(logfile, 'r') as f:
-                    for line in f.readlines():
-                        if line.startswith('Build Configuration:'):
-                            newlines.append(line)
-                            continue
-                        if line.startswith('--------------------'):
-                            break
-                        if newlines:
-                            newlines.append(line)
-                if newlines:
-                    with open(config_out, 'w') as f:
-                        f.write(''.join(newlines))
-                else:
-                    logger.warning('Failed to find config info from %s' % logfile)
 
         # Archive the sources
         if os.path.exists(local_sources):
