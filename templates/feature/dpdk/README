@@ -112,7 +112,7 @@ eal_flags_autotest requires -m parameter with a correct value.
 
 4. DPDK examples applications
 =============================
-Various DPDK example application are built along with DPDK. To include
+Various DPDK example applications are built along with DPDK. To include
 these in your image add the 'dpdk-example' package to your image using
 IMAGE_INSTALL_append or similar in your local.conf.
 
