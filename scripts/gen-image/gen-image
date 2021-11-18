@@ -151,6 +151,9 @@ class GenImage(object):
         parser.add_argument('-c', '--config',
             default=None,
             help="Read configuration from file, such as DISTRO, MACHINE and layers' branches", action="store")
+        parser.add_argument('--rpm-url',
+            default=None,
+            help='Specify the url to download (rsync) rpm packages, these packages will be used by packagefeed-stability.bbclass, the RPM_URL is the prepfix of the url, e.g, rsync://RPM_URL/<machine>/repos/rpm/', action="store")
         parser.add_argument('-p', '--product', choices=['lincd', 'lts-21'], required=False,
             default='lts-21',
             help='Specify the product', action="store")
@@ -212,6 +215,8 @@ class GenImage(object):
         self.pr_db = os.path.join(self.cache_dir, 'prserv.sqlite3')
         self.pr_log = os.path.join(self.builddir, 'cache/prserv.log')
         self.pr_dir = os.path.join(self.handoff_dir, 'prserv')
+
+        self.deploy_dir_rpm = ""
 
     def read_config(self):
         logger.info('Reading configuration from %s' % self.args.config)
@@ -380,6 +385,8 @@ class GenImage(object):
                 self.tmpdir = line.split('=')[1].replace('"', '')
             if line.startswith('WRTEMPLATE='):
                 self.templates = line.split('=')[1].replace('"', '')
+            if line.startswith('DEPLOY_DIR_RPM='):
+                self.deploy_dir_rpm = line.split('=')[1].replace('"', '')
 
         if 'feature/lat' in self.templates:
             self.support_lat = True
@@ -405,6 +412,9 @@ class GenImage(object):
                 f.seek(0)
                 if not line in f.readlines():
                     f.write(line)
+
+        if self.args.rpm_url:
+            self.download_rpm()
 
     def mv_to_old(self, src_name):
         src = os.path.join(self.handoff_dir, src_name)
@@ -871,6 +881,13 @@ class GenImage(object):
             logger.error('Failed to check ci branch: %s' % e)
 
         return False
+
+    def download_rpm(self):
+        logger.info('Downloading rpm packages ...')
+        if not os.path.exists(self.deploy_dir_rpm):
+            os.makedirs(self.deploy_dir_rpm)
+        cmd = 'rsync -az --delete %s/intel-x86-64/repos/rpm/ %s' % (self.args.rpm_url, self.deploy_dir_rpm)
+        run_cmd(cmd, logger)
 
     def gen_images(self):
         self.gen_ostree()
