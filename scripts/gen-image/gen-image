@@ -330,7 +330,7 @@ class GenImage(object):
                     self.machine = os.path.basename(self.machine)
                     break
 
-        logger.info('Generating images for %s' % self.machine)
+        logger.info('Preparing build for %s' % self.machine)
         self.repos_dir = os.path.join(self.handoff_dir, self.machine, 'repos')
 
         if self.args.pr_database and os.path.exists(self.args.pr_database):
