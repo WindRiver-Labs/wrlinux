@@ -99,6 +99,13 @@ def set_logger(logger):
 def get_today():
     return time.strftime("%Y%m%d%H%M%S")
 
+def get_sha256(f):
+    with open(f, 'rb') as inf:
+        data = inf.read()
+    m = hashlib.sha256()
+    m.update(data)
+    return m.hexdigest()
+
 set_logger(logger)
 
 class GenImage(object):
@@ -488,7 +495,7 @@ class GenImage(object):
         if self.support_lat:
             deploy_files.append(os.path.join(self.doc_dir, 'appsdk.README.md'))
 
-        deploy_files.add(self.get_configinfo_file())
+        deploy_files.append(self.get_configinfo_file())
         self.do_deploy('%s/sdk' % self.machine, deploy_files)
 
     def get_deploy_files(self, type='', uboot=True, images=[]):
@@ -607,7 +614,7 @@ class GenImage(object):
         deploy_files = self.get_deploy_files(type='tar.bz2', uboot=False)
 
         deploy_files.append(os.path.join(self.doc_dir, 'container.README.md'))
-        deploy_files.add(self.get_configinfo_file())
+        deploy_files.append(self.get_configinfo_file())
         self.do_deploy('%s/container' % self.machine, deploy_files)
 
     def gen_feeds(self):
@@ -663,18 +670,13 @@ class GenImage(object):
                 sha256files.append(f)
         outlist = []
         if sha256files:
-                for sha256file in sha256files:
-                    basename = os.path.basename(sha256file)
-                    logger.info('Generating checksum for %s' % basename)
-                    with open(sha256file, 'rb') as inf:
-                        data = inf.read()
-                    m = hashlib.sha256()
-                    m.update(data)
-
-                    dirname = os.path.dirname(sha256file)
-                    outfile = os.path.join(dirname, 'sha256sum.txt')
-                    with open(outfile, 'a+') as f:
-                        f.write('%s *%s\n' % (m.hexdigest(), basename))
+            for sha256file in sha256files:
+                basename = os.path.basename(sha256file)
+                logger.info('Generating checksum for %s' % basename)
+                dirname = os.path.dirname(sha256file)
+                outfile = os.path.join(dirname, 'sha256sum.txt')
+                with open(outfile, 'a+') as f:
+                    f.write('%s *%s\n' % (get_sha256(sha256file), basename))
         else:
             logger.warning("The checksum is not generated since no files are found!")
 
@@ -691,7 +693,6 @@ class GenImage(object):
         logger.info('Generating sources for IP review')
         logger.info('Using prefile %s' % self.ip_conf)
         # The docker won't be built in a world build since it is started with "virtual/".
-        # The "bitbake world docker --runall=deploy_archives" doesn't work, so build world.
         self.do_build('world docker %s -r %s --runall=deploy_archives' % (' '.join(self.images), self.ip_conf))
 
         # And sdk
@@ -715,6 +716,57 @@ class GenImage(object):
         cmd = 'rsync -a --exclude "*-native-*" %s/*/* %s' % (src_dir, dst_dir)
         logger.info('Running %s' % cmd)
         subprocess.check_call(cmd, shell=True)
+
+        # Archive the sources
+        if os.path.exists(dst_dir):
+            logger.info('Creating tarballs in %s...' % dst_dir)
+            if shutil.which('pigz'):
+                logger.info('Using pigz...')
+                tar_opt = '-I pigz -cf'
+            else:
+                tar_opt = '-czf'
+            sources_list = os.path.join(dst_dir, 'sources-list-%s.txt' % self.machine)
+            sf = open(sources_list, 'w')
+            for i in os.listdir(dst_dir):
+                sumfiles = []
+                # Generate checksums
+                topdir = '%s/%s' % (dst_dir, i)
+                if not os.path.isdir(topdir):
+                    continue
+                for root, dirs, files in os.walk(topdir):
+                    for f in files + dirs:
+                        f_path = '%s/%s' % (root, f)
+                        sumfiles.append(f_path.replace(topdir + '/', ''))
+                sumfiles.sort()
+                # Save files' sha256 to outfile, then use outfile's sha256 as
+                # the tarball's suffix, the outfile is mainly used for debugging.
+                outfile = '%s/gen-image-sha256sum.txt' % topdir
+                with open(outfile, 'w') as f:
+                    for s in sumfiles:
+                        # Use the HEAD commit's ID as sha256 for git repo
+                        s_path = '%s/%s' % (topdir, s)
+                        sha256 = get_sha256(s_path)
+                        if s.endswith('.tar.gz'):
+                            cmd = "tar --list --wildcards '*/*/.git/HEAD' -zf %s" % s_path
+                            retval, output = subprocess.getstatusoutput(cmd)
+                            if retval == 0:
+                                # Only extract the "./git" dir
+                                cmd = "tar -x --wildcards '*/*/.git/' -zf %s" % s_path
+                                subprocess.check_call(cmd, shell=True, cwd=topdir)
+                                g = git.cmd.Git('%s/%s' % (topdir, os.path.dirname(output)))
+                                sha256 = g.log('-1', '--format=%H', 'HEAD') + '(git)'
+                                extracted_dir = output.split('/')[0]
+                                if extracted_dir:
+                                    shutil.rmtree('%s/%s' % (topdir, extracted_dir))
+                                else:
+                                    logger.warning('Failed to figure out extracted_dir: %s' % output)
+                        f.write('%s *%s\n' % (sha256, s))
+                suffix = get_sha256(outfile)[:7]
+                tarball = '%s_%s.tar.gz' % (i, suffix)
+                cmd = 'tar --numeric-owner --remove-files %s %s %s' % (tar_opt, tarball, i)
+                subprocess.check_call(cmd, shell=True, cwd=dst_dir)
+                sf.write('%s\n' % tarball)
+            sf.close()
 
     def do_upload(self):
         logger.info('Preparing upload files...')
@@ -754,18 +806,6 @@ class GenImage(object):
                         shutil.copy(d_path, dst_dir_tgt)
                     elif d == 'repos':
                         shutil.copytree(d_path, os.path.join(dst_dir_tgt, d))
-
-        # Archive the sources
-        if os.path.exists(local_sources):
-            logger.info('Creating tarballs in %s...' % local_sources)
-            if shutil.which('pigz'):
-                logger.info('Using pigz...')
-                tar_opt = '-I pigz -cf'
-            else:
-                tar_opt = '-czf'
-            for i in os.listdir(local_sources):
-                cmd = 'tar --numeric-owner --remove-files %s %s.tar.gz %s' % (tar_opt, i, i)
-                subprocess.check_call(cmd, shell=True, cwd=local_sources)
 
         if os.path.exists(self.pr_dir):
             shutil.copytree(self.pr_dir, os.path.join(local_handoff_dir, 'prserv'))
