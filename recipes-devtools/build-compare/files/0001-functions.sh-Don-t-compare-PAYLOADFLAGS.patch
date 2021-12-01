@@ -1,0 +1,32 @@
+From 2d11d7234e757544a8a9c469b2d3a6d8fb3ae19e Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Wed, 1 Dec 2021 08:53:03 +0000
+Subject: [PATCH] functions.sh: Don't compare PAYLOADFLAGS
+
+This var doesn't affect the pacakge's data, so don't compare it. More infO
+
+https://git.yoctoproject.org/poky/commit/?id=b6e74ba64ebc5d18e40fd01ef87ca3fde6f33249
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ functions.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/functions.sh b/functions.sh
+index e1f3b29..f1c0bf3 100755
+--- a/functions.sh
++++ b/functions.sh
+@@ -72,7 +72,7 @@ QF_TAGS="${QF_TAGS}%{VENDOR} %{DISTRIBUTION} %{DISTURL}\\n"
+ QF_TAGS="${QF_TAGS}%{LICENSE}\\n"
+ QF_TAGS="${QF_TAGS}%{GROUP} %{URL} %{EXCLUDEARCH} %{EXCLUDEOS} %{EXCLUSIVEARCH}\\n"
+ QF_TAGS="${QF_TAGS}%{EXCLUSIVEOS} %{RPMVERSION} %{PLATFORM}\\n"
+-QF_TAGS="${QF_TAGS}%{PAYLOADFORMAT} %{PAYLOADCOMPRESSOR} %{PAYLOADFLAGS}\\n"
++QF_TAGS="${QF_TAGS}%{PAYLOADFORMAT} %{PAYLOADCOMPRESSOR}\\n"
+ 
+ # XXX We also need to check the existence (but not the content (!))
+ # of SIGGPG (and perhaps the other SIG*)
+-- 
+2.31.1
+

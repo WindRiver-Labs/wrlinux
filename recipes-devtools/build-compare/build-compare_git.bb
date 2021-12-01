@@ -7,6 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
 SRC_URI = "git://github.com/openSUSE/build-compare.git \
            file://0001-functions.sh-Fix-Process-Substitution-error.patch \
+           file://0001-functions.sh-Don-t-compare-PAYLOADFLAGS.patch \
 "
 
 # Date matches entry in build-compare.changes and date of SRCREV.
