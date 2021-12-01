@@ -118,9 +118,10 @@ class GenImage(object):
             'bcm-2xxx-rpi4',
         ]
 
-        self.data_dir = os.path.join(os.path.dirname(sys.argv[0]), 'data')
-        self.bin_image_conf = os.path.join(os.path.dirname(sys.argv[0]), 'data', 'wrlinux-bin-image.conf')
-        self.container_conf = os.path.join(os.path.dirname(sys.argv[0]), 'data', 'wrlinux-container.conf')
+        self.my_dir = os.path.abspath(os.path.dirname(sys.argv[0]))
+        self.data_dir = os.path.join(self.my_dir, 'data')
+        self.bin_image_conf = os.path.join(self.data_dir, 'wrlinux-bin-image.conf')
+        self.container_conf = os.path.join(self.data_dir, 'wrlinux-container.conf')
         self.ip_conf = os.path.join(self.data_dir, 'wrlinux-ip.conf')
 
         parser = argparse.ArgumentParser(
@@ -147,6 +148,9 @@ class GenImage(object):
         parser.add_argument('-u', '--upload-url',
             default=None,
             help='Specify the url to upload the files, which uses rsync to upload the files', action="store")
+        parser.add_argument('-c', '--config',
+            default=None,
+            help="Read configuration from file, such as DISTRO, MACHINE and layers' branches", action="store")
         parser.add_argument('-p', '--product', choices=['lincd', 'lts-21'], required=False,
             default='lts-21',
             help='Specify the product', action="store")
@@ -209,7 +213,107 @@ class GenImage(object):
         self.pr_log = os.path.join(self.builddir, 'cache/prserv.log')
         self.pr_dir = os.path.join(self.handoff_dir, 'prserv')
 
+    def read_config(self):
+        logger.info('Reading configuration from %s' % self.args.config)
+        distro = ""
+        self.layers = {}
+        with open (self.args.config, 'r') as f:
+            for line in f.readlines():
+                if not "=" in line:
+                    continue
+                line_split = line.split()
+                if len(line_split) < 3 or not line_split:
+                    continue
+                if line_split[0] == 'DISTRO':
+                    distro = line_split[2]
+                elif line_split[0] == 'MACHINE':
+                    self.machine = line_split[2].strip('"')
+                elif line_split[0] == 'WRLINUX_VERSION':
+                    wrlinux_version = line_split[2].strip('"')
+                elif line_split[0] == 'WRLINUX_BRANCH':
+                    wrlinux_branch = line_split[2].strip('"')
+                elif ":" in line_split[2]:
+                    layername = line_split[0]
+                    if layername == 'local':
+                        continue
+                    branch_id = line_split[2]
+                    id = branch_id.split(':')[1].strip('"')
+                    self.layers[layername] = id
+
+            if distro:
+                with open(self.local_conf, 'a') as f:
+                    f.write('DISTRO = %s\n' % distro)
+
+        # Figure out RCPL versions
+        version = '_'.join(wrlinux_version.split('.')[:2])
+        rcpl = int(wrlinux_version.split('.')[-1])
+        if rcpl < 10:
+            rcpl = "000%s" % rcpl
+        elif rcpl < 100:
+            rcpl = "00%s" % rcpl
+        elif rcpl < 1000:
+            rcpl = "0%s" % rcpl
+
+        if wrlinux_branch == "LTS":
+            version = "WRLINUX_%s_LTS_RCPL%s" % (version, rcpl)
+        elif wrlinux_branch == "Base":
+            version = "WRLINUX_%s_BASE_UPDATE%s" % (version, rcpl)
+        else:
+            logger.warning('Failed to figure out rcpl version')
+            version = ""
+        logger.debug('Version: %s' % version)
+
+        # Find all layers
+        cmd = "find %s/layers -path  '*/conf/layer.conf' -type f" % self.project
+        layer_confs = run_cmd(cmd, logger).split('\n')
+
+        def checkout_branch(candidates, commit_id):
+            checkedout = False
+            for c in candidates:
+                logger.debug('Checking out %s to %s' % (c, commit_id))
+                g = git.cmd.Git(c)
+                try:
+                    g.checkout(commit_id)
+                    checkedout = True
+                    break
+                except Exception as esc:
+                    logger.debug(esc)
+
+            return checkedout
+
+        logger.info('Checking out layers according to %s' % self.args.config)
+        handled_ids = []
+        for layername in self.layers:
+            candidates = []
+            for conf in layer_confs:
+                layer_conf = '/%s/conf/layer.conf' % layername
+                # It may match mutiple layers, so use candidates to save them
+                if conf.endswith(layer_conf):
+                    layer = os.path.dirname(os.path.dirname(conf))
+                    candidates.append(layer)
+
+            commit_id = self.layers[layername]
+            if commit_id in handled_ids:
+                continue
+            handled_ids.append(commit_id)
+            checkout_branch(candidates, commit_id)
+            if not checkout_branch(candidates, commit_id):
+                logger.warning('Failed to checkout %s to %s, try --debug for more info' % (layername, commit_id))
+                if version:
+                    logger.warning('Trying to checkout %s to %s as a workaround' % (layername, version))
+                    if not checkout_branch(candidates, version):
+                        logger.warning('Failed to checkout %s to %s, try --debug for more info' % (layername, version))
+                    else:
+                        logger.warning('Checked-out %s to %s, but this may not work' % (layername, version))
+
+        # The gen-image dir must be up-to-date
+        g = git.cmd.Git(self.my_dir)
+        g.checkout('m/master', self.my_dir)
+
     def prepare(self):
+
+        if self.args.config:
+            self.read_config()
 
         bitbake_e = ''
         if not self.machine:
