@@ -783,16 +783,17 @@ class GenImage(object):
             os.makedirs(local_handoff_dir)
 
         dst_dir_container = os.path.join(self.local_upload_dir_date, 'containers')
+        os.makedirs(dst_dir_container)
         local_sources = os.path.join(local_handoff_dir, 'sources')
+        os.makedirs(local_sources)
         for m in os.listdir(self.handoff_dir):
             if m == 'prserv':
                 continue
             file_prefix = os.path.join(self.handoff_dir, m)
             if os.path.exists(file_prefix):
                 if m.startswith('sources-'):
-                    cmd = 'rsync -a %s/* %s' % (file_prefix, local_sources)
-                    logger.info('Running %s' % cmd)
-                    subprocess.check_call(cmd, shell=True)
+                    cmd = 'cp -aln %s/* %s' % (file_prefix, local_sources)
+                    run_cmd(cmd)
                     continue
 
                 dst_dir_tgt = os.path.join(local_handoff_dir, m)
@@ -800,12 +801,16 @@ class GenImage(object):
                     os.makedirs(dst_dir_tgt)
                 for d in os.listdir(file_prefix):
                     d_path = os.path.join(file_prefix, d)
+                    cmd = ""
                     if d.startswith('container-'):
-                        shutil.copytree(d_path, os.path.join(dst_dir_container, d))
+                        cmd = 'cp -alf %s %s' % (d_path, dst_dir_container)
                     elif d.endswith('.tar.bz2'):
-                        shutil.copy(d_path, dst_dir_tgt)
+                        cmd = 'cp -alf %s %s' % (d_path, dst_dir_tgt)
                     elif d == 'repos':
-                        shutil.copytree(d_path, os.path.join(dst_dir_tgt, d))
+                        cmd = 'cp -alf %s/* %s' % (file_prefix, local_sources)
+
+                    if cmd:
+                        run_cmd(cmd)
 
         if os.path.exists(self.pr_dir):
             shutil.copytree(self.pr_dir, os.path.join(local_handoff_dir, 'prserv'))
