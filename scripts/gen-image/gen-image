@@ -33,7 +33,7 @@ def get_project():
     runqemu_dir = os.path.realpath(shutil.which("runqemu"))
     return os.path.realpath("%s/../../../../" % runqemu_dir)
 
-def run_cmd(cmd, logger):
+def run_cmd(cmd, logger=logger):
     logger.debug('Running %s' % cmd)
 
     try:
@@ -48,7 +48,7 @@ def run_cmd(cmd, logger):
 def run_bitbake_cmd(target, logger):
     cmd = 'bitbake %s' % target
     logger.info('Running %s' % cmd)
-    output = run_cmd(cmd, logger)
+    output = run_cmd(cmd)
     return output
 
 def set_logger(logger):
@@ -277,7 +277,7 @@ class GenImage(object):
 
         # Find all layers
         cmd = "find %s/layers -path  '*/conf/layer.conf' -type f" % self.project
-        layer_confs = run_cmd(cmd, logger).split('\n')
+        layer_confs = run_cmd(cmd).split('\n')
 
         def checkout_branch(candidates, commit_id):
             checkedout = False
@@ -570,7 +570,7 @@ class GenImage(object):
             # Regenerate wic image to support disk resize
             if os.path.exists(ostreerepo_dir):
                 cmd = "%s/layers/wr-ostree/scripts/bootfs.sh -L -b %s -s 0 -a 'instdate=BUILD_DATE instw=60'" % (self.project, image)
-                run_cmd(cmd, logger)
+                run_cmd(cmd)
 
             new_image = ""
             deploy_files |= set(self.get_deploy_files(uboot=not is_x86, images=[image]))
@@ -932,7 +932,7 @@ class GenImage(object):
         if not os.path.exists(self.deploy_dir_rpm):
             os.makedirs(self.deploy_dir_rpm)
         cmd = 'rsync -az --delete %s/intel-x86-64/repos/rpm/ %s' % (self.args.rpm_url, self.deploy_dir_rpm)
-        run_cmd(cmd, logger)
+        run_cmd(cmd)
 
     def gen_images(self):
         self.gen_ostree()
