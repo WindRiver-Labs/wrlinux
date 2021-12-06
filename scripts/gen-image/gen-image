@@ -807,7 +807,7 @@ class GenImage(object):
                     elif d.endswith('.tar.bz2'):
                         cmd = 'cp -alf %s %s' % (d_path, dst_dir_tgt)
                     elif d == 'repos':
-                        cmd = 'cp -alf %s/* %s' % (file_prefix, local_sources)
+                        cmd = 'cp -alf %s/* %s' % (d_path, os.path.join(dst_dir_tgt, d))
 
                     if cmd:
                         run_cmd(cmd)
