@@ -1,0 +1,7 @@
+This template adds the required tools and packages
+for running and debbuging programs using Visual Studio
+Code. This template also bundles sample applications.
+
+#@TYPE: Wrtemplate
+#@NAME: wrvscode
+#@DESCRIPTION: Add required tools for running and debugging programs using VS Code.
