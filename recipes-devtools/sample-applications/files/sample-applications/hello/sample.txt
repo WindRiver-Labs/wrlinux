@@ -1,0 +1,24 @@
+The Hello World as a User Project 
+---------------------------------------------
+
+This example shows how to use the build specs with a 
+user-defined Makefile.
+
+The respective SDK environment file has been sourced
+into the environment, and includes for example:
+
+  ${CC}       : the C compiler
+
+  ${CXX}      : the C++ compiler
+
+  ${CFLAGS}   : the C compiler flags
+
+  ${CXXFLAGS} : the C++ compiler flags
+
+  ${LDFLAGS}  : the Linker flags
+
+  ${ARCH}     : arch, useful for kernel modules
+
+  ${CROSS}    : cross-compiler, useful for kernel modules
+
+
