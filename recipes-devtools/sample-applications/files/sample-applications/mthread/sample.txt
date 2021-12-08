@@ -1,0 +1,12 @@
+The Multi-Thread Demonstration Program
+--------------------------------------
+
+The Multi-Thread program creates multiple pthreads
+from a single process using the pthread_create()
+function. It can be used with the tutorial
+titled Multi-Thread Project to demonstrate
+the debugging of multiple pthreads simultaneously.
+
+See the Multi-Thread Tutorial for details on
+running and debugging this program.
+

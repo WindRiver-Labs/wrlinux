@@ -1,0 +1,9 @@
+The Client/Server Demonstration Program
+---------------------------------------
+
+The Client/Server program is a multi-process
+demonstration program. It defines to build targets:
+"client" and "server".
+
+See the Client Server Tutorial for details on
+running and debugging this program.

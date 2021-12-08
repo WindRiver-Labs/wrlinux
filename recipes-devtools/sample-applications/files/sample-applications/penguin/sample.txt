@@ -1,0 +1,21 @@
+The Penguin Program as a User Project 
+-----------------------------------------
+
+The Penguin program is a C++ version of the Ball program.
+
+This example utilizes a user Makefile.
+
+The Penguin program simulates a series of bouncing characters.
+A variable named "grid" displays as a two-dimensional grid on
+which the balls bounce. The balls are represented using an array
+of ASCII characters. 
+
+Three kinds of characters are simulated:
+*  *A snowflake:* This character bounces off walls. The snowflake does
+   not affect the other characters it collides with. The snowflake is
+   represented by the character '*'.
+*  *A bear:* This bear deflects any character it collides with. It is
+   represented by the character 'b'.
+*  *A penguin:* This character deflects and turns any character it 
+   collides with. It is represented by the character '&lt;'.
+
