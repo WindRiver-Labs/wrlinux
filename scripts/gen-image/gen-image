@@ -712,9 +712,13 @@ class GenImage(object):
         logger.info('Deploying sources-%s' % self.machine)
         dst_dir = os.path.join(self.handoff_dir, 'sources-%s' % self.machine)
         self.mv_to_old('sources-%s' % self.machine)
-        cmd = 'rsync -a --exclude "*-native-*" %s/*/* %s' % (src_dir, dst_dir)
-        logger.info('Running %s' % cmd)
-        subprocess.check_call(cmd, shell=True)
+        os.makedirs(dst_dir)
+        # Use hardlinks
+        cmd = 'cp -al %s/*/* %s' % (src_dir, dst_dir)
+        run_cmd(cmd)
+        # Remove natives
+        cmd = 'rm -fr %s/*-native-*' % dst_dir
+        run_cmd(cmd)
 
         # Archive the sources
         if os.path.exists(dst_dir):
@@ -733,18 +737,19 @@ class GenImage(object):
                 if not os.path.isdir(topdir):
                     continue
                 for root, dirs, files in os.walk(topdir):
-                    for f in files + dirs:
+                    for f in files:
                         f_path = '%s/%s' % (root, f)
                         sumfiles.append(f_path.replace(topdir + '/', ''))
+
                 sumfiles.sort()
                 # Save files' sha256 to outfile, then use outfile's sha256 as
                 # the tarball's suffix, the outfile is mainly used for debugging.
                 outfile = '%s/gen-image-sha256sum.txt' % topdir
                 with open(outfile, 'w') as f:
                     for s in sumfiles:
+                        sha256 = ""
                         # Use the HEAD commit's ID as sha256 for git repo
                         s_path = '%s/%s' % (topdir, s)
-                        sha256 = get_sha256(s_path)
                         if s.endswith('.tar.gz'):
                             cmd = "tar --list --wildcards '*/*/.git/HEAD' -zf %s" % s_path
                             retval, output = subprocess.getstatusoutput(cmd)
@@ -759,7 +764,35 @@ class GenImage(object):
                                     shutil.rmtree('%s/%s' % (topdir, extracted_dir))
                                 else:
                                     logger.warning('Failed to figure out extracted_dir: %s' % output)
+                            elif s.startswith(i):
+                                # The archiver.bbclass creates a tarball for 'dir'
+                                # sources with a random directory name, which makes
+                                # the checksum mistmatch, so save checksum of in
+                                # the dir rather than the tarball itself to fix the
+                                # checksum issues.
+                                cmd = "tar --list --wildcards 'tmp*/' -zf %s" % s_path
+                                retval, output = subprocess.getstatusoutput(cmd)
+                                if retval == 0:
+                                    cmd = "tar -xzf %s" % s_path
+                                    subprocess.check_call(cmd, shell=True, cwd=topdir)
+                                    extracted_dir = output.split('/')[0]
+                                    if extracted_dir:
+                                        extracted_dir_path = '%s/%s' % (topdir, extracted_dir)
+                                        for root, dirs, files in os.walk(extracted_dir_path):
+                                            for file in files:
+                                                f_path = '%s/%s' % (root, file)
+                                                if sha256:
+                                                    sha256 += "\n%s" % get_sha256(f_path)
+                                                else:
+                                                    sha256 = get_sha256(f_path)
+                                        shutil.rmtree(extracted_dir_path)
+                                    else:
+                                        logger.warning('Failed to figure out extracted_dir: %s' % output)
+
+                        if not sha256:
+                            sha256 = get_sha256(s_path)
                         f.write('%s *%s\n' % (sha256, s))
+
                 suffix = get_sha256(outfile)[:7]
                 tarball = '%s_%s.tar.gz' % (i, suffix)
                 cmd = 'tar --numeric-owner --remove-files %s %s %s' % (tar_opt, tarball, i)
