@@ -41,7 +41,7 @@ SRCREV_machine_kb-v5.10-standard-nxp-ls20xx ?= "0431892b392fde0a15f85cae81cac0db
 LINUX_VERSION_kb-v5.10-standard-nxp-ls20xx = "5.10.85"
 SRCREV_machine_kb-v5.10-standard-nxp-sdk-5.10-nxp-s32g2xx ?= "7d55fb239cb8cdf76f57f0505c3c89bbfd663ca3"
 LINUX_VERSION_kb-v5.10-standard-nxp-sdk-5.10-nxp-s32g2xx = "5.10.85"
-SRCREV_machine_kb-v5.10-standard-nxp-sdk-5.10-nxp-soc ?= "857877f4bdf53fb05e2a9dcc663724f393dbac75"
+SRCREV_machine_kb-v5.10-standard-nxp-sdk-5.10-nxp-soc ?= "e8add84a60629f0fcf03f56c0c092c288dacdfaf"
 LINUX_VERSION_kb-v5.10-standard-nxp-sdk-5.10-nxp-soc = "5.10.85"
 SRCREV_machine_kb-v5.10-standard-preempt-rt-base ?= "97b3d2f0923ab9e9a9eb47c284006cddb0156146"
 LINUX_VERSION_kb-v5.10-standard-preempt-rt-base = "5.10.85"
@@ -92,4 +92,4 @@ LINUX_VERSION_kb-v5.10-standard-xilinx-zynqmp = "5.10.85"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_5.10 = "yocto-5.10"
-SRCREV_meta_5.10 = "be7b73b2c0e453724d18520ae165b5d474735578"
+SRCREV_meta_5.10 = "1b5a52522601fc2f9cc091c9a4fee88ea007e9c0"
