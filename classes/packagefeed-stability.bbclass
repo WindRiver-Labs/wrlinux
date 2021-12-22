@@ -218,6 +218,10 @@ def package_compare_impl(pkgtype, d):
                         and d.getVar('PACKAGE_ARCH') == 'all':
                     os.unlink(destpath)
                 if (os.stat(srcpath).st_dev == os.stat(destdir).st_dev):
+                    # Remove destpath in case it exists
+                    if os.path.exists(destpath):
+                        bb.note('Removing %s' % destpath)
+                        os.unlink(destpath)
                     # Use a hard link to save space
                     os.link(srcpath, destpath)
                 else:
