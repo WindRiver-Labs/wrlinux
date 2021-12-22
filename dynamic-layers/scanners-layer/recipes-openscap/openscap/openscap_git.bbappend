@@ -1,7 +1,10 @@
-SRCREV = "c70bc47449398dc31b66cb00ca00c820a369c4e3"
-SRC_URI = "git://github.com/OpenSCAP/openscap.git;branch=maint-1.3 \
+SRCREV = "e7db4f84e487c533fe5756ecd85ce96ec1e11cec"
+SRC_URI = "git://github.com/OpenSCAP/openscap.git;branch=maint-1.3;protocol=https \
           "
-PV = "1.3.1+git${SRCPV}"
+PV = "1.3.5"
 
 # Fix build failure with gcc-10
 CFLAGS_append = " -fcommon"
+
+DEPENDS_append = " xmlsec1"
+DEPENDS_append_class-native = " xmlsec1-native"
