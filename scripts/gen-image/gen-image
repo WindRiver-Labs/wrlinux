@@ -576,12 +576,15 @@ class GenImage(object):
             basename = '%s-%s' % (image, self.machine)
             ustart_images = ['ustart.img.bmap']
             if self.machine == 'nxp-s32g2xx':
-                ustart_images += ['ustart-evb.img.gz', 'ustart-rdb2.img.gz']
+                ustart_images += ['evb.ustart.img.gz', 'rdb2.ustart.img.gz']
             else:
                 ustart_images.append('ustart.img.gz')
 
             for f in ustart_images:
-                newf = os.path.join(self.builddir, '%s.%s' % (basename, f))
+                if self.machine == 'nxp-s32g2xx':
+                    newf = os.path.join(self.builddir, '%s-%s' % (basename, f))
+                else:
+                    newf = os.path.join(self.builddir, '%s.%s' % (basename, f))
                 os.rename(f, newf)
                 deploy_files.add(newf)
 
