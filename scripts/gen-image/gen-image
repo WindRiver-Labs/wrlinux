@@ -339,6 +339,9 @@ class GenImage(object):
         logger.info('Preparing build for %s' % self.machine)
         self.repos_dir = os.path.join(self.handoff_dir, self.machine, 'repos')
 
+        self.handoff_name_ws = "%s-%s" % (self.handoff_name, self.machine)
+        self.handoff_dir_ws = os.path.join(self.handoff_dir, self.handoff_name_ws)
+
         if self.args.pr_database and os.path.exists(self.args.pr_database):
             if not self.args.pr_database.endswith('.sqlite3'):
                 raise Exception('Invalid PR databse file: %s' % self.args.pr_database)
@@ -358,9 +361,13 @@ class GenImage(object):
 
         if self.args.build_images or (self.machine and not self.args.ip_review):
             self.mv_to_old(self.machine)
+            self.mv_to_old(self.handoff_name_ws)
 
         if not os.path.exists(self.handoff_dir):
             os.makedirs(self.handoff_dir)
+
+        if not os.path.exists(self.handoff_dir_ws):
+            os.makedirs(self.handoff_dir_ws)
 
         with open(self.local_conf, 'a+') as f:
             # Only need write MACHIINE when it is not specified
@@ -686,10 +693,15 @@ class GenImage(object):
         if os.path.exists(file_prefix):
             for d in os.listdir(file_prefix):
                 if ('-minimal-' in d or '-full-' in d or 'sdk-' in d) and not d.startswith('container-'):
-                    cmd = 'tar --numeric-owner -cjvf %s.tar.bz2 %s' % (d, d)
-                    logger.debug('Running %s' % cmd)
+                    tarname = '%s.tar.bz2' % d
+                    tarname_path = os.path.join(file_prefix, tarname)
+                    cmd = 'tar --numeric-owner -cjvf %s %s' % (tarname, d)
+                    logger.info('Running %s' % cmd)
                     subprocess.check_output(cmd, shell=True, cwd=file_prefix)
-        logger.info('Deploy files: %s' % os.path.join(self.handoff_dir, self.machine))
+
+                    shutil.copy(tarname_path, self.handoff_dir_ws)
+
+        logger.info('Deploy files: %s and WRLinux-lts-21-Images-%s' % (os.path.join(self.handoff_dir, self.machine), self.machine))
 
     def ip_review(self):
         logger.info('Generating sources for IP review')
@@ -818,7 +830,9 @@ class GenImage(object):
             os.makedirs(local_handoff_dir)
 
         dst_dir_container = os.path.join(self.local_upload_dir_date, 'containers')
+        dst_dir_ws = os.path.join(self.local_upload_dir_date, 'ws')
         os.makedirs(dst_dir_container)
+        os.makedirs(dst_dir_ws)
         local_sources = os.path.join(local_handoff_dir, 'sources')
         os.makedirs(local_sources)
         for m in os.listdir(self.handoff_dir):
@@ -828,6 +842,11 @@ class GenImage(object):
             if os.path.exists(file_prefix):
                 if m.startswith('sources-'):
                     cmd = 'cp -aln %s/* %s' % (file_prefix, local_sources)
+                    run_cmd(cmd)
+                    continue
+
+                if m.startswith('%s-' % self.handoff_name):
+                    cmd = 'cp -alf %s %s' % (file_prefix, dst_dir_ws)
                     run_cmd(cmd)
                     continue
 
