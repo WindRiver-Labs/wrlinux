@@ -861,7 +861,7 @@ class GenImage(object):
         # Run rsync to remote url. Note, the slash '/' in cmd is very
         # important, otherwise, rsync would sync upload itself, but not the
         # files inside it.
-        cmd = 'rsync -az %s/ %s' % (self.local_upload_dir, self.args.upload_url)
+        cmd = 'rsync -a %s/ %s' % (self.local_upload_dir, self.args.upload_url)
         logger.info('Running %s' % cmd)
         subprocess.check_call(cmd, shell=True)
 
@@ -969,7 +969,7 @@ class GenImage(object):
         logger.info('Downloading rpm packages ...')
         if not os.path.exists(self.deploy_dir_rpm):
             os.makedirs(self.deploy_dir_rpm)
-        cmd = 'rsync -az --delete %s/intel-x86-64/repos/rpm/ %s' % (self.args.rpm_url, self.deploy_dir_rpm)
+        cmd = 'rsync -a --delete %s/intel-x86-64/repos/rpm/ %s' % (self.args.rpm_url, self.deploy_dir_rpm)
         run_cmd(cmd)
 
     def gen_images(self):
