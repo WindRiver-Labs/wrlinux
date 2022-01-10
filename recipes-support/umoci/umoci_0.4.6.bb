@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://src/${GO_IMPORT}/COPYING;md5=3b83ef96387f14655fc854dd
 inherit go
 
 SRC_URI = " \
-    git://${GO_IMPORT}; \
+    git://${GO_IMPORT};branch=main;protocol=https; \
 "
 
 SRCREV = "5efa06acfb3bb4e65d2711cf5255970948e047cf"
