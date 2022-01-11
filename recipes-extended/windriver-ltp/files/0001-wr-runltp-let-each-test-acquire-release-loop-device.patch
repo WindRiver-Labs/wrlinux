@@ -1,0 +1,140 @@
+From 3ca71ab3fee49e5f64fae9537474af0e10b7b91b Mon Sep 17 00:00:00 2001
+From: Ovidiu Panait <ovidiu.panait@windriver.com>
+Date: Thu, 6 Jan 2022 10:36:33 +0000
+Subject: [PATCH] wr-runltp: let each test acquire/release loop device
+
+As explained in upstream commit [1], having a single loop device for all
+testcases is a bad idea, as it can lead to unexpected failures.
+
+In LTS19, ltp currently uses a single loop device (created by wr-runltp wrapper
+script) of 512MB, which generates the following failures:
+"""
+mkfs01 2 TFAIL: 'mkfs -t vfat /dev/loop0 16000' failed.
+Warning: block count mismatch: found 524288 but assuming 16000.
+WARNING: Not enough clusters for a 32 bit FAT!
+mkfs.vfat: Attempting to create a too large filesystem
+...
+mkfs01 2 TFAIL: 'mkfs -t msdos /dev/loop0 16000' failed.
+Warning: block count mismatch: found 524288 but assuming 16000.
+WARNING: Not enough clusters for a 32 bit FAT!
+mkfs.msdos: Attempting to create a too large filesystem
+"""
+
+mkfs.vfat detects that loop0 is a large block device (512 MB), so by default it
+tries to create a FAT32 filesystem for it. But the "16000" argument in mkfs01
+testcase restricts the filesystem size to only 16k blocks, which is too little
+for a FAT32 filesystem.
+
+These failures would have not occured if the testcases were to create the test
+loop devices by themselves, using appropriate device sizes. To fix this and
+other potential failures, align with upstream codebase and let each testcase
+create, acquire and release a loop device.
+
+Before & after LTP runs for qemux86-64 indicate no new failures:
+       BEFORE            |         AFTER
+------------------------------------------------
+msgstress04      FAIL    |  msgstress04      FAIL
+leapsec_timer    FAIL    |  leapsec_timer    FAIL
+mkfs01_msdos_sh  FAIL    |  mkfs01_msdos_sh  PASS
+mkfs01_vfat_sh   FAIL    |  mkfs01_vfat_sh   PASS
+umip_basic_test  FAIL    |  umip_basic_test  FAIL
+
+[1] https://github.com/linux-test-project/ltp/commit/fec810aa86296cf230b672e290ec41c70fff4dd8
+
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
+---
+ wrLinux_ltp/wr-runltp | 45 +++++++++++++------------------------------
+ 1 file changed, 13 insertions(+), 32 deletions(-)
+
+diff --git a/wrLinux_ltp/wr-runltp b/wrLinux_ltp/wr-runltp
+index 7b36a7290..9f4f12e36 100755
+--- a/wrLinux_ltp/wr-runltp
++++ b/wrLinux_ltp/wr-runltp
+@@ -21,6 +21,7 @@ export LTPROOT=$(dirname $WRLTPROOT)
+ 
+ external_parameter="$*"
+ cmdline_skip=""
++cmdline_block_device=""
+ EXECUTION_TIME=`date +"%Y_%b_%d-%Hh_%Mm_%Ss"`
+ START_TIME=`date`
+ KERNEL_VERSION=`uname -a| cut -d ' ' -f 3`
+@@ -36,7 +37,7 @@ LOOP_DEVICE_SWAP=""
+ SWAPON=0
+ 
+ BLOCK_DEVICE_FILE=$WRLTPROOT/block_device_file
+-BLOCK_DEVICE_FSTYPE=ext4
++BLOCK_DEVICE_FSTYPE=""
+ TMP_MOUNT_FSTYPE=ext4
+ LOOP_DEVICE_BLOCK=""
+ 
+@@ -214,32 +215,6 @@ hugetlb_setup()
+     sed -i -e 's#^\(hugeshmget03\)\(.*\)#\1 orignmi=$(cat /proc/sys/kernel/shmmni); echo 16 > /proc/sys/kernel/shmmni; \2; echo ${orignmi} > /proc/sys/kernel/shmmni#' $LTPROOT/runtest/hugetlb
+ }
+ 
+-# Create an unmounted block device for syscalls test
+-create_block_device()
+-{
+-    LOOP_DEVICE_BLOCK=$(losetup -f)
+-    [[ ${LOOP_DEVICE_BLOCK} ]] || {
+-        echo No free loop device
+-        return 1
+-    }
+-
+-    dd if=/dev/zero of=${BLOCK_DEVICE_FILE} bs=1M count=256 > /dev/null 2>&1 || {
+-        echo "Failed to create file $BLOCK_DEVICE_FILE"
+-        return 1
+-    }
+-
+-    losetup $LOOP_DEVICE_BLOCK $BLOCK_DEVICE_FILE > /dev/null 2>&1 || {
+-        echo "Fail to setup loop device $LOOP_DEVICE_BLOCK"
+-        return 1
+-    }
+-
+-    mkfs.${BLOCK_DEVICE_FSTYPE} ${LOOP_DEVICE_BLOCK} > /dev/null 2>&1 || {
+-        echo Failed to format ${LOOP_DEVICE_BLOCK} into ${BLOCK_DEVICE_FSTYPE}
+-        return 1
+-    }
+-    return 0
+-}
+-
+ # Setup LTP runtime environment
+ setup()
+ {
+@@ -255,11 +230,17 @@ setup()
+ if [ -z "$LOOP_DEVICE_BLOCK" ]; then
+     if losetup -a | grep -q "$BLOCK_DEVICE_FILE"; then
+         LOOP_DEVICE_BLOCK=$(losetup -a | grep "$BLOCK_DEVICE_FILE" | cut -d " " -f 1 | tr -d ":")
+-    else
+-        create_block_device
+     fi
+ fi
+ 
++if [ -n "$LOOP_DEVICE_BLOCK" ]; then
++    cmdline_block_device="-b $LOOP_DEVICE_BLOCK"
++fi
++
++if [ -n "$BLOCK_DEVICE_FSTYPE" ]; then
++    cmdline_block_device="$cmdline_block_device -B $BLOCK_DEVICE_FSTYPE"
++fi
++
+ # Create a swap partition when the total memory is less than 64M.
+ 
+     MemTotal=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`
+@@ -534,11 +515,11 @@ main()
+ {
+     if [ "$RUN_SELECTED_CASE" -eq 0 ]; then
+         $LTPROOT/runltp -l $RUNTIME_LOGFILE -f $SCENARIO_GROUP_LIST \
+-        -b $LOOP_DEVICE_BLOCK -B $BLOCK_DEVICE_FSTYPE -d $TMPDIR \
+-        $external_parameter $cmdline_skip -p | tee $SCREEN_LOGFILE
++        $cmdline_block_device -d $TMPDIR $external_parameter \
++        $cmdline_skip -p | tee $SCREEN_LOGFILE
+     else
+         $LTPROOT/runltp -l $RUNTIME_LOGFILE -f $SCENARIO_GROUP_LIST \
+-        -b $LOOP_DEVICE_BLOCK -B $BLOCK_DEVICE_FSTYPE -d $TMPDIR -s "\<$SELECTED_CASE\>" \
++        $cmdline_block_device -d $TMPDIR -s "\<$SELECTED_CASE\>" \
+         $external_parameter $cmdline_skip -p | tee $SCREEN_LOGFILE
+     fi
+ 
+-- 
+2.23.0
+
