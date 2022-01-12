@@ -107,6 +107,13 @@ def get_sha256(f):
 
 set_logger(logger)
 
+def check_and_write(outfile, line):
+    with open(outfile, 'a+') as f:
+        f.seek(0)
+        if not line in f.readlines():
+            logger.info('Writting "%s" to %s' % (line.strip(), outfile))
+            f.write(line)
+
 class GenImage(object):
     """
     * Generate the following images in order:
@@ -370,24 +377,18 @@ class GenImage(object):
         if not os.path.exists(self.handoff_dir_ws):
             os.makedirs(self.handoff_dir_ws)
 
+
         with open(self.local_conf, 'a+') as f:
             # Only need write MACHIINE when it is not specified
             if not bitbake_e:
                 f.write('\nMACHINE = "%s"\n' % self.machine)
-            line = 'require %s\n' % self.bin_image_conf
-            if self.image in (self.image_minimal, self.image_full):
-                f.seek(0)
-                if not line in f.readlines():
-                    logger.info('Writting %s to conf/local.conf' % line)
-                    f.write(line)
+
+
+        line = 'require %s\n' % self.bin_image_conf
+        check_and_write(self.local_conf, line)
 
         line = 'BBLAYERS += "%s/layers/wrlinux/wrlinux-kernel-dev"\n' % self.project
-        with open(self.bblayers_conf, 'a+') as f:
-            f.seek(0)
-            if not line in f.readlines():
-                logger.info('Writting "%s" to %s' % (line.strip(), self.bblayers_conf))
-                f.write('\n#### Added by gen-image\n')
-                f.write(line)
+        check_and_write(self.bblayers_conf, line)
 
         self.feed_archs = []
         all_archs = []
@@ -429,11 +430,8 @@ class GenImage(object):
             uri = 'http://%s:%s/outdir' % (hostname, port)
             logger.warning('PACKAGE_FEED_URIS is not defined, setting it to %s' % uri)
 
-            with open(self.local_conf, 'a+') as f:
-                line = 'PACKAGE_FEED_URIS = "%s"\n' % uri
-                f.seek(0)
-                if not line in f.readlines():
-                    f.write(line)
+            line = 'PACKAGE_FEED_URIS = "%s"\n' % uri
+            check_and_write(self.local_conf, line)
 
         if self.args.rpm_url:
             self.download_rpm()
