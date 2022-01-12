@@ -334,15 +334,28 @@ class GenImage(object):
         if self.args.config:
             self.read_config()
 
+        line = 'require %s\n' % self.bin_image_conf
+        check_and_write(self.local_conf, line)
+
+        line = 'BBLAYERS += "%s/layers/wrlinux/wrlinux-kernel-dev"\n' % self.project
+        check_and_write(self.bblayers_conf, line)
+
         bitbake_e = ''
-        if not self.machine:
-            logger.info('Figuring out machine ...')
-            bitbake_e = self.do_build('-e')
-            for line in bitbake_e.split('\n'):
-                if line.startswith('PKGDATA_DIR='):
-                    self.machine = line.split('=')[1].replace('"', '')
-                    self.machine = os.path.basename(self.machine)
-                    break
+        logger.info('Figuring out machine ...')
+        bitbake_e = self.do_build('-e')
+        for line in bitbake_e.split('\n'):
+            if line.startswith('PKGDATA_DIR='):
+                self.machine = line.split('=')[1].replace('"', '')
+                self.machine = os.path.basename(self.machine)
+                break
+
+        # Only write MACHINE when self.args.machine != MACHINE from bitbake_e
+        if self.args.machine and self.machine != self.args.machine:
+            self.machine = self.args.machine
+            with open(self.local_conf, 'a+') as f:
+                f.write('\nMACHINE = "%s"\n' % self.args.machine)
+                # Need need re-run 'bitbake -e'
+                bitbake_e = ''
 
         logger.info('Preparing build for %s' % self.machine)
         self.repos_dir = os.path.join(self.handoff_dir, self.machine, 'repos')
@@ -376,19 +389,6 @@ class GenImage(object):
 
         if not os.path.exists(self.handoff_dir_ws):
             os.makedirs(self.handoff_dir_ws)
-
-
-        with open(self.local_conf, 'a+') as f:
-            # Only need write MACHIINE when it is not specified
-            if not bitbake_e:
-                f.write('\nMACHINE = "%s"\n' % self.machine)
-
-
-        line = 'require %s\n' % self.bin_image_conf
-        check_and_write(self.local_conf, line)
-
-        line = 'BBLAYERS += "%s/layers/wrlinux/wrlinux-kernel-dev"\n' % self.project
-        check_and_write(self.bblayers_conf, line)
 
         self.feed_archs = []
         all_archs = []
@@ -932,7 +932,7 @@ class GenImage(object):
             logfile = os.path.join('tmp-%s-glibc/log' % machine, 'cooker', machine, 'console-latest.log')
 
             # The docker won't be built in a world build since it is started with "virtual/".
-            self.do_build('-r %s -g world docker %s' % (preconf, ' '.join(self.images)), conf='MACHINE="%s"\n' % machine)
+            self.do_build('-r %s -g world docker %s' % (preconf, ' '.join(self.images)))
 
             with open(logfile, 'r') as f:
                 nonnul_src |= set(f.readlines())
