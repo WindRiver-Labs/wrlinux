@@ -201,6 +201,7 @@ class GenImage(object):
         self.local_layer = os.path.join(self.project, 'layers/local')
 
         self.local_conf = os.path.join(self.builddir, 'conf/local.conf')
+        self.bblayers_conf = os.path.join(self.builddir, 'conf/bblayers.conf')
 
         if self.args.product == 'lincd':
             self.handoff_name = 'WRLinux-CD-Images'
@@ -379,6 +380,14 @@ class GenImage(object):
                 if not line in f.readlines():
                     logger.info('Writting %s to conf/local.conf' % line)
                     f.write(line)
+
+        line = 'BBLAYERS += "%s/layers/wrlinux/wrlinux-kernel-dev"\n' % self.project
+        with open(self.bblayers_conf, 'a+') as f:
+            f.seek(0)
+            if not line in f.readlines():
+                logger.info('Writting "%s" to %s' % (line.strip(), self.bblayers_conf))
+                f.write('\n#### Added by gen-image\n')
+                f.write(line)
 
         self.feed_archs = []
         all_archs = []
