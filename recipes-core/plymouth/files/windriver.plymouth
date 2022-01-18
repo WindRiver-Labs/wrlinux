@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=windriver
+Description=My custom splash screen image
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/windriver
+ScriptFile=/usr/share/plymouth/themes/windriver/windriver.script
