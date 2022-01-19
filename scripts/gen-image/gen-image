@@ -999,7 +999,7 @@ class GenImage(object):
         logger.info('Downloading rpm packages ...')
         if not os.path.exists(self.deploy_dir_rpm):
             os.makedirs(self.deploy_dir_rpm)
-        cmd = 'rsync -a --delete %s/intel-x86-64/repos/rpm/ %s' % (self.args.rpm_url, self.deploy_dir_rpm)
+        cmd = 'rsync -a --delete %s/%s/repos/rpm/ %s' % (self.args.rpm_url, self.machine, self.deploy_dir_rpm)
         run_cmd(cmd)
 
     def gen_images(self):
