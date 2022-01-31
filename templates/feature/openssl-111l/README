@@ -1,0 +1,7 @@
+This template installs openssl-1.1.1l to the filesystem.
+
+To use this template, add the following to your setup line:
+
+    --templates feature/openssl-111l
+
+#@DESCRIPTION: installs openssl-1.1.1l to the filesystem
