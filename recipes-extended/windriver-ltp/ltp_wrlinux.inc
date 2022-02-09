@@ -19,6 +19,7 @@ SRC_URI += " file://README \
              file://0018-posix-skip-the-test-pthread_barrier_destroy_2-1.patch \
              file://0019-wrLinux_ltp-Remove-admin_tools.patch \
              file://0020-ltp-remove-modules-in-SCENARIO_GROUP_LIST.patch \
+             file://0001-wr-runltp-let-each-test-acquire-release-loop-device.patch \
             "
 
 do_compile(){
