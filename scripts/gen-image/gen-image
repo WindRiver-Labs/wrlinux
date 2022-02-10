@@ -708,10 +708,6 @@ class GenImage(object):
 
                     shutil.copy(tarname_path, self.handoff_dir_ws)
 
-        # Copy mirror-index
-        mirror_index_src = os.path.join(self.data_dir, 'mirror-index')
-        mirror_index_dst = os.path.join(self.handoff_dir_ws, 'mirror-index')
-        shutil.copytree(mirror_index_src, mirror_index_dst)
         logger.info('Deploy files: %s and WRLinux-lts-21-Images-%s' % (os.path.join(self.handoff_dir, self.machine), self.machine))
 
     def ip_review(self):
