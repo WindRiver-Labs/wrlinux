@@ -126,11 +126,6 @@ class GenImage(object):
     """
 
     def __init__(self):
-        self.supported_machines = [
-            'intel-x86-64',
-            'bcm-2xxx-rpi4',
-        ]
-
         self.my_dir = os.path.abspath(os.path.dirname(sys.argv[0]))
         self.data_dir = os.path.join(self.my_dir, 'data')
         self.bin_image_conf = os.path.join(self.data_dir, 'wrlinux-bin-image.conf')
@@ -149,9 +144,6 @@ class GenImage(object):
         parser.add_argument('-i', '--build-images',
             default=False,
             help='Generate binary images and repos, this is the default action. -r -i will generate both images and sources', action="store_true")
-        parser.add_argument('-g', '--gen-recipes',
-            default=False,
-            help='Generate recipes list used by the image', action="store_true")
         parser.add_argument('-b', '--pr-database',
             default=os.path.join(self.data_dir, 'prserv.sqlite3'),
             help='Specify PR database to use, no database will be used if specified no', action="store")
@@ -891,95 +883,6 @@ class GenImage(object):
         logger.info('Running %s' % cmd)
         subprocess.check_call(cmd, shell=True)
 
-    def gen_recipes(self):
-
-        if os.getcwd() != self.builddir:
-            raise Exception("This function must be run in BUILDDIR %s" % self.builddir)
-
-        if self.machine:
-            machines = [self.machine]
-        else:
-            machines = self.supported_machines
-
-        new_lines = set()
-        nonnul_src = set()
-
-        bbclass_src = os.path.join(self.data_dir, 'wrlinux-print-pf.bbclass')
-        bbclass_dst = os.path.join(self.local_layer, 'classes')
-
-        logger.info('Copying wrlinux-print-pf.bbclass to %s' % bbclass_dst)
-        logger.info('You can remove them manually if not needed any more')
-        shutil.copy(bbclass_src, bbclass_dst)
-
-        preconf = os.path.join(self.data_dir, 'wrlinux-print-pf.conf')
-
-        def write_set_to_file(set_data, outfile):
-            set_data_list = list(pf_set)
-            set_data_list.sort()
-
-            logger.info('Saving recipes to %s' % outfile)
-            with open(outfile, 'w') as f:
-                for pf in set_data_list:
-                    f.write('%s\n' % pf)
-
-        for machine in machines:
-            logger.info('Generating recipes list for %s' % machine)
-            # Clean bb_cache.dat to make it reparse and print pf for recipes which have source
-            cache_dir = os.path.join('tmp-%s-glibc' % machine, 'cache/default-glibc')
-            if os.path.exists(cache_dir):
-                shutil.rmtree(cache_dir)
-
-            logfile = os.path.join('tmp-%s-glibc/log' % machine, 'cooker', machine, 'console-latest.log')
-
-            # The docker won't be built in a world build since it is started with "virtual/".
-            self.do_build('-r %s -g world docker %s' % (preconf, ' '.join(self.images)))
-
-            with open(logfile, 'r') as f:
-                nonnul_src |= set(f.readlines())
-
-            world_list = 'task-depends-world-%s.dot' % machine
-            os.rename('task-depends.dot', world_list)
-
-            # And sdk
-            sdk_list = 'task-depends-sdk-%s.dot' % machine
-            self.do_build('%s -g -cpopulate_sdk' % self.image)
-            os.rename('task-depends.dot', sdk_list)
-
-            for dot in (world_list, sdk_list):
-                with open(dot, 'r') as f:
-                    for line in f.readlines():
-                        if '[label=' in line:
-                            new_lines.add(line)
-
-        pf_set = set()
-        for line in new_lines:
-            pn = line.split('.do_')[0].strip('"')
-            if pn.endswith('-native'):
-                continue
-            pv = line.split('\\n')[1]
-            # Handle pe
-            if pv.startswith(':'):
-                pv = pv[1:]
-            else:
-                pe = pv.split(':')[0] + '_'
-                pv = pe + pv.split(':')[1]
-            pf = '%s-%s' % (pn, pv)
-            pf_set.add(pf)
-
-        write_set_to_file(pf_set, 'recipes-list')
-
-        print_pf_key = ' PRINT_PF: '
-        print_pf_new = set()
-        for line in nonnul_src:
-            if print_pf_key in line:
-                print_pf_new.add(line.split(print_pf_key)[1].strip())
-
-        pf_set &= print_pf_new
-        set_data_list = list(pf_set)
-        set_data_list.sort()
-
-        write_set_to_file(pf_set, 'recipes-list-src')
-
     def is_ci_branch(self):
         try:
             g = git.cmd.Git(self.data_dir)
@@ -1019,8 +922,6 @@ def main():
         # Generate sources only
         elif gen.args.ip_review:
             gen.ip_review()
-        elif gen.args.gen_recipes:
-            gen.gen_recipes()
         # Generate binary images by default
         else:
             gen.gen_images()
