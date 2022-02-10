@@ -352,6 +352,7 @@ class GenImage(object):
         logger.info('Preparing build for %s' % self.machine)
         self.repos_dir = os.path.join(self.handoff_dir, self.machine, 'repos')
 
+        self.machines_ws = ["intel-x86-64", "bcm-2xxx-rpi4", "nxp-imx8"]
         self.handoff_name_ws = "%s-%s" % (self.handoff_name, self.machine)
         self.handoff_dir_ws = os.path.join(self.handoff_dir, self.handoff_name_ws)
 
@@ -378,9 +379,6 @@ class GenImage(object):
 
         if not os.path.exists(self.handoff_dir):
             os.makedirs(self.handoff_dir)
-
-        if not os.path.exists(self.handoff_dir_ws):
-            os.makedirs(self.handoff_dir_ws)
 
         self.feed_archs = []
         all_archs = []
@@ -698,7 +696,10 @@ class GenImage(object):
                     logger.info('Running %s' % cmd)
                     subprocess.check_output(cmd, shell=True, cwd=file_prefix)
 
-                    shutil.copy(tarname_path, self.handoff_dir_ws)
+                    if self.machine in self.machines_ws:
+                        if not os.path.exists(self.handoff_dir_ws):
+                            os.makedirs(self.handoff_dir_ws)
+                        shutil.copy(tarname_path, self.handoff_dir_ws)
 
         logger.info('Deploy files: %s and WRLinux-lts-21-Images-%s' % (os.path.join(self.handoff_dir, self.machine), self.machine))
 
