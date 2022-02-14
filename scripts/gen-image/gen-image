@@ -156,6 +156,9 @@ class GenImage(object):
         parser.add_argument('-c', '--config',
             default=None,
             help="Read configuration from file, such as DISTRO, MACHINE and layers' branches", action="store")
+        parser.add_argument('--recipes',
+            default=None,
+            help='Specify the recipes to build rather than default recipes, use comma as separator for multiple ones', action="store")
         parser.add_argument('--rpm-url',
             default=None,
             help='Specify the url to download (rsync) rpm packages, these packages will be used by packagefeed-stability.bbclass, the RPM_URL is the prepfix of the url, e.g, rsync://RPM_URL/<machine>/repos/rpm/', action="store")
@@ -221,6 +224,11 @@ class GenImage(object):
         self.pr_db = os.path.join(self.cache_dir, 'prserv.sqlite3')
         self.pr_log = os.path.join(self.builddir, 'cache/prserv.log')
         self.pr_dir = os.path.join(self.handoff_dir, 'prserv')
+
+
+        self.recipes = ''
+        if self.args.recipes.strip():
+            self.recipes = ' '.join(self.args.recipes.split(','))
 
         self.deploy_dir_rpm = ""
 
@@ -623,7 +631,11 @@ class GenImage(object):
     def gen_feeds(self):
         logger.info('Generating packages feeds...')
         # The docker won't be built in a world build since it is started by virtual.
-        self.do_build('world docker %s' % ' '.join(self.images))
+        if self.recipes:
+            targets = self.recipes
+        else:
+            targets += 'world docker %s' % ' '.join(self.images)
+        self.do_build(targets)
 
         # Remove unneeded archs
         rpm_dir = os.path.join(self.tmpdir, 'deploy/rpm')
@@ -659,6 +671,9 @@ class GenImage(object):
         os.makedirs(self.pr_dir)
         shutil.copy(self.pr_db, self.pr_dir)
         shutil.copy(self.pr_log, self.pr_dir)
+
+        if self.recipes:
+            return
 
         # Generate sha256 for the following files
         # - container/*.tar.bz2
@@ -900,9 +915,10 @@ class GenImage(object):
         run_cmd(cmd)
 
     def gen_images(self):
-        self.gen_ostree()
-        self.gen_container()
-        self.gen_sdk()
+        if not self.recipes:
+            self.gen_ostree()
+            self.gen_container()
+            self.gen_sdk()
         self.gen_feeds()
         self.post()
 
