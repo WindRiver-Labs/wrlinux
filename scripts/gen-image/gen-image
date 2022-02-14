@@ -323,9 +323,6 @@ class GenImage(object):
 
     def prepare(self):
 
-        if self.args.config:
-            self.read_config()
-
         line = 'require %s\n' % self.bin_image_conf
         check_and_write(self.local_conf, line)
 
@@ -914,6 +911,8 @@ def main():
 
     if gen.args.upload_url:
         gen.do_upload()
+    elif gen.args.config:
+        gen.read_config()
     else:
         gen.prepare()
         # Generate both images and sources
