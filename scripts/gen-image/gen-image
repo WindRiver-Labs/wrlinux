@@ -157,7 +157,7 @@ class GenImage(object):
             default=None,
             help="Read configuration from file, such as DISTRO, MACHINE and layers' branches", action="store")
         parser.add_argument('--recipes',
-            default=None,
+            default='',
             help='Specify the recipes to build rather than default recipes, use comma as separator for multiple ones', action="store")
         parser.add_argument('--rpm-url',
             default=None,
