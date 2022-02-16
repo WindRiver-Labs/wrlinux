@@ -11,6 +11,11 @@ https://gitlab.freedesktop.org/plymouth/plymouth
 To use the template, add "--templates feature/plymouth" as a
 setup option.
 
+Append "i915.modeset=0" to kernel command line to workaround the black
+screen issue [1] and [2].
+[1] https://gitlab.freedesktop.org/plymouth/plymouth/-/issues/160
+[2] https://gitlab.freedesktop.org/plymouth/plymouth/-/issues/102
+
 #@TYPE: Wrtemplate
 #@NAME: plymouth
 #@DESCRIPTION: Add plymouth splash screen to image
