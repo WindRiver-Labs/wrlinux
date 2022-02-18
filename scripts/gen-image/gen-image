@@ -634,7 +634,7 @@ class GenImage(object):
         if self.recipes:
             targets = self.recipes
         else:
-            targets += 'world docker %s' % ' '.join(self.images)
+            targets = 'world docker %s' % ' '.join(self.images)
         self.do_build(targets)
 
         # Remove unneeded archs
