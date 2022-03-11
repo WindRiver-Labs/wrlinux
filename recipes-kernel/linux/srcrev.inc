@@ -35,7 +35,7 @@ SRCREV_machine_kb-v5.2-standard-edgerouter ?= "f3d5c4a21ed5040f6a2b15fd5c5ccad7d
 LINUX_VERSION_kb-v5.2-standard-edgerouter ?= "5.2.60"
 SRCREV_machine_kb-v5.2-standard-fsl-mpc8315e-rdb ?= "4ac04baa0a3fe98ecc7066335aa7ad58ed06f4cb"
 LINUX_VERSION_kb-v5.2-standard-fsl-mpc8315e-rdb ?= "5.2.60"
-SRCREV_machine_kb-v5.2-standard-intel-sdk-5.4-intel-socfpga ?= "68e33561b94a18485fef4e39e8db43fa8dc88637"
+SRCREV_machine_kb-v5.2-standard-intel-sdk-5.4-intel-socfpga ?= "854d7ebba4fb2e1ed0bf724ee6926824ca3054a6"
 LINUX_VERSION_kb-v5.2-standard-intel-sdk-5.4-intel-socfpga ?= "5.2.60"
 SRCREV_machine_kb-v5.2-standard-intel-socfpga ?= "2548f521aec250961ae3e6d7fa662ae79d45030b"
 LINUX_VERSION_kb-v5.2-standard-intel-socfpga ?= "5.2.60"
@@ -108,5 +108,5 @@ LINUX_VERSION_kb-v5.2-standard-xlnx-soc ?= "5.2.60"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_5.2 = "yocto-5.2-wr"
-SRCREV_meta_5.2 = "479d571a92ef7b1aa7a9476ea71e70def2972295"
+SRCREV_meta_5.2 = "6377f82090bbb5d8d20f02229e9788061d64cf55"
 LINUX_VERSION_5.2 = "5.2.60"
