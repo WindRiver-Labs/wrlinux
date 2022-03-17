@@ -589,22 +589,12 @@ class GenImage(object):
         deploy_files = set()
         is_x86 = 'intel' in self.machine or 'x86-64' in self.machine
 
-        # Remove ostreerepo_dir to avoid mixing minimal and full, otherwise the
-        # minimal's size would be large in the second run.
-        ostreerepo_dir = os.path.join(self.tmpdir, 'deploy/images/%s/ostree_repo' % self.machine)
-        if os.path.exists(ostreerepo_dir):
-            ostreerepo_dir_saved = '%s.%s.%s' % (ostreerepo_dir, self.machine, self.today)
-            shutil.move(ostreerepo_dir, ostreerepo_dir_saved)
-        else:
-            logger.debug("%s doesn't exist" % ostreerepo_dir)
-
-        self.do_build('%s -cclean' % ' '.join(self.images))
         for image in self.images:
             self.do_build(target=image)
 
             # Regenerate wic image to support disk resize
-            if os.path.exists(ostreerepo_dir):
-                cmd = "%s/layers/wr-ostree/scripts/bootfs.sh -L -b %s -s 0 -a 'instdate=BUILD_DATE instw=60'" % (self.project, image)
+            if os.path.exists(self.ostree_repo):
+                cmd = "%s/layers/wr-ostree/scripts/bootfs.sh -l 0 -b %s -s 0 -a 'instdate=BUILD_DATE instw=60'" % (self.project, image)
                 run_cmd(cmd)
 
             new_image = ""
@@ -640,8 +630,8 @@ class GenImage(object):
 
         logger.info('Deploying %s/repos/ostree_repo...' % self.machine)
         dst_dir = os.path.join(self.repos_dir, 'ostree_repo')
-        if os.path.exists(ostreerepo_dir):
-            shutil.copytree(ostreerepo_dir, dst_dir)
+        if os.path.exists(self.ostree_repo):
+            shutil.copytree(self.ostree_repo, dst_dir)
 
     def gen_container(self):
         logger.info('Generating container image...')
