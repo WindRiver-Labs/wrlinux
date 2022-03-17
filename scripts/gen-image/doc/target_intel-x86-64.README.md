@@ -93,7 +93,7 @@ For qemu x86_64 with KVM:
         -drive if=none,id=hd,file=boot-image-qemu.hddimg,format=raw \
         -device virtio-scsi-pci,id=scsi -device scsi-hd,drive=hd \
         -cpu kvm64 -enable-kvm \
-        -drive if=pflash,format=qcow2,file=ovmf.qcow2
+        -drive if=pflash,format=qcow2,file=ovmf.qcow2 -nographic
 
 For qemu x86_64 without KVM:
 
@@ -101,7 +101,9 @@ For qemu x86_64 without KVM:
         -drive if=none,id=hd,file=boot-image-qemu.hddimg,format=raw \
         -device virtio-scsi-pci,id=scsi -device scsi-hd,drive=hd \
         -cpu Nehalem \
-        -drive if=pflash,format=qcow2,file=ovmf.qcow2
+        -drive if=pflash,format=qcow2,file=ovmf.qcow2 -nographic
+
+Note, remove '-nographic' to enable graphical output
 
 #### Qemu Simulator (require 2.11 or higher)
 qemu-system-x86_64
@@ -134,10 +136,6 @@ If above refer does not work (such as you do not have root right to enable kvm)
 #### Qemu Bootloader
 Enable UEFI support for Virtual Machines
 `-drive if=pflash,format=qcow2,file=ovmf.qcow2`
-
-#### Qemu No Graphic
-Disable graphical output and redirect serial I/Os to console
-`-nographic`
 
 ## Install a package
 Because dnf can't upgrade kernel on the ostree image, so run the following

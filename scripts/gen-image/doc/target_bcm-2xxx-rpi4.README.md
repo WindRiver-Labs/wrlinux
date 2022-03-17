@@ -130,10 +130,6 @@ Use QEMU 2.11 ARM Virtual Machine with CPU cortex-a57
 Add pre-built qemu bootloader qemu-u-boot-bcm-2xxx-rpi4.bin
 `-bios qemu-u-boot-bcm-2xxx-rpi4.bin`
 
-#### Qemu No Graphic
-Disable graphical output and redirect serial I/Os to console
-`-nographic`
-
 #### Qemu Graphic (XFCE desktop)
 Enable graphical and redirect serial I/Os to console
 `-device virtio-gpu-pci -serial stdio`
