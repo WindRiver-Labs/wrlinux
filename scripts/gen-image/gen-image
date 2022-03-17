@@ -162,9 +162,9 @@ class GenImage(object):
         parser.add_argument('--recipes',
             default='',
             help='Specify the recipes to build rather than default recipes, use comma as separator for multiple ones', action="store")
-        parser.add_argument('--rpm-url',
+        parser.add_argument('--repo-url', '--rpm-url',
             default=None,
-            help='Specify the url to download (rsync) rpm packages, these packages will be used by packagefeed-stability.bbclass, the RPM_URL is the prepfix of the url, e.g, rsync://RPM_URL/<machine>/repos/rpm/', action="store")
+            help='Specify the url to download (rsync) rpm packages and ostree repo, the rpm packages will be used by packagefeed-stability.bbclass, the REPO_URL is the prepfix of the url, e.g, rsync://REPO_URL/<machine>/repos/rpm/', action="store")
         parser.add_argument('-p', '--product', choices=['lincd', 'lts-21'], required=False,
             default='lts-21',
             help='Specify the product', action="store")
@@ -235,6 +235,7 @@ class GenImage(object):
             self.recipes = ' '.join(self.args.recipes.split(','))
 
         self.deploy_dir_rpm = ""
+        self.ostree_repo = ""
 
     def read_config(self):
         logger.info('Reading configuration from %s' % self.args.config)
@@ -409,6 +410,8 @@ class GenImage(object):
                 self.templates = line.split('=')[1].replace('"', '')
             if line.startswith('DEPLOY_DIR_RPM='):
                 self.deploy_dir_rpm = line.split('=')[1].replace('"', '')
+            if line.startswith('OSTREE_REPO='):
+                self.ostree_repo = line.split('=')[1].replace('"', '')
 
         if 'feature/lat' in self.templates:
             self.support_lat = True
@@ -434,8 +437,8 @@ class GenImage(object):
             line = 'PACKAGE_FEED_URIS = "%s"\n' % uri
             check_and_write(self.local_conf, line)
 
-        if self.args.rpm_url:
-            self.download_rpm()
+        if self.args.repo_url:
+            self.download_repos()
 
     def mv_to_old(self, src_name):
         src = os.path.join(self.handoff_dir, src_name)
@@ -945,11 +948,17 @@ class GenImage(object):
 
         return False
 
-    def download_rpm(self):
+    def download_repos(self):
         logger.info('Downloading rpm packages ...')
         if not os.path.exists(self.deploy_dir_rpm):
             os.makedirs(self.deploy_dir_rpm)
-        cmd = 'rsync -a --delete %s/%s/repos/rpm/ %s' % (self.args.rpm_url, self.machine, self.deploy_dir_rpm)
+        cmd = 'rsync -a --delete %s/%s/repos/rpm/ %s' % (self.args.repo_url, self.machine, self.deploy_dir_rpm)
+        run_cmd(cmd)
+
+        logger.info('Downloading ostree repo...')
+        if not os.path.exists(self.ostree_repo):
+            os.makedirs(self.ostree_repo)
+        cmd = 'rsync -a --delete %s/%s/repos/ostree_repo/ %s' % (self.args.repo_url, self.machine, self.ostree_repo)
         run_cmd(cmd)
 
     def gen_images(self):
