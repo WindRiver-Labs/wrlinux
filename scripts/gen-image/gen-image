@@ -33,11 +33,14 @@ def get_project():
     runqemu_dir = os.path.realpath(shutil.which("runqemu"))
     return os.path.realpath("%s/../../../../" % runqemu_dir)
 
-def run_cmd(cmd, logger=logger):
+def run_cmd(cmd, logger=logger, cwd=''):
     logger.info('Running %s' % cmd)
 
     try:
-        output = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+        if cwd:
+            output = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT, cwd=cwd)
+        else:
+            output = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
         output = output.decode('utf-8')
         logger.debug('output: %s' % output)
     except subprocess.CalledProcessError as e:
@@ -225,6 +228,7 @@ class GenImage(object):
         self.pr_log = os.path.join(self.builddir, 'cache/prserv.log')
         self.pr_dir = os.path.join(self.handoff_dir, 'prserv')
 
+        self.logs_dir = os.path.join(self.handoff_dir, 'logs')
 
         self.recipes = ''
         if self.args.recipes.strip():
@@ -419,6 +423,8 @@ class GenImage(object):
         if not self.tmpdir:
             raise Exception("Failed to figure tmpdir!")
 
+        self.tmpdir_bn = os.path.basename(self.tmpdir)
+
         if not feed_uris_defined:
             port = '9310'
             hostname = socket.gethostname()
@@ -539,7 +545,7 @@ class GenImage(object):
 
         logger.info('Generating %s' % config_outfile)
         newlines = []
-        logfile = 'tmp-%s-glibc/log/cooker/%s/console-latest.log' % (self.machine, self.machine)
+        logfile = '%s/log/cooker/%s/console-latest.log' % (self.tmpdir_bn, self.machine)
         with open(logfile, 'r') as f:
             for line in f.readlines():
                 if line.startswith('Build Configuration:'):
@@ -670,7 +676,17 @@ class GenImage(object):
         self.mv_to_old('prserv')
         os.makedirs(self.pr_dir)
         shutil.copy(self.pr_db, self.pr_dir)
-        shutil.copy(self.pr_log, self.pr_dir)
+
+        # Save logs for each machine
+        if not os.path.exists(self.logs_dir):
+            os.makedirs(self.logs_dir)
+        tarname = os.path.basename(self.tmpdir) + '.tar.gz'
+        self.mv_to_old('logs/%s' % tarname)
+        cmd = "find %s/work/*/*/*/temp -name 'log.*' -exec cp -al --parent {} %s \;" % (self.tmpdir_bn, self.logs_dir)
+        run_cmd(cmd, cwd=self.builddir)
+        cmd = "tar --numeric-owner -czf %s %s" % (tarname, self.tmpdir_bn)
+        run_cmd(cmd, cwd=self.logs_dir)
+        shutil.rmtree(os.path.join(self.logs_dir, self.tmpdir_bn))
 
         if self.recipes:
             return
@@ -848,7 +864,7 @@ class GenImage(object):
         local_sources = os.path.join(local_handoff_dir, 'sources')
         os.makedirs(local_sources)
         for m in os.listdir(self.handoff_dir):
-            if m == 'prserv':
+            if m == 'prserv' or m == 'logs':
                 continue
             file_prefix = os.path.join(self.handoff_dir, m)
             if os.path.exists(file_prefix):
@@ -883,6 +899,10 @@ class GenImage(object):
 
         if os.path.exists(self.pr_dir):
             shutil.copytree(self.pr_dir, os.path.join(local_handoff_dir, 'prserv'))
+
+        dst_dir_logs = os.path.join(self.local_upload_dir_date, 'logs')
+        if os.path.exists(self.logs_dir):
+            shutil.copytree(self.logs_dir, dst_dir_logs)
 
         # Create a symlink to latest dir
         os.symlink(date, os.path.join(self.local_upload_dir, 'latest'))
