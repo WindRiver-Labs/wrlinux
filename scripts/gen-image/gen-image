@@ -556,10 +556,28 @@ class GenImage(object):
                 if newlines:
                     newlines.append(line)
         if newlines:
+            newlines.append('\n')
+            # Add more build info
+            if os.path.exists('/etc/issue'):
+                build_host = ""
+                with open('/etc/issue') as f:
+                    for line in f.readlines():
+                        if line.strip():
+                            build_host += "BUILD_HOST\t\t= \"%s\"" % line.strip()
+                if build_host:
+                    newlines.append(build_host + '\n')
+
+            cmd = 'uname -a'
+            uname_a = run_cmd(cmd).strip()
+            newlines.append("BUILD_HOST_UNAME_A\t = \"%s\"\n" % uname_a)
+
+            newlines.append("BUILDDIR\t\t= \"%s\"\n" % self.builddir)
+
             with open(config_outfile, 'w') as f:
                 f.write(''.join(newlines))
         else:
             logger.warning('Failed to find config info from %s' % logfile)
+
         return (config_outfile)
 
     def gen_ostree(self):
