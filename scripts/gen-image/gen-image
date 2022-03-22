@@ -179,9 +179,9 @@ class GenImage(object):
 
         logger.setLevel(self.args.loglevel)
 
-        bitbake_path = shutil.which('bitbake')
+        self.bitbake_path = shutil.which('bitbake')
         self.builddir = os.getenv('BUILDDIR')
-        if not (bitbake_path and self.builddir):
+        if not (self.bitbake_path and self.builddir):
             raise Exception('bitbake command is not found, this tools should be run after source oe-init-build-env')
 
         self.today = get_today()
@@ -237,6 +237,8 @@ class GenImage(object):
         self.deploy_dir_rpm = ""
         self.ostree_repo = ""
 
+        self.extra_patches_dir = os.path.join(self.handoff_dir, 'extra-patches')
+
     def read_config(self):
         logger.info('Reading configuration from %s' % self.args.config)
         distro = ""
@@ -253,9 +255,9 @@ class GenImage(object):
                 elif line_split[0] == 'MACHINE':
                     self.machine = line_split[2].strip('"')
                 elif line_split[0] == 'WRLINUX_VERSION':
-                    wrlinux_version = line_split[2].strip('"')
+                    self.wrlinux_version = line_split[2].strip('"')
                 elif line_split[0] == 'WRLINUX_BRANCH':
-                    wrlinux_branch = line_split[2].strip('"')
+                    self.wrlinux_branch = line_split[2].strip('"')
                 elif ":" in line_split[2]:
                     layername = line_split[0]
                     if layername == 'local':
@@ -269,8 +271,8 @@ class GenImage(object):
                     f.write('DISTRO = %s\n' % distro)
 
         # Figure out RCPL versions
-        version = '_'.join(wrlinux_version.split('.')[:2])
-        rcpl = int(wrlinux_version.split('.')[-1])
+        version = '_'.join(self.wrlinux_version.split('.')[:2])
+        rcpl = int(self.wrlinux_version.split('.')[-1])
         if rcpl < 10:
             rcpl = "000%s" % rcpl
         elif rcpl < 100:
@@ -278,9 +280,9 @@ class GenImage(object):
         elif rcpl < 1000:
             rcpl = "0%s" % rcpl
 
-        if wrlinux_branch == "LTS":
+        if self.wrlinux_branch == "LTS":
             version = "WRLINUX_%s_LTS_RCPL%s" % (version, rcpl)
-        elif wrlinux_branch == "Base":
+        elif self.wrlinux_branch == "Base":
             version = "WRLINUX_%s_BASE_UPDATE%s" % (version, rcpl)
         else:
             logger.warning('Failed to figure out rcpl version')
@@ -412,6 +414,12 @@ class GenImage(object):
                 self.deploy_dir_rpm = line.split('=')[1].replace('"', '')
             if line.startswith('OSTREE_REPO='):
                 self.ostree_repo = line.split('=')[1].replace('"', '')
+            if line.startswith('BBLAYERS='):
+                self.bblayers = line.split('=')[1].replace('"', '')
+            if line.startswith('WRLINUX_VERSION='):
+                self.wrlinux_version = line.split('=')[1].replace('"', '')
+            if line.startswith('WRLINUX_BRANCH='):
+                self.wrlinux_branch = line.split('=')[1].replace('"', '')
 
         if 'feature/lat' in self.templates:
             self.support_lat = True
@@ -674,6 +682,46 @@ class GenImage(object):
         dst_dir = os.path.join(self.repos_dir, 'rpm')
         shutil.copytree(rpm_dir, dst_dir)
 
+    def collect_extra_patches(self):
+        """
+        Collecting local patches in each layer except layers/local
+        """
+        logger.info('Collecting local patches...')
+        checked = set()
+        for layer in self.bblayers.split() + [os.path.dirname(self.bitbake_path)]:
+            layer = layer.strip()
+            if not layer or layer.endswith('/local'):
+                continue
+            g = git.cmd.Git(layer)
+            try:
+                toplevel = g.rev_parse('--show-toplevel')
+                if toplevel in checked:
+                    continue
+                checked.add(toplevel)
+
+                extra_patches_layer = os.path.join(self.extra_patches_dir, '%s-%s'% (self.wrlinux_version, self.wrlinux_branch), os.path.basename(toplevel))
+                # Clean previous patches
+                if os.path.exists(extra_patches_layer):
+                    shutil.rmtree(extra_patches_layer)
+
+                # Check uncommited changes
+                diff = g.diff()
+                if diff:
+                    os.makedirs(extra_patches_layer)
+
+                    # Check uncommited changes
+                    diff_patch = os.path.join(extra_patches_layer, '9999-uncommited.patch')
+                    with open(diff_patch, 'w') as f:
+                        f.write(diff)
+
+                # Check commited changes
+                diff = g.diff('m/master..HEAD')
+                if diff:
+                    g.format_patch('m/master..HEAD', '-o', extra_patches_layer)
+
+            except Exception as esc:
+                logger.warning('%s: %' % (layer, esc))
+
     def post(self):
         with open(self.local_conf, 'a') as f:
             f.write('#### Done by gen-image\n')
@@ -698,6 +746,8 @@ class GenImage(object):
         cmd = "tar --numeric-owner -czf %s %s" % (tarname, self.tmpdir_bn)
         run_cmd(cmd, cwd=self.logs_dir)
         shutil.rmtree(os.path.join(self.logs_dir, self.tmpdir_bn))
+
+        self.collect_extra_patches()
 
         if self.recipes:
             return
@@ -875,7 +925,7 @@ class GenImage(object):
         local_sources = os.path.join(local_handoff_dir, 'sources')
         os.makedirs(local_sources)
         for m in os.listdir(self.handoff_dir):
-            if m == 'prserv' or m == 'logs':
+            if m in ('prserv', 'logs', "extra-patches"):
                 continue
             file_prefix = os.path.join(self.handoff_dir, m)
             if os.path.exists(file_prefix):
@@ -914,6 +964,16 @@ class GenImage(object):
         dst_dir_logs = os.path.join(self.local_upload_dir_date, 'logs')
         if os.path.exists(self.logs_dir):
             shutil.copytree(self.logs_dir, dst_dir_logs)
+
+        # Create a tarball for all the extra patches
+        if os.path.exists(self.extra_patches_dir):
+            dst_dir_extra_patches = os.path.join(local_handoff_dir, 'extra-patches')
+            for d in os.listdir(self.extra_patches_dir):
+                if not os.path.exists(dst_dir_extra_patches):
+                    os.makedirs(dst_dir_extra_patches)
+                tarname_path = '%s/extra-patches-%s.tar.gz' % (dst_dir_extra_patches, d)
+                cmd = 'tar --numeric-owner -czf %s %s' % (tarname_path, d)
+                run_cmd(cmd, cwd=self.extra_patches_dir)
 
         # Create a symlink to latest dir
         os.symlink(date, os.path.join(self.local_upload_dir, 'latest'))
