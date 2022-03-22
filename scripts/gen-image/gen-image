@@ -117,6 +117,20 @@ def check_and_write(outfile, line):
             logger.info('Writting "%s" to %s' % (line.strip(), outfile))
             f.write(line)
 
+def apply_extra_patches_internal(repo, patches_dir):
+    logger.info('Applying extra patches to %s' % repo)
+    g = git.cmd.Git(repo)
+    for patch in os.listdir(patches_dir):
+        logger.info('Applying %s' % patch)
+        patch_path = os.path.join(patches_dir, patch)
+        try:
+            if patch == "9999-uncommited.patch":
+                g.apply(patch_path)
+            else:
+                g.am(patch_path)
+        except Exception as esc:
+            logger.error('Failed to apply %s in %s: %s' % (patch_path, repo, esc))
+
 class GenImage(object):
     """
     * Generate the following images in order:
@@ -165,6 +179,9 @@ class GenImage(object):
         parser.add_argument('--repo-url', '--rpm-url',
             default=None,
             help='Specify the url to download (rsync) rpm packages and ostree repo, the rpm packages will be used by packagefeed-stability.bbclass, the REPO_URL is the prepfix of the url, e.g, rsync://REPO_URL/<machine>/repos/rpm/', action="store")
+        parser.add_argument('-e', '--extra-patches',
+            default=None,
+            help='Apply extra-patches.tar.gz, the extra-patches.tar.gz is created by previous build', action="store")
         parser.add_argument('-p', '--product', choices=['lincd', 'lts-21'], required=False,
             default='lts-21',
             help='Specify the product', action="store")
@@ -336,8 +353,24 @@ class GenImage(object):
         g = git.cmd.Git(self.my_dir)
         g.checkout('m/master', self.my_dir)
 
-    def prepare(self):
+    def apply_extra_patches(self):
+        """
+        Apply extra patches to the product
+        """
+        logger.info('Unpacking %s...' % self.args.extra_patches)
+        dst = "extra-patches"
+        if os.path.exists(dst):
+            shutil.rmtree(dst)
+        os.makedirs(dst)
+        cmd = 'tar --strip-components 1 -xzf %s -C %s' % (self.args.extra_patches, dst)
+        run_cmd(cmd)
 
+        for d in os.listdir(dst):
+            for layer in self.bblayers.split() + ['/'.join(self.bitbake_path.split('/')[0:-2])]:
+                if layer.endswith('/%s' % d):
+                    apply_extra_patches_internal(layer, os.path.join(os.path.abspath('extra-patches'), d))
+
+    def prepare(self):
         line = 'require %s\n' % self.bin_image_conf
         check_and_write(self.local_conf, line)
 
@@ -688,7 +721,7 @@ class GenImage(object):
         """
         logger.info('Collecting local patches...')
         checked = set()
-        for layer in self.bblayers.split() + [os.path.dirname(self.bitbake_path)]:
+        for layer in self.bblayers.split() + ['/'.join(self.bitbake_path.split('/')[0:-2])]:
             layer = layer.strip()
             if not layer or layer.endswith('/local'):
                 continue
@@ -712,7 +745,7 @@ class GenImage(object):
                     # Check uncommited changes
                     diff_patch = os.path.join(extra_patches_layer, '9999-uncommited.patch')
                     with open(diff_patch, 'w') as f:
-                        f.write(diff)
+                        f.write(diff + '\n')
 
                 # Check commited changes
                 diff = g.diff('m/master..HEAD')
@@ -1022,7 +1055,10 @@ class GenImage(object):
 def main():
     gen = GenImage()
 
-    if gen.args.upload_url:
+    if gen.args.extra_patches:
+        gen.prepare()
+        gen.apply_extra_patches()
+    elif gen.args.upload_url:
         gen.do_upload()
     elif gen.args.config:
         gen.read_config()
