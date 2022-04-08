@@ -64,10 +64,10 @@ Now burn the image onto the micro SD card:
 The <boardtype> is evb or rdb2 which depends on your hardware.
 
     For full image
-    $ zcat wrlinux-image-full-nxp-s32g2xx.ustart-<boardtype>.img.gz | sudo dd of=/dev/sdX bs=1M status=progress
+    $ zcat wrlinux-image-full-nxp-s32g.ustart-<boardtype>.img.gz | sudo dd of=/dev/sdX bs=1M status=progress
 
     Or minimal image
-    $ zcat wrlinux-image-minimal-nxp-s32g2xx.ustart-<boardtype>.img.gz | sudo dd of=/dev/sdX bs=1M status=progress
+    $ zcat wrlinux-image-minimal-nxp-s32g.ustart-<boardtype>.img.gz | sudo dd of=/dev/sdX bs=1M status=progress
 
     $ sync
     $ eject /dev/sdX

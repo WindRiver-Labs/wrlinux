@@ -74,8 +74,8 @@ IMAGE_FEATURES_remove = "${@['', 'x11-base'][bb.utils.to_boolean(d.getVar('IMAGE
 IMAGE_FEATURES_remove_intel-socfpga-64 = "x11-base"
 IMAGE_INSTALL_remove_intel-socfpga-64 = "packagegroup-xfce-extended wr-themes"
 
-IMAGE_FEATURES_remove_nxp-s32g2xx = "x11-base"
-IMAGE_INSTALL_remove_nxp-s32g2xx = "packagegroup-xfce-extended wr-themes"
+IMAGE_FEATURES_remove_nxp-s32g = "x11-base"
+IMAGE_INSTALL_remove_nxp-s32g = "packagegroup-xfce-extended wr-themes"
 
 IMAGE_FEATURES_remove_xilinx-zynq = "x11-base"
 IMAGE_INSTALL_remove_xilinx-zynq = "packagegroup-xfce-extended wr-themes"

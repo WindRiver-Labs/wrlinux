@@ -37,8 +37,8 @@ IMAGE_INSTALL_remove = "\
 # For ostree
 IMAGE_INSTALL_append = " ${@bb.utils.contains('OSTREE_BOOTLOADER', 'u-boot', 'u-boot-uenv', '', d)}"
 
-# For nxp-s32g2xx
-IMAGE_INSTALL_append_nxp-s32g2xx = " u-boot-s32"
+# For nxp-s32g
+IMAGE_INSTALL_append_nxp-s32g = " u-boot-s32"
 
 NO_RECOMMENDATIONS = "1"
 
