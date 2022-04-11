@@ -643,7 +643,7 @@ class GenImage(object):
             basename = '%s-%s' % (image, self.machine)
             ustart_images = ['ustart.img.bmap']
             if self.machine == 'nxp-s32g':
-                ustart_images += ['evb.ustart.img.gz', 'rdb2.ustart.img.gz']
+                ustart_images += ['evb.ustart.img.gz', 'rdb2.ustart.img.gz', 'rdb3.ustart.img.gz']
             else:
                 ustart_images.append('ustart.img.gz')
 

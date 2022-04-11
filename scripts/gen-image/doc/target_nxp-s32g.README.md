@@ -61,7 +61,7 @@ and un-mount those that are mounted, for example:
 
 Now burn the image onto the micro SD card:
 
-The <boardtype> is evb or rdb2 which depends on your hardware.
+The <boardtype> is evb, rdb2, rdb3 which depends on your hardware.
 
     For full image
     $ zcat wrlinux-image-full-nxp-s32g.ustart-<boardtype>.img.gz | sudo dd of=/dev/sdX bs=1M status=progress
