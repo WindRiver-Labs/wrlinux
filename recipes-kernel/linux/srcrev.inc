@@ -39,7 +39,7 @@ SRCREV_machine_kb-v5.10-standard-mti-malta64 ?= "36a2d17167ee66a2feda5fb1efee0a2
 LINUX_VERSION_kb-v5.10-standard-mti-malta64 = "5.10.110"
 SRCREV_machine_kb-v5.10-standard-nxp-ls20xx ?= "97403320f13a6e9d40f1fed044f713ed3241223e"
 LINUX_VERSION_kb-v5.10-standard-nxp-ls20xx = "5.10.110"
-SRCREV_machine_kb-v5.10-standard-nxp-sdk-5.10-nxp-s32g2xx ?= "315df6b52a3bb839e05c4133f6615276897aece7"
+SRCREV_machine_kb-v5.10-standard-nxp-sdk-5.10-nxp-s32g2xx ?= "929d7bfc9ace081bd39ea609406355505d06e8ec"
 LINUX_VERSION_kb-v5.10-standard-nxp-sdk-5.10-nxp-s32g2xx = "5.10.110"
 SRCREV_machine_kb-v5.10-standard-nxp-sdk-5.10-nxp-soc ?= "527b66f9aa5cec9121ad85fdf2d6ff33d59cfb87"
 LINUX_VERSION_kb-v5.10-standard-nxp-sdk-5.10-nxp-soc = "5.10.110"
@@ -53,7 +53,7 @@ SRCREV_machine_kb-v5.10-standard-preempt-rt-cn-sdkv5.4-octeon ?= "f110b61cfef520
 LINUX_VERSION_kb-v5.10-standard-preempt-rt-cn-sdkv5.4-octeon = "5.10.110"
 SRCREV_machine_kb-v5.10-standard-preempt-rt-intel-sdk-5.10-intel-socfpga ?= "5292e8b8cadd13b75ee53ff2e57549a567dcb331"
 LINUX_VERSION_kb-v5.10-standard-preempt-rt-intel-sdk-5.10-intel-socfpga = "5.10.110"
-SRCREV_machine_kb-v5.10-standard-preempt-rt-nxp-sdk-5.10-nxp-s32g2xx ?= "69d0db370dbca8e7a4040941182e5433c677e423"
+SRCREV_machine_kb-v5.10-standard-preempt-rt-nxp-sdk-5.10-nxp-s32g2xx ?= "19dad271f538622eeb4b0ea3728dbe48edb78c78"
 LINUX_VERSION_kb-v5.10-standard-preempt-rt-nxp-sdk-5.10-nxp-s32g2xx = "5.10.110"
 SRCREV_machine_kb-v5.10-standard-preempt-rt-nxp-sdk-5.10-nxp-soc ?= "331577dd9e8937bd16807d18024ac0f57abd374e"
 LINUX_VERSION_kb-v5.10-standard-preempt-rt-nxp-sdk-5.10-nxp-soc = "5.10.110"
@@ -94,4 +94,4 @@ LINUX_VERSION_kb-v5.10-standard-xilinx-zynqmp = "5.10.110"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_5.10 = "yocto-5.10"
-SRCREV_meta_5.10 = "bddb0e4921f541bafa595986f16cff5390d01f40"
+SRCREV_meta_5.10 = "682d236b4ea50b80102a136bd8a064aeed6c7008"
