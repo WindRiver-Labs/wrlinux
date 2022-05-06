@@ -37,7 +37,7 @@ Table of Contents
     1.1 Purpose of This Document
 ---------------------------------
 
-This document intends to give a high level overview about the desin thought,
+This document intends to give a high level overview about the design thought,
 project structure and usage of Wind River Linux LTP and POSIX test tools, also
 known as wrLtp and wrPosix.
 
@@ -46,7 +46,7 @@ open posix testsuite. LTP and POSIX are released in the same LTP distribution by
 Linux Test Project.
 
 The detailed discussion about LTP and POSIX themselves is out of the scope of this
-document. Please refer to LTP homepage http://ltp.sourceforge.net.
+document. Please refer to LTP homepage https://linux-test-project.github.io
 
     1.2 Feedback and Corrections
 ---------------------------------
