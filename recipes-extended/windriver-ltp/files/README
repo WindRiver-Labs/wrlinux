@@ -94,7 +94,7 @@ To build ltp package , you need to configure wrLinux project with --enable-test.
 ----------------------------------
 
 Script runltp is used to execute LTP test. Script wr-runltp is a wrapper of
-runltp and used by wrLtp to create a automated test execution and analysis
+runltp and used by wrLtp to create an automated test execution and analysis
 environment.
 
 Here list all the available methods wr-runltp offers to run LTP test. For the
@@ -204,7 +204,7 @@ test suites. By default, the wr-runposix execute the following scenario groups:
 -TPS
 
 A test suite includes a group of test cases focusing on one particular linux
-feature. Each test suite is executed accroding to the command line defined by
+feature. Each test suite is executed according to the command line defined by
 the file run.sh under each suite folder. All conformance interface test suites
 are placed under /opt/open_posix_testsuite/conformance/interfaces/. Please refer
 to the wr-runposix for the test suite list of each scenario group.
@@ -292,7 +292,7 @@ includes skipped test case on runtime target. These two files are used to record
 the test case which will not be executed. The file skipfile records the skipped
 test case with skip reason.
 
-File Ltp_console_output.log recored output of target console during LTP test.
+File Ltp_console_output.log recorded output of target console during LTP test.
 
     4.3 wrLtp test knowledge base
 ---------------------------------
@@ -470,7 +470,7 @@ HUNG is another test result in POSIX test log and indicate the timeout of POSIX
 test case.
 
 The test case which is marked as FAIL, HUNG or UNRESOLVED is taken as failed
-test case and recoreded in the failed test report.
+test case and recorded in the failed test report.
 
     5.6 Continue the remaining POSIX test after rebooting
 ---------------------------------------------------------
