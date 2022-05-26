@@ -40,7 +40,10 @@ NOTE: On target, run ostree_upgrade.sh to update the image rather than
 if not present.
 
 ## Supported BSPs
-- MCIMX8QM-MEK : Board: MCIMX8QM-MEK SCH-29420 REV C2, 700-29420 REV C2. CPU: NXP i.MX8QM RevB A53 at 1200 MHz at 27C
+- MCIMX8QM-MEK: Board: MCIMX8QM-MEK SCH-29420 REV C2, 700-29420 REV C2.
+			    CPU: NXP i.MX8QM RevB A53 at 1200 MHz at 27C
+- MCIMX8M-EVK: Board: MCIMX8M-EVK SCH-29615 REV B3, 700-29615 REV X6.
+               CPU: Freescale i.MX8MQ rev2.0 1500 MHz
 
 ## How to install/boot binary image
 
