@@ -592,10 +592,11 @@ class GenImage(object):
         logfile = '%s/log/cooker/%s/console-latest.log' % (self.tmpdir_bn, self.machine)
         with open(logfile, 'r') as f:
             for line in f.readlines():
+                line_strip = line.strip()
                 if line.startswith('Build Configuration:'):
                     newlines.append(line)
                     continue
-                if line.startswith('--------------------'):
+                if newlines and not line_strip:
                     break
                 if newlines:
                     newlines.append(line)
