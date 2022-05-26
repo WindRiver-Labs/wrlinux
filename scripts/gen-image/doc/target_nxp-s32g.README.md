@@ -40,8 +40,15 @@ NOTE: On target, run ostree_upgrade.sh to update the image rather than
 if not present.
 
 ## Supported BSPs
-- NXP S32G274A-EVB: S32GRV-PLATEVB (SCH-30081 REV B, 700-30081 REV B), S32G-PROCEVB-S, CPU: NXP S32G274A rev. 1.0.0/1.0.1/2.1.0
-- NXP S32G274A-RDB2: Board: S32G274A-VNP-RDB2 (SCH-47440 REV C1, 700-47440 REV X2), CPU: NXP S32G274A rev. 2.1.0
+- NXP S32G274A-EVB: Board: S32GRV-PLATEVB (SCH-30081 REV B, 700-30081 REV B)
+                    S32G-PROCEVB-S
+                    CPU: NXP S32G274A rev. 2.1.0
+
+- NXP S32G274A-RDB2: Board: S32G274A-VNP-RDB2 (SCH-47440 REV C1, 700-47440 REV X2)
+                     CPU: NXP S32G274A rev. 2.1.0
+
+- NXP S32G399A-RDB3: Board: S32G399A-VNP-RDB3 (SCH-53060 REV E1, 700-53060 REV X2)
+                     CPU: NXP S32G399A rev. 1.0
 
 ## How to install/boot binary image
 
@@ -64,10 +71,10 @@ Now burn the image onto the micro SD card:
 The <boardtype> is evb, rdb2, rdb3 which depends on your hardware.
 
     For full image
-    $ zcat wrlinux-image-full-nxp-s32g.ustart-<boardtype>.img.gz | sudo dd of=/dev/sdX bs=1M status=progress
+    $ zcat wrlinux-image-full-nxp-s32g*.ustart-<boardtype>.img.gz | sudo dd of=/dev/sdX bs=1M status=progress
 
     Or minimal image
-    $ zcat wrlinux-image-minimal-nxp-s32g.ustart-<boardtype>.img.gz | sudo dd of=/dev/sdX bs=1M status=progress
+    $ zcat wrlinux-image-minimal-nxp-s32g*.ustart-<boardtype>.img.gz | sudo dd of=/dev/sdX bs=1M status=progress
 
     $ sync
     $ eject /dev/sdX
