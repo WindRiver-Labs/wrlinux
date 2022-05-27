@@ -68,14 +68,22 @@ Now burn the image onto the micro SD card:
     Or minimal image
     $ zcat wrlinux-image-minimal-nxp-imx8.ustart.img.gz | sudo dd of=/dev/sdX bs=1M status=progress conv=fsync
 
-    NOTE: The following imx-boot-imx8qmmek-sd-5-4.bin-flash is from NXP, it
-    isn't integrated into WRLinux because of the license issue. You can ask
-    NXP for it.
+    NOTE: The following imx-boot-imx8qmmek-sd-5-4.bin-flash and
+    5.10.72-2.2.0_imx-boot-imx8mqevk-sd.bin-flash_evk is from NXP, it isn't
+    integrated into WRLinux because of the license issue. You can ask NXP for it.
     BUT YOU MUST CHECK WITH NXP ON WHETHER YOU CAN USE IT OR NOT.
 
     $ sudo umount /dev/sdX*
-    $ sudo dd if=imx-boot-imx8qmmek-sd-5-4.bin-flash of=/dev/sdX bs=1k seek=32 conv=fsync
+
+    - For MCIMX8QM-MEK board:
+      $ sudo dd if=imx-boot-imx8qmmek-sd-5-4.bin-flash of=/dev/sdX bs=1k seek=32 conv=fsync
+
+    - For MCIMX8M-EVK board:
+      $ sudo dd if=5.10.72-2.2.0_imx-boot-imx8mqevk-sd.bin-flash_evk of=/dev/sdX bs=1k seek=33 conv=fsync
+
     $ sudo eject /dev/sdX
+
+    Note, the seek number is different (32 and 33)
 
 This should give you a bootable micro SD card device. Insert the
 SD card into SD slot, and then power on.
