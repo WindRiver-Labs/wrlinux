@@ -61,7 +61,7 @@ SRCREV_machine_kb-v5.10-standard-preempt-rt-sdkv5.10-axxia ?= "e67a03474f1530ed5
 LINUX_VERSION_kb-v5.10-standard-preempt-rt-sdkv5.10-axxia = "5.10.119"
 SRCREV_machine_kb-v5.10-standard-preempt-rt-sdkv5.10-xlnx-soc ?= "b0da0b5fd1a2f2d2a7ac4f14d684cf3980a763cf"
 LINUX_VERSION_kb-v5.10-standard-preempt-rt-sdkv5.10-xlnx-soc = "5.10.119"
-SRCREV_machine_kb-v5.10-standard-preempt-rt-ti-sdk-5.10-ti-j72xx ?= "d851163f065aff8b8b87754c9dd84daee98a6bb4"
+SRCREV_machine_kb-v5.10-standard-preempt-rt-ti-sdk-5.10-ti-j72xx ?= "0f6b7699ba84acf839161959acaabc8393a9ea52"
 LINUX_VERSION_kb-v5.10-standard-preempt-rt-ti-sdk-5.10-ti-j72xx = "5.10.119"
 SRCREV_machine_kb-v5.10-standard-preempt-rt-x86 ?= "976fded256582ae1dcabd9d863a824e6524f28f0"
 LINUX_VERSION_kb-v5.10-standard-preempt-rt-x86 = "5.10.119"
@@ -77,7 +77,7 @@ SRCREV_machine_kb-v5.10-standard-sdkv5.4-xlnx-soc ?= "c16bf6659dec085a5e7afd6d18
 LINUX_VERSION_kb-v5.10-standard-sdkv5.4-xlnx-soc = "5.10.119"
 SRCREV_machine_kb-v5.10-standard-ti-am335x ?= "6706d4d8c5e5b7937bd452f5dc031b097123e2f4"
 LINUX_VERSION_kb-v5.10-standard-ti-am335x = "5.10.119"
-SRCREV_machine_kb-v5.10-standard-ti-sdk-5.10-ti-j72xx ?= "c47cfea343c4a0518ab0542b79d4b677123bf41a"
+SRCREV_machine_kb-v5.10-standard-ti-sdk-5.10-ti-j72xx ?= "f88947aa2d19ad1faedab9bcc6e24c5cb44f2534"
 LINUX_VERSION_kb-v5.10-standard-ti-sdk-5.10-ti-j72xx = "5.10.119"
 SRCREV_machine_kb-v5.10-standard-tiny-arm-versatile-926ejs ?= "7af86bd5a858e21bd96d9d421c6346d96280fef4"
 LINUX_VERSION_kb-v5.10-standard-tiny-arm-versatile-926ejs = "5.10.119"
@@ -94,4 +94,4 @@ LINUX_VERSION_kb-v5.10-standard-xilinx-zynqmp = "5.10.119"
 
 # yocto-kernel-cache entries
 KERNEL_CACHE_BRANCH_5.10 = "yocto-5.10"
-SRCREV_meta_5.10 = "4e0c273886602078d6c346c564973fea185fd62c"
+SRCREV_meta_5.10 = "6337d56f23d18e5680493dadcb52899d5e6a7c09"
