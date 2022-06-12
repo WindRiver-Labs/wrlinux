@@ -159,6 +159,7 @@ SRC_URI += "file://wr-policy-fix-dev-log-label.patch \
             file://wr-policy-samba-enable-samba_export_all_rw-and-samba_export_al.patch \
             file://wr-policy-rpm-fix-avc-denials-for-rpm_t.patch \
             file://wr-policy-postfix-fix-avc-denials-for-postfix_local_t.patch \
+            file://wr-policy-revert-remove-unused-translate-permission-in-context.patch \
             file://wr-policy-targeted-make-unconfined_u-the-default-selinux-user.patch \
             file://wr-policy-sysadm-fix-avc-denials-for-systemd-gpt-auto-generato.patch \
             file://wr-policy-sysnetwork-fix-avc-denials-for-dhclient.patch \
@@ -175,4 +176,7 @@ SRC_URI += "file://wr-policy-fix-dev-log-label.patch \
             file://wr-policy-Allow-sshd_t-and-staff_t-read-symlinks.patch \
             file://wr-policy-lable-system-export-as-ostree_exec_t.patch \
             file://wr-policy-usermanage.fc-fix-avc-denials-when-use-useradd.patch \
+            file://domain-unconfined-access-to-bpf.patch \
+            file://systemd-Add-initial-policy-for-systemd-user.patch \
+            file://unconfined-fixes-for-bluetooth-dbus-chat-and-systemd.patch \
            "

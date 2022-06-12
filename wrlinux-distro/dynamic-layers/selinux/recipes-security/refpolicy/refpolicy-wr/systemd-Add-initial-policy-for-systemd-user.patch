@@ -1,0 +1,625 @@
+From da156aea1e89a6ff6025be7e50c9c8173e5a6dcf Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Fri, 19 Apr 2019 11:50:59 -0400
+Subject: [PATCH] systemd: Add initial policy for systemd --user.
+
+This is just a start; it does not cover all uses.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+
+Reference to upstream patch:
+https://github.com/SELinuxProject/refpolicy/commit/da156aea1e89a6ff6025be7e50c9c8173e5a6dcf
+
+Signed-off-by: Li Wang <li.wang@windriver.com>
+---
+ config/appconfig-mcs/default_contexts         |   1 +
+ config/appconfig-mcs/root_default_contexts    |   1 +
+ config/appconfig-mcs/staff_u_default_contexts |   1 +
+ .../unconfined_u_default_contexts             |   1 +
+ config/appconfig-mcs/user_u_default_contexts  |   1 +
+ config/appconfig-mls/default_contexts         |   1 +
+ config/appconfig-mls/root_default_contexts    |   1 +
+ config/appconfig-mls/staff_u_default_contexts |   1 +
+ .../unconfined_u_default_contexts             |   1 +
+ config/appconfig-mls/user_u_default_contexts  |   1 +
+ config/appconfig-standard/default_contexts    |   1 +
+ .../appconfig-standard/root_default_contexts  |   1 +
+ .../staff_u_default_contexts                  |   1 +
+ .../unconfined_u_default_contexts             |   1 +
+ .../user_u_default_contexts                   |   1 +
+ policy/modules/system/init.if                 |  58 +++++++++
+ policy/modules/system/init.te                 |  18 ++-
+ policy/modules/system/mount.if                |  18 +++
+ policy/modules/system/systemd.if              | 111 ++++++++++++++++++
+ policy/modules/system/systemd.te              |  48 ++++++++
+ policy/modules/system/unconfined.if           |  36 ++++++
+ policy/modules/system/unconfined.te           |   2 +
+ policy/modules/system/userdomain.if           |   4 +
+ 23 files changed, 309 insertions(+), 1 deletion(-)
+
+diff --git a/config/appconfig-mcs/default_contexts b/config/appconfig-mcs/default_contexts
+index 698d54ce8..de0baa80c 100644
+--- a/config/appconfig-mcs/default_contexts
++++ b/config/appconfig-mcs/default_contexts
+@@ -1,4 +1,5 @@
+ system_r:crond_t:s0		user_r:user_t:s0 staff_r:staff_t:s0 sysadm_r:sysadm_t:s0 unconfined_r:unconfined_t:s0 user_r:cronjob_t:s0 staff_r:cronjob_t:s0 sysadm_r:cronjob_t:s0 system_r:system_cronjob_t:s0 unconfined_r:unconfined_cronjob_t:s0
++system_r:init_t:s0		user_r:user_systemd_t:s0 staff_r:staff_systemd_t:s0 sysadm_r:sysadm_systemd_t:s0 unconfined_r:unconfined_t:s0
+ system_r:local_login_t:s0	user_r:user_t:s0 staff_r:staff_t:s0 sysadm_r:sysadm_t:s0 unconfined_r:unconfined_t:s0
+ system_r:remote_login_t:s0	user_r:user_t:s0 staff_r:staff_t:s0 unconfined_r:unconfined_t:s0
+ system_r:sshd_t:s0		user_r:user_t:s0 staff_r:staff_t:s0 sysadm_r:sysadm_t:s0 unconfined_r:unconfined_t:s0
+diff --git a/config/appconfig-mcs/root_default_contexts b/config/appconfig-mcs/root_default_contexts
+index 7805778a2..498b429f5 100644
+--- a/config/appconfig-mcs/root_default_contexts
++++ b/config/appconfig-mcs/root_default_contexts
+@@ -1,4 +1,5 @@
+ system_r:crond_t:s0		unconfined_r:unconfined_t:s0 sysadm_r:cronjob_t:s0 staff_r:cronjob_t:s0 user_r:cronjob_t:s0
++system_r:init_t:s0		unconfined_r:unconfined_t:s0 sysadm_r:sysadm_systemd_t:s0 staff_r:staff_systemd_t:s0 user_r:user_systemd_t:s0
+ system_r:local_login_t:s0	unconfined_r:unconfined_t:s0 sysadm_r:sysadm_t:s0 staff_r:staff_t:s0 user_r:user_t:s0
+ 
+ staff_r:staff_su_t:s0		unconfined_r:unconfined_t:s0 sysadm_r:sysadm_t:s0 staff_r:staff_t:s0 user_r:user_t:s0
+diff --git a/config/appconfig-mcs/staff_u_default_contexts b/config/appconfig-mcs/staff_u_default_contexts
+index daefcf77d..8f506fa57 100644
+--- a/config/appconfig-mcs/staff_u_default_contexts
++++ b/config/appconfig-mcs/staff_u_default_contexts
+@@ -1,3 +1,4 @@
++system_r:init_t:s0		staff_r:staff_systemd_t:s0 sysadm_r:sysadm_systemd_t:s0
+ system_r:local_login_t:s0	staff_r:staff_t:s0 sysadm_r:sysadm_t:s0
+ system_r:remote_login_t:s0	staff_r:staff_t:s0
+ system_r:sshd_t:s0		staff_r:staff_t:s0 sysadm_r:sysadm_t:s0
+diff --git a/config/appconfig-mcs/unconfined_u_default_contexts b/config/appconfig-mcs/unconfined_u_default_contexts
+index 106e093d8..96c5e13aa 100644
+--- a/config/appconfig-mcs/unconfined_u_default_contexts
++++ b/config/appconfig-mcs/unconfined_u_default_contexts
+@@ -1,4 +1,5 @@
+ system_r:crond_t:s0		unconfined_r:unconfined_t:s0 unconfined_r:unconfined_cronjob_t:s0
++system_r:init_t:s0		unconfined_r:unconfined_t:s0
+ system_r:initrc_t:s0		unconfined_r:unconfined_t:s0
+ system_r:local_login_t:s0	unconfined_r:unconfined_t:s0
+ system_r:remote_login_t:s0	unconfined_r:unconfined_t:s0
+diff --git a/config/appconfig-mcs/user_u_default_contexts b/config/appconfig-mcs/user_u_default_contexts
+index 56d6071c2..24af20b93 100644
+--- a/config/appconfig-mcs/user_u_default_contexts
++++ b/config/appconfig-mcs/user_u_default_contexts
+@@ -1,3 +1,4 @@
++system_r:init_t:s0		user_r:user_systemd_t:s0
+ system_r:local_login_t:s0	user_r:user_t:s0
+ system_r:remote_login_t:s0	user_r:user_t:s0
+ system_r:sshd_t:s0		user_r:user_t:s0
+diff --git a/config/appconfig-mls/default_contexts b/config/appconfig-mls/default_contexts
+index 698d54ce8..de0baa80c 100644
+--- a/config/appconfig-mls/default_contexts
++++ b/config/appconfig-mls/default_contexts
+@@ -1,4 +1,5 @@
+ system_r:crond_t:s0		user_r:user_t:s0 staff_r:staff_t:s0 sysadm_r:sysadm_t:s0 unconfined_r:unconfined_t:s0 user_r:cronjob_t:s0 staff_r:cronjob_t:s0 sysadm_r:cronjob_t:s0 system_r:system_cronjob_t:s0 unconfined_r:unconfined_cronjob_t:s0
++system_r:init_t:s0		user_r:user_systemd_t:s0 staff_r:staff_systemd_t:s0 sysadm_r:sysadm_systemd_t:s0 unconfined_r:unconfined_t:s0
+ system_r:local_login_t:s0	user_r:user_t:s0 staff_r:staff_t:s0 sysadm_r:sysadm_t:s0 unconfined_r:unconfined_t:s0
+ system_r:remote_login_t:s0	user_r:user_t:s0 staff_r:staff_t:s0 unconfined_r:unconfined_t:s0
+ system_r:sshd_t:s0		user_r:user_t:s0 staff_r:staff_t:s0 sysadm_r:sysadm_t:s0 unconfined_r:unconfined_t:s0
+diff --git a/config/appconfig-mls/root_default_contexts b/config/appconfig-mls/root_default_contexts
+index 7805778a2..498b429f5 100644
+--- a/config/appconfig-mls/root_default_contexts
++++ b/config/appconfig-mls/root_default_contexts
+@@ -1,4 +1,5 @@
+ system_r:crond_t:s0		unconfined_r:unconfined_t:s0 sysadm_r:cronjob_t:s0 staff_r:cronjob_t:s0 user_r:cronjob_t:s0
++system_r:init_t:s0		unconfined_r:unconfined_t:s0 sysadm_r:sysadm_systemd_t:s0 staff_r:staff_systemd_t:s0 user_r:user_systemd_t:s0
+ system_r:local_login_t:s0	unconfined_r:unconfined_t:s0 sysadm_r:sysadm_t:s0 staff_r:staff_t:s0 user_r:user_t:s0
+ 
+ staff_r:staff_su_t:s0		unconfined_r:unconfined_t:s0 sysadm_r:sysadm_t:s0 staff_r:staff_t:s0 user_r:user_t:s0
+diff --git a/config/appconfig-mls/staff_u_default_contexts b/config/appconfig-mls/staff_u_default_contexts
+index daefcf77d..8f506fa57 100644
+--- a/config/appconfig-mls/staff_u_default_contexts
++++ b/config/appconfig-mls/staff_u_default_contexts
+@@ -1,3 +1,4 @@
++system_r:init_t:s0		staff_r:staff_systemd_t:s0 sysadm_r:sysadm_systemd_t:s0
+ system_r:local_login_t:s0	staff_r:staff_t:s0 sysadm_r:sysadm_t:s0
+ system_r:remote_login_t:s0	staff_r:staff_t:s0
+ system_r:sshd_t:s0		staff_r:staff_t:s0 sysadm_r:sysadm_t:s0
+diff --git a/config/appconfig-mls/unconfined_u_default_contexts b/config/appconfig-mls/unconfined_u_default_contexts
+index 106e093d8..96c5e13aa 100644
+--- a/config/appconfig-mls/unconfined_u_default_contexts
++++ b/config/appconfig-mls/unconfined_u_default_contexts
+@@ -1,4 +1,5 @@
+ system_r:crond_t:s0		unconfined_r:unconfined_t:s0 unconfined_r:unconfined_cronjob_t:s0
++system_r:init_t:s0		unconfined_r:unconfined_t:s0
+ system_r:initrc_t:s0		unconfined_r:unconfined_t:s0
+ system_r:local_login_t:s0	unconfined_r:unconfined_t:s0
+ system_r:remote_login_t:s0	unconfined_r:unconfined_t:s0
+diff --git a/config/appconfig-mls/user_u_default_contexts b/config/appconfig-mls/user_u_default_contexts
+index 56d6071c2..24af20b93 100644
+--- a/config/appconfig-mls/user_u_default_contexts
++++ b/config/appconfig-mls/user_u_default_contexts
+@@ -1,3 +1,4 @@
++system_r:init_t:s0		user_r:user_systemd_t:s0
+ system_r:local_login_t:s0	user_r:user_t:s0
+ system_r:remote_login_t:s0	user_r:user_t:s0
+ system_r:sshd_t:s0		user_r:user_t:s0
+diff --git a/config/appconfig-standard/default_contexts b/config/appconfig-standard/default_contexts
+index 25ee341c1..2013606c4 100644
+--- a/config/appconfig-standard/default_contexts
++++ b/config/appconfig-standard/default_contexts
+@@ -1,4 +1,5 @@
+ system_r:crond_t	user_r:user_t staff_r:staff_t sysadm_r:sysadm_t unconfined_r:unconfined_t user_r:cronjob_t staff_r:cronjob_t sysadm_r:cronjob_t system_r:system_cronjob_t unconfined_r:unconfined_cronjob_t
++system_r:init_t		user_r:user_systemd_t staff_r:staff_systemd_t sysadm_r:sysadm_systemd_t unconfined_r:unconfined_t
+ system_r:local_login_t	user_r:user_t staff_r:staff_t sysadm_r:sysadm_t unconfined_r:unconfined_t
+ system_r:remote_login_t	user_r:user_t staff_r:staff_t unconfined_r:unconfined_t
+ system_r:sshd_t		user_r:user_t staff_r:staff_t sysadm_r:sysadm_t unconfined_r:unconfined_t
+diff --git a/config/appconfig-standard/root_default_contexts b/config/appconfig-standard/root_default_contexts
+index f5225686c..60080fb2a 100644
+--- a/config/appconfig-standard/root_default_contexts
++++ b/config/appconfig-standard/root_default_contexts
+@@ -1,4 +1,5 @@
+ system_r:crond_t	unconfined_r:unconfined_t sysadm_r:cronjob_t staff_r:cronjob_t user_r:cronjob_t
++system_r:init_t		unconfined_r:unconfined_t sysadm_r:sysadm_systemd_t staff_r:staff_systemd_t user_r:user_systemd_t
+ system_r:local_login_t  unconfined_r:unconfined_t sysadm_r:sysadm_t staff_r:staff_t user_r:user_t
+ 
+ staff_r:staff_su_t	unconfined_r:unconfined_t sysadm_r:sysadm_t staff_r:staff_t user_r:user_t
+diff --git a/config/appconfig-standard/staff_u_default_contexts b/config/appconfig-standard/staff_u_default_contexts
+index 382fe3380..e44544f08 100644
+--- a/config/appconfig-standard/staff_u_default_contexts
++++ b/config/appconfig-standard/staff_u_default_contexts
+@@ -1,3 +1,4 @@
++system_r:init_t			staff_r:staff_systemd_t sysadm_r:sysadm_systemd_t
+ system_r:local_login_t		staff_r:staff_t sysadm_r:sysadm_t
+ system_r:remote_login_t		staff_r:staff_t
+ system_r:sshd_t			staff_r:staff_t sysadm_r:sysadm_t
+diff --git a/config/appconfig-standard/unconfined_u_default_contexts b/config/appconfig-standard/unconfined_u_default_contexts
+index e340b2199..2931e851c 100644
+--- a/config/appconfig-standard/unconfined_u_default_contexts
++++ b/config/appconfig-standard/unconfined_u_default_contexts
+@@ -1,4 +1,5 @@
+ system_r:crond_t		unconfined_r:unconfined_t unconfined_r:unconfined_cronjob_t
++system_r:init_t			unconfined_r:unconfined_t
+ system_r:initrc_t		unconfined_r:unconfined_t
+ system_r:local_login_t		unconfined_r:unconfined_t
+ system_r:remote_login_t		unconfined_r:unconfined_t
+diff --git a/config/appconfig-standard/user_u_default_contexts b/config/appconfig-standard/user_u_default_contexts
+index 63b7eecd1..8b553c4bd 100644
+--- a/config/appconfig-standard/user_u_default_contexts
++++ b/config/appconfig-standard/user_u_default_contexts
+@@ -1,3 +1,4 @@
++system_r:init_t			user_r:user_systemd_t
+ system_r:local_login_t		user_r:user_t
+ system_r:remote_login_t		user_r:user_t
+ system_r:sshd_t			user_r:user_t
+diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
+index d72105518..28a7aef43 100644
+--- a/policy/modules/system/init.if
++++ b/policy/modules/system/init.if
+@@ -643,6 +643,44 @@ interface(`init_daemon_lock_file',`
+ 	allow initrc_t $1:file manage_file_perms;
+ ')
+ 
++########################################
++## <summary>
++##	Execute init (/sbin/init) with a domain transition
++##	to the provided domain.
++## </summary>
++## <desc>
++##	Execute init (/sbin/init) with a domain transition
++##	to the provided domain.  This is used by systemd
++##	to execute the systemd user session.
++## </desc>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++## <param name="domain">
++##	<summary>
++##	New domain.
++##	</summary>
++## </param>
++#
++interface(`init_pgm_spec_user_daemon_domain',`
++	gen_require(`
++		type init_t, init_exec_t;
++	')
++
++	domain_type($1)
++	domain_entry_file($1, init_exec_t)
++
++	spec_domtrans_pattern(init_t, init_exec_t, $1)
++
++	allow init_t $1:process { setsched rlimitinh noatsecure };
++
++	ifdef(`init_systemd',`
++		allow $1 init_t:unix_stream_socket { getattr read write ioctl };
++	')
++')
++
+ ########################################
+ ## <summary>
+ ##	Execute init (/sbin/init) with a domain transition.
+@@ -699,6 +737,26 @@ interface(`init_exec',`
+ 	can_exec($1, init_exec_t)
+ ')
+ 
++########################################
++## <summary>
++##	Allow the init program to be an entrypoint
++##	for the specified domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++## <rolecap/>
++#
++interface(`init_pgm_entrypoint',`
++	gen_require(`
++		type init_exec_t;
++	')
++
++	allow $1 init_exec_t:file entrypoint;
++')
++
+ ########################################
+ ## <summary>
+ ##	Execute the rc application in the caller domain.
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index 1d3ebd062..1c5357d92 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -248,7 +248,8 @@ ifdef(`init_systemd',`
+ 	allow init_t systemprocess:unix_stream_socket create_stream_socket_perms;
+ 	allow init_t systemprocess:unix_dgram_socket create_socket_perms;
+ 
+-	allow init_t self:process { getcap getsched setsched setpgid setfscreate setsockcreate setcap setrlimit };
++	# setexec and setkeycreate for systemd --user
++	allow init_t self:process { getcap getsched setsched setpgid setfscreate setsockcreate setexec setkeycreate setcap setrlimit };
+ 	allow init_t self:capability2 { audit_read block_suspend };
+ 	allow init_t self:netlink_kobject_uevent_socket create_socket_perms;
+ 	allow init_t self:unix_dgram_socket lock;
+@@ -324,6 +325,9 @@ ifdef(`init_systemd',`
+ 	dev_write_watchdog(init_t)
+ 
+ 	domain_read_all_domains_state(init_t)
++	# for starting systemd --user in the right domain:
++	domain_subj_id_change_exemption(init_t)
++	domain_role_change_exemption(init_t)
+ 
+ 	files_read_all_pids(init_t)
+ 	files_list_usr(init_t)
+@@ -402,6 +406,8 @@ ifdef(`init_systemd',`
+ 	selinux_validate_context(init_t)
+ 	selinux_compute_create_context(init_t)
+ 	selinux_compute_access_vector(init_t)
++	# for starting systemd --user in the right domain:
++	selinux_compute_user_contexts(init_t)
+ 
+ 	storage_getattr_removable_dev(init_t)
+ 
+@@ -448,6 +454,9 @@ ifdef(`init_systemd',`
+ 
+ 	optional_policy(`
+ 		systemd_dbus_chat_logind(init_t)
++		systemd_search_all_user_keys(init_t)
++		systemd_create_all_user_keys(init_t)
++		systemd_write_all_user_keys(init_t)
+ 	')
+ 
+ 	optional_policy(`
+@@ -457,6 +466,13 @@ ifdef(`init_systemd',`
+ 	optional_policy(`
+ 		modutils_domtrans(init_t)
+ 	')
++
++	optional_policy(`
++		# for systemd --user:
++		unconfined_search_keys(init_t)
++		unconfined_create_keys(init_t)
++		unconfined_write_keys(init_t)
++	')
+ ',`
+ 	optional_policy(`
+ 		tunable_policy(`init_upstart',`
+diff --git a/policy/modules/system/mount.if b/policy/modules/system/mount.if
+index bf9a8bf31..ea1b2305a 100644
+--- a/policy/modules/system/mount.if
++++ b/policy/modules/system/mount.if
+@@ -184,6 +184,24 @@ interface(`mount_rw_loopback_files',`
+ 	allow $1 mount_loopback_t:file rw_file_perms;
+ ')
+ 
++########################################
++## <summary>
++##	List mount runtime files.
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`mount_list_runtime',`
++	gen_require(`
++		type mount_runtime_t;
++	')
++
++	allow $1 mount_runtime_t:dir list_dir_perms;
++')
++
+ ########################################
+ ## <summary>
+ ##     Getattr on mount_var_run_t files
+diff --git a/policy/modules/system/systemd.if b/policy/modules/system/systemd.if
+index 48ebc8362..0f2df1a83 100644
+--- a/policy/modules/system/systemd.if
++++ b/policy/modules/system/systemd.if
+@@ -1,5 +1,62 @@
+ ## <summary>Systemd components (not PID 1)</summary>
+ 
++#########################################
++## <summary>
++##	Template for systemd --user per-role domains.
++## </summary>
++## <param name="prefix">
++##	<summary>
++##	Prefix for generated types
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	The user role.
++##	</summary>
++## </param>
++## <param name="userdomain">
++##	<summary>
++##	The user domain for the role.
++##	</summary>
++## </param>
++#
++template(`systemd_role_template',`
++	gen_require(`
++		attribute systemd_user_session_type, systemd_log_parse_env_type;
++		type systemd_user_runtime_t, systemd_user_runtime_notify_t;
++	')
++
++	#################################
++	#
++	# Declarations
++	#
++	type $1_systemd_t, systemd_user_session_type, systemd_log_parse_env_type;
++	init_pgm_spec_user_daemon_domain($1_systemd_t)
++	domain_user_exemption_target($1_systemd_t)
++	ubac_constrained($1_systemd_t)
++	role $2 types $1_systemd_t;
++
++	#################################
++	#
++	# Local policy
++	#
++
++	allow $3 systemd_user_runtime_t:dir { manage_dir_perms relabel_dir_perms };
++	allow $3 systemd_user_runtime_t:file { manage_file_perms relabel_file_perms };
++	allow $3 systemd_user_runtime_t:lnk_file { manage_lnk_file_perms relabel_lnk_file_perms };
++	allow $3 systemd_user_runtime_t:fifo_file { manage_fifo_file_perms relabel_fifo_file_perms };
++	allow $3 systemd_user_runtime_t:sock_file { manage_sock_file_perms relabel_sock_file_perms };
++
++	allow $3 systemd_user_runtime_notify_t:sock_file { manage_sock_file_perms relabel_sock_file_perms };
++
++	# This domain is per-role because of the below transitions.
++	# See the sytemd --user section of systemd.te for the
++	# remainder of the rules.
++	allow $1_systemd_t $3:process { setsched rlimitinh };
++	corecmd_shell_domtrans($1_systemd_t, $3)
++	corecmd_bin_domtrans($1_systemd_t, $3)
++')
++
+ ######################################
+ ## <summary>
+ ##   Make the specified type usable as an
+@@ -983,3 +1040,57 @@ interface(`systemd_getattr_unit_dirs',`
+ 
+ 	allow $1 systemd_unit_t:dir getattr;
+ ')
++
++########################################
++## <summary>
++##	Search keys for the all systemd --user domains.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_search_all_user_keys',`
++	gen_require(`
++		attribute systemd_user_session_type;
++	')
++
++	allow $1 systemd_user_session_type:key search;
++')
++
++########################################
++## <summary>
++##	Create keys for the all systemd --user domains.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_create_all_user_keys',`
++	gen_require(`
++		attribute systemd_user_session_type;
++	')
++
++	allow $1 systemd_user_session_type:key create;
++')
++
++########################################
++## <summary>
++##	Write keys for the all systemd --user domains.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_write_all_user_keys',`
++	gen_require(`
++		attribute systemd_user_session_type;
++	')
++
++	allow $1 systemd_user_session_type:key write;
++')
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 75ac06297..8e71f4a7f 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -22,6 +22,7 @@ gen_tunable(systemd_nspawn_labeled_namespace, false)
+ 
+ attribute systemd_log_parse_env_type;
+ attribute systemd_tmpfiles_conf_type;
++attribute systemd_user_session_type;
+ 
+ type systemd_activate_t;
+ type systemd_activate_exec_t;
+@@ -202,6 +203,12 @@ init_system_domain(systemd_update_done_t, systemd_update_done_exec_t)
+ type systemd_update_run_t;
+ files_type(systemd_update_run_t)
+ 
++type systemd_user_runtime_notify_t;
++userdom_user_runtime_content(systemd_user_runtime_notify_t)
++
++type systemd_user_runtime_t;
++userdom_user_runtime_content(systemd_user_runtime_t)
++
+ #
+ # Unit file types
+ #
+@@ -1272,3 +1279,44 @@ systemd_service_allow_kernel_files_domain_to_tmp_t(systemd_tmpfiles_t)
+ systemd_log_parse_environment(systemd_update_done_t)
+ 
+ kernel_read_kernel_sysctls(systemd_update_done_t)
++
++#########################################
++#
++# User session (systemd --user) local policy
++#
++
++allow systemd_user_session_type self:capability { dac_read_search sys_resource };
++dontaudit systemd_user_session_type self:capability dac_override;
++allow systemd_user_session_type self:process setfscreate;
++allow systemd_user_session_type self:udp_socket create_socket_perms;
++allow systemd_user_session_type self:unix_stream_socket create_stream_socket_perms;
++allow systemd_user_session_type self:netlink_kobject_uevent_socket { bind create getattr setopt };
++
++allow systemd_user_session_type systemd_user_runtime_t:dir manage_dir_perms;
++allow systemd_user_session_type systemd_user_runtime_t:sock_file { create write };
++userdom_user_runtime_filetrans(systemd_user_session_type, systemd_user_runtime_t, dir)
++
++allow systemd_user_session_type systemd_user_runtime_notify_t:sock_file create;
++type_transition systemd_user_session_type systemd_user_runtime_t:sock_file systemd_user_runtime_notify_t "notify";
++
++dev_write_sysfs_dirs(systemd_user_session_type)
++dev_read_sysfs(systemd_user_session_type)
++
++files_read_etc_files(systemd_user_session_type)
++files_list_usr(systemd_user_session_type)
++
++fs_getattr_cgroup(systemd_user_session_type)
++fs_rw_cgroup_files(systemd_user_session_type)
++fs_manage_cgroup_dirs(systemd_user_session_type)
++
++init_signal(systemd_user_session_type)
++
++kernel_read_kernel_sysctls(systemd_user_session_type)
++
++mount_list_runtime(systemd_user_session_type)
++
++storage_getattr_fixed_disk_dev(systemd_user_session_type)
++
++# for systemd to read udev status
++udev_read_pid_files(systemd_user_session_type)
++udev_list_pids(systemd_user_session_type)
+diff --git a/policy/modules/system/unconfined.if b/policy/modules/system/unconfined.if
+index c61b9d292..8b40b0f87 100644
+--- a/policy/modules/system/unconfined.if
++++ b/policy/modules/system/unconfined.if
+@@ -488,6 +488,24 @@ interface(`unconfined_dontaudit_rw_tcp_sockets',`
+ 	dontaudit $1 unconfined_t:tcp_socket { read write };
+ ')
+ 
++########################################
++## <summary>
++##	Search keys for the unconfined domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`unconfined_search_keys',`
++	gen_require(`
++		type unconfined_t;
++	')
++
++	allow $1 unconfined_t:key search;
++')
++
+ ########################################
+ ## <summary>
+ ##	Create keys for the unconfined domain.
+@@ -506,6 +524,24 @@ interface(`unconfined_create_keys',`
+ 	allow $1 unconfined_t:key create;
+ ')
+ 
++########################################
++## <summary>
++##	Write keys for the unconfined domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`unconfined_write_keys',`
++	gen_require(`
++		type unconfined_t;
++	')
++
++	allow $1 unconfined_t:key write;
++')
++
+ ########################################
+ ## <summary>
+ ##	Send messages to the unconfined domain over dbus.
+diff --git a/policy/modules/system/unconfined.te b/policy/modules/system/unconfined.te
+index 3c2703750..d19ca0374 100644
+--- a/policy/modules/system/unconfined.te
++++ b/policy/modules/system/unconfined.te
+@@ -66,6 +66,8 @@ ifdef(`direct_sysadm_daemon',`
+ ifdef(`init_systemd',`
+ 	# for systemd-analyze
+ 	init_service_status(unconfined_t)
++	# for systemd --user:
++	init_pgm_entrypoint(unconfined_t)
+ 
+ 	optional_policy(`
+ 		systemd_dbus_chat_resolved(unconfined_t)
+diff --git a/policy/modules/system/userdomain.if b/policy/modules/system/userdomain.if
+index dc6a754db..52fca1eeb 100644
+--- a/policy/modules/system/userdomain.if
++++ b/policy/modules/system/userdomain.if
+@@ -882,6 +882,10 @@ template(`userdom_common_user_template',`
+ 		slrnpull_search_spool($1_t)
+ 	')
+ 
++	optional_policy(`
++		systemd_role_template($1, $1_r, $1_t)
++	')
++
+ 	optional_policy(`
+ 		usernetctl_run($1_t, $1_r)
+ 	')
+-- 
+2.23.0
+

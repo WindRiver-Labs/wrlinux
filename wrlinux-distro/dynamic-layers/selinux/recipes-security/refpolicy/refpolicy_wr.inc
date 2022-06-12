@@ -175,4 +175,7 @@ SRC_URI += "file://wr-policy-fix-dev-log-label.patch \
             file://wr-policy-Allow-sshd_t-and-staff_t-read-symlinks.patch \
             file://wr-policy-lable-system-export-as-ostree_exec_t.patch \
             file://wr-policy-usermanage.fc-fix-avc-denials-when-use-useradd.patch \
+            file://domain-unconfined-access-to-bpf.patch \
+            file://systemd-Add-initial-policy-for-systemd-user.patch \
+            file://unconfined-fixes-for-bluetooth-dbus-chat-and-systemd.patch \
            "
